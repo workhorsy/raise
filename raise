@@ -504,7 +504,7 @@ def load_rscript(g=globals(), l=locals()):
 	with open('rscript', 'rb') as f:
 		code = None
 		try:
-			code = compile(f.read() + "\n", 'rscript', 'exec')
+			code = compile(f.read(), 'rscript', 'exec')
 		except Exception as e:
 			print_exit(e)
 
