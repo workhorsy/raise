@@ -549,7 +549,7 @@ def update():
 	print_status("Downloading newest Raise version".format(target_name))
 	try:
 		import urllib2
-		response = urllib2.urlopen('http://launchpad.net/raise/trunk/0.0/+download/raise')
+		response = urllib2.urlopen('http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/raise')
 		html = response.read()
 
 		with open('raise.new', 'wb') as f:
