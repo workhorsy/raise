@@ -33,7 +33,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 '''
 
-import os, sys
+import os, sys, stat
 import shutil
 import atexit
 from subprocess import *
@@ -174,6 +174,16 @@ def cd(name):
 	except:
 		print_fail()
 		print_exit("Failed to change to another directory.".format(name))
+
+def mvfile(source, dest):
+	print_status("Moving the file '{0}' to '{1}'".format(source, dest))
+	os.rename(source, dest)
+	try:
+		
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to move the file' {0}'.".format(source))
 
 def cpfile(source, dest):
 	print_status("Copying the file '{0}' to '{1}'".format(source, dest))
@@ -535,6 +545,28 @@ def load_rscript(g=globals(), l=locals()):
 
 		exec(code, g, l)
 
+def update():
+	print_status("Downloading newest Raise version".format(target_name))
+	try:
+		import urllib2
+		response = urllib2.urlopen('http://launchpad.net/raise/trunk/0.0/+download/raise')
+		html = response.read()
+
+		with open('raise.new', 'wb') as f:
+			f.write(html)
+
+		print_ok()
+	except Exception as e:
+		print_fail()
+		print_exit(str(e))
+		exit()
+
+	mvfile('raise', 'raise.old')
+	mvfile('raise.new', 'raise')
+	os.chmod('raise', stat.S_IRWXU| stat.S_IRWXG| stat.S_IROTH | stat.S_IXOTH)
+	rmfile('raise.old')
+	exit()
+
 if __name__ == '__main__':
 
 	load_rscript()
@@ -543,6 +575,9 @@ if __name__ == '__main__':
 	# Try running a function with the same name as the target
 	if target_name == '':
 		print_exit("No target specified.")
+	elif target_name == 'update':
+		update()
+
 	try:
 		target = eval(target_name)
 		print_info("Running target '{0}'".format(target_name))
