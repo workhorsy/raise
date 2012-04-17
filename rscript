@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+
+RAISE_VERSION = '0.1'
+
+
+def clean():
+	pass
+
+def configure():
+	require_programs([
+	'ldconfig', 'locate', 'grep', 'stty', 'whoami',
+	'python'])
+
+	os.environ["RAISE_VERSION"] = RAISE_VERSION
+	os.environ["RAISE_PATH"] = "/usr/bin/raise"
+
+def remove():
+	require_root()
+	clean()
+	configure()
+
+	rmfile_f(os.environ["RAISE_PATH"])
+
+def install():
+	require_root()
+	clean()
+	remove()
+	configure()
+
+	# Copy the files to the system directory
+	cpfile('raise', os.environ["RAISE_PATH"])
+
+
+

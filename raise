@@ -1,0 +1,535 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+#-------------------------------------------------------------------------------
+#
+#    This file is part of Raise a small Python based build automation tool.
+#    This project is hosted at https://launchpad.net/raise .
+#
+#-------------------------------------------------------------------------------
+
+
+import os, sys
+import shutil
+import atexit
+from subprocess import *
+import platform, re, glob
+
+class bcolors:
+	MESSAGE = '\033[44m'
+	OK = '\033[42m'
+	FAIL = '\033[41m'
+	ENDC = '\033[0m'
+
+def terminal_pad(command):
+	width = int(os.popen('stty size', 'r').read().split()[1])
+	if len(command) > (width-2):
+		i = int(width * (int(len(command) / width) + 1)) - 2
+	else:
+		i = width - 2
+
+	return command.ljust(i)
+
+def print_info(message):
+	sys.stdout.write(bcolors.MESSAGE + message + bcolors.ENDC + "\n")
+
+def print_status(message):
+	sys.stdout.write(terminal_pad('{0} ...'.format(message)))
+	sys.stdout.flush()
+
+def print_ok():
+	print(bcolors.OK + ":)" + bcolors.ENDC)
+
+def print_fail():
+	print(bcolors.FAIL + ":(" + bcolors.ENDC)
+
+def print_exit(message):
+	print(bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC)
+	exit()
+
+# Move the path to the location of the current file
+os.chdir(os.sys.path[0])
+pwd = os.sys.path[0]
+
+# Make sure we are in at least python 2.6
+if sys.version_info < (2, 6):
+	print_exit("Python 2.6 or greater is required.")
+# Figure out if the CPU is 32bit or 64bit
+bits = None
+if platform.architecture()[0] == '64bit':
+	bits = '64'
+else:
+	bits = '32'
+
+# Figure out the CPU architecture
+arch = None
+if re.match('^i\d86', platform.machine()):
+	arch = 'i386'
+elif platform.machine() == 'x86_64':
+	arch = 'x86_64'
+else:
+	print_exit("Unknown architecture: " + platform.machine() + " .")
+
+user_name = os.environ["LOGNAME"]
+if os.getenv("SUDO_USER"):
+	user_name = os.getenv("SUDO_USER")
+
+def require_root():
+	# Make sure we are root
+	if run('whoami') != 'root':
+		print_exit("Must be run as root.")
+
+def call_on_exit(cb):
+	# Set a cleanup function to run on exit
+	if cb:
+		atexit.register(cb)
+
+def require_not_root():
+	# Make sure we are NOT root
+	if run('whoami') == 'root':
+		print_exit("Must not be run as root.")
+
+def run(command):
+	p = Popen(command, stderr=PIPE, stdout=PIPE, shell=True)
+	p.wait()
+	e = p.stderr.read().rstrip()
+	o = p.stdout.read().rstrip()
+	try:
+		e = str(e, 'UTF-8')
+	except:
+		pass
+	try:
+		o = str(o, 'UTF-8')
+	except:
+		pass
+
+	if p.returncode:
+		if len(e) != 0:
+			raise Exception(e)
+		else:
+			raise Exception(o)
+
+	return o
+
+def run_say(command):
+	sys.stdout.write("Running command ...\n")
+	p = Popen(command, stderr=PIPE, stdout=PIPE, shell=True)
+	p.wait()
+	o = p.stdout.read().rstrip()
+	e = p.stderr.read().rstrip()
+	try:
+		e = str(e, 'UTF-8')
+	except:
+		pass
+	try:
+		o = str(o, 'UTF-8')
+	except:
+		pass
+
+	if p.returncode:
+		sys.stdout.write(terminal_pad(command))
+		print_fail()
+		if len(o):
+			print(o)
+		if len(e):
+			print(e)
+		print_exit('Failed to run command.')
+	else:
+		sys.stdout.write(terminal_pad(command))
+		print_ok()
+		if len(o):
+			print(o)
+		if len(e):
+			print(e)
+
+def cd(name):
+	print_status("Changing to dir '{0}'".format(name))
+	try:
+		os.chdir(name)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to change to another directory.".format(name))
+
+def cpfile(source, dest):
+	print_status("Copying the file '{0}' to '{1}'".format(source, dest))
+	try:
+		shutil.copy2(source, dest)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to copy the file '{0}' to '{1}'.".format(source, dest))
+
+def cpdir(source, dest, symlinks = False):
+	print_status("Copying the dir '{0}' to '{1}'".format(source, dest))
+	try:
+		shutil.copytree(source, dest, symlinks = symlinks)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to copy the dir '{0}' to '{1}'.".format(source, dest))
+
+def mkdir_f(source):
+	print_status("Making the dir '{0}'".format(source))
+	try:
+		os.mkdir(source)
+	except:
+		pass
+
+	print_ok()
+
+def mkdir(source):
+	print_status("Making the dir '{0}'".format(source))
+	try:
+		os.mkdir(source)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to make the dir '{0}'.".format(source))
+
+def rmdir(name):
+	print_status("Removing the dir '{0}'".format(name))
+	try:
+		if os.path.islink(name):
+			os.unlink(name)
+		elif os.path.isdir(name):
+			shutil.rmtree(name)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to remove the dir '{0}'.".format(name))
+
+def rmdir_f(name):
+	print_status("Removing the dir '{0}'".format(name))
+	try:
+		if os.path.islink(name):
+			os.unlink(name)
+		elif os.path.isdir(name):
+			shutil.rmtree(name)
+	except:
+		pass
+
+	print_ok()
+
+def rmfile(name):
+	print_status("Removing the file '{0}'".format(name))
+	try:
+		if os.path.islink(name):
+			os.unlink(name)
+		elif os.path.isfile(name):
+			os.remove(name)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed to remove the file '{0}'.".format(name))
+
+def rmfile_f(name):
+	print_status("Removing the file '{0}'".format(name))
+	try:
+		if os.path.islink(name):
+			os.unlink(name)
+		elif os.path.isfile(name):
+			os.remove(name)
+	except:
+		print_ok()
+
+def symlink(source, link_name):
+	print_status("Symlinking '{0}' to '{1}'".format(source, link_name))
+	try:
+		os.symlink(source, link_name)
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed linking '{0}' to '{1}'.".format(source, link_name))
+
+def _get_library_paths():
+	paths = ['/usr/lib']
+	for file_name in os.listdir('/etc/ld.so.conf.d/'):
+		f = open('/etc/ld.so.conf.d/' + file_name, 'r')
+		for path in f.readlines():
+			path = path.strip()
+			if os.path.exists(path) and not path in paths:
+				paths.append(path)
+
+	return paths
+
+def _is_installed_library(lib_name, extension):
+	for path in _get_library_paths():
+		for dirs, subdirs, files in os.walk(path):
+			for f in files:
+				if f == lib_name + extension:
+					return True
+
+	return False
+
+def _library_path(lib_name, extension):
+	lib_name += extension
+	for path in _get_library_paths():
+		for dirs, subdirs, files in os.walk(path):
+			for f in files:
+				file_name = lib_name.split('/')[-1]
+				path_end = lib_name[0:-(len(file_name)+1)]
+				if dirs.endswith(path_end) and f == file_name:
+					return os.path.join(dirs, file_name)
+
+	raise Exception("Library '{0}' not found.".format(lib_name))
+
+def require_static_library(lib_name):
+	print_status("Checking for static library '{0}'".format(lib_name))
+	is_installed = _is_installed_library(lib_name, '.a')
+
+	# Make them install the lib to continue
+	if not is_installed:
+		print_fail()
+		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
+
+	# Make them run updatedb if the library is not found by locate
+	try:
+		run("locate /" + lib_name + ".a")
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
+
+def require_shared_library(lib_name):
+	print_status("Checking for shared library '{0}'".format(lib_name))
+	is_installed = _is_installed_library(lib_name, '.so')
+
+	# Make them install the lib to continue
+	if not is_installed:
+		print_fail()
+		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
+
+	# Make them run ldconfig if the library is not found by ldconfig
+	try:
+		run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
+
+def require_static_or_shared_library(lib_name):
+	print_status("Checking for static/shared library '{0}'".format(lib_name))
+	is_static_installed = _is_installed_library(lib_name, '.a')
+	is_shared_installed = _is_installed_library(lib_name, '.so')
+
+	# Make them install the lib to continue
+	if not is_static_installed and not is_shared_installed:
+		print_fail()
+		print_exit("Static/Shared library '{0}' not installed. Install and try again.".format(lib_name))
+
+	# Make them run updatedb if the library is not found by locate
+	if is_static_installed:
+		try:
+			run("locate /" + lib_name + ".a")
+			print_ok()
+			return
+		except:
+			print_fail()
+			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
+
+	# Make them run ldconfig if the library is not found by ldconfig
+	if is_shared_installed:
+		try:
+			run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
+			print_ok()
+		except:
+			print_fail()
+			print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
+
+
+def require_static_libraries(lib_names):
+	for lib_name in lib_names:
+		require_static_library(lib_name)
+
+def require_shared_libraries(lib_names):
+	for lib_name in lib_names:
+		require_shared_library(lib_name)
+
+def require_static_or_shared_libraries(lib_names):
+	for lib_name in lib_names:
+		require_static_or_shared_library(lib_name)
+
+def require_programs(prog_names):
+	for prog_name in prog_names:
+		print_status("Checking for program '{0}'".format(prog_name))
+
+		try:
+			output = run('which {0}'.format(prog_name))
+			print_ok()
+		except:
+			print_fail()
+			print_exit("Install the program '{0}' and try again.".format(prog_name))
+
+def require_python_modules(mod_names):
+	for mod_name in mod_names:
+		print_status("Checking for python module '{0}'".format(mod_name))
+		try:
+			exec("import {0}".format(mod_name))
+			print_ok()
+		except ImportError as e:
+			print_fail()
+			print_exit("Install the python module '{0}' and try again.".format(mod_name))
+
+def header_path(header_name):
+	retval = None
+	try:
+		# Get any paths that contain the library name
+		paths = run('locate /' + header_name).split('\\n')
+
+		# First match paths that contain the architecture
+		for path in paths:
+			if 'lib' + bits in path or arch in path:
+				retval = path
+
+		# If none were matched specifically from the architecture
+		# Use the first
+		if retval == None:
+			retval = paths[0]
+	except:
+		pass
+
+	if not retval or not os.path.exists(retval):
+		raise Exception("Header file not found: '" + header_name + "'")
+
+	i = retval.rfind('/') + 1
+	return retval[:i]
+
+def header_paths(header_names):
+	paths = []
+	for header_name in header_names:
+		paths.append(header_path(header_name))
+
+	return paths
+
+def include_path(header_name):
+	return '-I' + header_path(header_name)
+
+def include_paths(header_names):
+	paths = []
+	for header_name in header_names:
+		paths.append(include_path(header_name))
+	return str.join(' ', paths)
+
+def shared_library_path(lib_name):
+	return _library_path(lib_name, '.so')
+
+def static_library_path(lib_name):
+	return _library_path(lib_name, '.a')
+
+def static_or_shared_library_path(lib_name):
+	try:
+		return static_library_path(lib_name)
+	except:
+		pass
+
+	try:
+		return shared_library_path(lib_name)
+	except:
+		pass
+
+	raise Exception("Static/Shared library not found: '" + lib_name + "'")
+
+def link_shared_path(lib_name):
+	return '-L' + shared_library_path(lib_name)
+
+def link_static_path(lib_name):
+	return '-L' + static_library_path(lib_name)
+
+def link_static_or_shared_path(lib_name):
+	return '-L' + static_or_shared_library_path(lib_name)
+
+def link_shared_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_shared_path(lib_name))
+	return str.join(' ', paths)
+
+def link_static_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_static_path(lib_name))
+	return str.join(' ', paths)
+
+def link_static_or_shared_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_static_or_shared_path(lib_name))
+	return str.join(' ', paths)
+
+def cc_build_object(o_file, c_files):
+	print_status("Building object file '{0}'".format(o_file))
+	try:
+		run("gcc ${CFLAGS} -c -o " + o_file + " " + str.join(' ', c_files) + " ${GLIB_INC}")
+		print_ok()
+	except Exception as e:
+		print_fail()
+		print(e.message)
+		print_exit("Build failed. Try again.")
+
+def ar_build_static_library(ar_file, o_files):
+	print_status("Building static library '{0}'".format(ar_file))
+	try:
+		run("ar rcs " + ar_file + " " + str.join(' ', o_files))
+		print_ok()
+	except Exception as e:
+		print_fail()
+		print(e.message)
+		print_exit("Archive failed. Try again.")
+
+def dmd_build_object(o_file, d_files, i_files, l_files, h_files):
+	print_status("Building object file '{0}'".format(o_file))
+	try:
+		command = "dmd ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files) + " ${GLIB_INC}"
+		run(command)
+		print_ok()
+	except Exception as e:
+		print_fail()
+		print(e.message)
+		print_exit("Build failed. Try again.")
+
+def dmd_build_program(out_file, inc_files, link_files):
+	print_status("Building program '{0}'".format(out_file))
+	try:
+		run("dmd ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files))
+		print_ok()
+	except Exception as e:
+		print_fail()
+		print(e.message)
+		print_exit("Build failed. Try again.")
+
+def load_rscript(g=globals(), l=locals()):
+	if not os.path.isfile('rscript'):
+		print_exit("No 'rscript' file found.")
+
+	with open('rscript', 'rb') as f:
+		code = None
+		try:
+			code = compile(f.read() + "\n", 'rscript', 'exec')
+		except Exception as e:
+			print_exit(e)
+
+		exec(code, g, l)
+
+if __name__ == '__main__':
+
+	load_rscript()
+	target_name = str(str.join(' ', sys.argv[1:]))
+
+	# Try running a function with the same name as the target
+	if target_name == '':
+		print_exit("No target specified.")
+	try:
+		target = eval(target_name)
+		print_info("Running target '{0}'".format(target_name))
+		target()
+	except NameError as e:
+		if e.message == "name '{0}' is not defined".format(target_name):
+			print_exit("No target named '{0}'.".format(target_name))
+		else:
+			raise
+	except Exception as e:
+		raise
+
+
+
+

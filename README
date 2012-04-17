@@ -1,0 +1,11 @@
+
+Raise is a small Python based build automation tool that ships with your code.
+
+The project is hosted at http://launchpad.net/raise and licensed under
+the GPL version 3 or greater. See the COPYRIGHT file for copyright information.
+
+
+
+// Install requirements
+Python 2.6 or greater
+
