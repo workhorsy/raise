@@ -267,7 +267,9 @@ def rmfile_f(name):
 		elif os.path.isfile(name):
 			os.remove(name)
 	except:
-		print_ok()
+		pass
+
+	print_ok()
 
 def symlink(source, link_name):
 	print_status("Symlinking '{0}' to '{1}'".format(source, link_name))
@@ -293,8 +295,9 @@ def _is_installed_library(lib_name, extension):
 	for path in _get_library_paths():
 		for dirs, subdirs, files in os.walk(path):
 			for f in files:
-				if f == lib_name + extension:
-					return True
+				if f.endswith(extension):
+					if os.path.join(dirs, f).endswith(lib_name + extension):
+						return True
 
 	return False
 
@@ -317,7 +320,7 @@ def require_static_library(lib_name):
 	# Make them install the lib to continue
 	if not is_installed:
 		print_fail()
-		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
+		print_exit("Static library '{0}.a' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
 	try:
@@ -334,7 +337,7 @@ def require_shared_library(lib_name):
 	# Make them install the lib to continue
 	if not is_installed:
 		print_fail()
-		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
+		print_exit("Shared library '{0}.so' not installed. Install and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ldconfig
 	try:
