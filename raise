@@ -34,10 +34,12 @@ either expressed or implied, of the FreeBSD Project.
 '''
 
 import os, sys, stat
+import platform, re, glob
 import shutil
 import atexit
+import urllib2
+from progressbar import *
 from subprocess import *
-import platform, re, glob
 
 class bcolors:
 	MESSAGE = '\033[44m'
@@ -546,14 +548,33 @@ def load_rscript(g=globals(), l=locals()):
 		exec(code, g, l)
 
 def update():
-	print_status("Downloading newest Raise version".format(target_name))
+	print("Downloading newest Raise version ...".format(target_name))
 	try:
-		import urllib2
-		response = urllib2.urlopen('http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise')
-		html = response.read()
+		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise'
+		response = urllib2.urlopen(url)
+		content_length = int(response.headers['content-length'])
 
-		with open('raise.new', 'wb') as f:
-			f.write(html)
+		# Get the file size in a friendly string
+		derp = ''
+		size_map = {
+			'MB' : 1024000.0,
+			'KB' : 1024.0,
+			'B'  : 1
+		}
+		for name, size in size_map.iteritems():
+			if content_length >= size:
+				derp = '{0} {1}'.format(round(content_length / size, 2), name)
+				break
+
+		widgets = ['Downloading ' + derp + ': ', Percentage(), ' ', Bar(marker=RotatingMarker()),
+				   ' ', ETA(), ' ', FileTransferSpeed()]
+		pbar = ProgressBar(widgets=widgets, maxval=content_length).start()
+		f = open('raise.new', 'wb')
+		for i in xrange(content_length):
+			pbar.update(i+1)
+			f.write(response.read(8))
+			#time.sleep(0.001)
+		pbar.finish()
 
 		print_ok()
 	except Exception as e:
