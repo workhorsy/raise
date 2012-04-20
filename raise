@@ -37,9 +37,13 @@ import os, sys, stat
 import platform, re, glob
 import shutil
 import atexit
-import urllib2
-from progressbar import *
 from subprocess import *
+if sys.version_info < (3, 0):
+	import urllib2
+	globals()['urlopen'] = urllib2.urlopen
+else:
+	import urllib.request
+	globals()['urlopen'] = urllib.request.urlopen
 
 class bcolors:
 	MESSAGE = '\033[44m'
@@ -550,35 +554,56 @@ def load_rscript(g=globals(), l=locals()):
 
 		exec(code, g, l)
 
+def friendly_size(data_length):
+	retval = ''
+	size_map = [
+		{'B'  : 1},
+		{'KB' : 1024.0},
+		{'MB' : 1024000.0}
+	]
+	for i in size_map:
+		for name, size in i.items():
+			if data_length >= size:
+				retval = '{0} {1}'.format(round(data_length / size, 2), name)
+				break
+
+	return retval
+
+def download_file(url, cb):
+	chunk_size = 1024
+	response = urlopen(url)
+	content_length = int(response.headers['Content-Length'])
+	data = b''
+	data_length = 0
+
+	while True:
+		chunk = response.read(chunk_size)
+		if not chunk:
+			break
+
+		data += chunk
+		data_length += len(chunk)
+		percent = round((float(data_length) / content_length)*100, 2)
+
+		cb(chunk, data_length, chunk_size, content_length, percent)
+
 def update():
 	print("Downloading newest Raise version ...".format(target_name))
 	try:
 		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise'
-		response = urllib2.urlopen(url)
-		content_length = int(response.headers['content-length'])
-
-		# Get the file size in a friendly string
-		derp = ''
-		size_map = {
-			'MB' : 1024000.0,
-			'KB' : 1024.0,
-			'B'  : 1
-		}
-		for name, size in size_map.iteritems():
-			if content_length >= size:
-				derp = '{0} {1}'.format(round(content_length / size, 2), name)
-				break
-
-		widgets = ['Downloading ' + derp + ': ', Percentage(), ' ', Bar(marker=RotatingMarker()),
-				   ' ', ETA(), ' ', FileTransferSpeed()]
-		pbar = ProgressBar(widgets=widgets, maxval=content_length).start()
 		f = open('raise.new', 'wb')
-		for i in xrange(content_length):
-			pbar.update(i+1)
-			f.write(response.read(8))
-			#time.sleep(0.001)
-		pbar.finish()
 
+		def cb(chunk, data_length, chunk_size, content_length, percent):
+			f.write(chunk)
+
+			sys.stdout.write("Downloaded {0} of {1} ({2}%)\r".format(friendly_size(data_length), friendly_size(content_length), percent))
+
+			if data_length >= content_length:
+				sys.stdout.write('\n')
+
+			sys.stdout.flush()
+
+		download_file(url, cb)
 		print_ok()
 	except Exception as e:
 		print_fail()
@@ -592,7 +617,6 @@ def update():
 	exit()
 
 if __name__ == '__main__':
-
 	load_rscript()
 	target_name = str(str.join(' ', sys.argv[1:]))
 
@@ -607,7 +631,7 @@ if __name__ == '__main__':
 		print_info("Running target '{0}'".format(target_name))
 		target()
 	except NameError as e:
-		if e.message == "name '{0}' is not defined".format(target_name):
+		if str(e) == "name '{0}' is not defined".format(target_name):
 			print_exit("No target named '{0}'.".format(target_name))
 		else:
 			raise
