@@ -515,14 +515,18 @@ def link_static_or_shared_paths(lib_names):
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
 
-def cc_build_object(o_file, c_files, i_files=[]):
-	print_status("Building object file '{0}'".format(o_file))
+def c_build_object(o_file, c_files, i_files=[]):
+	print_status("Building C object file '{0}'".format(o_file))
 	try:
-		run("gcc ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
+		if not 'CC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+
+		run("${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print(e.message)
+		print(e)
 		print_exit("Build failed. Try again.")
 
 def ar_build_static_library(ar_file, o_files):
@@ -532,29 +536,37 @@ def ar_build_static_library(ar_file, o_files):
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print(e.message)
+		print(e)
 		print_exit("Archive failed. Try again.")
 
-def dmd_build_object(o_file, d_files, i_files, l_files, h_files):
-	print_status("Building object file '{0}'".format(o_file))
+def d_build_object(o_file, d_files, i_files, l_files, h_files):
+	print_status("Building D object file '{0}'".format(o_file))
 	try:
-		command = "dmd ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print(e.message)
+		print(e)
 		print_exit("Build failed. Try again.")
 
-def dmd_build_program(out_file, inc_files, link_files=[]):
-	print_status("Building program '{0}'".format(out_file))
+def d_build_program(out_file, inc_files, link_files=[]):
+	print_status("Building D program '{0}'".format(out_file))
 	try:
-		command = "dmd ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 		run(command)
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print(e.message)
+		print(e)
 		print_exit("Build failed. Try again.")
 
 def load_rscript(g=globals(), l=locals()):
