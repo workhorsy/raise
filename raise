@@ -515,10 +515,10 @@ def link_static_or_shared_paths(lib_names):
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
 
-def cc_build_object(o_file, c_files):
+def cc_build_object(o_file, c_files, i_files=[]):
 	print_status("Building object file '{0}'".format(o_file))
 	try:
-		run("gcc ${CFLAGS} -c -o " + o_file + " " + str.join(' ', c_files) + " ${GLIB_INC}")
+		run("gcc ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
 		print_ok()
 	except Exception as e:
 		print_fail()
@@ -538,7 +538,7 @@ def ar_build_static_library(ar_file, o_files):
 def dmd_build_object(o_file, d_files, i_files, l_files, h_files):
 	print_status("Building object file '{0}'".format(o_file))
 	try:
-		command = "dmd ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files) + " ${GLIB_INC}"
+		command = "dmd ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
 		print_ok()
 	except Exception as e:
