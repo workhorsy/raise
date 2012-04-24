@@ -227,7 +227,7 @@ def mkdir(source):
 		print_fail()
 		print_exit("Failed to make the dir '{0}'.".format(source))
 
-def rmdir(name):
+def rmdir_and_children(name):
 	print_status("Removing the dir '{0}'".format(name))
 	try:
 		if os.path.islink(name):
@@ -235,19 +235,28 @@ def rmdir(name):
 		elif os.path.isdir(name):
 			shutil.rmtree(name)
 		print_ok()
-	except:
+	except OSError as e:
+		if 'No such file or directory' in e:
+			print_ok()
+			return
 		print_fail()
 		print_exit("Failed to remove the dir '{0}'.".format(name))
 
-def rmdir_f(name):
+def rmdir(name):
 	print_status("Removing the dir '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isdir(name):
-			shutil.rmtree(name)
-	except:
-		pass
+			os.rmdir(name)
+	except OSError as e:
+		if 'Directory not empty' in e:
+			pass
+		elif 'No such file or directory' in e:
+			pass
+		else:
+			print_fail()
+			print_exit("Failed to remove the dir '{0}'.".format(name))
 
 	print_ok()
 
@@ -257,7 +266,7 @@ def rmfile(name):
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
-			os.remove(name)
+			os.rmdir(name)
 		print_ok()
 	except:
 		print_fail()
@@ -531,10 +540,11 @@ def dmd_build_object(o_file, d_files, i_files, l_files, h_files):
 		print(e.message)
 		print_exit("Build failed. Try again.")
 
-def dmd_build_program(out_file, inc_files, link_files):
+def dmd_build_program(out_file, inc_files, link_files=[]):
 	print_status("Building program '{0}'".format(out_file))
 	try:
-		run("dmd ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files))
+		command = "dmd ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+		run(command)
 		print_ok()
 	except Exception as e:
 		print_fail()
