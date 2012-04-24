@@ -266,7 +266,7 @@ def rmfile(name):
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
-			os.rmdir(name)
+			os.remove(name)
 		print_ok()
 	except:
 		print_fail()
