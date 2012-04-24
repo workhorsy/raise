@@ -433,7 +433,7 @@ def header_path(header_name):
 	retval = None
 	try:
 		# Get any paths that contain the library name
-		paths = run('locate /' + header_name).split('\\n')
+		paths = run('locate /' + header_name).split('\n')
 
 		# First match paths that contain the architecture
 		for path in paths:
