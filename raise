@@ -636,11 +636,15 @@ def update():
 	exit()
 
 if __name__ == '__main__':
+	global pwd
 	global python
 	global bits
 	global arch
 	global user_name
 	global target_name
+
+	# Get the path of the rscript file
+	pwd = os.sys.path[0]
 
 	# Make sure we are in at least python 2.6
 	if sys.version_info < (2, 6):

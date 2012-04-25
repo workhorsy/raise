@@ -3,6 +3,7 @@
 
 
 RAISE_VERSION = '0.1'
+RAISE_PATH = '/usr/bin/raise'
 
 
 def clean():
@@ -14,14 +15,13 @@ def configure():
 	'python'])
 
 	os.environ["RAISE_VERSION"] = RAISE_VERSION
-	os.environ["RAISE_PATH"] = "/usr/bin/raise"
+	os.environ["RAISE_PATH"] = RAISE_PATH
 
 def remove():
 	require_root()
 	clean()
-	configure()
 
-	rmfile_f(os.environ["RAISE_PATH"])
+	rmfile_f(RAISE_PATH)
 
 def install():
 	require_root()
@@ -30,7 +30,7 @@ def install():
 	configure()
 
 	# Copy the files to the system directory
-	cpfile('raise', os.environ["RAISE_PATH"])
+	cpfile('raise', RAISE_PATH)
 
 
 
