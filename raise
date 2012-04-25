@@ -414,7 +414,7 @@ def require_python_modules(mod_names):
 	for mod_name in mod_names:
 		print_status("Checking for python module '{0}'".format(mod_name))
 		try:
-			run('python -c "import {0}"'.format(mod_name))
+			run('{0} -c "import {1}"'.format(python, mod_name))
 			print_ok()
 		except:
 			print_fail()
@@ -637,6 +637,7 @@ def update():
 
 if __name__ == '__main__':
 	global pwd
+	global python
 	global bits
 	global arch
 	global user_name
@@ -649,6 +650,18 @@ if __name__ == '__main__':
 	# Make sure we are in at least python 2.6
 	if sys.version_info < (2, 6):
 		print_exit("Python 2.6 or greater is required.")
+
+	# Get the name of the current running python program
+	python = 'python{0}'.format(sys.version_info[0])
+	try:
+		run('{0} -c "pass"'.format(python))
+	except:
+		python = 'python'
+		try:
+			run('{0} -c "pass"'.format(python))
+		except:
+			print_exit('Could not find the current Python')
+
 	# Figure out if the CPU is 32bit or 64bit
 	bits = None
 	if platform.architecture()[0] == '64bit':
