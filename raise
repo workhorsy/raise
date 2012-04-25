@@ -77,33 +77,6 @@ def print_exit(message):
 	print(bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC)
 	exit()
 
-# Move the path to the location of the current file
-os.chdir(os.sys.path[0])
-pwd = os.sys.path[0]
-
-# Make sure we are in at least python 2.6
-if sys.version_info < (2, 6):
-	print_exit("Python 2.6 or greater is required.")
-# Figure out if the CPU is 32bit or 64bit
-bits = None
-if platform.architecture()[0] == '64bit':
-	bits = '64'
-else:
-	bits = '32'
-
-# Figure out the CPU architecture
-arch = None
-if re.match('^i\d86', platform.machine()):
-	arch = 'i386'
-elif platform.machine() == 'x86_64':
-	arch = 'x86_64'
-else:
-	print_exit("Unknown architecture: " + platform.machine() + " .")
-
-user_name = os.environ["LOGNAME"]
-if os.getenv("SUDO_USER"):
-	user_name = os.getenv("SUDO_USER")
-
 def require_root():
 	# Make sure we are root
 	if run('whoami') != 'root':
@@ -663,6 +636,39 @@ def update():
 	exit()
 
 if __name__ == '__main__':
+	global pwd
+	global bits
+	global arch
+	global user_name
+	global target_name
+
+	# Move the path to the location of the current file
+	os.chdir(os.sys.path[0])
+	pwd = os.sys.path[0]
+
+	# Make sure we are in at least python 2.6
+	if sys.version_info < (2, 6):
+		print_exit("Python 2.6 or greater is required.")
+	# Figure out if the CPU is 32bit or 64bit
+	bits = None
+	if platform.architecture()[0] == '64bit':
+		bits = '64'
+	else:
+		bits = '32'
+
+	# Figure out the CPU architecture
+	arch = None
+	if re.match('^i\d86', platform.machine()):
+		arch = 'i386'
+	elif platform.machine() == 'x86_64':
+		arch = 'x86_64'
+	else:
+		print_exit("Unknown architecture: " + platform.machine() + " .")
+
+	user_name = os.environ["LOGNAME"]
+	if os.getenv("SUDO_USER"):
+		user_name = os.getenv("SUDO_USER")
+
 	load_rscript()
 	target_name = str(str.join(' ', sys.argv[1:]))
 
