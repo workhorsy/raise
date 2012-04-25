@@ -293,6 +293,24 @@ def symlink(source, link_name):
 		print_fail()
 		print_exit("Failed linking '{0}' to '{1}'.".format(source, link_name))
 
+def ldconfig():
+	print_status("Running 'ldconfig'",)
+	try:
+		run('ldconfig')
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed run 'ldconfig'.")
+
+def updatedb():
+	print_status("Running 'updatedb'",)
+	try:
+		run('updatedb')
+		print_ok()
+	except:
+		print_fail()
+		print_exit("Failed run 'updatedb'.")
+
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
 	paths = ['/usr/lib']
