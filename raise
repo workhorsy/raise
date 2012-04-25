@@ -636,16 +636,11 @@ def update():
 	exit()
 
 if __name__ == '__main__':
-	global pwd
 	global python
 	global bits
 	global arch
 	global user_name
 	global target_name
-
-	# Move the path to the location of the current file
-	os.chdir(os.sys.path[0])
-	pwd = os.sys.path[0]
 
 	# Make sure we are in at least python 2.6
 	if sys.version_info < (2, 6):
