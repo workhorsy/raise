@@ -441,9 +441,9 @@ def require_python_modules(mod_names):
 	for mod_name in mod_names:
 		print_status("Checking for python module '{0}'".format(mod_name))
 		try:
-			exec("import {0}".format(mod_name))
+			run('python -c "import {0}"'.format(mod_name))
 			print_ok()
-		except ImportError as e:
+		except:
 			print_fail()
 			print_exit("Install the python module '{0}' and try again.".format(mod_name))
 
