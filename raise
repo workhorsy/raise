@@ -650,6 +650,10 @@ if __name__ == '__main__':
 		exit()
 	signal.signal(signal.SIGINT, signal_handler)
 
+	# Clear the terminal if ran as ./raise
+	if sys.argv[0].startswith('./'):
+		os.system('clear')
+
 	# Get the path of the rscript file
 	pwd = os.sys.path[0]
 
