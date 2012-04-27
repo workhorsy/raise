@@ -658,15 +658,9 @@ if __name__ == '__main__':
 		print_exit("Python 2.6 or greater is required.")
 
 	# Get the name of the current running python program
-	python = 'python{0}'.format(sys.version_info[0])
-	try:
-		run('{0} -c "pass"'.format(python))
-	except Exception as e:
-		python = 'python'
-		try:
-			run('{0} -c "pass"'.format(python))
-		except Exception as e:
-			print_exit('Could not find the current Python')
+	python = sys.executable
+	if not python:
+		raise Exception('Could not find python to run child processes with.')
 
 	# Figure out if the CPU is 32bit or 64bit
 	bits = None
