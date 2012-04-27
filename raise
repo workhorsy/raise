@@ -130,8 +130,8 @@ def run_say(command):
 	except Exception as err:
 		pass
 
+	sys.stdout.write(terminal_pad(command))
 	if p.returncode:
-		sys.stdout.write(terminal_pad(command))
 		print_fail()
 		if len(o):
 			print(o)
@@ -139,67 +139,57 @@ def run_say(command):
 			print(e)
 		print_exit('Failed to run command.')
 	else:
-		sys.stdout.write(terminal_pad(command))
 		print_ok()
 		if len(o):
 			print(o)
 		if len(e):
 			print(e)
 
-def cd(name):
-	print_status("Changing to dir '{0}'".format(name))
+def _do_on_fail_exit(success, fail, cb):
+	print_status(success)
 	try:
-		os.chdir(name)
+		cb()
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print_exit("Failed to change to another directory.".format(name))
+		print_exit(fail)
 
-def mvfile(source, dest):
-	print_status("Moving the file '{0}' to '{1}'".format(source, dest))
-	os.rename(source, dest)
+def _do_on_fail_pass(success, bc):
+	print_status(success)
 	try:
-		
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed to move the file' {0}'.".format(source))
-
-def cpfile(source, dest):
-	print_status("Copying the file '{0}' to '{1}'".format(source, dest))
-	try:
-		shutil.copy2(source, dest)
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed to copy the file '{0}' to '{1}'.".format(source, dest))
-
-def cpdir(source, dest, symlinks = False):
-	print_status("Copying the dir '{0}' to '{1}'".format(source, dest))
-	try:
-		shutil.copytree(source, dest, symlinks = symlinks)
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed to copy the dir '{0}' to '{1}'.".format(source, dest))
-
-def mkdir_f(source):
-	print_status("Making the dir '{0}'".format(source))
-	try:
-		os.mkdir(source)
+		cb()
 	except Exception as e:
 		pass
-
 	print_ok()
 
+def cd(name):
+	_do_on_fail_exit("Changing to dir '{0}'".format(name),
+					"Failed to change to the dir '{0}'.".format(name),
+				lambda: os.chdir(name))
+
+def mvfile(source, dest):
+	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
+					"Failed to move the file' {0}'.".format(source),
+				lambda: os.rename(source, dest))
+
+def cpfile(source, dest):
+	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
+					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
+				lambda: shutil.copy2(source, dest))
+
+def cpdir(source, dest, symlinks = False):
+	_do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
+					"Failed to copy the dir '{0}' to '{1}'.".format(source, dest),
+				lambda: shutil.copytree(source, dest, symlinks = symlinks))
+
+def mkdir_f(source):
+	_do_on_fail_pass("Making the dir '{0}'".format(source),
+				lambda: os.mkdir(source))
+
 def mkdir(source):
-	print_status("Making the dir '{0}'".format(source))
-	try:
-		os.mkdir(source)
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed to make the dir '{0}'.".format(source))
+	_do_on_fail_exit("Making the dir '{0}'".format(source),
+					"Failed to make the dir '{0}'.".format(source),
+				lambda: os.mkdir(source))
 
 def rmdir_and_children(name):
 	print_status("Removing the dir '{0}'".format(name))
@@ -259,31 +249,19 @@ def rmfile_f(name):
 	print_ok()
 
 def symlink(source, link_name):
-	print_status("Symlinking '{0}' to '{1}'".format(source, link_name))
-	try:
-		os.symlink(source, link_name)
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed linking '{0}' to '{1}'.".format(source, link_name))
+	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
+					"Failed linking '{0}' to '{1}'.".format(source, link_name),
+				lambda: os.symlink(source, link_name))
 
 def ldconfig():
-	print_status("Running 'ldconfig'",)
-	try:
-		run('ldconfig')
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed run 'ldconfig'.")
+	_do_on_fail_exit("Running 'ldconfig'",
+					"Failed run 'ldconfig'.",
+				lambda: run('ldconfig'))
 
 def updatedb():
-	print_status("Running 'updatedb'",)
-	try:
-		run('updatedb')
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit("Failed run 'updatedb'.")
+	_do_on_fail_exit("Running 'updatedb'",
+					"Failed run 'updatedb'.",
+				lambda: run('updatedb'))
 
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
@@ -402,24 +380,15 @@ def require_static_or_shared_libraries(lib_names):
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
-		print_status("Checking for program '{0}'".format(prog_name))
-
-		try:
-			output = run('which {0}'.format(prog_name))
-			print_ok()
-		except Exception as e:
-			print_fail()
-			print_exit("Install the program '{0}' and try again.".format(prog_name))
+		_do_on_fail_exit("Checking for program '{0}'".format(prog_name),
+						"Install the program '{0}' and try again.".format(prog_name),
+					lambda: run('which {0}'.format(prog_name)))
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
-		print_status("Checking for python module '{0}'".format(mod_name))
-		try:
-			run('{0} -c "import {1}"'.format(python, mod_name))
-			print_ok()
-		except Exception as e:
-			print_fail()
-			print_exit("Install the python module '{0}' and try again.".format(mod_name))
+		_do_on_fail_exit("Checking for python module '{0}'".format(mod_name),
+						"Install the python module '{0}' and try again.".format(mod_name),
+					lambda: run('{0} -c "import {1}"'.format(python, mod_name)))
 
 def header_path(header_name):
 	retval = None
@@ -694,13 +663,16 @@ if __name__ == '__main__':
 	require_programs([
 	'ldconfig', 'locate', 'grep', 'stty', 'whoami'])
 
-	# Try running a function with the same name as the target
+	# Get the target function
 	target_name = str(str.join(' ', sys.argv[1:]))
+
+	# Run update if that is the target
 	if target_name == '':
 		print_exit("No target specified.")
 	elif target_name == 'update':
 		update()
 
+	# Try running the target
 	try:
 		target = eval(target_name)
 		print_info("Running target '{0}'".format(target_name))

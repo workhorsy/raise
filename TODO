@@ -3,7 +3,8 @@ X. Have the raise check for its requirements automatically
 X. If you ctrl+c it will look like the command fails when exiting. global catchall
 X. Change python getting code to sys.executable
 X. Clear the terminal before each run so we don't have to clear; ./raise blah
-. Code reduction surgery
+X. Code reduction surgery
 . When checking for requirements it should check for them all before exiting.
 . Add some examples to an 'examples' dir
+. Print a list of targets when none is provided
 
