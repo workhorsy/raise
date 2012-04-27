@@ -34,6 +34,7 @@ either expressed or implied, of the FreeBSD Project.
 '''
 
 import os, sys, stat
+import signal
 import platform, re, glob
 import shutil
 import atexit
@@ -99,11 +100,11 @@ def run(command):
 	o = p.stdout.read().rstrip()
 	try:
 		e = str(e, 'UTF-8')
-	except:
+	except Exception as err:
 		pass
 	try:
 		o = str(o, 'UTF-8')
-	except:
+	except Exception as err:
 		pass
 
 	if p.returncode:
@@ -122,11 +123,11 @@ def run_say(command):
 	e = p.stderr.read().rstrip()
 	try:
 		e = str(e, 'UTF-8')
-	except:
+	except Exception as err:
 		pass
 	try:
 		o = str(o, 'UTF-8')
-	except:
+	except Exception as err:
 		pass
 
 	if p.returncode:
@@ -150,7 +151,7 @@ def cd(name):
 	try:
 		os.chdir(name)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to change to another directory.".format(name))
 
@@ -160,7 +161,7 @@ def mvfile(source, dest):
 	try:
 		
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to move the file' {0}'.".format(source))
 
@@ -169,7 +170,7 @@ def cpfile(source, dest):
 	try:
 		shutil.copy2(source, dest)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to copy the file '{0}' to '{1}'.".format(source, dest))
 
@@ -178,7 +179,7 @@ def cpdir(source, dest, symlinks = False):
 	try:
 		shutil.copytree(source, dest, symlinks = symlinks)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to copy the dir '{0}' to '{1}'.".format(source, dest))
 
@@ -186,7 +187,7 @@ def mkdir_f(source):
 	print_status("Making the dir '{0}'".format(source))
 	try:
 		os.mkdir(source)
-	except:
+	except Exception as e:
 		pass
 
 	print_ok()
@@ -196,7 +197,7 @@ def mkdir(source):
 	try:
 		os.mkdir(source)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to make the dir '{0}'.".format(source))
 
@@ -241,7 +242,7 @@ def rmfile(name):
 		elif os.path.isfile(name):
 			os.remove(name)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
@@ -252,7 +253,7 @@ def rmfile_f(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
 			os.remove(name)
-	except:
+	except Exception as e:
 		pass
 
 	print_ok()
@@ -262,7 +263,7 @@ def symlink(source, link_name):
 	try:
 		os.symlink(source, link_name)
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed linking '{0}' to '{1}'.".format(source, link_name))
 
@@ -271,7 +272,7 @@ def ldconfig():
 	try:
 		run('ldconfig')
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed run 'ldconfig'.")
 
@@ -280,7 +281,7 @@ def updatedb():
 	try:
 		run('updatedb')
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Failed run 'updatedb'.")
 
@@ -337,7 +338,7 @@ def require_static_library(lib_name):
 	try:
 		run("locate /" + lib_name + ".a")
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
@@ -354,7 +355,7 @@ def require_shared_library(lib_name):
 	try:
 		run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
 		print_ok()
-	except:
+	except Exception as e:
 		print_fail()
 		print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
@@ -374,7 +375,7 @@ def require_static_or_shared_library(lib_name):
 			run("locate /" + lib_name + ".a")
 			print_ok()
 			return
-		except:
+		except Exception as e:
 			print_fail()
 			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
@@ -383,7 +384,7 @@ def require_static_or_shared_library(lib_name):
 		try:
 			run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
 			print_ok()
-		except:
+		except Exception as e:
 			print_fail()
 			print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
@@ -406,7 +407,7 @@ def require_programs(prog_names):
 		try:
 			output = run('which {0}'.format(prog_name))
 			print_ok()
-		except:
+		except Exception as e:
 			print_fail()
 			print_exit("Install the program '{0}' and try again.".format(prog_name))
 
@@ -416,7 +417,7 @@ def require_python_modules(mod_names):
 		try:
 			run('{0} -c "import {1}"'.format(python, mod_name))
 			print_ok()
-		except:
+		except Exception as e:
 			print_fail()
 			print_exit("Install the python module '{0}' and try again.".format(mod_name))
 
@@ -435,7 +436,7 @@ def header_path(header_name):
 		# Use the first
 		if retval == None:
 			retval = paths[0]
-	except:
+	except Exception as e:
 		pass
 
 	if not retval or not os.path.exists(retval):
@@ -469,12 +470,12 @@ def static_library_path(lib_name):
 def static_or_shared_library_path(lib_name):
 	try:
 		return static_library_path(lib_name)
-	except:
+	except Exception as e:
 		pass
 
 	try:
 		return shared_library_path(lib_name)
-	except:
+	except Exception as e:
 		pass
 
 	raise Exception("Static/Shared library not found: '" + lib_name + "'")
@@ -643,6 +644,12 @@ if __name__ == '__main__':
 	global user_name
 	global target_name
 
+	# Have all KeyboardInterrupt exceptions quit with a clean message
+	def signal_handler(signal, frame):
+		print_exit('Exit called by the keyboard.')
+		exit()
+	signal.signal(signal.SIGINT, signal_handler)
+
 	# Get the path of the rscript file
 	pwd = os.sys.path[0]
 
@@ -654,11 +661,11 @@ if __name__ == '__main__':
 	python = 'python{0}'.format(sys.version_info[0])
 	try:
 		run('{0} -c "pass"'.format(python))
-	except:
+	except Exception as e:
 		python = 'python'
 		try:
 			run('{0} -c "pass"'.format(python))
-		except:
+		except Exception as e:
 			print_exit('Could not find the current Python')
 
 	# Figure out if the CPU is 32bit or 64bit

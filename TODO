@@ -1,0 +1,9 @@
+
+X. Have the raise check for its requirements automatically
+X. If you ctrl+c it will look like the command fails when exiting. global catchall
+. Change python getting code to sys.executable
+. Clear the terminal before each run so we don't have to clear; ./raise blah
+	Only clear the terminal when launched as './raise' not 'python raise'
+. Code reduction surgery
+. When checking for requirements it should check for them all before exiting.
+. Add some examples to an 'examples' dir
