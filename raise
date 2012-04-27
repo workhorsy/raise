@@ -685,6 +685,10 @@ if __name__ == '__main__':
 	# Load the rscript
 	load_rscript()
 
+	# Make sure all the programs we need are installed
+	require_programs([
+	'ldconfig', 'locate', 'grep', 'stty', 'whoami'])
+
 	# Try running a function with the same name as the target
 	target_name = str(str.join(' ', sys.argv[1:]))
 	if target_name == '':

@@ -10,10 +10,6 @@ def clean():
 	pass
 
 def configure():
-	require_programs([
-	'ldconfig', 'locate', 'grep', 'stty', 'whoami',
-	'python'])
-
 	os.environ["RAISE_VERSION"] = RAISE_VERSION
 	os.environ["RAISE_PATH"] = RAISE_PATH
 
