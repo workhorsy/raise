@@ -47,7 +47,7 @@ def download_file(url, cb):
 def update():
 	print("Downloading newest Raise version ...")
 	try:
-		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise'
+		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 		f = open('.raise_actual', 'wb')
 
 		def cb(chunk, data_length, chunk_size, content_length, percent):
