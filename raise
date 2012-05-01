@@ -103,9 +103,12 @@ if __name__ == '__main__':
 		update()
 		exit()
 
-	if not os.path.isfile('.raise_actual'):
+	actual = '.raise_actual'
+	if os.path.isfile('raise_actual'):
+		actual = 'raise_actual'
+	elif not os.path.isfile('.raise_actual'):
 		update()
 
-	os.system('./.raise_actual ' + args)
+	os.system('./{0} {1}'.format(actual, args))
 
 
