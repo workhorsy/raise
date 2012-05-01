@@ -6,9 +6,12 @@ the Expat License.
 
 // Install requirements
 Python 2.6 or greater
-ldconfig
+which
+clear
 locate
+whoami
 grep
 stty
-whoami
+ldconfig
+updatedb
 

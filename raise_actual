@@ -616,7 +616,7 @@ if __name__ == '__main__':
 
 	# Make sure all the programs we need are installed
 	require_programs([
-	'ldconfig', 'locate', 'grep', 'stty', 'whoami'])
+		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'ldconfig', 'updatedb'])
 
 	# Get the target function name
 	target_name = str(str.join(' ', sys.argv[1:]))
