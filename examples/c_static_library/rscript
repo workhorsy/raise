@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+
+def clean():
+	rmfile_f('raise_example')
+	rmfile_f('libexample.o')
+	rmfile_f('libexample.a')
+
+def configure():
+	require_programs([
+	'gcc', 'ar'])
+
+	os.environ['CC'] = 'gcc'
+	os.environ['CFLAGS'] = '-g -Wall -Werror'
+
+def test():
+	clean()
+	configure()
+
+	c_build_object('libexample.o', ['libexample.c'])
+	ar_build_static_library('libexample.a', ['libexample.o'])
+	c_build_program('raise_example', ['main.c'], ['libexample.a'])
+	run_say('./raise_example')
+
+def remove():
+	require_root()
+	clean()
+
+	rmfile_f('/usr/bin/raise_example')
+
+def install():
+	require_root()
+	clean()
+	remove()
+
+	configure()
+	c_build_object('libexample.o', ['libexample.c'])
+	ar_build_static_library('libexample.a', ['libexample.o'])
+	c_build_program('raise_example', ['main.c'], ['libexample.a'])
+
+	cpfile('raise_example', '/usr/bin/raise_example')
+
+
+
