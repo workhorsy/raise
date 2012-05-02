@@ -6,5 +6,5 @@ X. Clear the terminal before each run so we don't have to clear; ./raise blah
 X. Code reduction surgery
 X. Print a list of targets when none is provided
 . When checking for requirements it should check for them all before exiting.
-. Add some examples to an 'examples' dir
+X. Add some examples to an 'examples' dir
 
