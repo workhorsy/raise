@@ -12,9 +12,16 @@ def configure():
 
 	os.environ['CC'] = 'gcc'
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
+	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 def test():
-	print_exit('You will have to run "./raise install" to test this.')
+	clean()
+	configure()
+
+	c_build_object('libexample.o', ['libexample.c'])
+	c_build_shared_library('libexample.so', ['libexample.o'])
+	c_build_program('raise_example', ['main.c'], ['${LD_LIBRARY_PATH}/libexample.so'])
+	run_say('./raise_example')
 
 def remove():
 	require_root()
@@ -35,7 +42,3 @@ def install():
 
 	cpfile('raise_example', '/usr/bin/raise_example')
 	cpfile('libexample.so', '/usr/lib/libexample.so')
-	run_say('/usr/bin/raise_example')
-
-
-
