@@ -510,7 +510,7 @@ def ar_build_static_library(ar_file, o_files):
 def c_build_shared_library(so_file, o_files):
 	print_status("Building shared library '{0}'".format(so_file))
 	try:
-		command = "${CC} ${CFLAGS} -shared -Wl,-soname," + so_file + " -o " + so_file + " " + str.join(' ', o_files) + " -lc "
+		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 		run(command)
 		print_ok()
 	except Exception as e:
@@ -628,8 +628,12 @@ if __name__ == '__main__':
 	targets = load_rscript()
 
 	# Make sure all the programs we need are installed
+	# FIXME: Requiring gcc, ar, ld, and ldconfig makes raise
+	# gcc specific. What other linkers and archivers are used
+	# with other C compilers? Clang, MS cl, et cetera
 	require_programs([
-		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'ldconfig', 'updatedb'])
+		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'updatedb',
+		'gcc', 'ar', 'ld', 'ldconfig'])
 
 	# Get the target function name
 	target_name = str(str.join(' ', sys.argv[1:]))

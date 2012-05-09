@@ -12,6 +12,8 @@ locate
 whoami
 grep
 stty
-ldconfig
 updatedb
-
+gcc
+ar
+ld
+ldconfig
