@@ -90,7 +90,7 @@ def update():
 		download_file(url, cb)
 
 		# Make the file executable
-		os.chmod('.raise_actual', 0775 | stat.S_IXOTH)
+		os.chmod('.raise_actual', 0o775 | stat.S_IXOTH)
 	except Exception as e:
 		print(str(e))
 
