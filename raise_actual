@@ -681,7 +681,7 @@ if __name__ == '__main__':
 	# with other C compilers? Clang, MS cl, et cetera
 	require_raise_dependencies([
 		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'updatedb',
-		'gcc', 'ar', 'ld', 'ldconfig', 'derps'])
+		'gcc', 'ar', 'ld', 'ldconfig'])
 
 	# Try running the target
 	target = targets[target_name]
