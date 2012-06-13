@@ -370,11 +370,29 @@ def require_static_or_shared_libraries(lib_names):
 	for lib_name in lib_names:
 		require_static_or_shared_library(lib_name)
 
+def require_raise_dependencies(prog_names):
+	fails = []
+	# See which programs are not installed
+	for prog_name in prog_names:
+		cb = lambda: run('which {0}'.format(prog_name))
+		try:
+			cb()
+		except Exception as e:
+			fails.append(prog_name)
+
+	# Print them in a list then exit
+	if fails:
+		print_info("Checking for Raise dependencies")
+		for f in fails:
+			print_status("Checking for program '{0}'".format(f))
+			print_fail()
+		print_exit("Install the dependencies '{0}' and try again.".format(str.join("', '", fails)))
+
 def require_programs(prog_names):
 	for prog_name in prog_names:
 		_do_on_fail_exit("Checking for program '{0}'".format(prog_name),
-						"Install the program '{0}' and try again.".format(prog_name),
-					lambda: run('which {0}'.format(prog_name)))
+				"Install the program '{0}' and try again.".format(prog_name),
+				lambda: run('which {0}'.format(prog_name)))
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
@@ -631,7 +649,7 @@ if __name__ == '__main__':
 	# FIXME: Requiring gcc, ar, ld, and ldconfig makes raise
 	# gcc specific. What other linkers and archivers are used
 	# with other C compilers? Clang, MS cl, et cetera
-	require_programs([
+	require_raise_dependencies([
 		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'updatedb',
 		'gcc', 'ar', 'ld', 'ldconfig'])
 
