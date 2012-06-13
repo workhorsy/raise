@@ -137,17 +137,17 @@ def run_say(command):
 		if len(e):
 			print(e)
 
-def _do_on_fail_exit(success, fail, cb):
-	print_status(success)
+def _do_on_fail_exit(start_message, fail_message, cb):
+	print_status(start_message)
 	try:
 		cb()
 		print_ok()
 	except Exception as e:
 		print_fail()
-		print_exit(fail)
+		print_exit(fail_message)
 
-def _do_on_fail_pass(success, bc):
-	print_status(success)
+def _do_on_fail_pass(start_message, bc):
+	print_status(start_message)
 	try:
 		cb()
 	except Exception as e:
@@ -382,7 +382,7 @@ def require_raise_dependencies(prog_names):
 
 	# Print them in a list then exit
 	if fails:
-		print_info("Checking for Raise dependencies")
+		print_info("Raise is checking for its dependencies")
 		for f in fails:
 			print_status("Checking for program '{0}'".format(f))
 			print_fail()
@@ -619,7 +619,7 @@ if __name__ == '__main__':
 	# Get the name of the current running python program
 	python = sys.executable
 	if not python:
-		raise Exception('Could not find python to run child processes with.')
+		print_exit('Could not find python to run child processes with.')
 
 	# Figure out if the CPU is 32bit or 64bit
 	bits = None
