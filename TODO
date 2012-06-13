@@ -1,5 +1,4 @@
 
-. Add help menu
 . Make it work on other Linux distros (Fedora, Debian, OpenSuse, Gentoo, Arch)
 . Make it work on BSD
 . Make it work on OpenSolaris
