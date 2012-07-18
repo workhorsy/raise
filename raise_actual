@@ -43,30 +43,35 @@ class bcolors:
 	FAIL = '\033[41m'
 	ENDC = '\033[0m'
 
-def terminal_pad(command):
+def terminal_pad(length, pad_char=' '):
 	width = int(os.popen('stty size', 'r').read().split()[1])
-	if len(command) > (width-2):
-		i = int(width * (int(len(command) / width) + 1)) - 2
+	if length > (width-2):
+		i = int(width * (int(length / width) + 1)) - 2
 	else:
 		i = width - 2
-
-	return command.ljust(i)
+	return ''.ljust(i-length, pad_char)
 
 def print_info(message):
 	sys.stdout.write(bcolors.MESSAGE + message + bcolors.ENDC + "\n")
-
-def print_status(message):
-	sys.stdout.write(terminal_pad('{0} ...'.format(message)))
 	sys.stdout.flush()
 
-def print_ok():
-	print(bcolors.OK + ":)" + bcolors.ENDC)
+def print_status(message):
+	message = '{0} ...'.format(message)
+	sys.stdout.write(message)
+	sys.stdout.flush()
+	return len(message)
 
-def print_fail():
-	print(bcolors.FAIL + ":(" + bcolors.ENDC)
+def print_ok(length):
+	sys.stdout.write(terminal_pad(length) + bcolors.OK + ":)" + bcolors.ENDC)
+	sys.stdout.flush()
+
+def print_fail(length):
+	sys.stdout.write(terminal_pad(length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC)
+	sys.stdout.flush()
 
 def print_exit(message):
-	print(bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC)
+	sys.stdout.write(bcolors.FAIL + message + ' Exiting ...\n' + bcolors.ENDC)
+	sys.stdout.flush()
 	exit()
 
 def require_root():
@@ -108,7 +113,10 @@ def run(command):
 
 # FIXME: Rename to run_print
 def run_say(command):
-	sys.stdout.write("Running command ...\n")
+	message = "Running command ..."
+	length = len(message)
+	sys.stdout.write(message)
+	sys.stdout.flush()
 	p = Popen(command, stderr=PIPE, stdout=PIPE, shell=True)
 	p.wait()
 	o = p.stdout.read().rstrip()
@@ -122,37 +130,36 @@ def run_say(command):
 	except Exception as err:
 		pass
 
-	sys.stdout.write(terminal_pad(command))
 	if p.returncode:
-		print_fail()
+		print_fail(length)
 		if len(o):
 			print(o)
 		if len(e):
 			print(e)
 		print_exit('Failed to run command.')
 	else:
-		print_ok()
+		print_ok(length)
 		if len(o):
 			print(o)
 		if len(e):
 			print(e)
 
 def _do_on_fail_exit(start_message, fail_message, cb):
-	print_status(start_message)
+	length = print_status(start_message)
 	try:
 		cb()
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print_exit(fail_message)
 
 def _do_on_fail_pass(start_message, bc):
-	print_status(start_message)
+	length = print_status(start_message)
 	try:
 		cb()
 	except Exception as e:
 		pass
-	print_ok()
+	print_ok(length)
 
 def cd(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),
@@ -184,22 +191,22 @@ def mkdir(source):
 				lambda: os.mkdir(source))
 
 def rmdir_and_children(name):
-	print_status("Removing the dir '{0}'".format(name))
+	length = print_status("Removing the dir '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isdir(name):
 			shutil.rmtree(name)
-		print_ok()
+		print_ok(length)
 	except OSError as e:
 		if 'No such file or directory' in e:
-			print_ok()
+			print_ok(length)
 			return
-		print_fail()
+		print_fail(length)
 		print_exit("Failed to remove the dir '{0}'.".format(name))
 
 def rmdir(name):
-	print_status("Removing the dir '{0}'".format(name))
+	length = print_status("Removing the dir '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
@@ -211,25 +218,25 @@ def rmdir(name):
 		elif 'No such file or directory' in e:
 			pass
 		else:
-			print_fail()
+			print_fail(length)
 			print_exit("Failed to remove the dir '{0}'.".format(name))
 
-	print_ok()
+	print_ok(length)
 
 def rmfile(name):
-	print_status("Removing the file '{0}'".format(name))
+	length = print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
 			os.remove(name)
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
 def rmfile_f(name):
-	print_status("Removing the file '{0}'".format(name))
+	length = print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
@@ -238,7 +245,7 @@ def rmfile_f(name):
 	except Exception as e:
 		pass
 
-	print_ok()
+	print_ok(length)
 
 def symlink(source, link_name):
 	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
@@ -296,66 +303,66 @@ def _library_path(lib_name, extension):
 		raise Exception("Library '{0}' not found.".format(lib_name))
 
 def require_static_library(lib_name):
-	print_status("Checking for static library '{0}'".format(lib_name))
+	length = print_status("Checking for static library '{0}'".format(lib_name))
 	is_installed = _is_library_installed(lib_name, '.a')
 
 	# Make them install the lib to continue
 	if not is_installed:
-		print_fail()
+		print_fail(length)
 		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
 	try:
 		run("locate /" + lib_name + ".a")
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
 def require_shared_library(lib_name):
-	print_status("Checking for shared library '{0}'".format(lib_name))
+	length = print_status("Checking for shared library '{0}'".format(lib_name))
 	is_installed = _is_library_installed(lib_name, '.so')
 
 	# Make them install the lib to continue
 	if not is_installed:
-		print_fail()
+		print_fail(length)
 		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ldconfig
 	try:
 		run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_static_or_shared_library(lib_name):
-	print_status("Checking for static/shared library '{0}'".format(lib_name))
+	length = print_status("Checking for static/shared library '{0}'".format(lib_name))
 	is_static_installed = _is_library_installed(lib_name, '.a')
 	is_shared_installed = _is_library_installed(lib_name, '.so')
 
 	# Make them install the lib to continue
 	if not is_static_installed and not is_shared_installed:
-		print_fail()
+		print_fail(length)
 		print_exit("Static/Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
 	if is_static_installed:
 		try:
 			run("locate /" + lib_name + ".a")
-			print_ok()
+			print_ok(length)
 			return
 		except Exception as e:
-			print_fail()
+			print_fail(length)
 			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ldconfig
 	if is_shared_installed:
 		try:
 			run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
-			print_ok()
+			print_ok(length)
 		except Exception as e:
-			print_fail()
+			print_fail(length)
 			print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_static_libraries(lib_names):
@@ -384,8 +391,8 @@ def require_raise_dependencies(prog_names):
 	if fails:
 		print_info("Raise is checking for its dependencies")
 		for f in fails:
-			print_status("Checking for program '{0}'".format(f))
-			print_fail()
+			length = print_status("Checking for program '{0}'".format(f))
+			print_fail(length)
 		print_exit("Install the dependencies '{0}' and try again.".format(str.join("', '", fails)))
 
 def require_programs(prog_names):
@@ -487,82 +494,82 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 def c_build_object(o_file, c_files, i_files=[]):
-	print_status("Building C object file '{0}'".format(o_file))
+	length = print_status("Building C object file '{0}'".format(o_file))
 	try:
 		if not 'CC' in os.environ:
-			print_fail()
+			print_fail(length)
 			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
 		run("${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Build failed. Try again.")
 
 def c_build_program(o_file, c_files, i_files=[]):
-	print_status("Building C program '{0}'".format(o_file))
+	length = print_status("Building C program '{0}'".format(o_file))
 	try:
 		if not 'CC' in os.environ:
-			print_fail()
+			print_fail(length)
 			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
 		run("${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Build failed. Try again.")
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
-	print_status("Building static library '{0}'".format(ar_file))
+	length = print_status("Building static library '{0}'".format(ar_file))
 	try:
 		run("ar rcs " + ar_file + " " + str.join(' ', o_files))
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Archive failed. Try again.")
 
 def c_build_shared_library(so_file, o_files):
-	print_status("Building shared library '{0}'".format(so_file))
+	length = print_status("Building shared library '{0}'".format(so_file))
 	try:
 		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 		run(command)
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Building shared library failed. Try again.")
 
 def d_build_object(o_file, d_files, i_files, l_files, h_files):
-	print_status("Building D object file '{0}'".format(o_file))
+	length = print_status("Building D object file '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
-			print_fail()
+			print_fail(length)
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Build failed. Try again.")
 
 def d_build_program(out_file, inc_files, link_files=[]):
-	print_status("Building D program '{0}'".format(out_file))
+	length = print_status("Building D program '{0}'".format(out_file))
 	try:
 		if not 'DC' in os.environ:
-			print_fail()
+			print_fail(length)
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 		run(command)
-		print_ok()
+		print_ok(length)
 	except Exception as e:
-		print_fail()
+		print_fail(length)
 		print(e)
 		print_exit("Build failed. Try again.")
 
@@ -659,7 +666,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (Jun 12 2012)")
+		print("Raise version 0.1 (July 17 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")

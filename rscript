@@ -28,5 +28,6 @@ def install():
 	# Copy the files to the system directory
 	cpfile('raise', RAISE_PATH)
 
-
+def test():
+	print('See examples in /examples directory.')
 
