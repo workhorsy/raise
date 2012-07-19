@@ -70,7 +70,7 @@ def print_fail(length):
 	sys.stdout.flush()
 
 def print_exit(message):
-	sys.stdout.write(bcolors.FAIL + message + ' Exiting ...\n' + bcolors.ENDC)
+	sys.stdout.write(bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC + '\n')
 	sys.stdout.flush()
 	exit()
 
@@ -666,7 +666,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (July 17 2012)")
+		print("Raise version 0.1 (July 18 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")
