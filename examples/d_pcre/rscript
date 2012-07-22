@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+
+def clean():
+	rmfile_f('a.out')
+	rmfile_f('raise_example.o')
+	rmfile_f('raise_example')
+	rmfile_f('lib_regex.o')
+
+def configure():
+	require_programs(['gcc', 'dmd'])
+
+	os.environ['CC'] = 'gcc'
+	os.environ['DC'] = 'dmd'
+	os.environ['CFLAGS'] = '-g -Wall -Werror'
+	os.environ['DFLAGS'] = '-g -w'
+
+	require_shared_libraries(['libpcre'])
+	require_static_libraries(['libphobos2'])
+
+def test():
+	clean()
+	configure()
+
+	c_build_object('lib_regex.o', ['lib_regex.c'])
+	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-lpcre'])
+	run_say('./raise_example')
+
+def remove():
+	require_root()
+	clean()
+
+	rmfile_f('/usr/bin/raise_example')
+	rmfile_f('/usr/lib/libexample.so')
+
+def install():
+	require_root()
+	clean()
+	remove()
+
+	configure()
+	c_build_object('libexample.o', ['libexample.c'])
+	c_build_shared_library('libexample.so', ['libexample.o'])
+	c_build_program('raise_example', ['main.c'], ['libexample.so'])
+
+	cpfile('raise_example', '/usr/bin/raise_example')
+	cpfile('libexample.so', '/usr/lib/libexample.so')

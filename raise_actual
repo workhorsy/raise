@@ -328,13 +328,13 @@ def require_shared_library(lib_name):
 		print_fail(length)
 		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
-	# Make them run ldconfig if the library is not found by ldconfig
+	# Make them run ldconfig if the library is not found by ld
 	try:
-		run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
+		run("ld -l " + lib_name.lstrip('lib'))
 		print_ok(length)
 	except Exception as e:
 		print_fail(length)
-		print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
+		print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_static_or_shared_library(lib_name):
 	length = print_status("Checking for static/shared library '{0}'".format(lib_name))
@@ -356,14 +356,14 @@ def require_static_or_shared_library(lib_name):
 			print_fail(length)
 			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
-	# Make them run ldconfig if the library is not found by ldconfig
+	# Make them run ldconfig if the library is not found by ld
 	if is_shared_installed:
 		try:
-			run("ldconfig -p | grep \"" + lib_name + "\.so (\"")
+			run("ld -l " + lib_name.lstrip('lib'))
 			print_ok(length)
 		except Exception as e:
 			print_fail(length)
-			print_exit("Shared library '{0}' not found with 'ldconfig'. Run 'sudo ldconfig' and try again.".format(lib_name))
+			print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_static_libraries(lib_names):
 	for lib_name in lib_names:
@@ -666,7 +666,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (July 18 2012)")
+		print("Raise version 0.1 (July 21 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")
@@ -688,7 +688,7 @@ if __name__ == '__main__':
 	# with other C compilers? Clang, MS cl, et cetera
 	require_raise_dependencies([
 		'which', 'clear', 'locate', 'whoami', 'grep', 'stty', 'updatedb',
-		'gcc', 'ar', 'ld', 'ldconfig'])
+		'gcc', 'ar', 'ld'])
 
 	# Try running the target
 	target = targets[target_name]

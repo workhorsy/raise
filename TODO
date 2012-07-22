@@ -1,7 +1,7 @@
 
 . The help command should list help and update
 . If downloading the raise_actual fails, raise_actual becomes blank
-. Make it work on other Linux distros (Fedora, Debian, OpenSuse, Gentoo, Arch)
+. Make it work on other Linux distros (Fedora, Debian, Gentoo, Arch)
 . Make it work on BSD
 . Make it work on OpenSolaris
 
