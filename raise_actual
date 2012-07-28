@@ -543,14 +543,48 @@ def c_build_shared_library(so_file, o_files):
 		print(e)
 		print_exit("Building shared library failed. Try again.")
 
-def d_build_object(o_file, d_files, i_files, l_files, h_files):
+def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	length = print_status("Building D object file '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
 			print_fail(length)
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
+		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+		if h_files:
+			command + "  -Hdimport -Hf" + str.join(' ', h_files)
+		run(command)
+		print_ok(length)
+	except Exception as e:
+		print_fail(length)
+		print(e)
+		print_exit("Build failed. Try again.")
+
+def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
+	length = print_status("Building D shared library '{0}'".format(o_file))
+	try:
+		if not 'DC' in os.environ:
+			print_fail(length)
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+		if h_files:
+			command + "  -Hdimport -Hf" + str.join(' ', h_files)
+		run(command)
+		print_ok(length)
+	except Exception as e:
+		print_fail(length)
+		print(e)
+		print_exit("Build failed. Try again.")
+
+def d_build_static_library(o_file, d_files, i_files, l_files, h_files):
+	length = print_status("Building D static library '{0}'".format(o_file))
+	try:
+		if not 'DC' in os.environ:
+			print_fail(length)
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
 		print_ok(length)
 	except Exception as e:
