@@ -330,7 +330,7 @@ def require_shared_library(lib_name):
 
 	# Make them run ldconfig if the library is not found by ld
 	try:
-		run("ld -l " + lib_name.lstrip('lib'))
+		run("ld -l " + lib_name.lstrip('lib') + ' -o /dev/null')
 		print_ok(length)
 	except Exception as e:
 		print_fail(length)
@@ -359,7 +359,7 @@ def require_static_or_shared_library(lib_name):
 	# Make them run ldconfig if the library is not found by ld
 	if is_shared_installed:
 		try:
-			run("ld -l " + lib_name.lstrip('lib'))
+			run("ld -l " + lib_name.lstrip('lib') + ' -o /dev/null')
 			print_ok(length)
 		except Exception as e:
 			print_fail(length)
