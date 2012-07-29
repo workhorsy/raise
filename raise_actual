@@ -552,7 +552,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 
 		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if h_files:
-			command + "  -Hdimport -Hf" + str.join(' ', h_files)
+			command += "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
 		print_ok(length)
 	except Exception as e:
@@ -569,7 +569,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
 
 		command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if h_files:
-			command + "  -Hdimport -Hf" + str.join(' ', h_files)
+			command += "  -Hdimport -Hf" + str.join(' ', h_files)
 		run(command)
 		print_ok(length)
 	except Exception as e:
