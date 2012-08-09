@@ -543,6 +543,21 @@ def c_build_shared_library(so_file, o_files):
 		print(e)
 		print_exit("Building shared library failed. Try again.")
 
+def d_build_interface(d_file, i_files):
+	length = print_status("Building D header file '{0}i'".format(d_file))
+	try:
+		if not 'DC' in os.environ:
+			print_fail(length)
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hdimport -Hf" + d_file + "i -of/dev/null"
+		run(command)
+		print_ok(length)
+	except Exception as e:
+		print_fail(length)
+		print(e)
+		print_exit("Build failed. Try again.")
+
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	length = print_status("Building D object file '{0}'".format(o_file))
 	try:
@@ -700,7 +715,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (July 29 2012)")
+		print("Raise version 0.1 (August 08 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")
