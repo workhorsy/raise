@@ -8,8 +8,6 @@ def clean():
 	rmfile_f('libexample.so')
 
 def configure():
-	require_programs(['gcc'])
-
 	os.environ['CC'] = 'gcc'
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()

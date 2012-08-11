@@ -9,7 +9,7 @@ def clean():
 	rmfile_f('lib_regex.o')
 
 def configure():
-	require_programs(['gcc', 'dmd'])
+	require_programs(['dmd'])
 
 	os.environ['CC'] = 'gcc'
 	os.environ['DC'] = 'dmd'
@@ -20,11 +20,13 @@ def configure():
 	require_static_libraries(['libphobos2'])
 
 def test():
-	clean()
 	configure()
 
 	c_build_object('lib_regex.o', ['lib_regex.c'])
-	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-lpcre'])
+
+	if is_outdated(to_update = ['raise_example'], triggers = ['main.d', 'lib_regex.d', 'lib_regex.o']):
+		d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-lpcre'])
+
 	run_say('./raise_example')
 
 def remove():

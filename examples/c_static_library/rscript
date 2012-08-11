@@ -8,19 +8,18 @@ def clean():
 	rmfile_f('libexample.a')
 
 def configure():
-	require_programs([
-	'gcc', 'ar'])
-
 	os.environ['CC'] = 'gcc'
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
 
 def test():
-	clean()
 	configure()
 
 	c_build_object('libexample.o', ['libexample.c'])
 	ar_build_static_library('libexample.a', ['libexample.o'])
-	c_build_program('raise_example', ['main.c'], ['libexample.a'])
+
+	if is_outdated(to_update = ['raise_example'], triggers = ['main.c', 'libexample.a']):
+		c_build_program('raise_example', ['main.c'], ['libexample.a'])
+
 	run_say('./raise_example')
 
 def remove():

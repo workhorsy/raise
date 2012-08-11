@@ -159,12 +159,10 @@ def is_outdated(to_update, triggers):
 	s, b = 0, 0
 	for trigger in triggers:
 		t = os.path.getmtime(trigger)
-		print(trigger, t)
 		if t > s:
 			s = t
 	for update in to_update:
 		t = os.path.getmtime(update)
-		print(update, t)
 		if t > b:
 			b = t
 
@@ -769,7 +767,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (August 10 2012)")
+		print("Raise version 0.1 (August 11 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")
