@@ -25,6 +25,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os, sys, stat
+import filecmp
 import signal
 import platform, re, glob
 import shutil
@@ -144,6 +145,35 @@ def run_say(command):
 		if len(e):
 			print(e)
 
+def is_outdated(to_update, triggers):
+	# Make sure all the triggers exist
+	for trigger in triggers:
+		assert(os.path.isfile(os.path.abspath(trigger)))
+
+	# Rebuild if any of the files to check do not exist
+	for update in to_update:
+		if not os.path.isfile(os.path.abspath(update)):
+			return True
+
+	# Get the modify date of the newest trigger file and file to check
+	s, b = 0, 0
+	for trigger in triggers:
+		t = os.path.getmtime(trigger)
+		print(trigger, t)
+		if t > s:
+			s = t
+	for update in to_update:
+		t = os.path.getmtime(update)
+		print(update, t)
+		if t > b:
+			b = t
+
+	# Rebuild if a trigger is newer than the newest file to check
+	if s > b:
+		return True
+	else:
+		return False
+
 def _do_on_fail_exit(start_message, fail_message, cb):
 	length = print_status(start_message)
 	try:
@@ -175,6 +205,12 @@ def cpfile(source, dest):
 	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
+
+def cp_new_file(source, dest):
+	if not os.path.isfile(os.path.abspath(dest)):
+		cpfile(source, dest)
+	elif not filecmp.cmp(source, dest):
+		cpfile(source, dest)
 
 def cpdir(source, dest, symlinks = False):
 	_do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
@@ -494,6 +530,9 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 def c_build_object(o_file, c_files, i_files=[]):
+	if not is_outdated(to_update = [o_file], triggers = c_files):
+		return
+
 	length = print_status("Building C object file '{0}'".format(o_file))
 	try:
 		if not 'CC' in os.environ:
@@ -523,6 +562,9 @@ def c_build_program(o_file, c_files, i_files=[]):
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
+	if not is_outdated(to_update = [ar_file], triggers = o_files):
+		return
+
 	length = print_status("Building static library '{0}'".format(ar_file))
 	try:
 		run("ar rcs " + ar_file + " " + str.join(' ', o_files))
@@ -533,6 +575,9 @@ def ar_build_static_library(ar_file, o_files):
 		print_exit("Archive failed. Try again.")
 
 def c_build_shared_library(so_file, o_files):
+	if not is_outdated(to_update = [so_file], triggers = o_files):
+		return
+
 	length = print_status("Building shared library '{0}'".format(so_file))
 	try:
 		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
@@ -544,13 +589,16 @@ def c_build_shared_library(so_file, o_files):
 		print_exit("Building shared library failed. Try again.")
 
 def d_build_interface(d_file, i_files):
-	length = print_status("Building D header file '{0}i'".format(d_file))
+	if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
+		return
+
+	length = print_status("Building D interface file '{0}i'".format(d_file))
 	try:
 		if not 'DC' in os.environ:
 			print_fail(length)
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hdimport -Hf" + d_file + "i -of/dev/null"
+		command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of/dev/null"
 		run(command)
 		print_ok(length)
 	except Exception as e:
@@ -559,6 +607,9 @@ def d_build_interface(d_file, i_files):
 		print_exit("Build failed. Try again.")
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
+	if not is_outdated(to_update = [o_file], triggers = d_files):
+		return
+
 	length = print_status("Building D object file '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
@@ -576,6 +627,9 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 		print_exit("Build failed. Try again.")
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
+	if not is_outdated(to_update = [o_file], triggers = d_files):
+		return
+
 	length = print_status("Building D shared library '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
@@ -715,7 +769,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (August 08 2012)")
+		print("Raise version 0.1 (August 10 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")
