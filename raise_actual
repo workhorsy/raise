@@ -182,7 +182,7 @@ def _do_on_fail_exit(start_message, fail_message, cb):
 		print_fail(length)
 		print_exit(fail_message)
 
-def _do_on_fail_pass(start_message, bc):
+def _do_on_fail_pass(start_message, cb):
 	length = print_status(start_message)
 	try:
 		cb()
