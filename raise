@@ -69,9 +69,15 @@ def download_file(url, cb):
 
 def update():
 	print("Downloading newest Raise version ...")
+
+	# Get the file name for actual
+	file_name = '.raise_actual'
+	if os.path.isfile('raise_actual'):
+		file_name = 'raise_actual'
+
 	try:
 		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
-		f = open('.raise_actual', 'wb')
+		f = open(file_name, 'wb')
 
 		def cb(chunk, data_length, chunk_size, content_length, percent):
 			# Write the next chunk to the file
@@ -90,7 +96,7 @@ def update():
 		download_file(url, cb)
 
 		# Make the file executable
-		os.chmod('.raise_actual', 0o775 | stat.S_IXOTH)
+		os.chmod(file_name, 0o775 | stat.S_IXOTH)
 	except Exception as e:
 		print(str(e))
 
