@@ -146,10 +146,13 @@ def run_say(command):
 		if len(e):
 			print(e)
 
-def is_outdated(to_update, triggers):
+def is_outdated(message, to_update, triggers):
 	# Make sure all the triggers exist
 	for trigger in triggers:
-		assert(os.path.isfile(os.path.abspath(trigger)))
+		if not os.path.isfile(os.path.abspath(trigger)):
+			length = print_status(message)
+			print_fail(length)
+			print_exit("The file '" + trigger + "' does not exist.")
 
 	# Rebuild if any of the files to check do not exist
 	for update in to_update:
@@ -537,10 +540,11 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 def c_build_object(o_file, c_files, i_files=[]):
-	if not is_outdated(to_update = [o_file], triggers = c_files):
+	message = "Building C object file '{0}'".format(o_file)
+	if not is_outdated(message, to_update = [o_file], triggers = c_files):
 		return
 
-	length = print_status("Building C object file '{0}'".format(o_file))
+	length = print_status(message)
 	try:
 		if not 'CC' in os.environ:
 			print_fail(length)
@@ -569,10 +573,11 @@ def c_build_program(o_file, c_files, i_files=[]):
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
-	if not is_outdated(to_update = [ar_file], triggers = o_files):
+	message = "Building static library '{0}'".format(ar_file)
+	if not is_outdated(message, to_update = [ar_file], triggers = o_files):
 		return
 
-	length = print_status("Building static library '{0}'".format(ar_file))
+	length = print_status(message)
 	try:
 		run("ar rcs " + ar_file + " " + str.join(' ', o_files))
 		print_ok(length)
@@ -582,10 +587,11 @@ def ar_build_static_library(ar_file, o_files):
 		print_exit("Archive failed. Try again.")
 
 def c_build_shared_library(so_file, o_files):
-	if not is_outdated(to_update = [so_file], triggers = o_files):
+	message = "Building shared library '{0}'".format(so_file)
+	if not is_outdated(message, to_update = [so_file], triggers = o_files):
 		return
 
-	length = print_status("Building shared library '{0}'".format(so_file))
+	length = print_status(message)
 	try:
 		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 		run(command)
@@ -596,10 +602,11 @@ def c_build_shared_library(so_file, o_files):
 		print_exit("Building shared library failed. Try again.")
 
 def d_build_interface(d_file, i_files):
-	if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
+	message = "Building D interface file '{0}i'".format(d_file)
+	if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
 		return
 
-	length = print_status("Building D interface file '{0}i'".format(d_file))
+	length = print_status(message)
 	f = tempfile.NamedTemporaryFile(delete=False)
 	f.close()
 	try:
@@ -618,10 +625,11 @@ def d_build_interface(d_file, i_files):
 		os.unlink(f.name)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
-	if not is_outdated(to_update = [o_file], triggers = d_files):
+	message = "Building D object file '{0}'".format(o_file)
+	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
 
-	length = print_status("Building D object file '{0}'".format(o_file))
+	length = print_status(message)
 	try:
 		if not 'DC' in os.environ:
 			print_fail(length)
@@ -638,10 +646,11 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 		print_exit("Build failed. Try again.")
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
-	if not is_outdated(to_update = [o_file], triggers = d_files):
+	message = "Building D shared library '{0}'".format(o_file)
+	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
 
-	length = print_status("Building D shared library '{0}'".format(o_file))
+	length = print_status(message)
 	try:
 		if not 'DC' in os.environ:
 			print_fail(length)
@@ -780,7 +789,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (August 26 2012)")
+		print("Raise version 0.1 (October 19 2012)")
 		print("A small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("")

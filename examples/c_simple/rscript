@@ -10,10 +10,10 @@ def configure():
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
 
 def test():
+	clean()
 	configure()
 
-	if is_outdated(to_update = ['raise_example'], triggers = ['main.c']):
-		c_build_program('raise_example', ['main.c'])
+	c_build_program('raise_example', ['main.c'])
 
 	run_say('./raise_example')
 

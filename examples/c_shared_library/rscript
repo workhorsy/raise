@@ -14,13 +14,13 @@ def configure():
 
 def test():
 	require_not_root()
+	clean()
 	configure()
 
 	c_build_object('libexample.o', ['libexample.c'])
 	c_build_shared_library('libexample.so', ['libexample.o'])
 
-	if is_outdated(to_update = ['raise_example'], triggers = ['main.c', 'libexample.so']):
-		c_build_program('raise_example', ['main.c'], ['${LD_LIBRARY_PATH}/libexample.so'])
+	c_build_program('raise_example', ['main.c'], ['${LD_LIBRARY_PATH}/libexample.so'])
 
 	run_say('./raise_example')
 

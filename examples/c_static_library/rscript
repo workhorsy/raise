@@ -12,13 +12,13 @@ def configure():
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
 
 def test():
+	clean()
 	configure()
 
 	c_build_object('libexample.o', ['libexample.c'])
 	ar_build_static_library('libexample.a', ['libexample.o'])
 
-	if is_outdated(to_update = ['raise_example'], triggers = ['main.c', 'libexample.a']):
-		c_build_program('raise_example', ['main.c'], ['libexample.a'])
+	c_build_program('raise_example', ['main.c'], ['libexample.a'])
 
 	run_say('./raise_example')
 
