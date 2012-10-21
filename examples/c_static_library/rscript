@@ -3,17 +3,19 @@
 
 
 def clean():
+	"""Removes any files and directories generated when building."""
 	rmfile_f('raise_example')
 	rmfile_f('libexample.o')
 	rmfile_f('libexample.a')
 
-def configure():
+def _configure():
 	os.environ['CC'] = 'gcc'
 	os.environ['CFLAGS'] = '-g -Wall -Werror'
 
 def test():
+	"""Builds the program, and runs it."""
 	clean()
-	configure()
+	_configure()
 
 	c_build_object('libexample.o', ['libexample.c'])
 	ar_build_static_library('libexample.a', ['libexample.o'])
@@ -23,17 +25,19 @@ def test():
 	run_say('./raise_example')
 
 def remove():
+	"""Uninstalls the program."""
 	require_root()
 	clean()
 
 	rmfile_f('/usr/bin/raise_example')
 
 def install():
+	"""Installs the program."""
 	require_root()
 	clean()
 	remove()
 
-	configure()
+	_configure()
 	c_build_object('libexample.o', ['libexample.c'])
 	ar_build_static_library('libexample.a', ['libexample.o'])
 	c_build_program('raise_example', ['main.c'], ['libexample.a'])

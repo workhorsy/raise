@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# This file is part of Raise a small build automation tool.
+# This file is part of Raise.
+# Raise is a small build automation tool that ships with your code.
 # This project is hosted at http://launchpad.net/raise .
 # Copyright (c) 2012, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
@@ -789,15 +790,24 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (October 19 2012)")
-		print("A small build automation tool that ships with your code.")
+		print("Raise version 0.1 (October 20 2012)")
+		print("A build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
+		print("Raise uses a MIT style license.")
 		print("")
-		print("Raise is hosted at:")
+		print("More information about Raise can be found at:")
 		print("http://launchpad.net/raise")
 		print("")
-		print("Raise uses a MIT / X / Expat style license. Which can be found at:")
-		print("http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE")
+		print("COMMANDS:")
+		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
+		print("")
+		print("\t./raise license - Prints the license that Raise uses.")
+		print("")
+		print("TARGETS:")
+		for t in targets:
+			print("")
+			no_doc = "No docstring is provided for this target."
+			print("\t./raise " + t + " - " + (targets[t].__doc__ or no_doc))
 		print("")
 		print_exit("No target specified. Found targets are {0}.".format(target_list))
 	

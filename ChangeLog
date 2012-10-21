@@ -1,4 +1,5 @@
 *  Release 0.1.0
 	* Fixed bug #1042007: './raise update only works when raise_actual starts with a period.'.
 	* Fixed Bug #1068745: 'is_outdated fails with ugly assert instead of frown'.
+	* Fixed Bug #1069282: 'The help message should more concise and helpful'.
 
