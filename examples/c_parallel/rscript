@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	rmfile('main')
+	rmfile('main.o')
+	rmfile('a.o')
+	rmfile('b.o')
+	rmfile('c.o')
+
+def _configure():
+	os.environ['CC'] = 'gcc'
+	os.environ['CFLAGS'] = ' -g -Wall -Werror'
+
+def build():
+	"""Builds the program. Will only build files that have changed since the last build."""
+	require_not_root()
+	_build()
+
+def rebuild():
+	"""Rebuilds the program. Will build all the files. Even if they have not changed since last build."""
+	require_not_root()
+	clean()
+	_build()
+
+def _build():
+	_configure()
+
+	# Get the names of all the c++ files
+	code_files = ['a', 'b', 'c', 'main']
+
+	# Build each c++ file into an object
+	# The parallel_c_build_object function will build each object in its own
+	# process. The parallel_wait function will wait for all the building to
+	# complete before continuing.
+	for f in code_files:
+		object_name = '{0}.o'.format(f)
+		code_name = '{0}.c'.format(f)
+		parallel_c_build_object(object_name, [code_name])
+	parallel_wait()
+
+	# Link all the objects into the program
+	object_files = [s + '.o' for s in code_files]
+	c_build_program('main', object_files)
+
+	# Run the program
+	run_say('./main')
+
+
+
+
