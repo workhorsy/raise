@@ -56,10 +56,10 @@ class bcolors:
 
 def terminal_pad(length, pad_char=' '):
 	width = int(os.popen('stty size', 'r').read().split()[1])
-	if length > (width-2):
-		i = int(width * (int(length / width) + 1)) - 2
+	if length > (width-3):
+		i = int(width * (int(length / width) + 1)) - 3
 	else:
-		i = width - 2
+		i = width - 3
 	return ''.ljust(i-length, pad_char)
 
 def print_info(message):
@@ -78,7 +78,7 @@ def print_status(message):
 	return len(message)
 
 def print_ok(length):
-	message = terminal_pad(length) + bcolors.OK + ":)" + bcolors.ENDC
+	message = terminal_pad(length) + bcolors.OK + ":)" + bcolors.ENDC + "\n"
 
 	t = threading.currentThread()
 	if type(t) == EventThread:
@@ -88,7 +88,7 @@ def print_ok(length):
 		sys.stdout.flush()
 
 def print_fail(length, post_fail_message=None):
-	message = terminal_pad(length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC
+	message = terminal_pad(length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC + "\n"
 	if post_fail_message:
 		message += post_fail_message + "\n"
 
@@ -160,6 +160,11 @@ class Event(object):
 	def run_sync(self):
 		self.run_async()
 		self.wait_to_complete()
+		if self._message:
+			sys.stdout.write(self._message)
+			sys.stdout.flush()
+		if self._status == 'failure':
+			exit()
 
 	def stop(self):
 		if self._subprocess:
@@ -196,13 +201,13 @@ def parallel_wait():
 					event.run_async()
 			elif event._status == 'success':
 				if event._message:
-					sys.stdout.write(event._message + "\n")
+					sys.stdout.write(event._message)
 					sys.stdout.flush()
 				event._status = 'done'
 				cpus_free += 1
 			elif event._status == 'failure':
 				if event._message:
-					sys.stdout.write(event._message + "\n")
+					sys.stdout.write(event._message)
 					sys.stdout.flush()
 				event._status = 'done'
 				has_failed = True
