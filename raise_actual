@@ -45,7 +45,7 @@ else:
 
 
 g_events = []
-cpus_total = multiprocessing.cpu_count()
+cpus_total = multiprocessing.cpu_count() * 2
 cpus_free = cpus_total
 
 class bcolors:
@@ -178,53 +178,56 @@ def parallel_wait():
 	global g_events
 	global cpus_total
 	global cpus_free
-	has_failed = False
+
+	ready_events = g_events
+	running_events = []
 
 	sys.stdout.write("Building C object files in parallel ...\n")
 	sys.stdout.flush()
-	while len(g_events):
-		# Check for errors that should make us stop events and exit
-		if has_failed:
-			for event in g_events:
-				event.stop()
-			for event in g_events:
-				event.wait_to_complete()
-			g_events = []
-			exit()
-
-		# Check if all the events are done
+	while len(ready_events) or len(running_events):
+		# Check for events that are done
 		all_done = True
-		for event in g_events:
-			if event._status == 'ready':
-				if cpus_free > 0 and not has_failed:
-					cpus_free -= 1
-					event.run_async()
-			elif event._status == 'success':
+		for event in running_events:
+			# Print any message if done
+			if event._status in ['success', 'failure']:
 				if event._message:
 					sys.stdout.write(event._message)
 					sys.stdout.flush()
+
+			# Success. Keep going
+			if event._status == 'success':
 				event._status = 'done'
 				cpus_free += 1
+			# Failure. Stop events and exit
 			elif event._status == 'failure':
-				if event._message:
-					sys.stdout.write(event._message)
-					sys.stdout.flush()
-				event._status = 'done'
-				has_failed = True
-				all_done = False
-				break
-
-			if event._status != 'done':
+				for event in running_events:
+					event.stop()
+					event.wait_to_complete()
+				exit()
+			# Not done. Keep going
+			elif event._status != 'done':
 				all_done = False
 
-		# If they all are done wait for them to exit then return
+		# Check for events that need to start
+		while cpus_free > 0 and len(ready_events):
+			event = ready_events.pop()
+			cpus_free -= 1
+			event.run_async()
+			running_events.insert(0, event)
+			all_done = False
+
+		# If they all are done, wait for them to exit then return
 		if all_done:
-			for event in g_events:
+			for event in running_events:
 				event.wait_to_complete()
-			g_events = []
+			running_events = []
 
-		# Otherwise sleep
-		time.sleep(0.1)
+		# Sleep if all the cpu cores are busy, or have already started
+		if cpus_free == 0 or len(ready_events) == 0:
+			time.sleep(0.1)
+
+	# Clear all the events
+	g_events = []
 
 def require_root():
 	# Make sure we are root
