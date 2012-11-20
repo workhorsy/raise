@@ -46,9 +46,9 @@ else:
 g_events = []
 
 class bcolors:
-	MESSAGE = '\033[44m'
-	OK = '\033[42m'
-	FAIL = '\033[41m'
+	MESSAGE = '\033[44m\033[37m'
+	OK = '\033[42m\033[37m'
+	FAIL = '\033[41m\033[37m'
 	ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):

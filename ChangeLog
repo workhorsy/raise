@@ -3,4 +3,5 @@
 	* Fixed Bug #1068745: 'is_outdated fails with ugly assert instead of frown'.
 	* Fixed Bug #1069282: 'The help message should more concise and helpful'.
 	* Fixed Bug #1069280: 'Build targets starting with an underline should be ignored'.
+	* Fixed Bug #1080970: 'Make highlighted text white, instead of system default'.
 
