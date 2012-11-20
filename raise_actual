@@ -34,6 +34,7 @@ import platform, re, glob
 import shutil
 import atexit
 import threading
+import multiprocessing
 from subprocess import *
 if sys.version_info < (3, 0):
 	import urllib2
@@ -44,6 +45,8 @@ else:
 
 
 g_events = []
+cpus_total = multiprocessing.cpu_count()
+cpus_free = cpus_total
 
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
@@ -168,6 +171,8 @@ class Event(object):
 
 def parallel_wait():
 	global g_events
+	global cpus_total
+	global cpus_free
 	has_failed = False
 
 	sys.stdout.write("Building C object files in parallel ...\n")
@@ -186,19 +191,25 @@ def parallel_wait():
 		all_done = True
 		for event in g_events:
 			if event._status == 'ready':
-				if not has_failed:
+				if cpus_free > 0 and not has_failed:
+					cpus_free -= 1
 					event.run_async()
-			elif event._status in ['success', 'failure']:
+			elif event._status == 'success':
 				if event._message:
 					sys.stdout.write(event._message + "\n")
 					sys.stdout.flush()
-					event._message = None
-				if event._status == 'failure':
-					has_failed = True
-					all_done = False
-					break
+				event._status = 'done'
+				cpus_free += 1
+			elif event._status == 'failure':
+				if event._message:
+					sys.stdout.write(event._message + "\n")
+					sys.stdout.flush()
+				event._status = 'done'
+				has_failed = True
+				all_done = False
+				break
 
-			if event._status not in ['success', 'failure']:
+			if event._status != 'done':
 				all_done = False
 
 		# If they all are done wait for them to exit then return
