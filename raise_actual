@@ -883,7 +883,7 @@ def load_rscript(g=globals(), l=locals()):
 	targets = {}
 	for key in globals().keys():
 		if not key in before:
-			if hasattr(globals()[key], '__call__'):
+			if not key.startswith('_') and hasattr(globals()[key], '__call__'):
 				targets[key] = globals()[key]
 
 	return targets
@@ -952,7 +952,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (October 25 2012)")
+		print("Raise version 0.1 (November 19 2012)")
 		print("A build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")
