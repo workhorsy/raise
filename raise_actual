@@ -35,7 +35,7 @@ import shutil
 import atexit
 import threading
 import multiprocessing
-from subprocess import *
+import subprocess
 if sys.version_info < (3, 0):
 	import urllib2
 	globals()['urlopen'] = urllib2.urlopen
@@ -44,9 +44,53 @@ else:
 	globals()['urlopen'] = urllib.request.urlopen
 
 
+global pwd
+global python
+global bits
+global arch
+global user_name
+global target_name
+
+target_name = None
 g_events = []
 cpus_total = multiprocessing.cpu_count() * 2
 cpus_free = cpus_total
+
+# Get the path of the rscript file
+pwd = os.sys.path[0]
+
+# Make sure we are in at least python 2.6
+if sys.version_info < (2, 6):
+	print_exit("Python 2.6 or greater is required.")
+
+# Get the name of the current running python program
+python = sys.executable
+if not python:
+	print_exit('Could not find python to run child processes with.')
+
+# Figure out if the CPU is 32bit or 64bit
+bits = None
+if platform.architecture()[0] == '64bit':
+	bits = '64'
+else:
+	bits = '32'
+
+# Figure out the CPU architecture
+arch = None
+if re.match('^i\d86', platform.machine()):
+	arch = 'i386'
+elif platform.machine() == 'x86_64':
+	arch = 'x86_64'
+else:
+	print_exit("Unknown architecture: " + platform.machine() + " .")
+
+# Get the user name
+user_name = os.environ["LOGNAME"]
+if os.getenv("SUDO_USER"):
+	user_name = os.getenv("SUDO_USER")
+
+
+
 
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
@@ -250,7 +294,7 @@ def run_sync(command):
 	return _run_get_output(p)
 
 def run_async(command):
-	p = Popen(command, stderr=PIPE, stdout=PIPE, shell=True, preexec_fn=os.setsid)
+	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 	return p
 
 def _run_get_output(p):
@@ -279,7 +323,7 @@ def run_say(command):
 	length = len(message)
 	sys.stdout.write(message)
 	sys.stdout.flush()
-	p = Popen(command, stderr=PIPE, stdout=PIPE, shell=True, preexec_fn=os.setsid)
+	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 	p.wait()
 	o = p.stdout.read().rstrip()
 	e = p.stderr.read().rstrip()
@@ -908,51 +952,11 @@ def load_rscript(g=globals(), l=locals()):
 	return targets
 
 if __name__ == '__main__':
-	global pwd
-	global python
-	global bits
-	global arch
-	global user_name
-	global target_name
-
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
 		print_exit('Exit called by the keyboard.')
 		exit()
 	signal.signal(signal.SIGINT, signal_handler)
-
-	# Get the path of the rscript file
-	pwd = os.sys.path[0]
-
-	# Make sure we are in at least python 2.6
-	if sys.version_info < (2, 6):
-		print_exit("Python 2.6 or greater is required.")
-
-	# Get the name of the current running python program
-	python = sys.executable
-	if not python:
-		print_exit('Could not find python to run child processes with.')
-
-	# Figure out if the CPU is 32bit or 64bit
-	bits = None
-	if platform.architecture()[0] == '64bit':
-		bits = '64'
-	else:
-		bits = '32'
-
-	# Figure out the CPU architecture
-	arch = None
-	if re.match('^i\d86', platform.machine()):
-		arch = 'i386'
-	elif platform.machine() == 'x86_64':
-		arch = 'x86_64'
-	else:
-		print_exit("Unknown architecture: " + platform.machine() + " .")
-
-	# Get the user name
-	user_name = os.environ["LOGNAME"]
-	if os.getenv("SUDO_USER"):
-		user_name = os.getenv("SUDO_USER")
 
 	# Load the rscript
 	targets = load_rscript()
@@ -971,7 +975,7 @@ if __name__ == '__main__':
 	if not target_name:
 		keys = targets.keys()
 		keys.sort()
-		print("Raise version 0.1 (November 19 2012)")
+		print("Raise version 0.1 (November 27 2012)")
 		print("A build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")
