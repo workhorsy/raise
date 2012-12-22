@@ -977,7 +977,6 @@ if __name__ == '__main__':
 		print("Raise is a small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")
-		print("")
 		print("More information about Raise can be found at:")
 		print("http://launchpad.net/raise")
 		print("")
@@ -989,10 +988,9 @@ if __name__ == '__main__':
 		if targets:
 			print("TARGETS:")
 			for t in targets:
-				print("")
 				no_doc = "No docstring is provided for this target."
 				print("\t./raise " + t + " - " + (targets[t].__doc__ or no_doc))
-			print("")
+				print("")
 			print_exit("No target specified. Found targets are {0}.".format(target_list))
 	
 	if not targets:
