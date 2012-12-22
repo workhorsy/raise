@@ -6,5 +6,6 @@
 	* Fixed Bug #1080970: 'Make highlighted text white, instead of system default'.
 	* Fixed Bug #1069279: 'Add building C objects in parallel'.
 	* Fixed Bug #1042008: 'Network errors can corrupt updates'.
+	* Fixed Bug #1093034: 'If there is no rscript file, the error message is unhelpful'.
 
 

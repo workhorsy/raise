@@ -925,7 +925,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 def load_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file
 	if not os.path.isfile('rscript'):
-		print_exit("No 'rscript' file found.")
+		return None
 
 	# Get a list of all the functions
 	before = []
@@ -973,8 +973,6 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		keys = targets.keys()
-		keys.sort()
 		print("Raise version 0.1 (December 21 2012)")
 		print("Raise is a small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
@@ -986,14 +984,20 @@ if __name__ == '__main__':
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
 		print("")
-		print("TARGETS:")
-		for t in targets:
+
+		# Print all the targets
+		if targets:
+			print("TARGETS:")
+			for t in targets:
+				print("")
+				no_doc = "No docstring is provided for this target."
+				print("\t./raise " + t + " - " + (targets[t].__doc__ or no_doc))
 			print("")
-			no_doc = "No docstring is provided for this target."
-			print("\t./raise " + t + " - " + (targets[t].__doc__ or no_doc))
-		print("")
-		print_exit("No target specified. Found targets are {0}.".format(target_list))
+			print_exit("No target specified. Found targets are {0}.".format(target_list))
 	
+	if not targets:
+		print_exit("No 'rscript' file found.")
+
 	# Exit if there is no target with that name
 	if not target_name in targets:
 		print_exit("No target named '{0}'. Found targets are {1}.".format(target_name, target_list))
