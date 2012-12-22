@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# This file is part of Raise a small build automation tool.
-# This project is hosted at http://launchpad.net/raise .
+# This file is part of Raise.
+# Raise is a small build automation tool that ships with your code.
+# Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
 # Copyright (c) 2012, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
