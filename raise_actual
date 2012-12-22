@@ -986,8 +986,6 @@ if __name__ == '__main__':
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
 		print("")
-		print("\t./raise license - Prints the license that Raise uses.")
-		print("")
 		print("TARGETS:")
 		for t in targets:
 			print("")

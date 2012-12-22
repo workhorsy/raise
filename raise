@@ -118,20 +118,25 @@ def update():
 		print(str(e))
 
 if __name__ == '__main__':
-	# Clear the terminal if ran as clear; ./raise
+	# Clear the terminal
 	os.system('clear')
 
+	# Get the arguments
 	args = str(str.join(' ', sys.argv[1:]))
+
+	# Run update if that is the target
 	if args == 'update':
 		update()
 		exit()
 
+	# Run update if there is no raise_actual file
 	actual = '.raise_actual'
 	if os.path.isfile('raise_actual'):
 		actual = 'raise_actual'
 	elif not os.path.isfile('.raise_actual'):
 		update()
 
+	# Have the raise_actual file handle everything else
 	os.system('./{0} {1}'.format(actual, args))
 
 
