@@ -434,6 +434,12 @@ def mkdir(source):
 
 def rmdir_and_children(name):
 	length = print_status("Removing the dir '{0}'".format(name))
+
+	# Make sure we are not removing the current directory
+	if name == os.getcwd():
+		print_fail(length)
+		print_exit("Can't remove the current directory '{0}'.".format(name))
+
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
@@ -449,6 +455,12 @@ def rmdir_and_children(name):
 
 def rmdir(name):
 	length = print_status("Removing the dir '{0}'".format(name))
+
+	# Make sure we are not removing the current directory
+	if name == os.getcwd():
+		print_fail(length)
+		print_exit("Can't remove the current directory '{0}'.".format(name))
+
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
