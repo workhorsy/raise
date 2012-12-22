@@ -7,5 +7,5 @@
 	* Fixed Bug #1069279: 'Add building C objects in parallel'.
 	* Fixed Bug #1042008: 'Network errors can corrupt updates'.
 	* Fixed Bug #1093034: 'If there is no rscript file, the error message is unhelpful'.
-
+	* Fixed Bug #1092346: 'mvfile fails across file systems'.
 

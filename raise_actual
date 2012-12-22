@@ -405,7 +405,7 @@ def cd(name):
 def mvfile(source, dest):
 	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
-				lambda: os.rename(source, dest))
+				lambda: shutil.move(source, dest))
 
 def cpfile(source, dest):
 	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
