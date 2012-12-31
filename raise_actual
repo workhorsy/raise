@@ -36,6 +36,7 @@ import atexit
 import threading
 import multiprocessing
 import subprocess
+import traceback
 if sys.version_info < (3, 0):
 	import urllib2
 	globals()['urlopen'] = urllib2.urlopen
@@ -48,7 +49,6 @@ global pwd
 global python
 global bits
 global arch
-global user_name
 global target_name
 
 target_name = None
@@ -84,13 +84,71 @@ elif platform.machine() == 'x86_64':
 else:
 	print_exit("Unknown architecture: " + platform.machine() + " .")
 
-# Get the user name
-user_name = os.environ["LOGNAME"]
-if os.getenv("SUDO_USER"):
-	user_name = os.getenv("SUDO_USER")
+
+def get_normal_user_name():
+	# Get the name from the environmental variable
+	user_name = \
+		os.getenv('SUDO_USER') or \
+		os.getenv('USER') or \
+		os.getenv('LOGNAME')
+
+	# Make sure we got a name
+	if not user_name:
+		print_exit('Failed to get the normal user name.')
+
+	return user_name
+
+def get_normal_user_id():
+	user_name = get_normal_user_name()
+	return int(os.popen('id -u {0}'.format(user_name)).read())
 
 
+class NormalUserSubProcess(multiprocessing.Process):
+	"""
+	Just like multiprocessing.Process, but it will run the function 
+	as a normal user when run as root.
+	"""
+	def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
+		super(NormalUserSubProcess, self).__init__(group, target, name, args, kwargs)
+		self._queue = multiprocessing.Queue()
 
+	def get_retval(self):
+		return self._queue.get()
+
+	def run(self):
+		# Change the user to the normal user
+		user_id = get_normal_user_id()
+		os.setgid(user_id)
+		os.setuid(user_id)
+
+		# Run the cb as the normal user
+		retval = {}
+		retval['exception'] = None
+		retval['is_exiting'] = False
+		try:
+			super(NormalUserSubProcess, self).run()
+		except SystemExit as err:
+			# Don't save any exit() exceptions. Just exit
+			retval['is_exiting'] = True
+		except Exception as err:
+			retval['exception'] = traceback.format_exc()
+		except StandardError as err:
+			retval['exception'] = traceback.format_exc()
+		except BaseException as err:
+			retval['exception'] = traceback.format_exc()
+		finally:
+			self._queue.put(retval)
+
+def do_as_normal_user(cb):
+	p = NormalUserSubProcess(target=cb, args=())
+	p.start()
+	p.join()
+
+	retval = p.get_retval()
+	if retval['is_exiting']:
+		exit()
+	if retval['exception']:
+		print_exit(retval['exception'])
 
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
@@ -985,7 +1043,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise version 0.1 (December 21 2012)")
+		print("Raise version 0.1 (December 30 2012)")
 		print("Raise is a small build automation tool that ships with your code.")
 		print("Copyright (c) 2012 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")

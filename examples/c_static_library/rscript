@@ -14,35 +14,57 @@ def _configure():
 
 def test():
 	"""Builds the program, and runs it."""
+	# Setup
+	require_not_root()
 	clean()
 	_configure()
 
+	# Build the library
 	c_build_object('libexample.o', ['libexample.c'])
 	ar_build_static_library('libexample.a', ['libexample.o'])
 
+	# Build the program and link against the library
 	c_build_program('raise_example', ['main.c'], ['libexample.a'])
 
+	# Run the program
 	run_say('./raise_example')
+
+def _remove():
+	rmfile_f('/usr/bin/raise_example')
 
 def remove():
 	"""Uninstalls the program."""
+	# Setup
 	require_root()
 	clean()
 
-	rmfile_f('/usr/bin/raise_example')
+	# Remove the files
+	_remove()
+
+	updatedb()
+	ldconfig()
 
 def install():
 	"""Installs the program."""
+	# Setup
 	require_root()
 	clean()
-	remove()
-
 	_configure()
-	c_build_object('libexample.o', ['libexample.c'])
-	ar_build_static_library('libexample.a', ['libexample.o'])
-	c_build_program('raise_example', ['main.c'], ['libexample.a'])
 
+	# Build as a normal user
+	def actual_build():
+		c_build_object('libexample.o', ['libexample.c'])
+		ar_build_static_library('libexample.a', ['libexample.o'])
+		c_build_program('raise_example', ['main.c'], ['libexample.a'])
+	do_as_normal_user(actual_build)
+
+	# Remove old install
+	_remove()
+
+	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
 
+	updatedb()
+	ldconfig()
 
 
