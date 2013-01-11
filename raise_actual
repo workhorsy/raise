@@ -933,7 +933,8 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 
 		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if h_files:
-			command += "  -Hdimport -Hf" + str.join(' ', h_files)
+			command += " -H -Hdimport -Hf" + str.join(' ', h_files)
+		print(command)
 		run_sync(command)
 		print_ok(length)
 	except Exception as e:
@@ -941,7 +942,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 		print(e)
 		print_exit("Build failed. Try again.")
 
-def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
+def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
 	message = "Building D shared library '{0}'".format(o_file)
 	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
@@ -953,8 +954,8 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-		if h_files:
-			command += "  -Hdimport -Hf" + str.join(' ', h_files)
+		if generate_headers:
+			command += "  -Hdimport -H"
 		run_sync(command)
 		print_ok(length)
 	except Exception as e:
@@ -962,14 +963,16 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], h_files=[]):
 		print(e)
 		print_exit("Build failed. Try again.")
 
-def d_build_static_library(o_file, d_files, i_files, l_files, h_files):
+def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
 	length = print_status("Building D static library '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
 			print_fail(length)
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files) + "  -Hdimport -Hf" + str.join(' ', h_files)
+		command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+		if generate_headers:
+			command += "  -Hdimport -H"
 		run_sync(command)
 		print_ok(length)
 	except Exception as e:
