@@ -934,7 +934,6 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if h_files:
 			command += " -H -Hdimport -Hf" + str.join(' ', h_files)
-		print(command)
 		run_sync(command)
 		print_ok(length)
 	except Exception as e:
