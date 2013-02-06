@@ -10,4 +10,5 @@
 	* Fixed Bug #1092346: 'mvfile fails across file systems'.
 	* Fixed Bug #1091416: 'Commands should not allow the removal of the current directory'.
 	* Fixed Bug #1068752: 'When installing, programs should not be built as root'.
+	* Fixed Bug #1117753: 'Make it work on BSD'.
 
