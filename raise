@@ -34,6 +34,8 @@ else:
 	import urllib.request
 	globals()['urlopen'] = urllib.request.urlopen
 
+RAISE_ACTUAL_URL = 'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
+
 def friendly_size(data_length):
 	retval = ''
 	size_map = [
@@ -87,8 +89,6 @@ def update():
 		file_name = 'raise_actual'
 
 	try:
-		url = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
-
 		def cb_progress(chunk, data_length, chunk_size, content_length, percent):
 			# Write the download progress
 			sys.stdout.write("Downloaded {0} of {1} ({2}%)\r".format(friendly_size(data_length), friendly_size(content_length), percent))
@@ -110,7 +110,7 @@ def update():
 			f.write(data)
 
 		# Download the file and call the cb after each chunk
-		download_file(url, cb_progress, cb_done)
+		download_file(RAISE_ACTUAL_URL, cb_progress, cb_done)
 
 		# Make the file executable
 		os.chmod(file_name, 0o775 | stat.S_IXOTH)
