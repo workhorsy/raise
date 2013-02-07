@@ -1069,7 +1069,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise version 0.1 (February 6 2013)")
+		print("Raise version 0.2 (February 6 2013)")
 		print("Raise is a small software build tool that ships with your code.")
 		print("Copyright (c) 2013 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")

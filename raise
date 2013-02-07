@@ -34,7 +34,7 @@ else:
 	import urllib.request
 	globals()['urlopen'] = urllib.request.urlopen
 
-RAISE_ACTUAL_URL = 'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
+RAISE_ACTUAL_URL = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 
 def friendly_size(data_length):
 	retval = ''
