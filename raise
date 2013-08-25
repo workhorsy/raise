@@ -118,9 +118,6 @@ def update():
 		print(str(e))
 
 if __name__ == '__main__':
-	# Clear the terminal
-	os.system('clear')
-
 	# Get the arguments
 	args = str(str.join(' ', sys.argv[1:]))
 
@@ -137,6 +134,7 @@ if __name__ == '__main__':
 		update()
 
 	# Have the raise_actual file handle everything else
-	os.system('./{0} {1}'.format(actual, args))
+	os.system('{0} {1} {2}'.format(sys.executable, actual, args))
+
 
 

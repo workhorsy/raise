@@ -50,6 +50,13 @@ global python
 global bits
 global arch
 global target_name
+global terminal_clear
+global terminal_width
+
+def early_exit(message):
+	sys.stdout.write(message + ' Exiting ...\n')
+	sys.stdout.flush()
+	exit()
 
 target_name = None
 g_events = []
@@ -59,14 +66,15 @@ cpus_free = cpus_total
 # Get the path of the rscript file
 pwd = os.sys.path[0]
 
+
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
-	print_exit("Python 2.6 or greater is required.")
+	early_exit("Python 2.6 or greater is required.")
 
 # Get the name of the current running python program
 python = sys.executable
 if not python:
-	print_exit('Could not find python to run child processes with.')
+	early_exit('Could not find python to run child processes with.')
 
 # Figure out if the CPU is 32bit or 64bit
 bits = None
@@ -77,13 +85,40 @@ else:
 
 # Figure out the CPU architecture
 arch = None
-if re.match('^i\d86', platform.machine()):
-	arch = 'i386'
+if re.match('^i\d86$|^x86$|^x86_32$', platform.machine()):
+	arch = 'x86_32'
 elif platform.machine() == 'x86_64':
 	arch = 'x86_64'
 else:
-	print_exit("Unknown architecture: " + platform.machine() + " .")
+	early_exit("Unknown architecture: " + platform.machine() + " .")
 
+
+# Figure out how to clear the terminal
+if platform.system() == 'Windows':
+	terminal_clear = 'cls'
+else:
+	terminal_clear = 'clear'
+	
+# Figure out the terminal width
+if platform.system() == 'Windows':
+	import _winreg
+	key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
+	val = _winreg.QueryValueEx(key, "ScreenBufferSize")
+	_winreg.CloseKey(key)
+	size = hex(val[0])
+	terminal_width = int('0x' + size[-4 : len(size)], 16)
+else:
+	terminal_width = int(os.popen('stty size', 'r').read().split()[1])
+
+def to_native(command):
+	if platform.system() == 'Windows':
+		# Remove starting ./
+		if command.startswith('./'):
+			command = command[2 :]
+		# Replace ${BLAH} with %BLAH%
+		command = command.replace('${', '%').replace('}', '%')
+			
+	return command
 
 def get_normal_user_name():
 	# Get the name from the environmental variable
@@ -157,7 +192,8 @@ class bcolors:
 	ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):
-	width = int(os.popen('stty size', 'r').read().split()[1])
+	width = terminal_width
+
 	if length > (width-3):
 		i = int(width * (int(length / width) + 1)) - 3
 	else:
@@ -352,7 +388,8 @@ def run_sync(command):
 	return _run_get_output(p)
 
 def run_async(command):
-	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+	command = to_native(command)
+	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
 	return p
 
 def _run_get_output(p):
@@ -377,11 +414,12 @@ def _run_get_output(p):
 
 # FIXME: Rename to run_print
 def run_say(command):
+	command = to_native(command)
 	message = "Running command ..."
 	length = len(message)
 	sys.stdout.write(message)
 	sys.stdout.flush()
-	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
 	p.wait()
 	o = p.stdout.read().rstrip()
 	e = p.stderr.read().rstrip()
@@ -711,10 +749,10 @@ def require_static_or_shared_libraries(lib_names):
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = [
-		'which', 'clear', 'locate', 'whoami', 'grep', 
-		'stty', 'gcc', 'ar', 'ld'
+		'which', 'locate', 'whoami', 'grep', 
+		'gcc', 'ar', 'ld'
 	]
-
+	
 	# Updatedb on BSD and OSX
 	if os.path.exists('/usr/libexec/locate.updatedb'):
 		prog_names.append('/usr/libexec/locate.updatedb')
@@ -1054,6 +1092,9 @@ if __name__ == '__main__':
 		exit()
 	signal.signal(signal.SIGINT, signal_handler)
 
+	# Clear the terminal
+	os.system(terminal_clear)
+	
 	# Load the rscript
 	targets = load_rscript()
 
@@ -1069,7 +1110,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise version 0.2 (February 6 2013)")
+		print("Raise version 0.2 (August 24 2013)")
 		print("Raise is a small software build tool that ships with your code.")
 		print("Copyright (c) 2013 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")
@@ -1106,3 +1147,4 @@ if __name__ == '__main__':
 	target = targets[target_name]
 	print_info("Running target '{0}'".format(target_name))
 	target()
+
