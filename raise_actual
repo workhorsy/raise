@@ -60,7 +60,7 @@ def early_exit(message):
 
 target_name = None
 g_events = []
-cpus_total = multiprocessing.cpu_count() * 2
+cpus_total = multiprocessing.cpu_count()
 cpus_free = cpus_total
 
 # Get the path of the rscript file
