@@ -1118,12 +1118,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise version 0.2 (August 26 2013)")
-		print("Raise is a small software build tool that ships with your code.")
-		print("Copyright (c) 2013 Matthew Brennan Jones <mattjones@workhorsy.org>")
-		print("Raise uses a MIT style license.")
-		print("More information about Raise can be found at:")
-		print("http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - August 26 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")

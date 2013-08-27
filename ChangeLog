@@ -1,5 +1,6 @@
 * Release 0.2.0
 	* Fixed Bug #1216466: 'Make it work on Windows with Cygwin'.
+	* Fixed Bug #1216445: 'Change introductory output message to be one line'.
 
 2013-02-06 Release 0.1.0
 	* Fixed bug #1042007: './raise update only works when raise_actual starts with a period.'.
