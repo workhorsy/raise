@@ -98,7 +98,8 @@ if platform.system() == 'Windows':
 	terminal_clear = 'cls'
 else:
 	terminal_clear = 'clear'
-	
+
+# FIXME: Have this look for stty first then try the registry
 # Figure out the terminal width
 if platform.system() == 'Windows':
 	import _winreg
@@ -138,52 +139,40 @@ def get_normal_user_id():
 	return int(os.popen('id -u {0}'.format(user_name)).read())
 
 
-class NormalUserSubProcess(multiprocessing.Process):
-	"""
-	Just like multiprocessing.Process, but it will run the function 
-	as a normal user when run as root.
-	"""
-	def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
-		super(NormalUserSubProcess, self).__init__(group, target, name, args, kwargs)
-		self._queue = multiprocessing.Queue()
-
-	def get_retval(self):
-		return self._queue.get()
-
-	def run(self):
-		# Change the user to the normal user
-		user_id = get_normal_user_id()
-		os.setgid(user_id)
-		os.setuid(user_id)
-
-		# Run the cb as the normal user
-		retval = {}
-		retval['exception'] = None
-		retval['is_exiting'] = False
-		try:
-			super(NormalUserSubProcess, self).run()
-		except SystemExit as err:
-			# Don't save any exit() exceptions. Just exit
-			retval['is_exiting'] = True
-		except Exception as err:
-			retval['exception'] = traceback.format_exc()
-		except StandardError as err:
-			retval['exception'] = traceback.format_exc()
-		except BaseException as err:
-			retval['exception'] = traceback.format_exc()
-		finally:
-			self._queue.put(retval)
-
 def do_as_normal_user(cb):
-	p = NormalUserSubProcess(target=cb, args=())
-	p.start()
-	p.join()
+	prev_id = -1
 
-	retval = p.get_retval()
-	if retval['is_exiting']:
+	# Change the user to the normal user
+	if platform.system() != 'Windows':
+		prev_id = os.geteuid()
+		user_id = get_normal_user_id()
+		os.setegid(user_id)
+		os.seteuid(user_id)
+
+	# Run the cb as the normal user
+	exception = False
+	is_exiting = False
+	try:
+		cb()
+	except SystemExit as err:
+		# Don't save any exit() exceptions. Just exit
+		is_exiting = True
+	except Exception as err:
+		exception = traceback.format_exc()
+	except StandardError as err:
+		exception = traceback.format_exc()
+	except BaseException as err:
+		exception = traceback.format_exc()
+	finally:
+		# Return the user to normal
+		if platform.system() != 'Windows':
+			os.setegid(prev_id)
+			os.seteuid(prev_id)
+
+	if is_exiting:
 		exit()
-	if retval['exception']:
-		print_exit(retval['exception'])
+	if exception:
+		print_exit(exception)
 
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
@@ -368,13 +357,32 @@ def parallel_wait():
 	g_events = []
 
 def require_root():
+	is_root = False
+
+	# Windows
+	if platform.system() == 'Windows':
+		try:
+			# Only Admin can read the C:\windows\temp
+			sys_root = os.environ.get('SystemRoot','C:\windows')
+			temp = os.listdir(os.path.join(sys_root, 'temp'))
+			is_root = True
+		except:
+			pass
+	# Linux / Unix
+	elif os.getuid() == 0:
+		is_root = True
+
 	# Make sure we are root
-	if run_sync('whoami') != 'root':
+	if not is_root:
 		print_exit("Must be run as root.")
 
 def require_not_root():
+	# On Windows it does not matter if we are root. So just return
+	if platform.system() == 'Windows':
+		return
+	
 	# Make sure we are NOT root
-	if run_sync('whoami') == 'root':
+	if os.getuid() == 0:
 		print_exit("Must not be run as root.")
 
 def call_on_exit(cb):
@@ -749,7 +757,7 @@ def require_static_or_shared_libraries(lib_names):
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = [
-		'which', 'locate', 'whoami', 'grep', 
+		'which', 'locate', 
 		'gcc', 'ar', 'ld'
 	]
 	
@@ -1110,7 +1118,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise version 0.2 (August 24 2013)")
+		print("Raise version 0.2 (August 26 2013)")
 		print("Raise is a small software build tool that ships with your code.")
 		print("Copyright (c) 2013 Matthew Brennan Jones <mattjones@workhorsy.org>")
 		print("Raise uses a MIT style license.")
