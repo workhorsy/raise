@@ -52,6 +52,9 @@ global arch
 global target_name
 global terminal_clear
 global terminal_width
+global message_length
+global is_parallel
+global parallel_message
 
 def early_exit(message):
 	sys.stdout.write(message + ' Exiting ...\n')
@@ -62,6 +65,8 @@ target_name = None
 g_events = []
 cpus_total = multiprocessing.cpu_count()
 cpus_free = cpus_total
+is_parallel = False
+parallel_message = None
 
 # Get the path of the rscript file
 pwd = os.sys.path[0]
@@ -194,160 +199,195 @@ def print_info(message):
 	sys.stdout.flush()
 
 def print_status(message):
+	global message_length
 	message = '{0} ...'.format(message)
+	message_length = len(message)
 
-	t = threading.currentThread()
-	if type(t) == EventThread:
-		t.set_message(message)
-	else:
-		sys.stdout.write(message)
-		sys.stdout.flush()
-	return len(message)
+	sys.stdout.write(message)
+	sys.stdout.flush()
 
-def print_ok(length):
-	message = terminal_pad(length) + bcolors.OK + ":)" + bcolors.ENDC + "\n"
+def print_ok():
+	global message_length
+	message = terminal_pad(message_length) + bcolors.OK + ":)" + bcolors.ENDC + "\n"
+	message_length = 0
 
-	t = threading.currentThread()
-	if type(t) == EventThread:
-		t.append_message(message)
-	else:
-		sys.stdout.write(message)
-		sys.stdout.flush()
+	sys.stdout.write(message)
+	sys.stdout.flush()
 
-def print_fail(length, post_fail_message=None):
-	message = terminal_pad(length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC + "\n"
+def print_fail(post_fail_message=None):
+	global message_length
+	message = terminal_pad(message_length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC + "\n"
 	if post_fail_message:
 		message += post_fail_message + "\n"
+	message_length = 0
 
-	t = threading.currentThread()
-	if type(t) == EventThread:
-		t.append_message(message)
-	else:
-		sys.stdout.write(message)
-		sys.stdout.flush()
+	sys.stdout.write(message)
+	sys.stdout.flush()
 
 def print_exit(message):
 	message = bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC + '\n'
 
-	t = threading.currentThread()
-	if type(t) == EventThread:
-		t.append_message(message)
-	else:
-		sys.stdout.write(message)
-		sys.stdout.flush()
-		exit()
+	sys.stdout.write(message)
+	sys.stdout.flush()
+	exit()
 
-class EventThread(threading.Thread):
-	def __init__(self, event):
-		self._event = event
-		threading.Thread.__init__(self)
-
-	def is_parallel(self):
-		return self._event._is_parallel
-
-	def set_message(self, message):
-		self._event._message = message
-
-	def append_message(self, message):
-		self._event._message += message
-
-	def set_subprocess(self, subprocess):
-		self._event._subprocess = subprocess
+class ProcessRunner(object):
+	def __init__(self, command):
+		self._command = command
+		self._process = None
+		self._return_code = None
+		self._stdout = None
+		self._stderr = None
+		self._status = None
 
 	def run(self):
-		self._event._call_func()
+		self._process = subprocess.Popen(
+			self._command, 
+			stderr = subprocess.PIPE, 
+			stdout = subprocess.PIPE, 
+			shell = True, 
+			env = os.environ.copy()
+		)
+
+	def wait(self):
+		# Wait for the process to exit
+		self._process.wait()
+
+		# Get the return code
+		self._return_code = self._process.returncode
+
+		# Get the standard out and error text
+		self._stderr  = self._process.stderr.read().rstrip()
+		self._stdout = self._process.stdout.read().rstrip()
+		try:
+			self._stderr = str(self._stderr, 'UTF-8')
+		except Exception as err:
+			pass
+		try:
+			self._stdout = str(self._stdout, 'UTF-8')
+		except Exception as err:
+			pass
+
+		# :( Failure
+		if self._return_code:
+			self._status = ':('
+		# :) Success
+		if not self._return_code:
+			self._status = ':)'
+
+	def get_is_done(self):
+		# You have to poll a process to update the retval. Even if it has stopped already
+		if self._process.returncode == None:
+			self._process.poll()
+		return self._process.returncode != None
+	is_done = property(get_is_done)
+
+	def get_is_ok(self):
+		self._require_wait()
+		return self._status == ':)'
+	is_ok = property(get_is_ok)
+
+	def get_is_failure(self):
+		self._require_wait()
+		return self._status == ':('
+	is_failure = property(get_is_failure)
+
+	def get_stderr(self):
+		self._require_wait()
+		return self._stderr
+	stderr = property(get_stderr)
+
+	def get_stdout(self):
+		self._require_wait()
+		return self._stdout
+	stdout = property(get_stdout)
+
+	def _require_wait(self):
+		if self._return_code == None:
+			raise Exception("Wait needs to be called before any info on the process can be gotten.")
+
 
 class Event(object):
-	def __init__(self, args, func, is_parallel):
+	def __init__(self, args, func, message):
 		self._args = args
 		self._func = func
-		self._is_parallel = is_parallel
+		self._message = message
 		self._status = 'ready'
-		self._message = None
-		self._thread = None
-		self._subprocess = None
+		self._runner = self._func(*self._args)
 
-	def _call_func(self):
-		if self._func(*self._args):
+	def get_is_done(self):
+		return self._runner.is_done
+	is_done = property(get_is_done)
+
+	def run(self):
+		global is_parallel
+		# Display the message if not in parallel
+		if not is_parallel:
+			print_status(self._message)
+
+		self._status = 'running'
+		self._runner.run()
+
+	def wait(self):
+		global is_parallel
+		# Wait for the process to complete
+		self._runner.wait()
+
+		# Display the message if in parallel
+		if is_parallel:
+			print_status(self._message)
+
+		# Success or failure
+		if self._runner.is_ok:
+			print_ok()
 			self._status = 'success'
 		else:
+			print_fail(self._runner.stderr)
+			print_exit("Build failed. Try again.")
 			self._status = 'failure'
 
-	def run_async(self):
-		self._status = 'running'
-		self._thread = EventThread(self)
-		self._thread.start()
+def parallel_start():
+	global is_parallel
+	global parallel_message
 
-	def wait_to_complete(self):
-		if not self._thread:
-			return
-		self._thread.join()
-		self._thread = None
+	is_parallel = True
+	parallel_message = None
 
-	def run_sync(self):
-		self.run_async()
-		self.wait_to_complete()
-		if self._message:
-			sys.stdout.write(self._message)
-			sys.stdout.flush()
-		if self._status == 'failure':
-			exit()
-
-	def stop(self):
-		if self._subprocess:
-			try:
-				os.killpg(self._subprocess.pid, signal.SIGTERM)
-			except Exception as err:
-				pass
-		self._status = 'stopped'
-
-def parallel_wait():
+def parallel_end():
 	global g_events
 	global cpus_total
 	global cpus_free
+	global is_parallel
+	global parallel_message
 
 	ready_events = g_events
 	running_events = []
 
-	sys.stdout.write("Building C object files in parallel ...\n")
-	sys.stdout.flush()
+	if parallel_message:
+		sys.stdout.write(parallel_message)
+		sys.stdout.flush()
+
 	while len(ready_events) or len(running_events):
 		# Check for events that are done
-		all_done = True
-		for event in running_events:
-			# Print any message if done
-			if event._status in ['success', 'failure']:
-				if event._message:
-					sys.stdout.write(event._message)
-					sys.stdout.flush()
+		for event in running_events[:]:
+			# Check if it is done
+			if event.is_done:
+				event.wait()
 
 			# Success. Keep going
 			if event._status == 'success':
-				event._status = 'done'
+				running_events.remove(event)
 				cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
-				for event in running_events:
-					event.stop()
-					event.wait_to_complete()
-				exit()
-			# Not done. Keep going
-			elif event._status != 'done':
-				all_done = False
+				print_exit("Event failed.")
 
 		# Check for events that need to start
 		while cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
 			cpus_free -= 1
-			event.run_async()
+			event.run()
 			running_events.insert(0, event)
-			all_done = False
-
-		# If they all are done, wait for them to exit then return
-		if all_done:
-			for event in running_events:
-				event.wait_to_complete()
-			running_events = []
 
 		# Sleep if all the cpu cores are busy, or have already started
 		if cpus_free == 0 or len(ready_events) == 0:
@@ -355,6 +395,8 @@ def parallel_wait():
 
 	# Clear all the events
 	g_events = []
+	is_parallel = False
+	parallel_message = None
 
 def require_root():
 	is_root = False
@@ -422,9 +464,10 @@ def _run_get_output(p):
 
 # FIXME: Rename to run_print
 def run_say(command):
+	global message_length
 	command = to_native(command)
 	message = "Running command ..."
-	length = len(message)
+	message_length = len(message)
 	sys.stdout.write(message)
 	sys.stdout.flush()
 	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
@@ -441,14 +484,14 @@ def run_say(command):
 		pass
 
 	if p.returncode:
-		print_fail(length)
+		print_fail()
 		if len(o):
 			print(o)
 		if len(e):
 			print(e)
 		print_exit('Failed to run command.')
 	else:
-		print_ok(length)
+		print_ok()
 		if len(o):
 			print(o)
 		if len(e):
@@ -458,8 +501,12 @@ def is_outdated(message, to_update, triggers):
 	# Make sure all the triggers exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
-			length = print_status(message)
-			print_fail(length)
+			if is_parallel and parallel_message:
+				sys.stdout.write(parallel_message)
+				sys.stdout.flush()
+
+			print_status(message)
+			print_fail()
 			print_exit("The file '" + trigger + "' does not exist.")
 
 	# Rebuild if any of the files to check do not exist
@@ -485,21 +532,21 @@ def is_outdated(message, to_update, triggers):
 		return False
 
 def _do_on_fail_exit(start_message, fail_message, cb):
-	length = print_status(start_message)
+	print_status(start_message)
 	try:
 		cb()
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print_exit(fail_message)
 
 def _do_on_fail_pass(start_message, cb):
-	length = print_status(start_message)
+	print_status(start_message)
 	try:
 		cb()
 	except Exception as e:
 		pass
-	print_ok(length)
+	print_ok()
 
 def cd(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),
@@ -537,11 +584,11 @@ def mkdir(source):
 				lambda: os.mkdir(source))
 
 def rmdir_and_children(name):
-	length = print_status("Removing the dir '{0}'".format(name))
+	print_status("Removing the dir '{0}'".format(name))
 
 	# Make sure we are not removing the current directory
 	if name == os.getcwd():
-		print_fail(length)
+		print_fail()
 		print_exit("Can't remove the current directory '{0}'.".format(name))
 
 	try:
@@ -549,20 +596,20 @@ def rmdir_and_children(name):
 			os.unlink(name)
 		elif os.path.isdir(name):
 			shutil.rmtree(name)
-		print_ok(length)
+		print_ok()
 	except OSError as e:
 		if 'No such file or directory' in e:
-			print_ok(length)
+			print_ok()
 			return
-		print_fail(length)
+		print_fail()
 		print_exit("Failed to remove the dir '{0}'.".format(name))
 
 def rmdir(name):
-	length = print_status("Removing the dir '{0}'".format(name))
+	print_status("Removing the dir '{0}'".format(name))
 
 	# Make sure we are not removing the current directory
 	if name == os.getcwd():
-		print_fail(length)
+		print_fail()
 		print_exit("Can't remove the current directory '{0}'.".format(name))
 
 	try:
@@ -576,25 +623,25 @@ def rmdir(name):
 		elif 'No such file or directory' in e:
 			pass
 		else:
-			print_fail(length)
+			print_fail()
 			print_exit("Failed to remove the dir '{0}'.".format(name))
 
-	print_ok(length)
+	print_ok()
 
 def rmfile(name):
-	length = print_status("Removing the file '{0}'".format(name))
+	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
 			os.remove(name)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
 def rmfile_f(name):
-	length = print_status("Removing the file '{0}'".format(name))
+	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
@@ -603,7 +650,7 @@ def rmfile_f(name):
 	except Exception as e:
 		pass
 
-	print_ok(length)
+	print_ok()
 
 def symlink(source, link_name):
 	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
@@ -672,29 +719,29 @@ def _library_path(lib_name, extension):
 		raise Exception("Library '{0}' not found.".format(lib_name))
 
 def require_static_library(lib_name):
-	length = print_status("Checking for static library '{0}'".format(lib_name))
+	print_status("Checking for static library '{0}'".format(lib_name))
 	is_installed = _is_library_installed(lib_name, '.a')
 
 	# Make them install the lib to continue
 	if not is_installed:
-		print_fail(length)
+		print_fail()
 		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
 	try:
 		run_sync("locate /" + lib_name + ".a")
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
 def require_shared_library(lib_name):
-	length = print_status("Checking for shared library '{0}'".format(lib_name))
+	print_status("Checking for shared library '{0}'".format(lib_name))
 	is_installed = _is_library_installed(lib_name, '.so')
 
 	# Make them install the lib to continue
 	if not is_installed:
-		print_fail(length)
+		print_fail()
 		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ld
@@ -702,31 +749,31 @@ def require_shared_library(lib_name):
 	f.close()
 	try:
 		run_sync("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 	finally:
 		os.unlink(f.name)
 
 def require_static_or_shared_library(lib_name):
-	length = print_status("Checking for static/shared library '{0}'".format(lib_name))
+	print_status("Checking for static/shared library '{0}'".format(lib_name))
 	is_static_installed = _is_library_installed(lib_name, '.a')
 	is_shared_installed = _is_library_installed(lib_name, '.so')
 
 	# Make them install the lib to continue
 	if not is_static_installed and not is_shared_installed:
-		print_fail(length)
+		print_fail()
 		print_exit("Static/Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
 	if is_static_installed:
 		try:
 			run_sync("locate /" + lib_name + ".a")
-			print_ok(length)
+			print_ok()
 			return
 		except Exception as e:
-			print_fail(length)
+			print_fail()
 			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ld
@@ -735,9 +782,9 @@ def require_static_or_shared_library(lib_name):
 		f.close()
 		try:
 			run_sync("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
-			print_ok(length)
+			print_ok()
 		except Exception as e:
-			print_fail(length)
+			print_fail()
 			print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 		finally:
 			os.unlink(f.name)
@@ -781,8 +828,8 @@ def require_raise_dependencies():
 	if fails:
 		print_info("Raise is checking for its dependencies")
 		for f in fails:
-			length = print_status("Checking for program '{0}'".format(f))
-			print_fail(length)
+			print_status("Checking for program '{0}'".format(f))
+			print_fail()
 		print_exit("Install the dependencies '{0}' and try again.".format(str.join("', '", fails)))
 
 def require_programs(prog_names):
@@ -883,57 +930,53 @@ def link_static_or_shared_paths(lib_names):
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
 
-def parallel_c_build_object(o_file, c_files, i_files=[]):
-	global g_events
-	args = [o_file, c_files, i_files]
-	func = _c_build_object
-	is_parallel = True
-	g_events.append(Event(args, func, is_parallel))
-
 def c_build_object(o_file, c_files, i_files=[]):
-	args = [o_file, c_files, i_files]
-	func = _c_build_object
-	is_parallel = False
-	event = Event(args, func, is_parallel)
-	event.run_sync()
+	global g_events
+	global is_parallel
+	global parallel_message
 
-def _c_build_object(o_file, c_files, i_files=[]):
-	t = threading.currentThread()
-	if not t.is_parallel():
+	# Setup the messages for parallel and serial
+	message = None
+	if not is_parallel:
 		message = "Building C object file '{0}'".format(o_file)
 	else:
+		parallel_message = "Building C object files in parallel ...\n"
 		message = "    '{0}'".format(o_file)
+
+	# Skip if the files have not changed since last build
 	if not is_outdated(message, to_update = [o_file], triggers = c_files):
-		return True
+		return
 
-	length = print_status(message)
-	try:
-		if not 'CC' in os.environ:
-			print_fail(length)
-			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+	# Make sure the environmental variable is set
+	if not 'CC' in os.environ:
+		print_fail()
+		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
-		p = run_async("${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-		t.set_subprocess(p)
-		p.wait()
-		_run_get_output(p)
-		print_ok(length)
-		return True
-	except Exception as e:
-		print_fail(length, str(e))
-		print_exit("Build failed. Try again.")
-		return False
+	# Create the event
+	args = [o_file, c_files, i_files]
+	func = _c_build_object
+	event = Event(args, func, message)
+	g_events.append(event)
+
+	# If not parallel, run the event now
+	if not is_parallel:
+		parallel_end()
+
+def _c_build_object(o_file, c_files, i_files=[]):
+	return ProcessRunner("${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
+
 
 def c_build_program(o_file, c_files, i_files=[]):
-	length = print_status("Building C program '{0}'".format(o_file))
+	print_status("Building C program '{0}'".format(o_file))
 	try:
 		if not 'CC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
 		run_sync("${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 
@@ -943,12 +986,12 @@ def ar_build_static_library(ar_file, o_files):
 	if not is_outdated(message, to_update = [ar_file], triggers = o_files):
 		return
 
-	length = print_status(message)
+	print_status(message)
 	try:
 		run_sync("ar rcs " + ar_file + " " + str.join(' ', o_files))
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Archive failed. Try again.")
 
@@ -957,13 +1000,13 @@ def c_build_shared_library(so_file, o_files):
 	if not is_outdated(message, to_update = [so_file], triggers = o_files):
 		return
 
-	length = print_status(message)
+	print_status(message)
 	try:
 		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Building shared library failed. Try again.")
 
@@ -972,19 +1015,19 @@ def d_build_interface(d_file, i_files):
 	if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
 		return
 
-	length = print_status(message)
+	print_status(message)
 	f = tempfile.NamedTemporaryFile(delete=False)
 	f.close()
 	try:
 		if not 'DC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of" + f.name
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 	finally:
@@ -995,19 +1038,19 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
 
-	length = print_status(message)
+	print_status(message)
 	try:
 		if not 'DC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if h_files:
 			command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 
@@ -1016,51 +1059,51 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
 
-	length = print_status(message)
+	print_status(message)
 	try:
 		if not 'DC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if generate_headers:
 			command += "  -Hdimport -H"
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
-	length = print_status("Building D static library '{0}'".format(o_file))
+	print_status("Building D static library '{0}'".format(o_file))
 	try:
 		if not 'DC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 		if generate_headers:
 			command += "  -Hdimport -H"
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 
 def d_build_program(out_file, inc_files, link_files=[]):
-	length = print_status("Building D program '{0}'".format(out_file))
+	print_status("Building D program '{0}'".format(out_file))
 	try:
 		if not 'DC' in os.environ:
-			print_fail(length)
+			print_fail()
 			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
 		command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 		run_sync(command)
-		print_ok(length)
+		print_ok()
 	except Exception as e:
-		print_fail(length)
+		print_fail()
 		print(e)
 		print_exit("Build failed. Try again.")
 
