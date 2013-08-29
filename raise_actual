@@ -967,18 +967,30 @@ def _c_build_object(o_file, c_files, i_files=[]):
 
 
 def c_build_program(o_file, c_files, i_files=[]):
-	print_status("Building C program '{0}'".format(o_file))
-	try:
-		if not 'CC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+	global g_events
+	global is_parallel
+	global parallel_message
 
-		run_sync("${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-		print_ok()
-	except Exception as e:
+	# Setup the message
+	message = "Building C program '{0}'".format(o_file)
+
+	# Make sure the environmental variable is set
+	if not 'CC' in os.environ:
 		print_fail()
-		print(e)
-		print_exit("Build failed. Try again.")
+		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+
+	# Create the event
+	args = [o_file, c_files, i_files]
+	func = _c_build_program
+	event = Event(args, func, message)
+	g_events.append(event)
+
+	# Run the event now
+	parallel_end()
+
+def _c_build_program(o_file, c_files, i_files=[]):
+	return ProcessRunner("${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
+
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
@@ -1161,7 +1173,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - August 26 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - August 29 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
