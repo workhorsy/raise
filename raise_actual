@@ -54,7 +54,7 @@ global terminal_clear
 global terminal_width
 global message_length
 global is_parallel
-global parallel_message
+global parallel_header
 
 def early_exit(message):
 	sys.stdout.write(message + ' Exiting ...\n')
@@ -66,7 +66,7 @@ g_events = []
 cpus_total = multiprocessing.cpu_count()
 cpus_free = cpus_total
 is_parallel = False
-parallel_message = None
+parallel_header = None
 
 # Get the path of the rscript file
 pwd = os.sys.path[0]
@@ -308,12 +308,11 @@ class ProcessRunner(object):
 
 
 class Event(object):
-	def __init__(self, args, func, message):
-		self._args = args
-		self._func = func
+	def __init__(self, command, message):
+		self._command = command
 		self._message = message
 		self._status = 'ready'
-		self._runner = self._func(*self._args)
+		self._runner = ProcessRunner(self._command)
 
 	def get_is_done(self):
 		return self._runner.is_done
@@ -348,23 +347,23 @@ class Event(object):
 
 def parallel_start():
 	global is_parallel
-	global parallel_message
+	global parallel_header
 
 	is_parallel = True
-	parallel_message = None
+	parallel_header = None
 
 def parallel_end():
 	global g_events
 	global cpus_total
 	global cpus_free
 	global is_parallel
-	global parallel_message
+	global parallel_header
 
 	ready_events = g_events
 	running_events = []
 
-	if parallel_message:
-		sys.stdout.write(parallel_message)
+	if parallel_header:
+		sys.stdout.write(parallel_header)
 		sys.stdout.flush()
 
 	while len(ready_events) or len(running_events):
@@ -396,7 +395,7 @@ def parallel_end():
 	# Clear all the events
 	g_events = []
 	is_parallel = False
-	parallel_message = None
+	parallel_header = None
 
 def require_root():
 	is_root = False
@@ -433,14 +432,10 @@ def call_on_exit(cb):
 		atexit.register(cb)
 
 def run_sync(command):
-	p = run_async(command)
-	p.wait()
-	return _run_get_output(p)
-
-def run_async(command):
 	command = to_native(command)
 	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
-	return p
+	p.wait()
+	return _run_get_output(p)
 
 def _run_get_output(p):
 	e = p.stderr.read().rstrip()
@@ -501,8 +496,8 @@ def is_outdated(message, to_update, triggers):
 	# Make sure all the triggers exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
-			if is_parallel and parallel_message:
-				sys.stdout.write(parallel_message)
+			if is_parallel and parallel_header:
+				sys.stdout.write(parallel_header)
 				sys.stdout.flush()
 
 			print_status(message)
@@ -933,14 +928,15 @@ def link_static_or_shared_paths(lib_names):
 def c_build_object(o_file, c_files, i_files=[]):
 	global g_events
 	global is_parallel
-	global parallel_message
+	global parallel_header
 
 	# Setup the messages for parallel and serial
 	message = None
+	#fail_message = "Build failed. Try again."
 	if not is_parallel:
 		message = "Building C object file '{0}'".format(o_file)
 	else:
-		parallel_message = "Building C object files in parallel ...\n"
+		parallel_header = "Building C object files in parallel ...\n"
 		message = "    '{0}'".format(o_file)
 
 	# Skip if the files have not changed since last build
@@ -953,26 +949,22 @@ def c_build_object(o_file, c_files, i_files=[]):
 		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
 	# Create the event
-	args = [o_file, c_files, i_files]
-	func = _c_build_object
-	event = Event(args, func, message)
+	command = "${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
+	event = Event(command, message)
 	g_events.append(event)
 
 	# If not parallel, run the event now
 	if not is_parallel:
 		parallel_end()
 
-def _c_build_object(o_file, c_files, i_files=[]):
-	return ProcessRunner("${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-
-
 def c_build_program(o_file, c_files, i_files=[]):
 	global g_events
 	global is_parallel
-	global parallel_message
+	global parallel_header
 
 	# Setup the message
 	message = "Building C program '{0}'".format(o_file)
+	#fail_message = "Build failed. Try again."
 
 	# Make sure the environmental variable is set
 	if not 'CC' in os.environ:
@@ -980,47 +972,56 @@ def c_build_program(o_file, c_files, i_files=[]):
 		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
 	# Create the event
-	args = [o_file, c_files, i_files]
-	func = _c_build_program
-	event = Event(args, func, message)
+	command = "${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
+	event = Event(command, message)
 	g_events.append(event)
 
 	# Run the event now
 	parallel_end()
 
-def _c_build_program(o_file, c_files, i_files=[]):
-	return ProcessRunner("${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files))
-
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
+	global g_events
+	global is_parallel
+	global parallel_header
+
+	# Setup the message
 	message = "Building static library '{0}'".format(ar_file)
+	#fail_message = "Archive failed. Try again."
+
+	# Skip if the files have not changed since last build
 	if not is_outdated(message, to_update = [ar_file], triggers = o_files):
 		return
 
-	print_status(message)
-	try:
-		run_sync("ar rcs " + ar_file + " " + str.join(' ', o_files))
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print(e)
-		print_exit("Archive failed. Try again.")
+	# Create the event
+	command = "ar rcs " + ar_file + " " + str.join(' ', o_files)
+	event = Event(command, message)
+	g_events.append(event)
+
+	# Run the event now
+	parallel_end()
 
 def c_build_shared_library(so_file, o_files):
+	global g_events
+	global is_parallel
+	global parallel_header
+
+	# Setup the message
 	message = "Building shared library '{0}'".format(so_file)
+	# fail_message = "Building shared library failed. Try again."
+
+	# Skip if the files have not changed since last build
 	if not is_outdated(message, to_update = [so_file], triggers = o_files):
 		return
 
-	print_status(message)
-	try:
-		command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
-		run_sync(command)
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print(e)
-		print_exit("Building shared library failed. Try again.")
+	# Create the event
+	command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
+	event = Event(command, message)
+	g_events.append(event)
+
+	# Run the event now
+	parallel_end()
 
 def d_build_interface(d_file, i_files):
 	message = "Building D interface file '{0}i'".format(d_file)
