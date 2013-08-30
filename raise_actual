@@ -628,30 +628,23 @@ def symlink(source, link_name):
 				lambda: os.symlink(source, link_name))
 
 def ldconfig():
-	global g_events
-	global is_parallel
-	global parallel_header
-
 	# Setup the message
-	message = "Running 'ldconfig'"
-	#fail_message = "Failed run 'ldconfig'."
+	print_status("Running 'ldconfig'")
 
 	# Create the event
-	command = "ldconfig"
-	event = Event(command, message)
-	g_events.append(event)
+	runner = ProcessRunner("ldconfig")
+	runner.run()
+	runner.wait()
 
-	# Run the event now
-	parallel_end()
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail()
+		print_exit("Failed run 'ldconfig'.")
 
 def updatedb():
-	global g_events
-	global is_parallel
-	global parallel_header
-
 	# Setup the message
-	message = "Running 'updatedb'"
-	#fail_message = "Failed run 'updatedb'."
+	print_status("Running 'updatedb'")
 
 	command = None
 	# Updatedb on BSD and OSX
@@ -661,12 +654,15 @@ def updatedb():
 	else:
 		command = 'updatedb'
 
-	# Create the event
-	event = Event(command, message)
-	g_events.append(event)
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
 
-	# Run the event now
-	parallel_end()
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail()
+		print_exit("Failed run 'updatedb'.")
 
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
