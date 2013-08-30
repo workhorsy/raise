@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 import os, sys, stat
 import tempfile
 import time
@@ -233,7 +234,7 @@ def print_exit(message):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		self._command = command
+		self._command = to_native(command)
 		self._process = None
 		self._return_code = None
 		self._stdout = None
@@ -282,10 +283,10 @@ class ProcessRunner(object):
 		return self._process.returncode != None
 	is_done = property(get_is_done)
 
-	def get_is_ok(self):
+	def get_is_success(self):
 		self._require_wait()
 		return self._status == ':)'
-	is_ok = property(get_is_ok)
+	is_success = property(get_is_success)
 
 	def get_is_failure(self):
 		self._require_wait()
@@ -337,7 +338,7 @@ class Event(object):
 			print_status(self._message)
 
 		# Success or failure
-		if self._runner.is_ok:
+		if self._runner.is_success:
 			print_ok()
 			self._status = 'success'
 		else:
@@ -431,32 +432,6 @@ def call_on_exit(cb):
 	if cb:
 		atexit.register(cb)
 
-def run_sync(command):
-	command = to_native(command)
-	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
-	p.wait()
-	return _run_get_output(p)
-
-def _run_get_output(p):
-	e = p.stderr.read().rstrip()
-	o = p.stdout.read().rstrip()
-	try:
-		e = str(e, 'UTF-8')
-	except Exception as err:
-		pass
-	try:
-		o = str(o, 'UTF-8')
-	except Exception as err:
-		pass
-
-	if p.returncode:
-		if len(e) != 0:
-			raise Exception(e)
-		else:
-			raise Exception(o)
-
-	return o
-
 # FIXME: Rename to run_print
 def run_say(command):
 	global message_length
@@ -528,12 +503,25 @@ def is_outdated(message, to_update, triggers):
 
 def _do_on_fail_exit(start_message, fail_message, cb):
 	print_status(start_message)
-	try:
-		cb()
-		print_ok()
-	except Exception as e:
-		print_fail()
-		print_exit(fail_message)
+
+	# Run it if it is a function
+	if hasattr(cb, '__call__'):
+		try:
+			cb()
+			print_ok()
+		except Exception as e:
+			print_fail()
+			print_exit(fail_message)
+	# Or run it as a process if a string
+	elif type(cb) == str:
+		runner = ProcessRunner(cb)
+		runner.run()
+		runner.wait()
+		if runner.is_success:
+			print_ok()
+		elif runner.is_failure:
+			print_fail()
+			print_exit(fail_message)
 
 def _do_on_fail_pass(start_message, cb):
 	print_status(start_message)
@@ -653,22 +641,45 @@ def symlink(source, link_name):
 				lambda: os.symlink(source, link_name))
 
 def ldconfig():
-	_do_on_fail_exit("Running 'ldconfig'",
-					"Failed run 'ldconfig'.",
-				lambda: run_sync('ldconfig'))
+	global g_events
+	global is_parallel
+	global parallel_header
+
+	# Setup the message
+	message = "Running 'ldconfig'"
+	#fail_message = "Failed run 'ldconfig'."
+
+	# Create the event
+	command = "ldconfig"
+	event = Event(command, message)
+	g_events.append(event)
+
+	# Run the event now
+	parallel_end()
 
 def updatedb():
-	updatedb_name = None
+	global g_events
+	global is_parallel
+	global parallel_header
+
+	# Setup the message
+	message = "Running 'updatedb'"
+	#fail_message = "Failed run 'updatedb'."
+
+	command = None
 	# Updatedb on BSD and OSX
 	if os.path.exists('/usr/libexec/locate.updatedb'):
-		updatedb_name = '/usr/libexec/locate.updatedb'
+		command = '/usr/libexec/locate.updatedb'
 	# Updatedb on Linux
 	else:
-		updatedb_name = 'updatedb'
+		command = 'updatedb'
 
-	_do_on_fail_exit("Running 'updatedb'",
-					"Failed run 'updatedb'.",
-				lambda: run_sync(updatedb_name))
+	# Create the event
+	event = Event(command, message)
+	g_events.append(event)
+
+	# Run the event now
+	parallel_end()
 
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
@@ -810,13 +821,13 @@ def require_raise_dependencies():
 	else:
 		prog_names.append('updatedb')
 
-	fails = []
 	# See which programs are not installed
+	fails = []
 	for prog_name in prog_names:
-		cb = lambda: run_sync('which {0}'.format(prog_name))
-		try:
-			cb()
-		except Exception as e:
+		runner = ProcessRunner('which {0}'.format(prog_name))
+		runner.run()
+		runner.wait()
+		if runner.is_failure:
 			fails.append(prog_name)
 
 	# Print them in a list then exit
@@ -829,15 +840,19 @@ def require_raise_dependencies():
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
-		_do_on_fail_exit("Checking for program '{0}'".format(prog_name),
-				"Install the program '{0}' and try again.".format(prog_name),
-				lambda: run_sync('which {0}'.format(prog_name)))
+		_do_on_fail_exit(
+			"Checking for program '{0}'".format(prog_name),
+			"Install the program '{0}' and try again.".format(prog_name),
+			'which {0}'.format(prog_name)
+		)
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
-		_do_on_fail_exit("Checking for python module '{0}'".format(mod_name),
-						"Install the python module '{0}' and try again.".format(mod_name),
-					lambda: run_sync('{0} -c "import {1}"'.format(python, mod_name)))
+		_do_on_fail_exit(
+			"Checking for python module '{0}'".format(mod_name),
+			"Install the python module '{0}' and try again.".format(mod_name),
+			'{0} -c "import {1}"'.format(python, mod_name)
+		)
 
 def header_path(header_name):
 	retval = None
