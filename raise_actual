@@ -303,6 +303,11 @@ class ProcessRunner(object):
 		return self._stdout
 	stdout = property(get_stdout)
 
+	def get_stdall(self):
+		self._require_wait()
+		return self._stdout + self._stderr
+	stdall = property(get_stdall)
+
 	def _require_wait(self):
 		if self._return_code == None:
 			raise Exception("Wait needs to be called before any info on the process can be gotten.")
@@ -434,38 +439,20 @@ def call_on_exit(cb):
 
 # FIXME: Rename to run_print
 def run_say(command):
-	global message_length
-	command = to_native(command)
-	message = "Running command ..."
-	message_length = len(message)
-	sys.stdout.write(message)
-	sys.stdout.flush()
-	p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, env=os.environ.copy())
-	p.wait()
-	o = p.stdout.read().rstrip()
-	e = p.stderr.read().rstrip()
-	try:
-		e = str(e, 'UTF-8')
-	except Exception as err:
-		pass
-	try:
-		o = str(o, 'UTF-8')
-	except Exception as err:
-		pass
+	print_status("Running command")
 
-	if p.returncode:
-		print_fail()
-		if len(o):
-			print(o)
-		if len(e):
-			print(e)
-		print_exit('Failed to run command.')
-	else:
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
 		print_ok()
-		if len(o):
-			print(o)
-		if len(e):
-			print(e)
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print_exit('Failed to run command.')
 
 def is_outdated(message, to_update, triggers):
 	# Make sure all the triggers exist
@@ -734,10 +721,12 @@ def require_static_library(lib_name):
 		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run updatedb if the library is not found by locate
-	try:
-		run_sync("locate /" + lib_name + ".a")
+	runner = ProcessRunner("locate /{0}.a".format(lib_name))
+	runner.run()
+	runner.wait()
+	if runner.is_success:
 		print_ok()
-	except Exception as e:
+	elif runner.is_failure:
 		print_fail()
 		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
@@ -753,14 +742,15 @@ def require_shared_library(lib_name):
 	# Make them run ldconfig if the library is not found by ld
 	f = tempfile.NamedTemporaryFile(delete=False)
 	f.close()
-	try:
-		run_sync("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
+	runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
+	runner.run()
+	runner.wait()
+	os.unlink(f.name)
+	if runner.is_success:
 		print_ok()
-	except Exception as e:
+	elif runner.is_failure:
 		print_fail()
 		print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
-	finally:
-		os.unlink(f.name)
 
 def require_static_or_shared_library(lib_name):
 	print_status("Checking for static/shared library '{0}'".format(lib_name))
@@ -774,26 +764,29 @@ def require_static_or_shared_library(lib_name):
 
 	# Make them run updatedb if the library is not found by locate
 	if is_static_installed:
-		try:
-			run_sync("locate /" + lib_name + ".a")
+		runner = ProcessRunner("locate /" + lib_name + ".a")
+		runner.run()
+		runner.wait()
+		if runner.is_success:
 			print_ok()
-			return
-		except Exception as e:
+		elif runner.is_failure:
 			print_fail()
 			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
+		return
 
 	# Make them run ldconfig if the library is not found by ld
 	if is_shared_installed:
 		f = tempfile.NamedTemporaryFile(delete=False)
 		f.close()
-		try:
-			run_sync("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
+		runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
+		runner.run()
+		runner.wait()
+		os.unlink(f.name)
+		if runner.is_success:
 			print_ok()
-		except Exception as e:
+		elif runner.is_failure:
 			print_fail()
 			print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
-		finally:
-			os.unlink(f.name)
 
 def require_static_libraries(lib_names):
 	for lib_name in lib_names:
@@ -856,9 +849,14 @@ def require_python_modules(mod_names):
 
 def header_path(header_name):
 	retval = None
-	try:
+
+	runner = ProcessRunner('locate /' + header_name)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
 		# Get any paths that contain the library name
-		paths = run_sync('locate /' + header_name).split('\n')
+		paths = runner.stdout.split('\n')
 
 		# First match paths that contain the architecture
 		for path in paths:
@@ -869,9 +867,8 @@ def header_path(header_name):
 		# Use the first
 		if retval == None:
 			retval = paths[0]
-	except Exception as e:
-		pass
 
+	# Make sure a header file was found
 	if not retval or not os.path.exists(retval):
 		raise Exception("Header file not found: '" + header_name + "'")
 
@@ -1043,96 +1040,111 @@ def d_build_interface(d_file, i_files):
 	if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
 		return
 
+	if not 'DC' in os.environ:
+		print_fail()
+		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
 	print_status(message)
 	f = tempfile.NamedTemporaryFile(delete=False)
 	f.close()
-	try:
-		if not 'DC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of" + f.name
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+	os.unlink(f.name)
 
-		command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of" + f.name
-		run_sync(command)
+	if runner.is_success:
 		print_ok()
-	except Exception as e:
-		print_fail()
-		print(e)
+	elif runner.is_failure:
+		print_fail(runner.stderr)
 		print_exit("Build failed. Try again.")
-	finally:
-		os.unlink(f.name)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	message = "Building D object file '{0}'".format(o_file)
 	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
-
 	print_status(message)
-	try:
-		if not 'DC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-		if h_files:
-			command += " -H -Hdimport -Hf" + str.join(' ', h_files)
-		run_sync(command)
-		print_ok()
-	except Exception as e:
+	if not 'DC' in os.environ:
 		print_fail()
-		print(e)
+		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+	command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	if h_files:
+		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
+
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail(runner.stderr)
 		print_exit("Build failed. Try again.")
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
 	message = "Building D shared library '{0}'".format(o_file)
 	if not is_outdated(message, to_update = [o_file], triggers = d_files):
 		return
-
 	print_status(message)
-	try:
-		if not 'DC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-		if generate_headers:
-			command += "  -Hdimport -H"
-		run_sync(command)
-		print_ok()
-	except Exception as e:
+	if not 'DC' in os.environ:
 		print_fail()
-		print(e)
+		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+	command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	if generate_headers:
+		command += "  -Hdimport -H"
+
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail(runner.stderr)
 		print_exit("Build failed. Try again.")
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
 	print_status("Building D static library '{0}'".format(o_file))
-	try:
-		if not 'DC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-		if generate_headers:
-			command += "  -Hdimport -H"
-		run_sync(command)
-		print_ok()
-	except Exception as e:
+	if not 'DC' in os.environ:
 		print_fail()
-		print(e)
+		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+	command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	if generate_headers:
+		command += "  -Hdimport -H"
+
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail(runner.stderr)
 		print_exit("Build failed. Try again.")
 
 def d_build_program(out_file, inc_files, link_files=[]):
 	print_status("Building D program '{0}'".format(out_file))
-	try:
-		if not 'DC' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-		command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
-		run_sync(command)
-		print_ok()
-	except Exception as e:
+	if not 'DC' in os.environ:
 		print_fail()
-		print(e)
+		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+	command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success:
+		print_ok()
+	elif runner.is_failure:
+		print_fail(runner.stderr)
 		print_exit("Build failed. Try again.")
 
 def load_rscript(g=globals(), l=locals()):
