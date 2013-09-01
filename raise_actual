@@ -54,8 +54,6 @@ global target_name
 global terminal_clear
 global terminal_width
 global message_length
-global is_parallel
-global parallel_header
 
 def early_exit(message):
 	sys.stdout.write(message + ' Exiting ...\n')
@@ -63,11 +61,8 @@ def early_exit(message):
 	exit()
 
 target_name = None
-g_events = []
 cpus_total = multiprocessing.cpu_count()
 cpus_free = cpus_total
-is_parallel = False
-parallel_header = None
 
 # Get the path of the rscript file
 pwd = os.sys.path[0]
@@ -314,33 +309,55 @@ class ProcessRunner(object):
 
 
 class Event(object):
-	def __init__(self, command, message):
-		self._command = command
-		self._message = message
+	is_parallel = False
+	is_first_parallel = False
+	events = []
+
+	def __init__(self, task, result, plural, singular, command, setup_cb):
 		self._status = 'ready'
-		self._runner = ProcessRunner(self._command)
+		self._runner = None
+
+		self._task = task
+		self._result = result
+		self._plural = plural
+		self._singular = singular
+		self._command = command
+		self._setup_cb = setup_cb
 
 	def get_is_done(self):
 		return self._runner.is_done
 	is_done = property(get_is_done)
 
 	def run(self):
-		global is_parallel
-		# Display the message if not in parallel
-		if not is_parallel:
-			print_status(self._message)
+		global message_length
 
+		# Show the parallel header
+		if Event.is_parallel:
+			if Event.is_first_parallel:
+				Event.is_first_parallel = False
+				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
+				sys.stdout.flush()
+				message_length = 0
+		# Show the sereal message
+		else:
+			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
+
+		# Run the setup function
+		if not self._setup_cb():
+			return
+
+		# Start the process
+		self._runner = ProcessRunner(self._command)
 		self._status = 'running'
 		self._runner.run()
 
 	def wait(self):
-		global is_parallel
 		# Wait for the process to complete
 		self._runner.wait()
 
-		# Display the message if in parallel
-		if is_parallel:
-			print_status(self._message)
+		# Display the message
+		if Event.is_parallel:
+			print_status("   '{0}'".format(self._result))
 
 		# Success or failure
 		if self._runner.is_success:
@@ -348,29 +365,26 @@ class Event(object):
 			self._status = 'success'
 		else:
 			print_fail(self._runner.stderr)
-			print_exit("Build failed. Try again.")
+			print_exit("{0} failed. Try again.".format(self._task))
 			self._status = 'failure'
 
-def parallel_start():
-	global is_parallel
-	global parallel_header
+def add_event(event):
+	Event.events.append(event)
 
-	is_parallel = True
-	parallel_header = None
+	# If not parallel, run the event now
+	if not Event.is_parallel:
+		parallel_end()
+
+def parallel_start():
+	Event.is_parallel = True
+	Event.is_first_parallel = True
 
 def parallel_end():
-	global g_events
 	global cpus_total
 	global cpus_free
-	global is_parallel
-	global parallel_header
 
-	ready_events = g_events
+	ready_events = Event.events
 	running_events = []
-
-	if parallel_header:
-		sys.stdout.write(parallel_header)
-		sys.stdout.flush()
 
 	while len(ready_events) or len(running_events):
 		# Check for events that are done
@@ -399,9 +413,9 @@ def parallel_end():
 			time.sleep(0.1)
 
 	# Clear all the events
-	g_events = []
-	is_parallel = False
-	parallel_header = None
+	Event.events = []
+	Event.is_parallel = False
+	Event.is_first_parallel = False
 
 def require_root():
 	is_root = False
@@ -453,15 +467,11 @@ def run_say(command):
 		print_fail()
 		print(command)
 		print_exit('Failed to run command.')
-
+'''
 def is_outdated(message, to_update, triggers):
 	# Make sure all the triggers exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
-			if is_parallel and parallel_header:
-				sys.stdout.write(parallel_header)
-				sys.stdout.flush()
-
 			print_status(message)
 			print_fail()
 			print_exit("The file '" + trigger + "' does not exist.")
@@ -487,7 +497,7 @@ def is_outdated(message, to_update, triggers):
 		return True
 	else:
 		return False
-
+'''
 def _do_on_fail_exit(start_message, fail_message, cb):
 	print_status(start_message)
 
@@ -631,16 +641,17 @@ def ldconfig():
 	# Setup the message
 	print_status("Running 'ldconfig'")
 
-	# Create the event
+	# Run the process
 	runner = ProcessRunner("ldconfig")
 	runner.run()
 	runner.wait()
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail()
+	# Success or failure
+	if runner.is_failure:
+		print_failure(runner.stdall)
 		print_exit("Failed run 'ldconfig'.")
+	elif runner.is_success:
+		print_ok()
 
 def updatedb():
 	# Setup the message
@@ -654,15 +665,17 @@ def updatedb():
 	else:
 		command = 'updatedb'
 
+	# Run the process
 	runner = ProcessRunner(command)
 	runner.run()
 	runner.wait()
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail()
+	# Success or failure
+	if runner.is_failure:
+		print_failure(runner.stdall)
 		print_exit("Failed run 'updatedb'.")
+	elif runner.is_success:
+		print_ok()
 
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
@@ -934,107 +947,90 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 def c_build_object(o_file, c_files, i_files=[]):
-	global g_events
-	global is_parallel
-	global parallel_header
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'C objects'
+	singular = 'C object'
+	command = "${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
 
-	# Setup the messages for parallel and serial
-	message = None
-	#fail_message = "Build failed. Try again."
-	if not is_parallel:
-		message = "Building C object file '{0}'".format(o_file)
-	else:
-		parallel_header = "Building C object files in parallel ...\n"
-		message = "    '{0}'".format(o_file)
+	def setup():
+		# Skip if the files have not changed since last build
+		#if not is_outdated(message, to_update = [o_file], triggers = c_files):
+		#	return True
 
-	# Skip if the files have not changed since last build
-	if not is_outdated(message, to_update = [o_file], triggers = c_files):
-		return
+		# Make sure the environmental variable is set
+		if not 'CC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
-	# Make sure the environmental variable is set
-	if not 'CC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+		return True
 
 	# Create the event
-	command = "${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
-	event = Event(command, message)
-	g_events.append(event)
-
-	# If not parallel, run the event now
-	if not is_parallel:
-		parallel_end()
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def c_build_program(o_file, c_files, i_files=[]):
-	global g_events
-	global is_parallel
-	global parallel_header
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'C objects'
+	singular = 'C object'
+	command = "${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
 
-	# Setup the message
-	message = "Building C program '{0}'".format(o_file)
-	#fail_message = "Build failed. Try again."
+	def setup():
+		# Make sure the environmental variable is set
+		if not 'CC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
 
-	# Make sure the environmental variable is set
-	if not 'CC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+		return True
 
 	# Create the event
-	command = "${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
-	event = Event(command, message)
-	g_events.append(event)
-
-	# Run the event now
-	parallel_end()
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
-	global g_events
-	global is_parallel
-	global parallel_header
+	# Setup the messages
+	task = 'Building'
+	result = ar_file
+	plural = 'static libraries'
+	singular = 'static library'
+	command = "ar rcs " + ar_file + " " + str.join(' ', o_files)
 
-	# Setup the message
-	message = "Building static library '{0}'".format(ar_file)
-	#fail_message = "Archive failed. Try again."
-
-	# Skip if the files have not changed since last build
-	if not is_outdated(message, to_update = [ar_file], triggers = o_files):
-		return
+	def setup():
+		# Skip if the files have not changed since last build
+		#if not is_outdated(message, to_update = [ar_file], triggers = o_files):
+		#	return
+		return True
 
 	# Create the event
-	command = "ar rcs " + ar_file + " " + str.join(' ', o_files)
-	event = Event(command, message)
-	g_events.append(event)
-
-	# Run the event now
-	parallel_end()
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def c_build_shared_library(so_file, o_files):
-	global g_events
-	global is_parallel
-	global parallel_header
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'shared libraries'
+	singular = 'shared library'
+	command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 
-	# Setup the message
-	message = "Building shared library '{0}'".format(so_file)
-	# fail_message = "Building shared library failed. Try again."
-
-	# Skip if the files have not changed since last build
-	if not is_outdated(message, to_update = [so_file], triggers = o_files):
-		return
+	def setup():
+		# Skip if the files have not changed since last build
+		#return not is_outdated(message, to_update = [so_file], triggers = o_files):
+		return True
 
 	# Create the event
-	command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
-	event = Event(command, message)
-	g_events.append(event)
-
-	# Run the event now
-	parallel_end()
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def d_build_interface(d_file, i_files):
 	message = "Building D interface file '{0}i'".format(d_file)
-	if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
-		return
+	#if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
+	#	return
 
 	if not 'DC' in os.environ:
 		print_fail()
@@ -1057,8 +1053,8 @@ def d_build_interface(d_file, i_files):
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	message = "Building D object file '{0}'".format(o_file)
-	if not is_outdated(message, to_update = [o_file], triggers = d_files):
-		return
+	#if not is_outdated(message, to_update = [o_file], triggers = d_files):
+	#	return
 	print_status(message)
 
 	if not 'DC' in os.environ:
@@ -1081,8 +1077,8 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
 	message = "Building D shared library '{0}'".format(o_file)
-	if not is_outdated(message, to_update = [o_file], triggers = d_files):
-		return
+	#if not is_outdated(message, to_update = [o_file], triggers = d_files):
+	#	return
 	print_status(message)
 
 	if not 'DC' in os.environ:
@@ -1197,7 +1193,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - August 29 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - August 31 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
