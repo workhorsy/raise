@@ -13,7 +13,7 @@ def clean():
 
 def _configure():
 	os.environ['CC'] = 'gcc'
-	os.environ['CFLAGS'] = ' -g -Wall -Werror'
+	os.environ['CFLAGS'] = '-g -Wall -Werror'
 
 def build():
 	"""Builds the program. Will only build files that have changed since the last build."""
@@ -33,14 +33,13 @@ def _build():
 	code_files = ['a', 'b', 'c', 'main']
 
 	# Build each c++ file into an object
-	# The parallel_c_build_object function will build each object in its own
-	# process. The parallel_wait function will wait for all the building to
-	# complete before continuing.
+	# All the events between parallel_start() and parallel_end() will be run in parallel
+	parallel_start()
 	for f in code_files:
 		object_name = '{0}.o'.format(f)
 		code_name = '{0}.c'.format(f)
-		parallel_c_build_object(object_name, [code_name])
-	parallel_wait()
+		c_build_object(object_name, [code_name])
+	parallel_end()
 
 	# Link all the objects into the program
 	object_files = [s + '.o' for s in code_files]
