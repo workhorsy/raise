@@ -25,18 +25,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-import os, sys, stat
-import tempfile
+import os, sys, platform
+import tempfile, shutil, filecmp
+import multiprocessing, subprocess
+import signal, atexit
+import re
 import time
-import filecmp
-import signal
-import platform, re, glob
-import shutil
-import atexit
-import threading
-import multiprocessing
-import subprocess
 import traceback
 if sys.version_info < (3, 0):
 	import urllib2
@@ -44,7 +38,6 @@ if sys.version_info < (3, 0):
 else:
 	import urllib.request
 	globals()['urlopen'] = urllib.request.urlopen
-
 
 global pwd
 global python
@@ -1207,7 +1200,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - August 31 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 2 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")

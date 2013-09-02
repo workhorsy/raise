@@ -1,4 +1,6 @@
 * Release 0.2.0
+	* Fixed Bug #1218594: 'Remove unused imports and group them'.
+	* Fixed Bug #1218083: 'Code for parallel and serial events is ugly and duplicate'.
 	* Fixed Bug #1217513: 'Sort error on dict_keys with python 3'.
 	* Fixed Bug #1216466: 'Make it work on Windows with Cygwin'.
 	* Fixed Bug #1216445: 'Change introductory output message to be one line'.
