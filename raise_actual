@@ -171,6 +171,7 @@ def do_as_normal_user(cb):
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
 	OK = '\033[42m\033[37m'
+	WARNING = '\033[43m\033[30m'
 	FAIL = '\033[41m\033[37m'
 	ENDC = '\033[0m'
 
@@ -198,6 +199,16 @@ def print_status(message):
 def print_ok():
 	global message_length
 	message = terminal_pad(message_length) + bcolors.OK + ":)" + bcolors.ENDC + "\n"
+	message_length = 0
+
+	sys.stdout.write(message)
+	sys.stdout.flush()
+
+def print_warning(post_message=None):
+	global message_length
+	message = terminal_pad(message_length, '.') + bcolors.WARNING + ":\\" + bcolors.ENDC + "\n"
+	if post_message:
+		message += post_message + "\n"
 	message_length = 0
 
 	sys.stdout.write(message)
@@ -260,9 +271,13 @@ class ProcessRunner(object):
 		# :( Failure
 		if self._return_code:
 			self._status = ':('
-		# :) Success
-		if not self._return_code:
-			self._status = ':)'
+		else:
+			# :\ Warning
+			if len(self._stderr):
+				self._status = ':\\'
+			# :) Success
+			else:
+				self._status = ':)'
 
 	def get_is_done(self):
 		# You have to poll a process to update the retval. Even if it has stopped already
@@ -275,6 +290,11 @@ class ProcessRunner(object):
 		self._require_wait()
 		return self._status == ':)'
 	is_success = property(get_is_success)
+
+	def get_is_warning(self):
+		self._require_wait()
+		return self._status == ':\\'
+	is_warning = property(get_is_warning)
 
 	def get_is_failure(self):
 		self._require_wait()
@@ -357,6 +377,9 @@ class Event(object):
 		# Success or failure
 		if self._runner.is_success:
 			print_ok()
+			self._status = 'success'
+		elif self._runner.is_warning:
+			print_warning(self._runner.stderr)
 			self._status = 'success'
 		else:
 			print_fail(self._runner.stderr)
@@ -466,7 +489,7 @@ def run_say(command):
 	runner.run()
 	runner.wait()
 
-	if runner.is_success:
+	if runner.is_success or runner.is_warning:
 		print_ok()
 		print(command)
 		print(runner.stdall)
@@ -521,7 +544,7 @@ def _do_on_fail_exit(start_message, fail_message, cb):
 		runner = ProcessRunner(cb)
 		runner.run()
 		runner.wait()
-		if runner.is_success:
+		if runner.is_success or runner.is_warning:
 			print_ok()
 		elif runner.is_failure:
 			print_fail()
@@ -657,7 +680,7 @@ def ldconfig():
 	if runner.is_failure:
 		print_failure(runner.stdall)
 		print_exit("Failed run 'ldconfig'.")
-	elif runner.is_success:
+	elif runner.is_success or runner.is_warning:
 		print_ok()
 
 def updatedb():
@@ -681,7 +704,7 @@ def updatedb():
 	if runner.is_failure:
 		print_failure(runner.stdall)
 		print_exit("Failed run 'updatedb'.")
-	elif runner.is_success:
+	elif runner.is_success or runner.is_warning:
 		print_ok()
 
 # Returns all the paths that libraries are installed in
@@ -740,7 +763,7 @@ def require_static_library(lib_name):
 	runner = ProcessRunner("locate /{0}.a".format(lib_name))
 	runner.run()
 	runner.wait()
-	if runner.is_success:
+	if runner.is_success or runner.is_warning:
 		print_ok()
 	elif runner.is_failure:
 		print_fail()
@@ -760,7 +783,7 @@ def require_shared_library(lib_name):
 	runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
 	runner.run()
 	runner.wait()
-	if runner.is_success:
+	if runner.is_success or runner.is_warning:
 		print_ok()
 	elif runner.is_failure:
 		print_fail()
@@ -781,7 +804,7 @@ def require_static_or_shared_library(lib_name):
 		runner = ProcessRunner("locate /" + lib_name + ".a")
 		runner.run()
 		runner.wait()
-		if runner.is_success:
+		if runner.is_success or runner.is_warning:
 			print_ok()
 		elif runner.is_failure:
 			print_fail()
@@ -794,7 +817,7 @@ def require_static_or_shared_library(lib_name):
 		runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
 		runner.run()
 		runner.wait()
-		if runner.is_success:
+		if runner.is_success or runner.is_warning:
 			print_ok()
 		elif runner.is_failure:
 			print_fail()
@@ -866,7 +889,7 @@ def header_path(header_name):
 	runner.run()
 	runner.wait()
 
-	if runner.is_success:
+	if runner.is_success or runner.is_warning:
 		# Get any paths that contain the library name
 		paths = runner.stdout.split('\n')
 
