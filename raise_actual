@@ -419,6 +419,18 @@ def parallel_end():
 	Event.is_parallel = False
 	Event.is_first_parallel = False
 
+def SelfDeletingNamedTemporaryFile():
+	f = tempfile.NamedTemporaryFile(delete=False)
+	f.close()
+
+	def cb():
+		if os.path.exists(f.name):
+			os.unlink(f.name)
+
+	atexit.register(cb)
+
+	return f
+
 def require_root():
 	is_root = False
 
@@ -751,12 +763,10 @@ def require_shared_library(lib_name):
 		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
 	# Make them run ldconfig if the library is not found by ld
-	f = tempfile.NamedTemporaryFile(delete=False)
-	f.close()
+	f = SelfDeletingNamedTemporaryFile()
 	runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
 	runner.run()
 	runner.wait()
-	os.unlink(f.name)
 	if runner.is_success:
 		print_ok()
 	elif runner.is_failure:
@@ -787,12 +797,10 @@ def require_static_or_shared_library(lib_name):
 
 	# Make them run ldconfig if the library is not found by ld
 	if is_shared_installed:
-		f = tempfile.NamedTemporaryFile(delete=False)
-		f.close()
+		f = SelfDeletingNamedTemporaryFile()
 		runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
 		runner.run()
 		runner.wait()
-		os.unlink(f.name)
 		if runner.is_success:
 			print_ok()
 		elif runner.is_failure:
@@ -1031,116 +1039,119 @@ def c_build_shared_library(so_file, o_files):
 	add_event(event)
 
 def d_build_interface(d_file, i_files):
-	message = "Building D interface file '{0}i'".format(d_file)
-	#if not is_outdated(message, to_update = [d_file+'i'], triggers = [d_file]):
-	#	return
+	# Setup the messages
+	task = 'Building'
+	result = d_file + 'i'
+	plural = 'D interfaces'
+	singular = 'D interface'
 
-	if not 'DC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-	print_status(message)
-	f = tempfile.NamedTemporaryFile(delete=False)
-	f.close()
+	f = SelfDeletingNamedTemporaryFile()
 	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of" + f.name
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
-	os.unlink(f.name)
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail(runner.stderr)
-		print_exit("Build failed. Try again.")
+	def setup():
+		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
+			return False
+
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
-	message = "Building D object file '{0}'".format(o_file)
-	#if not is_outdated(message, to_update = [o_file], triggers = d_files):
-	#	return
-	print_status(message)
-
-	if not 'DC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'D objects'
+	singular = 'D object'
 
 	command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
+	def setup():
+		if not is_outdated(to_update = [o_file], triggers = d_files):
+			return False
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail(runner.stderr)
-		print_exit("Build failed. Try again.")
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
-	message = "Building D shared library '{0}'".format(o_file)
-	#if not is_outdated(message, to_update = [o_file], triggers = d_files):
-	#	return
-	print_status(message)
-
-	if not 'DC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'D shared libraries'
+	singular = 'D shared library'
 
 	command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
+	def setup():
+		if not is_outdated(to_update = [o_file], triggers = d_files):
+			return False
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail(runner.stderr)
-		print_exit("Build failed. Try again.")
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
-	print_status("Building D static library '{0}'".format(o_file))
-
-	if not 'DC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'D static libraries'
+	singular = 'D static library'
 
 	command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
+	def setup():
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail(runner.stderr)
-		print_exit("Build failed. Try again.")
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
-	print_status("Building D program '{0}'".format(out_file))
-
-	if not 'DC' in os.environ:
-		print_fail()
-		print_exit("Set the env variable 'DC' to the D compiler, and try again.")
-
+	# Setup the messages
+	task = 'Building'
+	result = out_file
+	plural = 'D programs'
+	singular = 'D program'
 	command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
+	def setup():
+		if not 'DC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'DC' to the D compiler, and try again.")
 
-	if runner.is_success:
-		print_ok()
-	elif runner.is_failure:
-		print_fail(runner.stderr)
-		print_exit("Build failed. Try again.")
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def load_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file
