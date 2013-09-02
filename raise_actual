@@ -300,7 +300,7 @@ class ProcessRunner(object):
 
 	def get_stdall(self):
 		self._require_wait()
-		return self._stdout + self._stderr
+		return self._stdout + '\n' + self._stderr
 	stdall = property(get_stdall)
 
 	def _require_wait(self):
@@ -338,18 +338,20 @@ class Event(object):
 				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
 				message_length = 0
-		# Show the sereal message
-		else:
-			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Run the setup function
 		if not self._setup_cb():
-			return
+			return False
+
+		# Show the serial message
+		if not Event.is_parallel:
+			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Start the process
 		self._runner = ProcessRunner(self._command)
 		self._status = 'running'
 		self._runner.run()
+		return True
 
 	def wait(self):
 		# Wait for the process to complete
@@ -404,9 +406,9 @@ def parallel_end():
 		# Check for events that need to start
 		while cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
-			cpus_free -= 1
-			event.run()
-			running_events.insert(0, event)
+			if event.run():
+				cpus_free -= 1
+				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
 		if cpus_free == 0 or len(ready_events) == 0:
@@ -466,13 +468,13 @@ def run_say(command):
 	elif runner.is_failure:
 		print_fail()
 		print(command)
+		print(runner.stdall)
 		print_exit('Failed to run command.')
-'''
-def is_outdated(message, to_update, triggers):
+
+def is_outdated(to_update, triggers):
 	# Make sure all the triggers exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
-			print_status(message)
 			print_fail()
 			print_exit("The file '" + trigger + "' does not exist.")
 
@@ -497,7 +499,7 @@ def is_outdated(message, to_update, triggers):
 		return True
 	else:
 		return False
-'''
+
 def _do_on_fail_exit(start_message, fail_message, cb):
 	print_status(start_message)
 
@@ -956,8 +958,8 @@ def c_build_object(o_file, c_files, i_files=[]):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		#if not is_outdated(message, to_update = [o_file], triggers = c_files):
-		#	return True
+		if not is_outdated(to_update = [o_file], triggers = c_files):
+			return False
 
 		# Make sure the environmental variable is set
 		if not 'CC' in os.environ:
@@ -1002,8 +1004,8 @@ def ar_build_static_library(ar_file, o_files):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		#if not is_outdated(message, to_update = [ar_file], triggers = o_files):
-		#	return
+		if not is_outdated(to_update = [ar_file], triggers = o_files):
+			return False
 		return True
 
 	# Create the event
@@ -1013,14 +1015,15 @@ def ar_build_static_library(ar_file, o_files):
 def c_build_shared_library(so_file, o_files):
 	# Setup the messages
 	task = 'Building'
-	result = o_file
+	result = so_file
 	plural = 'shared libraries'
 	singular = 'shared library'
 	command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
 
 	def setup():
 		# Skip if the files have not changed since last build
-		#return not is_outdated(message, to_update = [so_file], triggers = o_files):
+		if not is_outdated(to_update = [so_file], triggers = o_files):
+			return False
 		return True
 
 	# Create the event
