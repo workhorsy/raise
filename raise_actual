@@ -146,6 +146,11 @@ def do_as_normal_user(cb):
 	if exception:
 		print_exit(exception)
 
+class emoticons:
+	SMILE = ':)'
+	NORMAL = ':\\'
+	FROWN = ':('
+
 class bcolors:
 	MESSAGE = '\033[44m\033[37m'
 	OK = '\033[42m\033[37m'
@@ -178,7 +183,7 @@ def print_ok():
 	global message_length
 
 	padding = terminal_pad(message_length)
-	message = "{0}{1}:){2}\n".format(padding, bcolors.OK, bcolors.ENDC)
+	message = "{0}{1}{2}{3}\n".format(padding, bcolors.OK, emoticons.SMILE, bcolors.ENDC)
 	message_length = 0
 
 	sys.stdout.write(message)
@@ -188,7 +193,7 @@ def print_warning(post_message=None):
 	global message_length
 
 	padding = terminal_pad(message_length, '.')
-	message = "{0}{1}:\\{2}\n".format(padding, bcolors.WARNING, bcolors.ENDC)
+	message = "{0}{1}{2}{3}\n".format(padding, bcolors.WARNING, emoticons.NORMAL, bcolors.ENDC)
 	if post_message:
 		message += post_message + "\n"
 	message_length = 0
@@ -200,7 +205,7 @@ def print_fail(post_fail_message=None):
 	global message_length
 
 	padding = terminal_pad(message_length, '.')
-	message = "{0}{1}:({2}\n".format(padding, bcolors.FAIL, bcolors.ENDC)
+	message = "{0}{1}{2}{3}\n".format(padding, bcolors.FAIL, emoticons.FROWN, bcolors.ENDC)
 	if post_fail_message:
 		message += post_fail_message + "\n"
 	message_length = 0
@@ -261,14 +266,14 @@ class ProcessRunner(object):
 
 		# :( Failure
 		if self._return_code:
-			self._status = ':('
+			self._status = emoticons.FROWN
 		else:
 			# :\ Warning
 			if len(self._stderr):
-				self._status = ':\\'
+				self._status = emoticons.NORMAL
 			# :) Success
 			else:
-				self._status = ':)'
+				self._status = emoticons.SMILE
 
 	def get_is_done(self):
 		# You have to poll a process to update the retval. Even if it has stopped already
@@ -279,17 +284,17 @@ class ProcessRunner(object):
 
 	def get_is_success(self):
 		self._require_wait()
-		return self._status == ':)'
+		return self._status == emoticons.SMILE
 	is_success = property(get_is_success)
 
 	def get_is_warning(self):
 		self._require_wait()
-		return self._status == ':\\'
+		return self._status == emoticons.NORMAL
 	is_warning = property(get_is_warning)
 
 	def get_is_failure(self):
 		self._require_wait()
-		return self._status == ':('
+		return self._status == emoticons.FROWN
 	is_failure = property(get_is_failure)
 
 	def get_stderr(self):
