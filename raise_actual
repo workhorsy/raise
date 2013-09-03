@@ -42,7 +42,7 @@ global terminal_width
 global message_length
 
 def early_exit(message):
-	sys.stdout.write(message + ' Exiting ...\n')
+	sys.stdout.write('{0} Exiting ...\n'.format(message))
 	sys.stdout.flush()
 	exit()
 
@@ -73,7 +73,7 @@ if re.match('^i\d86$|^x86$|^x86_32$', platform.machine()):
 elif platform.machine() == 'x86_64':
 	arch = 'x86_64'
 else:
-	early_exit("Unknown architecture {0}.".format(platform.machine()))
+	early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
 # Figure out how to clear the terminal
 if platform.system() == 'Windows':
@@ -163,7 +163,7 @@ def terminal_pad(length, pad_char=' '):
 	return ''.ljust(i-length, pad_char)
 
 def print_info(message):
-	sys.stdout.write(bcolors.MESSAGE + message + bcolors.ENDC + "\n")
+	sys.stdout.write('{0}{1}{2}\n'.format(bcolors.MESSAGE, message, bcolors.ENDC))
 	sys.stdout.flush()
 
 def print_status(message):
@@ -176,7 +176,9 @@ def print_status(message):
 
 def print_ok():
 	global message_length
-	message = terminal_pad(message_length) + bcolors.OK + ":)" + bcolors.ENDC + "\n"
+
+	padding = terminal_pad(message_length)
+	message = "{0}{1}:){2}\n".format(padding, bcolors.OK, bcolors.ENDC)
 	message_length = 0
 
 	sys.stdout.write(message)
@@ -184,7 +186,9 @@ def print_ok():
 
 def print_warning(post_message=None):
 	global message_length
-	message = terminal_pad(message_length, '.') + bcolors.WARNING + ":\\" + bcolors.ENDC + "\n"
+
+	padding = terminal_pad(message_length, '.')
+	message = "{0}{1}:\\{2}\n".format(padding, bcolors.WARNING, bcolors.ENDC)
 	if post_message:
 		message += post_message + "\n"
 	message_length = 0
@@ -194,7 +198,9 @@ def print_warning(post_message=None):
 
 def print_fail(post_fail_message=None):
 	global message_length
-	message = terminal_pad(message_length, '.') + bcolors.FAIL + ":(" + bcolors.ENDC + "\n"
+
+	padding = terminal_pad(message_length, '.')
+	message = "{0}{1}:({2}\n".format(padding, bcolors.FAIL, bcolors.ENDC)
 	if post_fail_message:
 		message += post_fail_message + "\n"
 	message_length = 0
@@ -203,7 +209,7 @@ def print_fail(post_fail_message=None):
 	sys.stdout.flush()
 
 def print_exit(message):
-	message = bcolors.FAIL + message + ' Exiting ...' + bcolors.ENDC + '\n'
+	message = '{0}{1} Exiting ...{2}\n'.format(bcolors.FAIL, message, bcolors.ENDC)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
@@ -217,7 +223,6 @@ class ProcessRunner(object):
 				command = command[2 :]
 			# Replace ${BLAH} with %BLAH%
 			command = command.replace('${', '%').replace('}', '%')
-			
 
 		self._command = command
 		self._process = None
@@ -490,7 +495,7 @@ def is_outdated(to_update, triggers):
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
 			print_fail()
-			print_exit("The file '" + trigger + "' does not exist.")
+			print_exit("The file '{0}' does not exist.".format(trigger))
 
 	# Return true if any of the files to check do not exist
 	for update in to_update:
