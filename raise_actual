@@ -32,14 +32,7 @@ import signal, atexit
 import re
 import time
 import traceback
-if sys.version_info < (3, 0):
-	import urllib2
-	globals()['urlopen'] = urllib2.urlopen
-else:
-	import urllib.request
-	globals()['urlopen'] = urllib.request.urlopen
 
-global pwd
 global python
 global bits
 global arch
@@ -53,17 +46,13 @@ def early_exit(message):
 	sys.stdout.flush()
 	exit()
 
-target_name = None
-cpus_total = multiprocessing.cpu_count()
-cpus_free = cpus_total
-
-# Get the path of the rscript file
-pwd = os.sys.path[0]
-
-
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
+
+target_name = None
+cpus_total = multiprocessing.cpu_count()
+cpus_free = cpus_total
 
 # Get the name of the current running python program
 python = sys.executable
@@ -84,8 +73,7 @@ if re.match('^i\d86$|^x86$|^x86_32$', platform.machine()):
 elif platform.machine() == 'x86_64':
 	arch = 'x86_64'
 else:
-	early_exit("Unknown architecture: " + platform.machine() + " .")
-
+	early_exit("Unknown architecture {0}.".format(platform.machine()))
 
 # Figure out how to clear the terminal
 if platform.system() == 'Windows':
@@ -104,16 +92,6 @@ if platform.system() == 'Windows':
 	terminal_width = int('0x' + size[-4 : len(size)], 16)
 else:
 	terminal_width = int(os.popen('stty size', 'r').read().split()[1])
-
-def to_native(command):
-	if platform.system() == 'Windows':
-		# Remove starting ./
-		if command.startswith('./'):
-			command = command[2 :]
-		# Replace ${BLAH} with %BLAH%
-		command = command.replace('${', '%').replace('}', '%')
-			
-	return command
 
 def get_normal_user_name():
 	# Get the name from the environmental variable
@@ -233,7 +211,15 @@ def print_exit(message):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		self._command = to_native(command)
+		if platform.system() == 'Windows':
+			# Remove starting ./
+			if command.startswith('./'):
+				command = command[2 :]
+			# Replace ${BLAH} with %BLAH%
+			command = command.replace('${', '%').replace('}', '%')
+			
+
+		self._command = command
 		self._process = None
 		self._return_code = None
 		self._stdout = None
@@ -500,13 +486,13 @@ def run_say(command):
 		print_exit('Failed to run command.')
 
 def is_outdated(to_update, triggers):
-	# Make sure all the triggers exist
+	# Exit if any triggers don't exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
 			print_fail()
 			print_exit("The file '" + trigger + "' does not exist.")
 
-	# Rebuild if any of the files to check do not exist
+	# Return true if any of the files to check do not exist
 	for update in to_update:
 		if not os.path.isfile(os.path.abspath(update)):
 			return True
@@ -841,7 +827,7 @@ def require_raise_dependencies():
 		'which', 'locate', 
 		'gcc', 'ar', 'ld'
 	]
-	
+
 	# Updatedb on BSD and OSX
 	if os.path.exists('/usr/libexec/locate.updatedb'):
 		prog_names.append('/usr/libexec/locate.updatedb')
@@ -1207,7 +1193,7 @@ if __name__ == '__main__':
 
 	# Clear the terminal
 	os.system(terminal_clear)
-	
+
 	# Load the rscript
 	targets = load_rscript()
 
@@ -1223,18 +1209,19 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 2 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 3 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
-		print("\t./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
+		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
 		print("")
 
 		# Print all the targets
 		if targets:
+			no_doc = "No docstring is provided for this target."
 			print("TARGETS:")
 			for t in targets:
-				no_doc = "No docstring is provided for this target."
-				print("\t./raise " + t + " - " + (targets[t].__doc__ or no_doc))
+				doc = targets[t].__doc__ or no_doc
+				print("    ./raise {0} - {1}".format(t, doc))
 				print("")
 			print_exit("No target specified. Found targets are {0}.".format(target_list))
 	
