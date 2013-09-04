@@ -1,4 +1,5 @@
 * Release 0.2.0
+	* Fixed Bug #1118920: 'Unknown architecture on Open Indiana 'i86pc''.
 	* Fixed Bug #1218021: 'Warnings printed to stderr should be shown with :\ instead of :)'.
 	* Fixed Bug #1218594: 'Remove unused imports and group them'.
 	* Fixed Bug #1218083: 'Code for parallel and serial events is ugly and duplicate'.

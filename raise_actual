@@ -59,19 +59,15 @@ python = sys.executable
 if not python:
 	early_exit('Could not find python to run child processes with.')
 
-# Figure out if the CPU is 32bit or 64bit
-bits = None
-if platform.architecture()[0] == '64bit':
-	bits = '64'
-else:
-	bits = '32'
-
 # Figure out the CPU architecture
 arch = None
-if re.match('^i\d86$|^x86$|^x86_32$', platform.machine()):
+bits = None
+if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
 	arch = 'x86_32'
-elif platform.machine() == 'x86_64':
+	bits = '32'
+elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
 	arch = 'x86_64'
+	bits = '64'
 else:
 	early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
