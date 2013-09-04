@@ -6,7 +6,6 @@ a MIT style license.
 
 // Install requirements
 Python 2.6 or greater
-which
 locate
 stty
 updatedb

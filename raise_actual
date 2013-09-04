@@ -830,7 +830,7 @@ def require_static_or_shared_libraries(lib_names):
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = [
-		'which', 'locate', 
+		'locate',
 		'gcc', 'ar', 'ld'
 	]
 
@@ -844,10 +844,8 @@ def require_raise_dependencies():
 	# See which programs are not installed
 	fails = []
 	for prog_name in prog_names:
-		runner = ProcessRunner('which {0}'.format(prog_name))
-		runner.run()
-		runner.wait()
-		if runner.is_failure:
+		names = program_paths(prog_name)
+		if len(names) == 0:
 			fails.append(prog_name)
 
 	# Print them in a list then exit
@@ -860,11 +858,12 @@ def require_raise_dependencies():
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
-		_do_on_fail_exit(
-			"Checking for program '{0}'".format(prog_name),
-			"Install the program '{0}' and try again.".format(prog_name),
-			'which {0}'.format(prog_name)
-		)
+		print_status("Checking for program '{0}'".format(prog_name))
+		if len(program_paths(prog_name)):
+			print_ok()
+		else:
+			print_fail()
+			print_exit("Install the program '{0}' and try again.".format(prog_name))
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
@@ -873,6 +872,20 @@ def require_python_modules(mod_names):
 			"Install the python module '{0}' and try again.".format(mod_name),
 			'{0} -c "import {1}"'.format(python, mod_name)
 		)
+
+def program_paths(program_name):
+	paths = []
+	exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
+	path = os.environ['PATH']
+	for p in os.environ['PATH'].split(os.pathsep):
+		p = os.path.join(p, program_name)
+		if os.access(p, os.X_OK):
+			paths.append(p)
+		for e in exts:
+			pext = p + e
+			if os.access(pext, os.X_OK):
+				paths.append(pext)
+	return paths
 
 def header_path(header_name):
 	retval = None
