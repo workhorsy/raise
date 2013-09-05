@@ -33,6 +33,7 @@ import re
 import time
 import traceback
 
+global pwd
 global python
 global bits
 global arch
@@ -49,6 +50,9 @@ def early_exit(message):
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
+
+# Get the path of the rscript file
+pwd = os.sys.path[0]
 
 target_name = None
 cpus_total = multiprocessing.cpu_count()
@@ -854,8 +858,9 @@ def header_path(header_name):
 	for include_path in include_paths:
 		for root, dirs, files in os.walk(include_path):
 			for file_name in files:
-				if file_name == header_name:
-					paths.append(os.path.join(root, file_name))
+				complete_name = os.path.join(root, file_name)
+				if complete_name.endswith(header_name):
+					paths.append(complete_name)
 
 	# Of those paths, get the ones that match the architecture
 	for path in paths:
