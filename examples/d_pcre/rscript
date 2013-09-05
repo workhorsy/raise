@@ -49,7 +49,6 @@ def remove():
 	# Remove the files
 	_remove()
 
-	updatedb()
 	ldconfig()
 
 def install():
@@ -73,7 +72,6 @@ def install():
 	cpfile('raise_example', '/usr/bin/raise_example')
 	cpfile('lib_regex.so', '/usr/lib/lib_regex.so')
 
-	updatedb()
 	ldconfig()
 
 

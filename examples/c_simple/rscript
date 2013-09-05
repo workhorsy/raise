@@ -35,8 +35,6 @@ def remove():
 	# Remove the old files
 	_remove()
 
-	updatedb()
-
 def install():
 	"""Installs the program."""
 	# Setup
@@ -54,8 +52,6 @@ def install():
 
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
-
-	updatedb()
 
 
 

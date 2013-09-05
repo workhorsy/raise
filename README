@@ -6,9 +6,7 @@ a MIT style license.
 
 // Install requirements
 Python 2.6 or greater
-locate
 stty
-updatedb
 gcc
 ar
 ld

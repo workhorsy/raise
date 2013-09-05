@@ -43,7 +43,6 @@ def remove():
 	# Remove the old files
 	_remove()
 
-	updatedb()
 	ldconfig()
 
 def install():
@@ -67,7 +66,6 @@ def install():
 	cpfile('raise_example', '/usr/bin/raise_example')
 	cpfile('libexample.so', '/usr/lib/libexample.so')
 
-	updatedb()
 	ldconfig()
 
 

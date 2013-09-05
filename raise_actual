@@ -675,30 +675,6 @@ def ldconfig():
 	elif runner.is_success or runner.is_warning:
 		print_ok()
 
-def updatedb():
-	# Setup the message
-	print_status("Running 'updatedb'")
-
-	command = None
-	# Updatedb on BSD and OSX
-	if os.path.exists('/usr/libexec/locate.updatedb'):
-		command = '/usr/libexec/locate.updatedb'
-	# Updatedb on Linux
-	else:
-		command = 'updatedb'
-
-	# Run the process
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
-
-	# Success or failure
-	if runner.is_failure:
-		print_failure(runner.stdall)
-		print_exit("Failed run 'updatedb'.")
-	elif runner.is_success or runner.is_warning:
-		print_ok()
-
 # Returns all the paths that libraries are installed in
 def _get_library_paths():
 	paths = ['/usr/lib']
@@ -744,22 +720,16 @@ def _library_path(lib_name, extension):
 
 def require_static_library(lib_name):
 	print_status("Checking for static library '{0}'".format(lib_name))
+
+	# Check if the library is installed
 	is_installed = _is_library_installed(lib_name, '.a')
 
-	# Make them install the lib to continue
+	# If not, make them install the lib to continue
 	if not is_installed:
 		print_fail()
 		print_exit("Static library '{0}' not installed. Install and try again.".format(lib_name))
-
-	# Make them run updatedb if the library is not found by locate
-	runner = ProcessRunner("locate /{0}.a".format(lib_name))
-	runner.run()
-	runner.wait()
-	if runner.is_success or runner.is_warning:
+	else:
 		print_ok()
-	elif runner.is_failure:
-		print_fail()
-		print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
 
 def require_shared_library(lib_name):
 	print_status("Checking for shared library '{0}'".format(lib_name))
@@ -786,24 +756,17 @@ def require_static_or_shared_library(lib_name):
 	is_static_installed = _is_library_installed(lib_name, '.a')
 	is_shared_installed = _is_library_installed(lib_name, '.so')
 
-	# Make them install the lib to continue
+	# Make them install the lib if neither was found
 	if not is_static_installed and not is_shared_installed:
 		print_fail()
 		print_exit("Static/Shared library '{0}' not installed. Install and try again.".format(lib_name))
 
-	# Make them run updatedb if the library is not found by locate
+	# Success if the static library is installed
 	if is_static_installed:
-		runner = ProcessRunner("locate /" + lib_name + ".a")
-		runner.run()
-		runner.wait()
-		if runner.is_success or runner.is_warning:
-			print_ok()
-		elif runner.is_failure:
-			print_fail()
-			print_exit("Static library '{0}' not found with 'locate'. Run 'sudo updatedb' and try again.".format(lib_name))
+		print_ok()
 		return
 
-	# Make them run ldconfig if the library is not found by ld
+	# Success if the shared library is installed and found by ldconfig
 	if is_shared_installed:
 		f = SelfDeletingNamedTemporaryFile()
 		runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
@@ -830,16 +793,8 @@ def require_static_or_shared_libraries(lib_names):
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = [
-		'locate',
 		'gcc', 'ar', 'ld'
 	]
-
-	# Updatedb on BSD and OSX
-	if os.path.exists('/usr/libexec/locate.updatedb'):
-		prog_names.append('/usr/libexec/locate.updatedb')
-	# Updatedb on Linux
-	else:
-		prog_names.append('updatedb')
 
 	# See which programs are not installed
 	fails = []
@@ -890,23 +845,27 @@ def program_paths(program_name):
 def header_path(header_name):
 	retval = None
 
-	runner = ProcessRunner('locate /' + header_name)
-	runner.run()
-	runner.wait()
+	# Get any paths that contain the library name
+	paths = []
+	include_paths = [
+		"/usr/include", 
+		"/usr/local/include"
+	]
+	for include_path in include_paths:
+		for root, dirs, files in os.walk(include_path):
+			for file_name in files:
+				if file_name == header_name:
+					paths.append(os.path.join(root, file_name))
 
-	if runner.is_success or runner.is_warning:
-		# Get any paths that contain the library name
-		paths = runner.stdout.split('\n')
+	# Of those paths, get the ones that match the architecture
+	for path in paths:
+		if 'lib' + bits in path or arch in path:
+			retval = path
 
-		# First match paths that contain the architecture
-		for path in paths:
-			if 'lib' + bits in path or arch in path:
-				retval = path
-
-		# If none were matched specifically from the architecture
-		# Use the first
-		if retval == None:
-			retval = paths[0]
+	# If none were matched specifically from the architecture
+	# Use the first
+	if retval == None and paths:
+		retval = paths[0]
 
 	# Make sure a header file was found
 	if not retval or not os.path.exists(retval):
@@ -1228,7 +1187,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 3 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 4 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
