@@ -37,6 +37,7 @@ global pwd
 global python
 global bits
 global arch
+global os_type
 global target_name
 global terminal_clear
 global terminal_width
@@ -75,15 +76,23 @@ elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
 else:
 	early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
+# Figure out the general OS type
+if 'cygwin' in platform.system().lower():
+	os_type = 'Cygwin'
+elif 'windows' in platform.system().lower():
+	os_type = 'Windows'
+else:
+	os_type = 'Unix'
+
 # Figure out how to clear the terminal
-if platform.system() == 'Windows':
+if os_type == 'Windows':
 	terminal_clear = 'cls'
 else:
 	terminal_clear = 'clear'
 
 # FIXME: Have this look for stty first then try the registry
 # Figure out the terminal width
-if platform.system() == 'Windows':
+if os_type == 'Windows':
 	import _winreg
 	key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
 	val = _winreg.QueryValueEx(key, "ScreenBufferSize")
@@ -115,7 +124,7 @@ def do_as_normal_user(cb):
 	prev_id = -1
 
 	# Change the user to the normal user
-	if platform.system() != 'Windows':
+	if not os_type in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -137,7 +146,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if platform.system() != 'Windows':
+		if not os_type in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -222,7 +231,7 @@ def print_exit(message):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if platform.system() == 'Windows':
+		if os_type == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -446,8 +455,12 @@ def SelfDeletingNamedTemporaryFile():
 def require_root():
 	is_root = False
 
+	# Cygwin
+	if os_type == 'Cygwin':
+		# Cygwin has no root user
+		is_root = True
 	# Windows
-	if platform.system() == 'Windows':
+	elif os_type == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot','C:\windows')
@@ -464,8 +477,8 @@ def require_root():
 		print_exit("Must be run as root.")
 
 def require_not_root():
-	# On Windows it does not matter if we are root. So just return
-	if platform.system() == 'Windows':
+	# On Windows/Cygwin it does not matter if we are root. So just return
+	if os_type in ['Windows', 'Cygwin']:
 		return
 	
 	# Make sure we are NOT root
@@ -667,6 +680,11 @@ def ldconfig():
 	# Setup the message
 	print_status("Running 'ldconfig'")
 
+	# Skip ldconfig on Cygwin
+	if os_type == 'Cygwin':
+		print_ok()
+		return
+
 	# Run the process
 	runner = ProcessRunner("ldconfig")
 	runner.run()
@@ -674,7 +692,7 @@ def ldconfig():
 
 	# Success or failure
 	if runner.is_failure:
-		print_failure(runner.stdall)
+		print_fail(runner.stdall)
 		print_exit("Failed run 'ldconfig'.")
 	elif runner.is_success or runner.is_warning:
 		print_ok()
