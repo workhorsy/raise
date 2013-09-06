@@ -814,9 +814,11 @@ def require_static_or_shared_libraries(lib_names):
 
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
-	prog_names = [
-		'gcc', 'ar', 'ld'
-	]
+	prog_names = None
+	if os_type == 'Windows':
+		prog_names = ['cl.exe']
+	else:
+		prog_names = ['gcc', 'ar', 'ld']
 
 	# See which programs are not installed
 	fails = []
@@ -983,13 +985,29 @@ def c_build_object(o_file, c_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+class Compiler(object):
+	def __init__(self, name, exe_extension, shared_lib_extension, static_lib_extension, out_file, debug, warnings_all, warnings_as_errors):
+		self._name = name
+		self._exe_extension = exe_extension
+		self._shared_lib_extension = shared_lib_extension
+		self._static_lib_extension = static_lib_extension
+		self._out_file = out_file
+		self._debug = debug
+		self._warnings_all = warnings_all
+		self._warnings_as_errors = warnings_as_errors
+
+cl = Compiler('cl.exe', 'exe', 'dll', 'a', '/Fe', '/Yd', '', '')
+gcc = Compiler('gcc', '', 'so', 'a', '-o ', '-g', '-Wall', '-Werror')
+cc = cl
+
 def c_build_program(o_file, c_files, i_files=[]):
 	# Setup the messages
 	task = 'Building'
 	result = o_file
 	plural = 'C objects'
 	singular = 'C object'
-	command = "${CC} ${CFLAGS} -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
+	command = '${CC} ${CFLAGS} ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files) + cc._out_file + o_file + cc._exe_extension
+	print(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -1210,7 +1228,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 4 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 6 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
