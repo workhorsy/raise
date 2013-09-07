@@ -42,6 +42,8 @@ global target_name
 global terminal_clear
 global terminal_width
 global message_length
+global cc
+cc = None
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -961,18 +963,120 @@ def link_static_or_shared_paths(lib_names):
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
 
+# Other C compilers: Clang, DMC, Dingus, Elsa, PCC
+# http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
+class Compiler(object):
+	def __init__(self, name, exe_extension, object_extension, 
+				shared_lib_extension, static_lib_extension, out_file, no_link, 
+				debug, warnings_all, warnings_as_errors):
+
+		self._name = name
+
+		# Save text for all the options
+		self._opt_exe_extension = exe_extension
+		self._opt_object_extension = object_extension
+		self._opt_shared_lib_extension = shared_lib_extension
+		self._opt_static_lib_extension = static_lib_extension
+		self._opt_out_file = out_file
+		self._opt_no_link = no_link
+		self._opt_debug = debug
+		self._opt_warnings_all = warnings_all
+		self._opt_warnings_as_errors = warnings_as_errors
+
+		# Set the default values of the flags
+		self.debug = False
+		self.warnings_all = False
+		self.warnings_as_errors = False
+
+gcc = Compiler(
+	name =                 'gcc', 
+	exe_extension =        '', 
+	object_extension =     '.o', 
+	shared_lib_extension = '.so', 
+	static_lib_extension = '.a', 
+	out_file =             '-o ', 
+	no_link =              '-c', 
+	debug =                '-g', 
+	warnings_all =         '-Wall', 
+	warnings_as_errors =   '-Werror'
+)
+
+# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
+cl = Compiler(
+	name =                 'cl.exe', 
+	exe_extension =        '.exe', 
+	object_extension =     '.obj', 
+	shared_lib_extension = '.dll', 
+	static_lib_extension = '.lib', 
+	out_file =             '/Fe', 
+	no_link =              '/c', 
+	debug =                '/Yd', 
+	warnings_all =         '/Wall', 
+	warnings_as_errors =   ''
+)
+
+def to_native(thing):
+	replaces = {
+		'.o' : cc._opt_object_extension,
+		'.so': cc._opt_shared_lib_extension,
+		'.a' : cc._opt_static_lib_extension
+	}
+
+	if type(thing) == list:
+		for before, after in replaces.items():
+			thing = [o.replace(before, after) for o in thing]
+	else:
+		for before, after in replaces.items():
+			thing = thing.replace(before, after)
+
+	return thing
+
+def c_get_default_compiler():
+	if os_type == 'Windows':
+		return cl
+	else:
+		return gcc
+
+def c_save_environment(compiler):
+	# CC
+	global cc
+	cc = compiler
+	os.environ['CC'] = cc._name
+
+	# CFLAGS
+	opts = []
+	if cc.debug: opts.append(cc._opt_debug)
+	if cc.warnings_all: opts.append(cc._opt_warnings_all)
+	if cc.warnings_as_errors: opts.append(cc._opt_warnings_as_errors)
+	os.environ['CFLAGS'] = str.join(' ', opts)
+
 def c_build_object(o_file, c_files, i_files=[]):
+	# Change file extensions to os format
+	o_file = to_native(o_file)
+	c_files = to_native(c_files)
+	i_files = to_native(i_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = o_file
 	plural = 'C objects'
 	singular = 'C object'
-	command = "${CC} ${CFLAGS} -c -o " + o_file + ' ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files)
+	command = "${CC} ${CFLAGS} " + \
+				cc._opt_no_link + ' ' +  \
+				cc._opt_out_file + ' ' + \
+				o_file + ' ' + \
+				str.join(' ', c_files) + ' ' + \
+				str.join(' ', i_files)
 
 	def setup():
 		# Skip if the files have not changed since last build
 		if not is_outdated(to_update = [o_file], triggers = c_files):
 			return False
+
+		# Make sure the environmental variable is set
+		if not cc:
+			print_fail()
+			print_exit("A C compiler must be set to cc.")
 
 		# Make sure the environmental variable is set
 		if not 'CC' in os.environ:
@@ -985,29 +1089,21 @@ def c_build_object(o_file, c_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-class Compiler(object):
-	def __init__(self, name, exe_extension, shared_lib_extension, static_lib_extension, out_file, debug, warnings_all, warnings_as_errors):
-		self._name = name
-		self._exe_extension = exe_extension
-		self._shared_lib_extension = shared_lib_extension
-		self._static_lib_extension = static_lib_extension
-		self._out_file = out_file
-		self._debug = debug
-		self._warnings_all = warnings_all
-		self._warnings_as_errors = warnings_as_errors
-
-cl = Compiler('cl.exe', 'exe', 'dll', 'a', '/Fe', '/Yd', '', '')
-gcc = Compiler('gcc', '', 'so', 'a', '-o ', '-g', '-Wall', '-Werror')
-cc = cl
-
 def c_build_program(o_file, c_files, i_files=[]):
+	# Change file extensions to os format
+	o_file = to_native(o_file)
+	c_files = to_native(c_files)
+	i_files = to_native(i_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = o_file
-	plural = 'C objects'
-	singular = 'C object'
-	command = '${CC} ${CFLAGS} ' + str.join(' ', c_files) + ' ' + str.join(' ', i_files) + cc._out_file + o_file + cc._exe_extension
-	print(command)
+	plural = 'C programs'
+	singular = 'C program'
+	command = '${CC} ${CFLAGS} ' + \
+				str.join(' ', c_files) + ' ' + \
+				str.join(' ', i_files) + ' ' + \
+				cc._opt_out_file + o_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -1024,12 +1120,18 @@ def c_build_program(o_file, c_files, i_files=[]):
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
+	# Change file extensions to os format
+	ar_file = to_native(ar_file)
+	o_files = to_native(o_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = ar_file
 	plural = 'static libraries'
 	singular = 'static library'
-	command = "ar rcs " + ar_file + " " + str.join(' ', o_files)
+	command = "ar rcs " + \
+			ar_file + " " + \
+			str.join(' ', o_files)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -1042,12 +1144,19 @@ def ar_build_static_library(ar_file, o_files):
 	add_event(event)
 
 def c_build_shared_library(so_file, o_files):
+	# Change file extensions to os format
+	so_file = to_native(so_file)
+	o_files = to_native(o_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = so_file
 	plural = 'shared libraries'
 	singular = 'shared library'
-	command = "ld -G {0} -o {1}".format(str.join(' ', o_files), so_file)
+	command = "ld -G {0} {1} {2}".format(
+				str.join(' ', o_files), 
+				cc._opt_out_file, 
+				so_file)
 
 	def setup():
 		# Skip if the files have not changed since last build

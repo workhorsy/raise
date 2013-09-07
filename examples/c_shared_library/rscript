@@ -9,8 +9,12 @@ def clean():
 	rmfile_f('libexample.so')
 
 def _configure():
-	os.environ['CC'] = 'gcc'
-	os.environ['CFLAGS'] = '-g -Wall -Werror'
+	cc = c_get_default_compiler()
+	cc.debug = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	c_save_environment(cc)
+
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 def test():
