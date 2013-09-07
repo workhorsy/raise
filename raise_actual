@@ -43,7 +43,9 @@ global terminal_clear
 global terminal_width
 global message_length
 global cc
+global dc
 cc = None
+dc = None
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -1015,6 +1017,19 @@ cl = Compiler(
 	warnings_as_errors =   ''
 )
 
+dmd = Compiler(
+	name =                 'dmd', 
+	exe_extension =        '', 
+	object_extension =     '.o', 
+	shared_lib_extension = '.so', 
+	static_lib_extension = '.a', 
+	out_file =             '-of', 
+	no_link =              '-c', 
+	debug =                '-g', 
+	warnings_all =         '-w', 
+	warnings_as_errors =   ''
+)
+
 def to_native(thing):
 	replaces = {
 		'.o' : cc._opt_object_extension,
@@ -1168,6 +1183,22 @@ def c_build_shared_library(so_file, o_files):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+def d_get_default_compiler():
+	return dmd
+
+def d_save_environment(compiler):
+	# DC
+	global dc
+	dc = compiler
+	os.environ['DC'] = dc._name
+
+	# DFLAGS
+	opts = []
+	if dc.debug: opts.append(dc._opt_debug)
+	if dc.warnings_all: opts.append(dc._opt_warnings_all)
+	if dc.warnings_as_errors: opts.append(dc._opt_warnings_as_errors)
+	os.environ['DFLAGS'] = str.join(' ', opts)
+
 def d_build_interface(d_file, i_files):
 	# Setup the messages
 	task = 'Building'
@@ -1176,7 +1207,7 @@ def d_build_interface(d_file, i_files):
 	singular = 'D interface'
 
 	f = SelfDeletingNamedTemporaryFile()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i -of" + f.name
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + dc._opt_out_file + f.name
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -1199,7 +1230,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	plural = 'D objects'
 	singular = 'D object'
 
-	command = "${DC} ${DFLAGS} -c -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -c " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 
@@ -1224,7 +1255,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	plural = 'D shared libraries'
 	singular = 'D shared library'
 
-	command = "${DC} ${DFLAGS} -shared -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -shared " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1249,7 +1280,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	plural = 'D static libraries'
 	singular = 'D static library'
 
-	command = "${DC} ${DFLAGS} -lib -of" + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -lib " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1270,7 +1301,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	result = out_file
 	plural = 'D programs'
 	singular = 'D program'
-	command = "${DC} ${DFLAGS} -of" + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = "${DC} ${DFLAGS} " + dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -1337,7 +1368,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 6 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 7 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")

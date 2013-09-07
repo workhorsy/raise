@@ -12,10 +12,17 @@ def clean():
 def _configure():
 	require_programs(['dmd'])
 
-	os.environ['CC'] = 'gcc'
-	os.environ['DC'] = 'dmd'
-	os.environ['CFLAGS'] = '-g -Wall -Werror'
-	os.environ['DFLAGS'] = '-g -w'
+	cc = c_get_default_compiler()
+	cc.debug = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	c_save_environment(cc)
+
+	dc = d_get_default_compiler()
+	dc.debug = True
+	dc.warnings_all = True
+	dc.warnings_as_errors = True
+	d_save_environment(dc)
 
 	require_shared_libraries(['libpcre'])
 	require_static_libraries(['libphobos2'])
