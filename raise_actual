@@ -36,16 +36,12 @@ import traceback
 global pwd
 global python
 global target_name
-global terminal_clear
-global terminal_width
 global message_length
 global config
 
 pwd = None
 python = None
 target_name = None
-terminal_clear = None
-terminal_width = None
 message_length = None
 config = None
 
@@ -68,7 +64,6 @@ if not python:
 
 class Config(object):
 	def __init__(self):
-		self._os_type = None
 		self._cc = None
 		self._dc = None
 		self._clinker = None
@@ -113,6 +108,24 @@ class Config(object):
 				static_lib_extension = '.a'
 			)
 
+		# Figure out how to clear the terminal
+		if self._os_type._name == 'Windows':
+			self._terminal_clear = 'cls'
+		else:
+			self._terminal_clear = 'clear'
+
+		# FIXME: Have this look for stty first then try the registry
+		# Figure out the terminal width
+		if self._os_type._name == 'Windows':
+			import _winreg
+			key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
+			val = _winreg.QueryValueEx(key, "ScreenBufferSize")
+			_winreg.CloseKey(key)
+			size = hex(val[0])
+			self._terminal_width = int('0x' + size[-4 : len(size)], 16)
+		else:
+			self._terminal_width = int(os.popen('stty size', 'r').read().split()[1])
+
 class OSType(object):
 	def __init__(self, name, exe_extension, object_extension, 
 				shared_lib_extension, static_lib_extension):
@@ -123,25 +136,6 @@ class OSType(object):
 		self._shared_lib_extension = shared_lib_extension
 		self._static_lib_extension = static_lib_extension
 
-config = Config()
-
-# Figure out how to clear the terminal
-if config._os_type._name == 'Windows':
-	terminal_clear = 'cls'
-else:
-	terminal_clear = 'clear'
-
-# FIXME: Have this look for stty first then try the registry
-# Figure out the terminal width
-if config._os_type._name == 'Windows':
-	import _winreg
-	key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
-	val = _winreg.QueryValueEx(key, "ScreenBufferSize")
-	_winreg.CloseKey(key)
-	size = hex(val[0])
-	terminal_width = int('0x' + size[-4 : len(size)], 16)
-else:
-	terminal_width = int(os.popen('stty size', 'r').read().split()[1])
 
 def get_normal_user_name():
 	# Get the name from the environmental variable
@@ -209,7 +203,7 @@ class bcolors:
 	ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):
-	width = terminal_width
+	width = config._terminal_width
 
 	if length > (width-3):
 		i = int(width * (int(length / width) + 1)) - 3
@@ -1400,6 +1394,10 @@ def load_rscript(g=globals(), l=locals()):
 	return targets
 
 if __name__ == '__main__':
+	# Figure out everything we need to know about the system
+	global config
+	config = Config()
+
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
 		print_exit('Exit called by the keyboard.')
@@ -1407,7 +1405,7 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Clear the terminal
-	os.system(terminal_clear)
+	os.system(config._terminal_clear)
 
 	# Load the rscript
 	targets = load_rscript()
