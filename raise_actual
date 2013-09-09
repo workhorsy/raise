@@ -606,16 +606,24 @@ def cd(name):
 				lambda: os.chdir(name))
 
 def mvfile(source, dest):
+	source = to_native(source)
+	dest = to_native(dest)
+
 	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
 def cpfile(source, dest):
+	source = to_native(source)
+	dest = to_native(dest)
 	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
 def cp_new_file(source, dest):
+	source = to_native(source)
+	dest = to_native(dest)
+
 	if not os.path.isfile(os.path.abspath(dest)):
 		cpfile(source, dest)
 	elif not filecmp.cmp(source, dest):
@@ -681,6 +689,8 @@ def rmdir(name):
 	print_ok()
 
 def rmfile(name):
+	name = to_native(name)
+
 	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
@@ -693,6 +703,8 @@ def rmfile(name):
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
 def rmfile_f(name):
+	name = to_native(name)
+
 	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
@@ -705,6 +717,9 @@ def rmfile_f(name):
 	print_ok()
 
 def symlink(source, link_name):
+	source = to_native(source)
+	link_name = to_native(link_name)
+
 	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))
@@ -1070,12 +1085,14 @@ ld = Linker(
 )
 
 def to_native(thing):
+	# Get a dict of the standard extensions and their other os counterparts
 	replaces = {
 		'.o' : config._os_type._object_extension,
 		'.so': config._os_type._shared_lib_extension,
 		'.a' : config._os_type._static_lib_extension
 	}
 
+	# Replace the extension
 	if type(thing) == list:
 		for before, after in replaces.items():
 			thing = [o.replace(before, after) for o in thing]
@@ -1250,6 +1267,9 @@ def d_save_compiler(compiler):
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files):
+	d_file = to_native(d_file)
+	i_files = to_native(i_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = d_file + 'i'
@@ -1274,6 +1294,12 @@ def d_build_interface(d_file, i_files):
 	add_event(event)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
+	o_file = to_native(o_file)
+	d_files = to_native(d_files)
+	i_files = to_native(i_files)
+	l_files = to_native(l_files)
+	h_files = to_native(h_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -1299,6 +1325,11 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	add_event(event)
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
+	o_file = to_native(o_file)
+	d_files = to_native(d_files)
+	i_files = to_native(i_files)
+	l_files = to_native(l_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -1324,6 +1355,11 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
+	o_files = to_native(o_files)
+	d_files = to_native(d_files)
+	i_files = to_native(i_files)
+	l_files = to_native(l_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -1346,6 +1382,10 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
+	out_file = to_native(out_file)
+	inc_files = to_native(inc_files)
+	link_files = to_native(link_files)
+
 	# Setup the messages
 	task = 'Building'
 	result = out_file
@@ -1395,7 +1435,6 @@ def load_rscript(g=globals(), l=locals()):
 
 if __name__ == '__main__':
 	# Figure out everything we need to know about the system
-	global config
 	config = Config()
 
 	# Have all KeyboardInterrupt exceptions quit with a clean message
