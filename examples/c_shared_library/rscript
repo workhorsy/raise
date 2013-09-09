@@ -13,7 +13,10 @@ def _configure():
 	cc.debug = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_environment(cc)
+	c_save_compiler(cc)
+
+	linker = c_get_default_linker()
+	c_save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -29,7 +32,10 @@ def test():
 	c_build_shared_library('libexample.so', ['libexample.o'])
 
 	# Build the program and link against the library
-	c_build_program('raise_example', ['main.c'], ['${LD_LIBRARY_PATH}/libexample.so'])
+	c_build_program(
+			'raise_example', 
+			['main.c'], 
+			[os.path.join('${LD_LIBRARY_PATH}', 'libexample.so')])
 
 	# Run the program
 	run_say('./raise_example')
@@ -71,6 +77,7 @@ def install():
 	cpfile('libexample.so', '/usr/lib/libexample.so')
 
 	ldconfig()
+
 
 
 

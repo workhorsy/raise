@@ -16,13 +16,16 @@ def _configure():
 	cc.debug = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_environment(cc)
+	c_save_compiler(cc)
 
 	dc = d_get_default_compiler()
 	dc.debug = True
 	dc.warnings_all = True
 	dc.warnings_as_errors = True
-	d_save_environment(dc)
+	d_save_compiler(dc)
+
+	linker = c_get_default_linker()
+	c_save_linker(linker)
 
 	require_shared_libraries(['libpcre'])
 	require_static_libraries(['libphobos2'])

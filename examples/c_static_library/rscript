@@ -13,7 +13,7 @@ def _configure():
 	cc.debug = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_environment(cc)
+	c_save_compiler(cc)
 
 def test():
 	"""Builds the program, and runs it."""
@@ -44,7 +44,6 @@ def remove():
 	# Remove the files
 	_remove()
 
-	updatedb()
 	ldconfig()
 
 def install():
@@ -67,7 +66,7 @@ def install():
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
 
-	updatedb()
 	ldconfig()
+
 
 

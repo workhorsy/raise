@@ -44,8 +44,10 @@ global terminal_width
 global message_length
 global cc
 global dc
+global clinker
 cc = None
 dc = None
+clinker = None
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -391,7 +393,7 @@ class Event(object):
 			print_warning(self._runner.stderr)
 			self._status = 'success'
 		else:
-			print_fail(self._runner.stderr)
+			print_fail(self._runner.stdall)
 			print_exit("{0} failed. Try again.".format(self._task))
 			self._status = 'failure'
 
@@ -820,7 +822,7 @@ def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = None
 	if os_type == 'Windows':
-		prog_names = ['cl.exe']
+		prog_names = ['cl.exe', 'link.exe']
 	else:
 		prog_names = ['gcc', 'ar', 'ld']
 
@@ -968,13 +970,14 @@ def link_static_or_shared_paths(lib_names):
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class Compiler(object):
-	def __init__(self, name, exe_extension, object_extension, 
+	def __init__(self, name, default_flags, exe_extension, object_extension, 
 				shared_lib_extension, static_lib_extension, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors):
 
 		self._name = name
 
 		# Save text for all the options
+		self._opt_default_flags = default_flags
 		self._opt_exe_extension = exe_extension
 		self._opt_object_extension = object_extension
 		self._opt_shared_lib_extension = shared_lib_extension
@@ -992,6 +995,7 @@ class Compiler(object):
 
 gcc = Compiler(
 	name =                 'gcc', 
+	default_flags =        '', 
 	exe_extension =        '', 
 	object_extension =     '.o', 
 	shared_lib_extension = '.so', 
@@ -1006,19 +1010,21 @@ gcc = Compiler(
 # http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
 cl = Compiler(
 	name =                 'cl.exe', 
+	default_flags =        '/nologo', 
 	exe_extension =        '.exe', 
 	object_extension =     '.obj', 
 	shared_lib_extension = '.dll', 
 	static_lib_extension = '.lib', 
 	out_file =             '/Fe', 
 	no_link =              '/c', 
-	debug =                '/Yd', 
+	debug =                '', 
 	warnings_all =         '/Wall', 
 	warnings_as_errors =   ''
 )
 
 dmd = Compiler(
 	name =                 'dmd', 
+	default_flags =        '', 
 	exe_extension =        '', 
 	object_extension =     '.o', 
 	shared_lib_extension = '.so', 
@@ -1028,6 +1034,28 @@ dmd = Compiler(
 	debug =                '-g', 
 	warnings_all =         '-w', 
 	warnings_as_errors =   ''
+)
+
+class Linker(object):
+	def __init__(self, name, default_flags, out_file, shared):
+		self._name = name
+		
+		self._opt_default_flags = default_flags
+		self._opt_out_file = out_file
+		self._opt_shared = shared
+
+link = Linker(
+	name            = 'link.exe',
+	default_flags   = '/nologo', 
+	out_file        = '/out:', 
+	shared          = '/dll '
+)
+
+ld = Linker(
+	name            = 'ld',
+	default_flags   = '', 
+	out_file        = '-o ', 
+	shared          = '-G'
 )
 
 def to_native(thing):
@@ -1046,13 +1074,25 @@ def to_native(thing):
 
 	return thing
 
+def c_get_default_linker():
+	if os_type == 'Windows':
+		return link
+	else:
+		return ld
+
+def c_save_linker(linker):
+	# CLINKER
+	global clinker
+	clinker = linker
+	os.environ['CLINKER'] = clinker._name
+
 def c_get_default_compiler():
 	if os_type == 'Windows':
 		return cl
 	else:
 		return gcc
 
-def c_save_environment(compiler):
+def c_save_compiler(compiler):
 	# CC
 	global cc
 	cc = compiler
@@ -1060,6 +1100,7 @@ def c_save_environment(compiler):
 
 	# CFLAGS
 	opts = []
+	opts.append(cc._opt_default_flags)
 	if cc.debug: opts.append(cc._opt_debug)
 	if cc.warnings_all: opts.append(cc._opt_warnings_all)
 	if cc.warnings_as_errors: opts.append(cc._opt_warnings_as_errors)
@@ -1078,7 +1119,7 @@ def c_build_object(o_file, c_files, i_files=[]):
 	singular = 'C object'
 	command = "${CC} ${CFLAGS} " + \
 				cc._opt_no_link + ' ' +  \
-				cc._opt_out_file + ' ' + \
+				cc._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
@@ -1168,9 +1209,12 @@ def c_build_shared_library(so_file, o_files):
 	result = so_file
 	plural = 'shared libraries'
 	singular = 'shared library'
-	command = "ld -G {0} {1} {2}".format(
+	command = "{0} {1} {2} {3} {4}{5}".format(
+				clinker._name, 
+				clinker._opt_default_flags, 
+				clinker._opt_shared, 
 				str.join(' ', o_files), 
-				cc._opt_out_file, 
+				clinker._opt_out_file, 
 				so_file)
 
 	def setup():
@@ -1186,7 +1230,7 @@ def c_build_shared_library(so_file, o_files):
 def d_get_default_compiler():
 	return dmd
 
-def d_save_environment(compiler):
+def d_save_compiler(compiler):
 	# DC
 	global dc
 	dc = compiler
@@ -1368,7 +1412,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 7 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 9 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")

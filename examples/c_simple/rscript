@@ -11,7 +11,7 @@ def _configure():
 	cc.debug = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_environment(cc)
+	c_save_compiler(cc)
 
 def test():
 	"""Builds the program, and runs it."""
@@ -55,6 +55,7 @@ def install():
 
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
+
 
 
 
