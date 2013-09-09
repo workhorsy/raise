@@ -37,17 +37,11 @@ global pwd
 global python
 global bits
 global arch
-global os_type
 global target_name
 global terminal_clear
 global terminal_width
 global message_length
-global cc
-global dc
-global clinker
-cc = None
-dc = None
-clinker = None
+global config
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -82,23 +76,65 @@ elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
 else:
 	early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
+class Config(object):
+	def __init__(self):
+		self._os_type = None
+		self._cc = None
+		self._dc = None
+		self._clinker = None
+
+class OSType(object):
+	def __init__(self, name, exe_extension, object_extension, 
+				shared_lib_extension, static_lib_extension):
+
+		self._name = name
+		self._exe_extension = exe_extension
+		self._object_extension = object_extension
+		self._shared_lib_extension = shared_lib_extension
+		self._static_lib_extension = static_lib_extension
+
+unix = OSType(
+	name =                 'Unix', 
+	exe_extension =        '', 
+	object_extension =     '.o', 
+	shared_lib_extension = '.so', 
+	static_lib_extension = '.a'
+)
+
+cygwin = OSType(
+	name =                 'Cygwin', 
+	exe_extension =        '', 
+	object_extension =     '.o', 
+	shared_lib_extension = '.so', 
+	static_lib_extension = '.a'
+)
+
+windows = OSType(
+	name =                 'Windows', 
+	exe_extension =        '.exe', 
+	object_extension =     '.obj', 
+	shared_lib_extension = '.dll', 
+	static_lib_extension = '.lib'
+)
+
 # Figure out the general OS type
+config = Config()
 if 'cygwin' in platform.system().lower():
-	os_type = 'Cygwin'
+	config._os_type = cygwin
 elif 'windows' in platform.system().lower():
-	os_type = 'Windows'
+	config._os_type = windows
 else:
-	os_type = 'Unix'
+	config._os_type = unix
 
 # Figure out how to clear the terminal
-if os_type == 'Windows':
+if config._os_type._name == 'Windows':
 	terminal_clear = 'cls'
 else:
 	terminal_clear = 'clear'
 
 # FIXME: Have this look for stty first then try the registry
 # Figure out the terminal width
-if os_type == 'Windows':
+if config._os_type._name == 'Windows':
 	import _winreg
 	key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
 	val = _winreg.QueryValueEx(key, "ScreenBufferSize")
@@ -130,7 +166,7 @@ def do_as_normal_user(cb):
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not os_type in ['Windows', 'Cygwin']:
+	if not config._os_type._name in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -152,7 +188,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not os_type in ['Windows', 'Cygwin']:
+		if not config._os_type._name in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -237,7 +273,7 @@ def print_exit(message):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if os_type == 'Windows':
+		if config._os_type._name == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -462,11 +498,11 @@ def require_root():
 	is_root = False
 
 	# Cygwin
-	if os_type == 'Cygwin':
+	if config._os_type._name == 'Cygwin':
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif os_type == 'Windows':
+	elif config._os_type._name == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot','C:\windows')
@@ -484,7 +520,7 @@ def require_root():
 
 def require_not_root():
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if os_type in ['Windows', 'Cygwin']:
+	if config._os_type._name in ['Windows', 'Cygwin']:
 		return
 	
 	# Make sure we are NOT root
@@ -687,7 +723,7 @@ def ldconfig():
 	print_status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if os_type == 'Cygwin':
+	if config._os_type._name == 'Cygwin':
 		print_ok()
 		return
 
@@ -821,7 +857,7 @@ def require_static_or_shared_libraries(lib_names):
 def require_raise_dependencies():
 	# Get a list of all the programs raise uses
 	prog_names = None
-	if os_type == 'Windows':
+	if config._os_type._name == 'Windows':
 		prog_names = ['cl.exe', 'link.exe']
 	else:
 		prog_names = ['gcc', 'ar', 'ld']
@@ -967,21 +1003,17 @@ def link_static_or_shared_paths(lib_names):
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
 
+
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class Compiler(object):
-	def __init__(self, name, default_flags, exe_extension, object_extension, 
-				shared_lib_extension, static_lib_extension, out_file, no_link, 
+	def __init__(self, name, default_flags, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors):
 
 		self._name = name
 
 		# Save text for all the options
 		self._opt_default_flags = default_flags
-		self._opt_exe_extension = exe_extension
-		self._opt_object_extension = object_extension
-		self._opt_shared_lib_extension = shared_lib_extension
-		self._opt_static_lib_extension = static_lib_extension
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
 		self._opt_debug = debug
@@ -996,10 +1028,6 @@ class Compiler(object):
 gcc = Compiler(
 	name =                 'gcc', 
 	default_flags =        '', 
-	exe_extension =        '', 
-	object_extension =     '.o', 
-	shared_lib_extension = '.so', 
-	static_lib_extension = '.a', 
 	out_file =             '-o ', 
 	no_link =              '-c', 
 	debug =                '-g', 
@@ -1011,10 +1039,6 @@ gcc = Compiler(
 cl = Compiler(
 	name =                 'cl.exe', 
 	default_flags =        '/nologo', 
-	exe_extension =        '.exe', 
-	object_extension =     '.obj', 
-	shared_lib_extension = '.dll', 
-	static_lib_extension = '.lib', 
 	out_file =             '/Fe', 
 	no_link =              '/c', 
 	debug =                '', 
@@ -1025,10 +1049,6 @@ cl = Compiler(
 dmd = Compiler(
 	name =                 'dmd', 
 	default_flags =        '', 
-	exe_extension =        '', 
-	object_extension =     '.o', 
-	shared_lib_extension = '.so', 
-	static_lib_extension = '.a', 
 	out_file =             '-of', 
 	no_link =              '-c', 
 	debug =                '-g', 
@@ -1060,9 +1080,9 @@ ld = Linker(
 
 def to_native(thing):
 	replaces = {
-		'.o' : cc._opt_object_extension,
-		'.so': cc._opt_shared_lib_extension,
-		'.a' : cc._opt_static_lib_extension
+		'.o' : config._os_type._object_extension,
+		'.so': config._os_type._shared_lib_extension,
+		'.a' : config._os_type._static_lib_extension
 	}
 
 	if type(thing) == list:
@@ -1075,35 +1095,35 @@ def to_native(thing):
 	return thing
 
 def c_get_default_linker():
-	if os_type == 'Windows':
+	if config._os_type._name == 'Windows':
 		return link
 	else:
 		return ld
 
 def c_save_linker(linker):
 	# CLINKER
-	global clinker
-	clinker = linker
-	os.environ['CLINKER'] = clinker._name
+	global config
+	config._clinker = linker
+	os.environ['CLINKER'] = config._clinker._name
 
 def c_get_default_compiler():
-	if os_type == 'Windows':
+	if config._os_type._name == 'Windows':
 		return cl
 	else:
 		return gcc
 
 def c_save_compiler(compiler):
 	# CC
-	global cc
-	cc = compiler
-	os.environ['CC'] = cc._name
+	global config
+	config._cc = compiler
+	os.environ['CC'] = config._cc._name
 
 	# CFLAGS
 	opts = []
-	opts.append(cc._opt_default_flags)
-	if cc.debug: opts.append(cc._opt_debug)
-	if cc.warnings_all: opts.append(cc._opt_warnings_all)
-	if cc.warnings_as_errors: opts.append(cc._opt_warnings_as_errors)
+	opts.append(config._cc._opt_default_flags)
+	if config._cc.debug: opts.append(config._cc._opt_debug)
+	if config._cc.warnings_all: opts.append(config._cc._opt_warnings_all)
+	if config._cc.warnings_as_errors: opts.append(config._cc._opt_warnings_as_errors)
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
 def c_build_object(o_file, c_files, i_files=[]):
@@ -1118,8 +1138,8 @@ def c_build_object(o_file, c_files, i_files=[]):
 	plural = 'C objects'
 	singular = 'C object'
 	command = "${CC} ${CFLAGS} " + \
-				cc._opt_no_link + ' ' +  \
-				cc._opt_out_file + \
+				config._cc._opt_no_link + ' ' +  \
+				config._cc._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
@@ -1128,11 +1148,6 @@ def c_build_object(o_file, c_files, i_files=[]):
 		# Skip if the files have not changed since last build
 		if not is_outdated(to_update = [o_file], triggers = c_files):
 			return False
-
-		# Make sure the environmental variable is set
-		if not cc:
-			print_fail()
-			print_exit("A C compiler must be set to cc.")
 
 		# Make sure the environmental variable is set
 		if not 'CC' in os.environ:
@@ -1159,7 +1174,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 	command = '${CC} ${CFLAGS} ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				cc._opt_out_file + o_file
+				config._cc._opt_out_file + o_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -1210,11 +1225,11 @@ def c_build_shared_library(so_file, o_files):
 	plural = 'shared libraries'
 	singular = 'shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
-				clinker._name, 
-				clinker._opt_default_flags, 
-				clinker._opt_shared, 
+				config._clinker._name, 
+				config._clinker._opt_default_flags, 
+				config._clinker._opt_shared, 
 				str.join(' ', o_files), 
-				clinker._opt_out_file, 
+				config._clinker._opt_out_file, 
 				so_file)
 
 	def setup():
@@ -1232,15 +1247,15 @@ def d_get_default_compiler():
 
 def d_save_compiler(compiler):
 	# DC
-	global dc
-	dc = compiler
-	os.environ['DC'] = dc._name
+	global config
+	config._dc = compiler
+	os.environ['DC'] = config._dc._name
 
 	# DFLAGS
 	opts = []
-	if dc.debug: opts.append(dc._opt_debug)
-	if dc.warnings_all: opts.append(dc._opt_warnings_all)
-	if dc.warnings_as_errors: opts.append(dc._opt_warnings_as_errors)
+	if config._dc.debug: opts.append(config._dc._opt_debug)
+	if config._dc.warnings_all: opts.append(config._dc._opt_warnings_all)
+	if config._dc.warnings_as_errors: opts.append(config._dc._opt_warnings_as_errors)
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files):
@@ -1251,7 +1266,7 @@ def d_build_interface(d_file, i_files):
 	singular = 'D interface'
 
 	f = SelfDeletingNamedTemporaryFile()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + dc._opt_out_file + f.name
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + config._dc._opt_out_file + f.name
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -1274,7 +1289,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	plural = 'D objects'
 	singular = 'D object'
 
-	command = "${DC} ${DFLAGS} -c " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -c " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 
@@ -1299,7 +1314,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	plural = 'D shared libraries'
 	singular = 'D shared library'
 
-	command = "${DC} ${DFLAGS} -shared " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -shared " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1324,7 +1339,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	plural = 'D static libraries'
 	singular = 'D static library'
 
-	command = "${DC} ${DFLAGS} -lib " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -lib " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1345,7 +1360,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	result = out_file
 	plural = 'D programs'
 	singular = 'D program'
-	command = "${DC} ${DFLAGS} " + dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = "${DC} ${DFLAGS} " + config._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():
 		if not 'DC' in os.environ:
