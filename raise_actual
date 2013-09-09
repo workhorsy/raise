@@ -35,13 +35,19 @@ import traceback
 
 global pwd
 global python
-global bits
-global arch
 global target_name
 global terminal_clear
 global terminal_width
 global message_length
 global config
+
+pwd = None
+python = None
+target_name = None
+terminal_clear = None
+terminal_width = None
+message_length = None
+config = None
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -55,26 +61,10 @@ if sys.version_info < (2, 6):
 # Get the path of the rscript file
 pwd = os.sys.path[0]
 
-target_name = None
-cpus_total = multiprocessing.cpu_count()
-cpus_free = cpus_total
-
 # Get the name of the current running python program
 python = sys.executable
 if not python:
 	early_exit('Could not find python to run child processes with.')
-
-# Figure out the CPU architecture
-arch = None
-bits = None
-if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
-	arch = 'x86_32'
-	bits = '32'
-elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
-	arch = 'x86_64'
-	bits = '64'
-else:
-	early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
 class Config(object):
 	def __init__(self):
@@ -82,6 +72,46 @@ class Config(object):
 		self._cc = None
 		self._dc = None
 		self._clinker = None
+
+		# Figure out the CPU architecture
+		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
+			self._arch = 'x86_32'
+			self._bits = '32'
+		elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
+			self._arch = 'x86_64'
+			self._bits = '64'
+		else:
+			early_exit('Unknown architecture {0}.'.format(platform.machine()))
+
+		# Figure out how many cpus there are
+		self._cpus_total = multiprocessing.cpu_count()
+		self._cpus_free = self._cpus_total
+
+		# Figure out the general OS type
+		if 'cygwin' in platform.system().lower():
+			self._os_type = OSType(
+				name =                 'Cygwin', 
+				exe_extension =        '', 
+				object_extension =     '.o', 
+				shared_lib_extension = '.so', 
+				static_lib_extension = '.a'
+			)
+		elif 'windows' in platform.system().lower():
+			self._os_type = OSType(
+				name =                 'Windows', 
+				exe_extension =        '.exe', 
+				object_extension =     '.obj', 
+				shared_lib_extension = '.dll', 
+				static_lib_extension = '.lib'
+			)
+		else:
+			self._os_type = OSType(
+				name =                 'Unix', 
+				exe_extension =        '', 
+				object_extension =     '.o', 
+				shared_lib_extension = '.so', 
+				static_lib_extension = '.a'
+			)
 
 class OSType(object):
 	def __init__(self, name, exe_extension, object_extension, 
@@ -93,38 +123,7 @@ class OSType(object):
 		self._shared_lib_extension = shared_lib_extension
 		self._static_lib_extension = static_lib_extension
 
-unix = OSType(
-	name =                 'Unix', 
-	exe_extension =        '', 
-	object_extension =     '.o', 
-	shared_lib_extension = '.so', 
-	static_lib_extension = '.a'
-)
-
-cygwin = OSType(
-	name =                 'Cygwin', 
-	exe_extension =        '', 
-	object_extension =     '.o', 
-	shared_lib_extension = '.so', 
-	static_lib_extension = '.a'
-)
-
-windows = OSType(
-	name =                 'Windows', 
-	exe_extension =        '.exe', 
-	object_extension =     '.obj', 
-	shared_lib_extension = '.dll', 
-	static_lib_extension = '.lib'
-)
-
-# Figure out the general OS type
 config = Config()
-if 'cygwin' in platform.system().lower():
-	config._os_type = cygwin
-elif 'windows' in platform.system().lower():
-	config._os_type = windows
-else:
-	config._os_type = unix
 
 # Figure out how to clear the terminal
 if config._os_type._name == 'Windows':
@@ -445,9 +444,6 @@ def parallel_start():
 	Event.is_first_parallel = True
 
 def parallel_end():
-	global cpus_total
-	global cpus_free
-
 	ready_events = Event.events
 	running_events = []
 
@@ -461,23 +457,24 @@ def parallel_end():
 			# Success. Keep going
 			if event._status == 'success':
 				running_events.remove(event)
-				cpus_free += 1
+				config._cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
 				print_exit("Event failed.")
 
 		# Check for events that need to start
-		while cpus_free > 0 and len(ready_events):
+		while config._cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
 			if event.run():
-				cpus_free -= 1
+				config._cpus_free -= 1
 				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
-		if cpus_free == 0 or len(ready_events) == 0:
+		if config._cpus_free == 0 or len(ready_events) == 0:
 			time.sleep(0.1)
 
 	# Clear all the events
+	config._cpus_free = config._cpus_total
 	Event.events = []
 	Event.is_parallel = False
 	Event.is_first_parallel = False
@@ -926,7 +923,7 @@ def header_path(header_name):
 
 	# Of those paths, get the ones that match the architecture
 	for path in paths:
-		if 'lib' + bits in path or arch in path:
+		if 'lib' + config._bits in path or config._arch in path:
 			retval = path
 
 	# If none were matched specifically from the architecture
