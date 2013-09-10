@@ -127,10 +127,14 @@ if __name__ == '__main__':
 		exit()
 
 	# Run update if there is no raise_actual file
-	actual = '.raise_actual'
+	actual = None
 	if os.path.isfile('raise_actual'):
 		actual = 'raise_actual'
-	elif not os.path.isfile('.raise_actual'):
+	elif os.path.isfile('.raise_actual'):
+		actual = '.raise_actual'
+	elif os.path.isfile('../../raise_actual'):
+		actual = '../../raise_actual'
+	else:
 		update()
 
 	# Have the raise_actual file handle everything else
