@@ -7,6 +7,7 @@ def clean():
 	rmfile_f('raise_example')
 	rmfile_f('libexample.o')
 	rmfile_f('libexample.so')
+	rmfile_f('main.o')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -77,6 +78,7 @@ def install():
 	cpfile('libexample.so', '/usr/lib/libexample.so')
 
 	ldconfig()
+
 
 
 

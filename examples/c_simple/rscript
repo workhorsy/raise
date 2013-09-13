@@ -5,6 +5,7 @@
 def clean():
 	"""Removes any files and directories generated when building."""
 	rmfile_f('raise_example')
+	rmfile_f('main.o')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -55,6 +56,7 @@ def install():
 
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
+
 
 
 
