@@ -868,29 +868,6 @@ def require_static_or_shared_libraries(lib_names):
 	for lib_name in lib_names:
 		require_static_or_shared_library(lib_name)
 
-def require_raise_dependencies():
-	# Get a list of all the programs raise uses
-	prog_names = None
-	if config._os_type._name == 'Windows':
-		prog_names = ['cl.exe', 'link.exe']
-	else:
-		prog_names = ['gcc', 'ar', 'ld']
-
-	# See which programs are not installed
-	fails = []
-	for prog_name in prog_names:
-		names = program_paths(prog_name)
-		if len(names) == 0:
-			fails.append(prog_name)
-
-	# Print them in a list then exit
-	if fails:
-		print_info("Raise is checking for its dependencies")
-		for f in fails:
-			print_status("Checking for program '{0}'".format(f))
-			print_fail()
-		print_exit("Install the dependencies '{0}' and try again.".format(str.join("', '", fails)))
-
 def require_programs(prog_names):
 	for prog_name in prog_names:
 		print_status("Checking for program '{0}'".format(prog_name))
@@ -1642,12 +1619,6 @@ if __name__ == '__main__':
 	# Exit if there is no target with that name
 	if not target_name in targets:
 		print_exit("No target named '{0}'. Found targets are {1}.".format(target_name, target_list))
-
-	# Make sure all the programs we need are installed
-	# FIXME: Requiring gcc, ar, ld, and ldconfig makes raise
-	# gcc specific. What other linkers and archivers are used
-	# with other C compilers? Clang, MS cl, et cetera
-	require_raise_dependencies()
 
 	# Setup any modules
 	for module in modules:
