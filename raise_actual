@@ -1076,7 +1076,7 @@ def _c_module_setup():
 	global c_linkers
 
 	# Get the names and paths for know C compilers
-	names = ['gcc', 'cl.exe']
+	names = ['gcc', 'clang', 'cl.exe']
 	for name in names:
 		paths = program_paths(name)
 		if len(paths) == 0:
@@ -1085,6 +1085,18 @@ def _c_module_setup():
 		if name == 'gcc':
 			comp = Compiler(
 				name =                 'gcc', 
+				path =                 paths[0], 
+				default_flags =        '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Wall', 
+				warnings_as_errors =   '-Werror'
+			)
+			c_compilers[comp._name] = comp
+		elif name == 'clang':
+			comp = Compiler(
+				name =                 'clang', 
 				path =                 paths[0], 
 				default_flags =        '', 
 				out_file =             '-o ', 
@@ -1174,10 +1186,17 @@ def c_get_default_compiler():
 	global c_compilers
 	_c_require_module()
 
+	comp = None
+
 	if config._os_type._name == 'Windows':
-		return c_compilers['cl.exe']
+		comp = c_compilers['cl.exe']
 	else:
-		return c_compilers['gcc']
+		if 'gcc' in c_compilers:
+			comp = c_compilers['gcc']
+		elif 'clang' in c_compilers:
+			comp = c_compilers['clang']
+
+	return comp
 
 def c_save_compiler(compiler):
 	_c_require_module()
@@ -1323,7 +1342,7 @@ def _d_module_setup():
 	global d_compilers
 
 	# Get the names and paths for know D compilers
-	names = ['dmd']
+	names = ['dmd', 'ldc2']
 	for name in names:
 		paths = program_paths(name)
 		if len(paths) == 0:
@@ -1332,6 +1351,18 @@ def _d_module_setup():
 		if name == 'dmd':
 			comp = Compiler(
 				name =                 'dmd', 
+				path =                  paths[0], 
+				default_flags =        '', 
+				out_file =             '-of', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-w', 
+				warnings_as_errors =   ''
+			)
+			d_compilers[comp._name] = comp
+		elif name == 'ldc2':
+			comp = Compiler(
+				name =                 'ldc2', 
 				path =                  paths[0], 
 				default_flags =        '', 
 				out_file =             '-of', 
@@ -1361,7 +1392,13 @@ def d_get_default_compiler():
 	global d_compilers
 	_d_require_module()
 
-	return d_compilers['dmd']
+	comp = None
+	if 'dmd' in d_compilers:
+		comp = d_compilers['dmd']
+	elif 'ldc2' in d_compilers:
+		comp = d_compilers['ldc2']
+
+	return comp
 
 def d_save_compiler(compiler):
 	_d_require_module()
