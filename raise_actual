@@ -40,6 +40,7 @@ global message_length
 global config
 global modules
 global c_compilers
+global c_linkers
 global d_compilers
 
 pwd = None
@@ -49,6 +50,7 @@ message_length = None
 config = None
 modules = []
 c_compilers = {}
+c_linkers = {}
 d_compilers = {}
 
 def early_exit(message):
@@ -1046,20 +1048,6 @@ class Linker(object):
 		self._opt_out_file = out_file
 		self._opt_shared = shared
 
-link = Linker(
-	name            = 'link.exe',
-	default_flags   = '/nologo', 
-	out_file        = '/out:', 
-	shared          = '/dll '
-)
-
-ld = Linker(
-	name            = 'ld',
-	default_flags   = '', 
-	out_file        = '-o ', 
-	shared          = '-G'
-)
-
 def to_native(thing):
 	# Get a dict of the standard extensions and their other os counterparts
 	replaces = {
@@ -1085,6 +1073,7 @@ def require_module(name):
 
 def _c_module_setup():
 	global c_compilers
+	global c_linkers
 
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'cl.exe']
@@ -1125,6 +1114,36 @@ def _c_module_setup():
 		print_fail()
 		print_exit("No C compiler found. Install one and try again.")
 
+	# Get the names and paths for know linkers
+	names = ['ld', 'link.exe']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'link.exe':
+			link = Linker(
+				name            = 'link.exe',
+				default_flags   = '/nologo', 
+				out_file        = '/out:', 
+				shared          = '/dll '
+			)
+			c_linkers[link._name] = link
+		elif name == 'ld':
+			link = Linker(
+				name            = 'ld',
+				default_flags   = '', 
+				out_file        = '-o ', 
+				shared          = '-G'
+			)
+			c_linkers[link._name] = link
+
+	# Make sure there is at least one linker installed
+	if len(c_linkers) == 0:
+		print_status("Setting up C module")
+		print_fail()
+		print_exit("No linker found. Install one and try again.")
+
 def _c_require_module():
 	# Just return if setup
 	if c_compilers:
@@ -1135,12 +1154,13 @@ def _c_require_module():
 	print_exit("Call require_module('C') before using any C functions.")
 
 def c_get_default_linker():
+	global c_linkers
 	_c_require_module()
 
 	if config._os_type._name == 'Windows':
-		return link
+		return c_linkers['link.exe']
 	else:
-		return ld
+		return c_linkers['ld']
 
 def c_save_linker(linker):
 	_c_require_module()
