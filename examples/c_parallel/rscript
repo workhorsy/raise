@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import os
+require_module('C')
+
 
 def clean():
 	"""Removes any files and directories generated when building."""

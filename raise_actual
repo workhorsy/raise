@@ -38,12 +38,20 @@ global python
 global target_name
 global message_length
 global config
+global modules
+global c_compilers
+global c_linkers
+global d_compilers
 
 pwd = None
 python = None
 target_name = None
 message_length = None
 config = None
+modules = []
+c_compilers = {}
+c_linkers = {}
+d_compilers = {}
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -1013,10 +1021,11 @@ def link_static_or_shared_paths(lib_names):
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class Compiler(object):
-	def __init__(self, name, default_flags, out_file, no_link, 
+	def __init__(self, name, path, default_flags, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors):
 
 		self._name = name
+		self._path = path
 
 		# Save text for all the options
 		self._opt_default_flags = default_flags
@@ -1031,37 +1040,6 @@ class Compiler(object):
 		self.warnings_all = False
 		self.warnings_as_errors = False
 
-gcc = Compiler(
-	name =                 'gcc', 
-	default_flags =        '', 
-	out_file =             '-o ', 
-	no_link =              '-c', 
-	debug =                '-g', 
-	warnings_all =         '-Wall', 
-	warnings_as_errors =   '-Werror'
-)
-
-# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
-cl = Compiler(
-	name =                 'cl.exe', 
-	default_flags =        '/nologo', 
-	out_file =             '/Fe', 
-	no_link =              '/c', 
-	debug =                '', 
-	warnings_all =         '/Wall', 
-	warnings_as_errors =   ''
-)
-
-dmd = Compiler(
-	name =                 'dmd', 
-	default_flags =        '', 
-	out_file =             '-of', 
-	no_link =              '-c', 
-	debug =                '-g', 
-	warnings_all =         '-w', 
-	warnings_as_errors =   ''
-)
-
 class Linker(object):
 	def __init__(self, name, default_flags, out_file, shared):
 		self._name = name
@@ -1069,20 +1047,6 @@ class Linker(object):
 		self._opt_default_flags = default_flags
 		self._opt_out_file = out_file
 		self._opt_shared = shared
-
-link = Linker(
-	name            = 'link.exe',
-	default_flags   = '/nologo', 
-	out_file        = '/out:', 
-	shared          = '/dll '
-)
-
-ld = Linker(
-	name            = 'ld',
-	default_flags   = '', 
-	out_file        = '-o ', 
-	shared          = '-G'
-)
 
 def to_native(thing):
 	# Get a dict of the standard extensions and their other os counterparts
@@ -1102,25 +1066,141 @@ def to_native(thing):
 
 	return thing
 
+def require_module(name):
+	global modules
+
+	modules.append(name)
+
+def _c_module_setup():
+	global c_compilers
+	global c_linkers
+
+	# Get the names and paths for know C compilers
+	names = ['gcc', 'clang', 'cl.exe']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'gcc':
+			comp = Compiler(
+				name =                 'gcc', 
+				path =                 paths[0], 
+				default_flags =        '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Wall', 
+				warnings_as_errors =   '-Werror'
+			)
+			c_compilers[comp._name] = comp
+		elif name == 'clang':
+			comp = Compiler(
+				name =                 'clang', 
+				path =                 paths[0], 
+				default_flags =        '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Wall', 
+				warnings_as_errors =   '-Werror'
+			)
+			c_compilers[comp._name] = comp
+		elif name == 'cl.exe':
+			# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
+			comp = Compiler(
+				name =                 'cl.exe', 
+				path =                 paths[0], 
+				default_flags =        '/nologo', 
+				out_file =             '/Fe', 
+				no_link =              '/c', 
+				debug =                '', 
+				warnings_all =         '/Wall', 
+				warnings_as_errors =   ''
+			)
+			c_compilers[comp._name] = comp
+
+	# Make sure there is at least one C compiler installed
+	if len(c_compilers) == 0:
+		print_status("Setting up C module")
+		print_fail()
+		print_exit("No C compiler found. Install one and try again.")
+
+	# Get the names and paths for know linkers
+	names = ['ld', 'link.exe']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'link.exe':
+			link = Linker(
+				name            = 'link.exe',
+				default_flags   = '/nologo', 
+				out_file        = '/out:', 
+				shared          = '/dll '
+			)
+			c_linkers[link._name] = link
+		elif name == 'ld':
+			link = Linker(
+				name            = 'ld',
+				default_flags   = '', 
+				out_file        = '-o ', 
+				shared          = '-G'
+			)
+			c_linkers[link._name] = link
+
+	# Make sure there is at least one linker installed
+	if len(c_linkers) == 0:
+		print_status("Setting up C module")
+		print_fail()
+		print_exit("No linker found. Install one and try again.")
+
+def _c_require_module():
+	# Just return if setup
+	if c_compilers:
+		return
+
+	print_status("C module check")
+	print_fail()
+	print_exit("Call require_module('C') before using any C functions.")
+
 def c_get_default_linker():
+	global c_linkers
+	_c_require_module()
+
 	if config._os_type._name == 'Windows':
-		return link
+		return c_linkers['link.exe']
 	else:
-		return ld
+		return c_linkers['ld']
 
 def c_save_linker(linker):
+	_c_require_module()
+
 	# CLINKER
 	global config
 	config._clinker = linker
 	os.environ['CLINKER'] = config._clinker._name
 
 def c_get_default_compiler():
+	global c_compilers
+	_c_require_module()
+
+	comp = None
+
 	if config._os_type._name == 'Windows':
-		return cl
+		comp = c_compilers['cl.exe']
 	else:
-		return gcc
+		if 'gcc' in c_compilers:
+			comp = c_compilers['gcc']
+		elif 'clang' in c_compilers:
+			comp = c_compilers['clang']
+
+	return comp
 
 def c_save_compiler(compiler):
+	_c_require_module()
+
 	# CC
 	global config
 	config._cc = compiler
@@ -1135,6 +1215,8 @@ def c_save_compiler(compiler):
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
 def c_build_object(o_file, c_files, i_files=[]):
+	_c_require_module()
+
 	# Change file extensions to os format
 	o_file = to_native(o_file)
 	c_files = to_native(c_files)
@@ -1169,6 +1251,8 @@ def c_build_object(o_file, c_files, i_files=[]):
 	add_event(event)
 
 def c_build_program(o_file, c_files, i_files=[]):
+	_c_require_module()
+
 	# Change file extensions to os format
 	o_file = to_native(o_file)
 	c_files = to_native(c_files)
@@ -1199,6 +1283,8 @@ def c_build_program(o_file, c_files, i_files=[]):
 
 # FIXME: Rename to c_build_static_library
 def ar_build_static_library(ar_file, o_files):
+	_c_require_module()
+
 	# Change file extensions to os format
 	ar_file = to_native(ar_file)
 	o_files = to_native(o_files)
@@ -1223,6 +1309,8 @@ def ar_build_static_library(ar_file, o_files):
 	add_event(event)
 
 def c_build_shared_library(so_file, o_files):
+	_c_require_module()
+
 	# Change file extensions to os format
 	so_file = to_native(so_file)
 	o_files = to_native(o_files)
@@ -1250,10 +1338,71 @@ def c_build_shared_library(so_file, o_files):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+def _d_module_setup():
+	global d_compilers
+
+	# Get the names and paths for know D compilers
+	names = ['dmd', 'ldc2']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'dmd':
+			comp = Compiler(
+				name =                 'dmd', 
+				path =                  paths[0], 
+				default_flags =        '', 
+				out_file =             '-of', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-w', 
+				warnings_as_errors =   ''
+			)
+			d_compilers[comp._name] = comp
+		elif name == 'ldc2':
+			comp = Compiler(
+				name =                 'ldc2', 
+				path =                  paths[0], 
+				default_flags =        '', 
+				out_file =             '-of', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-w', 
+				warnings_as_errors =   ''
+			)
+			d_compilers[comp._name] = comp
+
+	# Make sure there is at least one D compiler installed
+	if len(d_compilers) == 0:
+		print_status("Setting up D module")
+		print_fail()
+		print_exit("No D compiler found. Install one and try again.")
+
+def _d_require_module():
+	# Just return if setup
+	if d_compilers:
+		return
+
+	print_status("D module check")
+	print_fail()
+	print_exit("Call require_module('D') before using any D functions.")
+
 def d_get_default_compiler():
-	return dmd
+	global d_compilers
+	_d_require_module()
+
+	comp = None
+	if 'dmd' in d_compilers:
+		comp = d_compilers['dmd']
+	elif 'ldc2' in d_compilers:
+		comp = d_compilers['ldc2']
+
+	return comp
 
 def d_save_compiler(compiler):
+	_d_require_module()
+
 	# DC
 	global config
 	config._dc = compiler
@@ -1267,6 +1416,8 @@ def d_save_compiler(compiler):
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files):
+	_d_require_module()
+
 	d_file = to_native(d_file)
 	i_files = to_native(i_files)
 
@@ -1294,6 +1445,8 @@ def d_build_interface(d_file, i_files):
 	add_event(event)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
+	_d_require_module()
+
 	o_file = to_native(o_file)
 	d_files = to_native(d_files)
 	i_files = to_native(i_files)
@@ -1325,6 +1478,8 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	add_event(event)
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
+	_d_require_module()
+
 	o_file = to_native(o_file)
 	d_files = to_native(d_files)
 	i_files = to_native(i_files)
@@ -1355,6 +1510,8 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
+	_d_require_module()
+
 	o_files = to_native(o_files)
 	d_files = to_native(d_files)
 	i_files = to_native(i_files)
@@ -1382,6 +1539,8 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
+	_d_require_module()
+
 	out_file = to_native(out_file)
 	inc_files = to_native(inc_files)
 	link_files = to_native(link_files)
@@ -1461,7 +1620,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 10 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 13 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
@@ -1489,6 +1648,15 @@ if __name__ == '__main__':
 	# gcc specific. What other linkers and archivers are used
 	# with other C compilers? Clang, MS cl, et cetera
 	require_raise_dependencies()
+
+	# Setup any modules
+	for module in modules:
+		if module == 'C':
+			_c_module_setup()
+		elif module == 'D':
+			_d_module_setup()
+		else:
+			print_exit('Unknown module "{0}"'.format(module))
 
 	# Try running the target
 	target = targets[target_name]
