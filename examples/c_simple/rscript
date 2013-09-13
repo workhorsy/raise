@@ -5,10 +5,14 @@
 def clean():
 	"""Removes any files and directories generated when building."""
 	rmfile_f('raise_example')
+	rmfile_f('main.o')
 
 def _configure():
-	os.environ['CC'] = 'gcc'
-	os.environ['CFLAGS'] = '-g -Wall -Werror'
+	cc = c_get_default_compiler()
+	cc.debug = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	c_save_compiler(cc)
 
 def test():
 	"""Builds the program, and runs it."""
@@ -35,8 +39,6 @@ def remove():
 	# Remove the old files
 	_remove()
 
-	updatedb()
-
 def install():
 	"""Installs the program."""
 	# Setup
@@ -55,7 +57,7 @@ def install():
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
 
-	updatedb()
+
 
 
 

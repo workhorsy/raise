@@ -4,13 +4,19 @@ Raise is a small software build tool that ships with your code.
 The project is hosted at http://launchpad.net/raise and licensed under
 a MIT style license.
 
-// Install requirements
+// Linux/Unix install requirements
 Python 2.6 or greater
-which
-locate
 stty
-updatedb
 gcc
 ar
 ld
 ldconfig
+
+// Windows with Cygwin install requirements
+Python 2.6 or greater
+ncurses
+stty
+gcc
+ar
+ld
+

@@ -9,8 +9,11 @@ def clean():
 	rmfile_f('libexample.a')
 
 def _configure():
-	os.environ['CC'] = 'gcc'
-	os.environ['CFLAGS'] = '-g -Wall -Werror'
+	cc = c_get_default_compiler()
+	cc.debug = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	c_save_compiler(cc)
 
 def test():
 	"""Builds the program, and runs it."""
@@ -41,7 +44,6 @@ def remove():
 	# Remove the files
 	_remove()
 
-	updatedb()
 	ldconfig()
 
 def install():
@@ -64,7 +66,7 @@ def install():
 	# Install
 	cpfile('raise_example', '/usr/bin/raise_example')
 
-	updatedb()
 	ldconfig()
+
 
 
