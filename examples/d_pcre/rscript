@@ -29,8 +29,8 @@ def _configure():
 	linker = c_get_default_linker()
 	c_save_linker(linker)
 
-	require_shared_libraries(['libpcre'])
-	require_static_libraries(['libphobos2'])
+	require_shared_library('libpcre', lambda ver: ver.major == 3)
+	require_static_library('libphobos2')
 
 def test():
 	"""Builds the program, and runs it."""
@@ -43,7 +43,7 @@ def test():
 	c_build_object('lib_regex.o', ['lib_regex.c'])
 
 	# Build the D program using the C object file
-	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-lpcre'])
+	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-l:libpcre.so.3'])
 
 	# Run the program
 	run_say('./raise_example')

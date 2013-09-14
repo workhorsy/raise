@@ -32,6 +32,7 @@ import signal, atexit
 import re
 import time
 import traceback
+from collections import namedtuple
 
 global pwd
 global python
@@ -754,7 +755,7 @@ def ldconfig():
 		print_ok()
 
 # Returns all the paths that libraries are installed in
-def _get_library_paths():
+def _get_all_library_paths():
 	paths = ['/usr/lib']
 	if not os.path.exists('/etc/ld.so.conf.d/'):
 		return paths
@@ -769,21 +770,39 @@ def _get_library_paths():
 	return paths
 
 # Returns the full path of a library file or None
-def _get_library_path(lib_name, extension):
+def _get_library_path(lib_name, extension, version_cb = None):
 	lib_name += extension
-	for path in _get_library_paths():
-		for dirs, subdirs, files in os.walk(path):
+	for path in _get_all_library_paths():
+		for root, dirs, files in os.walk(path):
 			for f in files:
-				file_name = lib_name.split('/')[-1]
-				path_end = lib_name[0:-(len(file_name)+1)]
-				if dirs.endswith(path_end) and f == file_name:
-					return os.path.join(dirs, file_name)
+				# Skip it if not the right file or containing the name
+				if not lib_name in f or not extension in f:
+					continue
+
+				# Get the version number
+				Version = namedtuple('Version', 'major minor micro')
+				major, minor, micro = 0, 0, 0
+				try:
+					version = f.split(extension)[1].lstrip('.').split('.')
+					major = int(version[0])
+					minor = int(version[1])
+					micro = int(version[2])
+				except Exception as e:
+					pass
+				version = Version(major, minor, micro)
+
+				# Get the whole file name
+				whole_name = os.path.join(root, f)
+
+				# Return the name if it passed the callback's test. Or there was no test
+				if not version_cb or version_cb(version):
+					return whole_name
 
 	return None
 
 # Returns true if a library is installed
-def _is_library_installed(lib_name, extension):
-	if _get_library_path(lib_name, extension):
+def _is_library_installed(lib_name, extension, version_cb = None):
+	if _get_library_path(lib_name, extension, version_cb):
 		return True
 	else:
 		return False
@@ -809,9 +828,9 @@ def require_static_library(lib_name):
 	else:
 		print_ok()
 
-def require_shared_library(lib_name):
+def require_shared_library(lib_name, version_cb = None):
 	print_status("Checking for shared library '{0}'".format(lib_name))
-	is_installed = _is_library_installed(lib_name, '.so')
+	is_installed = _is_library_installed(lib_name, '.so', version_cb)
 
 	# Make them install the lib to continue
 	if not is_installed:
@@ -829,10 +848,10 @@ def require_shared_library(lib_name):
 		print_fail()
 		print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
-def require_static_or_shared_library(lib_name):
+def require_static_or_shared_library(lib_name, version_cb = None):
 	print_status("Checking for static/shared library '{0}'".format(lib_name))
 	is_static_installed = _is_library_installed(lib_name, '.a')
-	is_shared_installed = _is_library_installed(lib_name, '.so')
+	is_shared_installed = _is_library_installed(lib_name, '.so', version_cb)
 
 	# Make them install the lib if neither was found
 	if not is_static_installed and not is_shared_installed:
@@ -855,18 +874,6 @@ def require_static_or_shared_library(lib_name):
 		elif runner.is_failure:
 			print_fail()
 			print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
-
-def require_static_libraries(lib_names):
-	for lib_name in lib_names:
-		require_static_library(lib_name)
-
-def require_shared_libraries(lib_names):
-	for lib_name in lib_names:
-		require_shared_library(lib_name)
-
-def require_static_or_shared_libraries(lib_names):
-	for lib_name in lib_names:
-		require_static_or_shared_library(lib_name)
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
