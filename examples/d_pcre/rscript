@@ -29,7 +29,8 @@ def _configure():
 	linker = c_get_default_linker()
 	c_save_linker(linker)
 
-	require_shared_library('libpcre', lambda ver: ver.major == 3)
+	# FIXME: We need a way to save the path and version, to use at link time
+	require_shared_library('libpcre', lambda ver: ver.major == 8)
 	require_static_library('libphobos2')
 
 def test():
