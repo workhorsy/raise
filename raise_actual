@@ -83,7 +83,7 @@ def after(s, n):
 	if i == -1:
 		return s
 	else:
-		return s[i+1 : ]
+		return s[i+len(n) : ]
 
 def between(s, l, r):
 	return before(after(s, l), r)
@@ -808,6 +808,10 @@ def _get_library_path(lib_name, extension, version_cb = None):
 	if program_paths('dpkg'):
 		path = _dpkg_get_library_path(lib_name, extension, version_cb)
 
+	# Try finding the library with rpm
+	if path == None and program_paths('rpm'):
+		path = _rpm_get_library_path(lib_name, extension, version_cb)
+
 	# Try finding in the file system
 	if path == None:
 		path = _fs_get_library_path(lib_name, extension, version_cb)
@@ -817,22 +821,22 @@ def _get_library_path(lib_name, extension, version_cb = None):
 def _fs_get_library_path(lib_name, extension, version_cb = None):
 	for path in _get_all_library_paths():
 		for root, dirs, files in os.walk(path):
-			for f in files:
+			for entry in files:
 				# Get the whole file name
-				whole_name = os.path.join(root, f)
+				whole_name = os.path.join(root, entry)
 
 				# Skip it if not the right file or containing the name
 				if not lib_name in whole_name or not extension in whole_name:
 					continue
 
 				# Get the version number
-				version = f.split(extension)[1].lstrip('.')
+				version = entry.split(extension)[1].lstrip('.')
 				version = version_string_to_tuple(version)
 
 				# Return the name if it passed the callback's test. Or there was no test
 				#print(entry, version)
 				if not version_cb or version_cb(version):
-					return whole_name
+					return entry
 
 	return None
 
@@ -869,7 +873,51 @@ def _dpkg_get_library_path(lib_name, extension, version_cb = None):
 			# Return the file name if the version passes the test
 			#print(entry, version)
 			if not version_cb or version_cb(version):
-				return whole_name
+				return entry
+
+	return None
+
+def _rpm_get_library_path(lib_name, extension, version_cb = None):
+	lib_name = lib_name.lstrip('lib')
+	whole_name = lib_name + extension
+
+	# Find all libraries that contain the name
+	command = "rpm -qa | grep -i {0}".format(lib_name)
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+	if runner.is_failure:
+		return None
+
+	# Find all the files for this library
+	for package in runner.stdout.split("\n"):
+		# Get the name and version
+		command = "rpm -qi {0}".format(package)
+		runner = ProcessRunner(command)
+		runner.run()
+		runner.wait()
+		if runner.is_failure:
+			continue
+		name = between(runner.stdout, 'Name        : ', '\n')
+		version = between(runner.stdout, 'Version     : ', '\n')
+		version = version_string_to_tuple(version)
+
+		command = "rpm -ql {0}".format(package)
+		runner = ProcessRunner(command)
+		runner.run()
+		runner.wait()
+		if runner.is_failure:
+			continue
+
+		# Of those find the ones that are shared libraries
+		for entry in runner.stdout.split("\n"):
+			if not whole_name in entry:
+				continue
+
+			# Return the file name if the version passes the test
+			#print(entry, version)
+			if not version_cb or version_cb(version):
+				return entry
 
 	return None
 
@@ -1677,7 +1725,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 13 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 14 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
@@ -1713,4 +1761,3 @@ if __name__ == '__main__':
 	target = targets[target_name]
 	print_info("Running target '{0}'".format(target_name))
 	target()
-
