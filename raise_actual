@@ -800,29 +800,31 @@ def _get_all_library_paths():
 
 	return paths
 
+# FIXME: Make it work with other packaging systems:
+# http://en.wikipedia.org/wiki/List_of_software_package_management_systems
 # Returns the full path of a library file or None
 def _get_library_path(lib_name, extension, version_cb = None):
 	path = None
 
 	# Try finding the library with dpkg
 	if program_paths('dpkg'):
-		path = _dpkg_get_library_path(lib_name, extension, version_cb)
+		path = _get_library_path_from_dpkg(lib_name, extension, version_cb)
 
 	# Try finding the library with rpm
 	if path == None and program_paths('rpm'):
-		path = _rpm_get_library_path(lib_name, extension, version_cb)
+		path = _get_library_path_from_rpm(lib_name, extension, version_cb)
 
-	# Try finding the library with pkg
+	# Try finding the library with pkg_info
 	if path == None and program_paths('pkg_info'):
-		path = _pkg_info_get_library_path(lib_name, extension, version_cb)
+		path = _get_library_path_from_pkg_info(lib_name, extension, version_cb)
 
 	# Try finding in the file system
 	if path == None:
-		path = _fs_get_library_path(lib_name, extension, version_cb)
+		path = _get_library_path_from_fs(lib_name, extension, version_cb)
 
 	return path
 
-def _fs_get_library_path(lib_name, extension, version_cb = None):
+def _get_library_path_from_fs(lib_name, extension, version_cb = None):
 	for path in _get_all_library_paths():
 		for root, dirs, files in os.walk(path):
 			for entry in files:
@@ -844,7 +846,7 @@ def _fs_get_library_path(lib_name, extension, version_cb = None):
 
 	return None
 
-def _dpkg_get_library_path(lib_name, extension, version_cb = None):
+def _get_library_path_from_dpkg(lib_name, extension, version_cb = None):
 	whole_name = lib_name + extension
 
 	# Find all libraries that contain the name
@@ -881,7 +883,7 @@ def _dpkg_get_library_path(lib_name, extension, version_cb = None):
 
 	return None
 
-def _rpm_get_library_path(lib_name, extension, version_cb = None):
+def _get_library_path_from_rpm(lib_name, extension, version_cb = None):
 	lib_name = lib_name.lstrip('lib')
 	whole_name = lib_name + extension
 
@@ -925,7 +927,7 @@ def _rpm_get_library_path(lib_name, extension, version_cb = None):
 
 	return None
 
-def _pkg_info_get_library_path(lib_name, extension, version_cb = None):
+def _get_library_path_from_pkg_info(lib_name, extension, version_cb = None):
 	lib_name = lib_name.lstrip('lib')
 	whole_name = lib_name + extension
 
