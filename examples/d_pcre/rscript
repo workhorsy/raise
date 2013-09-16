@@ -27,7 +27,6 @@ def _configure():
 	linker = c_get_default_linker()
 	c_save_linker(linker)
 
-	# FIXME: We need a way to save the path and version, to use at link time
 	require_shared_library('libpcre', lambda ver: ver.major == 8)
 	require_static_library('libphobos2')
 
@@ -42,7 +41,9 @@ def test():
 	c_build_object('lib_regex.o', ['lib_regex.c'])
 
 	# Build the D program using the C object file
-	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], ['-L-l:libpcre.so.3'])
+	# FIXME: It should automatically get the library path from the require above
+	link = '-L-l:' + _get_library_path('libpcre', '.so', lambda ver: ver.major == 8)
+	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
 	run_say('./raise_example')

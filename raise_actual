@@ -1007,17 +1007,8 @@ def require_shared_library(lib_name, version_cb = None):
 		message = "Shared library '{0} ({1})' not installed. Install and try again."
 		print_fail()
 		print_exit(message.format(lib_name, ver))
-
-	# Make them run ldconfig if the library is not found by ld
-	f = SelfDeletingNamedTemporaryFile()
-	runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
-	runner.run()
-	runner.wait()
-	if runner.is_success or runner.is_warning:
+	else:
 		print_ok()
-	elif runner.is_failure:
-		print_fail()
-		print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_static_or_shared_library(lib_name, version_cb = None):
 	print_status("Checking for static/shared library '{0}'".format(lib_name))
@@ -1026,25 +1017,16 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 
 	# Make them install the lib if neither was found
 	if not is_static_installed and not is_shared_installed:
+		# Get the version requirement lambda as a printable string
+		ver = "Any version"
+		if version_cb:
+			ver = between(inspect.getsource(version_cb), ': ', ')')
+
+		message = "Shared/Static library '{0} ({1})' not installed. Install and try again."
 		print_fail()
-		print_exit("Static/Shared library '{0}' not installed. Install and try again.".format(lib_name))
-
-	# Success if the static library is installed
-	if is_static_installed:
+		print_exit(message.format(lib_name, ver))
+	else:
 		print_ok()
-		return
-
-	# Success if the shared library is installed and found by ldconfig
-	if is_shared_installed:
-		f = SelfDeletingNamedTemporaryFile()
-		runner = ProcessRunner("ld -l " + lib_name.lstrip('lib') + ' -o ' + f.name)
-		runner.run()
-		runner.wait()
-		if runner.is_success or runner.is_warning:
-			print_ok()
-		elif runner.is_failure:
-			print_fail()
-			print_exit("Shared library '{0}' not found with 'ld'. Run 'sudo ldconfig' and try again.".format(lib_name))
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
@@ -1775,7 +1757,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 15 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 16 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
