@@ -812,6 +812,10 @@ def _get_library_path(lib_name, extension, version_cb = None):
 	if path == None and program_paths('rpm'):
 		path = _rpm_get_library_path(lib_name, extension, version_cb)
 
+	# Try finding the library with pkg
+	if path == None and program_paths('pkg_info'):
+		path = _pkg_info_get_library_path(lib_name, extension, version_cb)
+
 	# Try finding in the file system
 	if path == None:
 		path = _fs_get_library_path(lib_name, extension, version_cb)
@@ -908,6 +912,44 @@ def _rpm_get_library_path(lib_name, extension, version_cb = None):
 		runner.wait()
 		if runner.is_failure:
 			continue
+
+		# Of those find the ones that are shared libraries
+		for entry in runner.stdout.split("\n"):
+			if not whole_name in entry:
+				continue
+
+			# Return the file name if the version passes the test
+			#print(entry, version)
+			if not version_cb or version_cb(version):
+				return entry
+
+	return None
+
+def _pkg_info_get_library_path(lib_name, extension, version_cb = None):
+	lib_name = lib_name.lstrip('lib')
+	whole_name = lib_name + extension
+
+	# Find all libraries that contain the name
+	command = "pkg_info -Ix {0}".format(lib_name)
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+	if runner.is_failure:
+		return None
+
+	for package in runner.stdout.split("\n"):
+		# Get the name and version
+		name = package.split()[0]
+		version = before(name.split('-')[-1], '_')
+		version = version_string_to_tuple(version)
+
+		# Find all the files for this library
+		command = "pkg_info -L {0}".format(lib_name)
+		runner = ProcessRunner(command)
+		runner.run()
+		runner.wait()
+		if runner.is_failure:
+			return None
 
 		# Of those find the ones that are shared libraries
 		for entry in runner.stdout.split("\n"):
