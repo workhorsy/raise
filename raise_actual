@@ -1453,15 +1453,15 @@ def _d_module_setup():
 	global d_compilers
 
 	# Get the names and paths for know D compilers
-	names = ['dmd', 'ldc2']
+	names = ['dmd', 'dmd2', 'ldc2']
 	for name in names:
 		paths = program_paths(name)
 		if len(paths) == 0:
 			continue
 
-		if name == 'dmd':
+		if name in ['dmd', 'dmd2']:
 			comp = Compiler(
-				name =                 'dmd', 
+				name =                 name, 
 				path =                  paths[0], 
 				default_flags =        '', 
 				out_file =             '-of', 
@@ -1504,10 +1504,10 @@ def d_get_default_compiler():
 	_d_require_module()
 
 	comp = None
-	if 'dmd' in d_compilers:
-		comp = d_compilers['dmd']
-	elif 'ldc2' in d_compilers:
-		comp = d_compilers['ldc2']
+	for name in ['dmd', 'dmd2', 'ldc2']:
+		if name in d_compilers:
+			comp = d_compilers[name]
+			break
 
 	return comp
 

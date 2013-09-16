@@ -12,8 +12,6 @@ def clean():
 	rmfile_f('lib_regex.o')
 
 def _configure():
-	require_programs(['dmd'])
-
 	cc = c_get_default_compiler()
 	cc.debug = True
 	cc.warnings_all = True
