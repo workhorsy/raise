@@ -31,7 +31,7 @@ import multiprocessing, subprocess
 import signal, atexit
 import re
 import time
-import traceback
+import traceback, inspect
 from collections import namedtuple
 
 global pwd
@@ -955,8 +955,14 @@ def require_shared_library(lib_name, version_cb = None):
 
 	# Make them install the lib to continue
 	if not is_installed:
+		# Get the version requirement lambda as a printable string
+		ver = "Any version"
+		if version_cb:
+			ver = between(inspect.getsource(version_cb), ': ', ')')
+
+		message = "Shared library '{0} ({1})' not installed. Install and try again."
 		print_fail()
-		print_exit("Shared library '{0}' not installed. Install and try again.".format(lib_name))
+		print_exit(message.format(lib_name, ver))
 
 	# Make them run ldconfig if the library is not found by ld
 	f = SelfDeletingNamedTemporaryFile()
@@ -1725,7 +1731,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 14 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 15 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
