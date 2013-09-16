@@ -944,7 +944,7 @@ def _pkg_info_get_library_path(lib_name, extension, version_cb = None):
 		version = version_string_to_tuple(version)
 
 		# Find all the files for this library
-		command = "pkg_info -L {0}".format(lib_name)
+		command = "pkg_info -L {0}".format(name)
 		runner = ProcessRunner(command)
 		runner.run()
 		runner.wait()
