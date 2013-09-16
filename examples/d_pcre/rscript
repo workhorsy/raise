@@ -27,6 +27,7 @@ def _configure():
 	linker = c_get_default_linker()
 	c_save_linker(linker)
 
+	require_header_file('libpcre', lambda ver: ver.major == 8)
 	require_shared_library('libpcre', lambda ver: ver.major == 8)
 	require_static_library('libphobos2')
 
@@ -42,7 +43,9 @@ def test():
 
 	# Build the D program using the C object file
 	# FIXME: It should automatically get the library path from the require above
-	link = '-L-l:' + _get_library_path('libpcre', '.so', lambda ver: ver.major == 8)
+	library_files = _get_library_files('libpcre', lambda ver: ver.major == 8)
+	static_file = _get_shared_library_from_library_files('libpcre', '.so', library_files)
+	link = '-L-l:' + static_file
 	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
