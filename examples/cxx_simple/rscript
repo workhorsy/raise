@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+require_module('C++')
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	rmfile_f('raise_example')
+	rmfile_f('main.o')
+
+def _configure():
+	cxx = cxx_get_default_compiler()
+	cxx.debug = True
+	cxx.warnings_all = True
+	cxx.warnings_as_errors = True
+	cxx_save_compiler(cxx)
+
+def test():
+	"""Builds the program, and runs it."""
+	# Setup
+	require_not_root()
+	clean()
+	_configure()
+
+	# Build the program
+	cxx_build_program('raise_example', ['main.cc'])
+
+	# Run the program
+	run_say('./raise_example')
+
+
+
+
+

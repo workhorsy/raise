@@ -42,6 +42,7 @@ global config
 global modules
 global c_compilers
 global c_linkers
+global cxx_compilers
 global d_compilers
 
 pwd = None
@@ -52,6 +53,7 @@ config = None
 modules = []
 c_compilers = {}
 c_linkers = {}
+cxx_compilers = {}
 d_compilers = {}
 
 def early_exit(message):
@@ -105,6 +107,7 @@ def version_string_to_tuple(version_string):
 class Config(object):
 	def __init__(self):
 		self._cc = None
+		self._cxx = None
 		self._dc = None
 		self._clinker = None
 
@@ -1514,6 +1517,140 @@ def c_build_shared_library(so_file, o_files):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+def _cxx_module_setup():
+	global cxx_compilers
+
+	# Get the names and paths for know C++ compilers
+	names = ['g++']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'g++':
+			comp = Compiler(
+				name =                 'g++', 
+				path =                 paths[0], 
+				default_flags =        '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Wall', 
+				warnings_as_errors =   '-Werror'
+			)
+			cxx_compilers[comp._name] = comp
+
+	# Make sure there is at least one C++ compiler installed
+	if len(cxx_compilers) == 0:
+		print_status("Setting up C++ module")
+		print_fail()
+		print_exit("No C++ compiler found. Install one and try again.")
+
+def _cxx_require_module():
+	# Just return if setup
+	if cxx_compilers:
+		return
+
+	print_status("C++ module check")
+	print_fail()
+	print_exit("Call require_module('C++') before using any C++ functions.")
+
+def cxx_get_default_compiler():
+	global cxx_compilers
+	_cxx_require_module()
+
+	comp = None
+
+	if config._os_type._name == 'Windows':
+		comp = cxx_compilers['cl.exe']
+	else:
+		if 'g++' in cxx_compilers:
+			comp = cxx_compilers['g++']
+
+	return comp
+
+def cxx_save_compiler(compiler):
+	_cxx_require_module()
+
+	# CXX
+	global config
+	config._cxx = compiler
+	os.environ['CXX'] = config._cxx._name
+
+	# CFLAGS
+	opts = []
+	opts.append(config._cxx._opt_default_flags)
+	if config._cxx.debug: opts.append(config._cxx._opt_debug)
+	if config._cxx.warnings_all: opts.append(config._cxx._opt_warnings_all)
+	if config._cxx.warnings_as_errors: opts.append(config._cxx._opt_warnings_as_errors)
+	os.environ['CXXFLAGS'] = str.join(' ', opts)
+
+def cxx_build_program(o_file, cxx_files, i_files=[]):
+	_cxx_require_module()
+
+	# Change file extensions to os format
+	o_file = to_native(o_file)
+	cxx_files = to_native(cxx_files)
+	i_files = to_native(i_files)
+
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'C++ programs'
+	singular = 'C++ program'
+	command = '${CXX} ${CXXFLAGS} ' + \
+				str.join(' ', cxx_files) + ' ' + \
+				str.join(' ', i_files) + ' ' + \
+				config._cxx._opt_out_file + o_file
+
+	def setup():
+		# Make sure the environmental variable is set
+		if not 'CXX' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CXX' to the C++ compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
+
+def cxx_build_object(o_file, cxx_files, i_files=[]):
+	_cxx_require_module()
+
+	# Change file extensions to os format
+	o_file = to_native(o_file)
+	cxx_files = to_native(cxx_files)
+	i_files = to_native(i_files)
+
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'C++ objects'
+	singular = 'C++ object'
+	command = "${CXX} ${CXXFLAGS} " + \
+				config._cxx._opt_no_link + ' ' +  \
+				config._cxx._opt_out_file + \
+				o_file + ' ' + \
+				str.join(' ', cxx_files) + ' ' + \
+				str.join(' ', i_files)
+
+	def setup():
+		# Skip if the files have not changed since last build
+		if not is_outdated(to_update = [o_file], triggers = cxx_files):
+			return False
+
+		# Make sure the environmental variable is set
+		if not 'CXX' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CXX' to the C++ compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
+
 def _d_module_setup():
 	global d_compilers
 
@@ -1823,6 +1960,8 @@ if __name__ == '__main__':
 	for module in modules:
 		if module == 'C':
 			_c_module_setup()
+		elif module == 'C++':
+			_cxx_module_setup()
 		elif module == 'D':
 			_d_module_setup()
 		else:

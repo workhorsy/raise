@@ -1,4 +1,5 @@
 * Release 0.2.0
+	* Fixed Bug #1225292: 'Add C++ support'.
 	* Fixed Bug #1221034: 'Does not work with versioned libraries like blah.so.1'.
 	* Fixed Bug #1224780: 'Add a way to specify library version requirements'.
 	* Fixed Bug #1225142: 'Remove gcc, ld, and ar as dependencies'.
