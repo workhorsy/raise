@@ -27,6 +27,7 @@ def _configure():
 	linker = c_get_default_linker()
 	c_save_linker(linker)
 
+	# FIXME: Make this cache the file lists instead of getting it again
 	require_header_file('libpcre', lambda ver: ver.major == 8)
 	require_shared_library('libpcre', lambda ver: ver.major == 8)
 	require_static_library('libphobos2')
