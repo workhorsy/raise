@@ -598,6 +598,15 @@ def run_say(command):
 		print(runner.stdall)
 		print_exit('Failed to run command.')
 
+def run_and_get_stdout(command):
+	runner = ProcessRunner(command)
+	runner.run()
+	runner.wait()
+	if runner.is_failure:
+		return None
+	else:
+		return runner.stdout
+
 def is_outdated(to_update, triggers):
 	# Exit if any triggers don't exist
 	for trigger in triggers:
@@ -862,8 +871,8 @@ def _get_library_files(lib_name, version_cb = None):
 	if not files and program_paths('pkg_info'):
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
 
-	# Try finding in the file system
-	if not files:
+	# Try finding in the file system if no version is required
+	if not files and not version_cb:
 		files = _get_library_files_from_fs(lib_name)
 
 	return files
@@ -890,15 +899,12 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	command = "dpkg --list | grep -i {0}".format(lib_name)
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
-	if runner.is_failure:
+	result = run_and_get_stdout("dpkg --list | grep -i {0}".format(lib_name))
+	if not result:
 		return matching_files
 
 	# For each package
-	for package in runner.stdout.split("\n"):
+	for package in result.split("\n"):
 		# Get the name and version
 		name = before(package.split()[1], ':')
 		version = between(package.split()[2], ':', '-')
@@ -909,15 +915,12 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 			continue
 
 		# Get all the files and directories
-		command = "dpkg -L {0}".format(name)
-		runner = ProcessRunner(command)
-		runner.run()
-		runner.wait()
-		if runner.is_failure:
+		result = run_and_get_stdout("dpkg -L {0}".format(name))
+		if not result:
 			continue
 
 		# Save all the files
-		library_entries = runner.stdout.split("\n")
+		library_entries = result.split("\n")
 		for entry in library_entries:
 			if os.path.isfile(entry):
 				matching_files.append(entry)
@@ -929,24 +932,18 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	command = "rpm -qa | grep -i {0}".format(lib_name)
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
-	if runner.is_failure:
+	result = run_and_get_stdout("rpm -qa | grep -i {0}".format(lib_name))
+	if not result:
 		return matching_files
 
 	# For each package
-	for package in runner.stdout.split("\n"):
+	for package in result.split("\n"):
 		# Get the name and version
-		command = "rpm -qi {0}".format(package)
-		runner = ProcessRunner(command)
-		runner.run()
-		runner.wait()
-		if runner.is_failure:
+		result = run_and_get_stdout("rpm -qi {0}".format(package))
+		if not result:
 			continue
-		name = between(runner.stdout, 'Name        : ', '\n')
-		version = between(runner.stdout, 'Version     : ', '\n')
+		name = between(result, 'Name        : ', '\n')
+		version = between(result, 'Version     : ', '\n')
 		version = version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
@@ -954,15 +951,12 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 			continue
 
 		# Get all the files and directories
-		command = "rpm -ql {0}".format(package)
-		runner = ProcessRunner(command)
-		runner.run()
-		runner.wait()
-		if runner.is_failure:
+		result = run_and_get_stdout("rpm -ql {0}".format(package))
+		if not result:
 			continue
 
 		# Save all the files
-		library_entries = runner.stdout.split("\n")
+		library_entries = result.split("\n")
 		for entry in library_entries:
 			if os.path.isfile(entry):
 				matching_files.append(entry)
@@ -974,15 +968,12 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	command = "pkg_info -Ix {0}".format(lib_name)
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.wait()
-	if runner.is_failure:
+	result = run_and_get_stdout("pkg_info -Ix {0}".format(lib_name))
+	if not result:
 		return None
 
 	# For each package
-	for package in runner.stdout.split("\n"):
+	for package in result.split("\n"):
 		# Get the name and version
 		name = package.split()[0]
 		version = before(name.split('-')[-1], '_')
@@ -993,15 +984,12 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 			continue
 
 		# Get all the files and directories
-		command = "pkg_info -L {0}".format(name)
-		runner = ProcessRunner(command)
-		runner.run()
-		runner.wait()
-		if runner.is_failure:
+		result = run_and_get_stdout("pkg_info -L {0}".format(name))
+		if not result:
 			return None
 
 		# Save all the files
-		library_entries = runner.stdout.split("\n")
+		library_entries = result.split("\n")
 		for entry in library_entries:
 			if os.path.isfile(entry):
 				matching_files.append(entry)
@@ -1944,7 +1932,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 18 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 19 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
@@ -1982,3 +1970,4 @@ if __name__ == '__main__':
 	target = targets[target_name]
 	print_info("Running target '{0}'".format(target_name))
 	target()
+
