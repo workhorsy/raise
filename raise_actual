@@ -859,6 +859,7 @@ def _get_header_from_library_files(library_name, library_files):
 # Returns the full path of a library file or None
 def _get_library_files(lib_name, version_cb = None):
 	files = []
+
 	# Try finding the library with dpkg
 	if not files and program_paths('dpkg'):
 		files = _get_library_files_from_dpkg(lib_name, version_cb)
@@ -871,11 +872,53 @@ def _get_library_files(lib_name, version_cb = None):
 	if not files and program_paths('pkg_info'):
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
 
+	# Try finding the library with pkg-config
+	if not files and program_paths('pkg-config'):
+		files = _get_library_files_from_pkg_config(lib_name, version_cb)
+
 	# Try finding in the file system if no version is required
 	if not files and not version_cb:
 		files = _get_library_files_from_fs(lib_name)
 
 	return files
+
+def _get_library_files_from_pkg_config(lib_name, version_cb = None):
+	matching_files = []
+	lib_name = lib_name.lstrip('lib')
+
+	# Find all packages that contain the name
+	result = run_and_get_stdout("pkg-config --list-all | grep -i {0}".format(lib_name))
+	if not result:
+		return matching_files
+
+	# For each package
+	for package in result.split("\n"):
+		# Get the name
+		name = package.split()[0]
+		if name.lower() != 'lib' + lib_name.lower():
+			continue
+
+		# Get the version, libdir, and includedir
+		version = run_and_get_stdout("pkg-config --modversion {0}".format(name))
+		libdir = run_and_get_stdout("pkg-config --variable=libdir {0}".format(name))
+		includedir = run_and_get_stdout("pkg-config --variable=includedir {0}".format(name))
+		if not version or not libdir or not includedir:
+			continue
+		version = version_string_to_tuple(version)
+
+		# Skip this package if the version does not match
+		if version_cb and not version_cb(version):
+			continue
+
+		# Get the library files in those directories
+		for d in [libdir, includedir]:
+			for root, dirs, files in os.walk(d):
+				for entry in files:
+					f = os.path.join(root, entry)
+					if f.split('.')[0].endswith(lib_name) and os.path.isfile(f):
+						matching_files.append(f)
+
+	return matching_files
 
 def _get_library_files_from_fs(lib_name):
 	for path in _get_all_library_paths():
