@@ -11,8 +11,10 @@ def clean():
 def _configure():
 	cxx = cxx_get_default_compiler()
 	cxx.debug = True
+	cxx.optimize = True
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True
+	cxx.compile_time_flags = ['ADD', 'MULTIPLY']
 	cxx_save_compiler(cxx)
 
 def test():

@@ -16,6 +16,7 @@ def clean():
 def _configure():
 	cc = c_get_default_compiler()
 	cc.debug = True
+	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
 	c_save_compiler(cc)

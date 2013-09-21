@@ -1240,30 +1240,35 @@ def link_static_or_shared_paths(lib_names):
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class Compiler(object):
-	def __init__(self, name, path, default_flags, out_file, no_link, 
-				debug, warnings_all, warnings_as_errors):
+	def __init__(self, name, path, setup, out_file, no_link, 
+				debug, warnings_all, warnings_as_errors, optimize, 
+				compile_time_flags):
 
 		self._name = name
 		self._path = path
 
 		# Save text for all the options
-		self._opt_default_flags = default_flags
+		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
 		self._opt_debug = debug
 		self._opt_warnings_all = warnings_all
 		self._opt_warnings_as_errors = warnings_as_errors
+		self._opt_optimize = optimize
+		self._opt_compile_time_flags = compile_time_flags
 
 		# Set the default values of the flags
 		self.debug = False
 		self.warnings_all = False
 		self.warnings_as_errors = False
+		self.optimize = False
+		self.compile_time_flags = []
 
 class Linker(object):
-	def __init__(self, name, default_flags, out_file, shared):
+	def __init__(self, name, setup, out_file, shared):
 		self._name = name
 		
-		self._opt_default_flags = default_flags
+		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_shared = shared
 
@@ -1305,24 +1310,28 @@ def _c_module_setup():
 			comp = Compiler(
 				name =                 'gcc', 
 				path =                 paths[0], 
-				default_flags =        '', 
+				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror'
+				warnings_as_errors =   '-Werror', 
+				optimize =             '-O2', 
+				compile_time_flags =   '-D'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'clang':
 			comp = Compiler(
 				name =                 'clang', 
 				path =                 paths[0], 
-				default_flags =        '', 
+				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror'
+				warnings_as_errors =   '-Werror', 
+				optimize =             '-O2', 
+				compile_time_flags =   '-D'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
@@ -1330,12 +1339,14 @@ def _c_module_setup():
 			comp = Compiler(
 				name =                 'cl.exe', 
 				path =                 paths[0], 
-				default_flags =        '/nologo', 
+				setup =                '/nologo', 
 				out_file =             '/Fe', 
 				no_link =              '/c', 
 				debug =                '', 
 				warnings_all =         '/Wall', 
-				warnings_as_errors =   ''
+				warnings_as_errors =   '', 
+				optimize =             '/O2', 
+				compile_time_flags =   '-D'
 			)
 			c_compilers[comp._name] = comp
 
@@ -1355,7 +1366,7 @@ def _c_module_setup():
 		if name == 'link.exe':
 			link = Linker(
 				name            = 'link.exe',
-				default_flags   = '/nologo', 
+				setup           = '/nologo', 
 				out_file        = '/out:', 
 				shared          = '/dll '
 			)
@@ -1363,7 +1374,7 @@ def _c_module_setup():
 		elif name == 'ld':
 			link = Linker(
 				name            = 'ld',
-				default_flags   = '', 
+				setup           = '', 
 				out_file        = '-o ', 
 				shared          = '-G'
 			)
@@ -1427,10 +1438,14 @@ def c_save_compiler(compiler):
 
 	# CFLAGS
 	opts = []
-	opts.append(config._cc._opt_default_flags)
+	opts.append(config._cc._opt_setup)
 	if config._cc.debug: opts.append(config._cc._opt_debug)
 	if config._cc.warnings_all: opts.append(config._cc._opt_warnings_all)
 	if config._cc.warnings_as_errors: opts.append(config._cc._opt_warnings_as_errors)
+	if config._cc.optimize: opts.append(config._cc._opt_optimize)
+	for compile_time_flag in config._cc.compile_time_flags:
+		opts.append(config._cc._opt_compile_time_flags + compile_time_flag)
+
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
 def c_build_object(o_file, c_files, i_files=[]):
@@ -1541,7 +1556,7 @@ def c_build_shared_library(so_file, o_files):
 	singular = 'shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
 				config._clinker._name, 
-				config._clinker._opt_default_flags, 
+				config._clinker._opt_setup, 
 				config._clinker._opt_shared, 
 				str.join(' ', o_files), 
 				config._clinker._opt_out_file, 
@@ -1571,12 +1586,14 @@ def _cxx_module_setup():
 			comp = Compiler(
 				name =                 'g++', 
 				path =                 paths[0], 
-				default_flags =        '', 
+				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror'
+				warnings_as_errors =   '-Werror', 
+				optimize =             '-O2', 
+				compile_time_flags =   '-D'
 			)
 			cxx_compilers[comp._name] = comp
 
@@ -1617,12 +1634,16 @@ def cxx_save_compiler(compiler):
 	config._cxx = compiler
 	os.environ['CXX'] = config._cxx._name
 
-	# CFLAGS
+	# CXXFLAGS
 	opts = []
-	opts.append(config._cxx._opt_default_flags)
+	opts.append(config._cxx._opt_setup)
 	if config._cxx.debug: opts.append(config._cxx._opt_debug)
 	if config._cxx.warnings_all: opts.append(config._cxx._opt_warnings_all)
 	if config._cxx.warnings_as_errors: opts.append(config._cxx._opt_warnings_as_errors)
+	if config._cxx.optimize: opts.append(config._cxx._opt_optimize)
+	for compile_time_flag in config._cxx.compile_time_flags:
+		opts.append(config._cxx._opt_compile_time_flags + compile_time_flag)
+
 	os.environ['CXXFLAGS'] = str.join(' ', opts)
 
 def cxx_build_program(o_file, cxx_files, i_files=[]):
@@ -1705,24 +1726,28 @@ def _d_module_setup():
 			comp = Compiler(
 				name =                 name, 
 				path =                  paths[0], 
-				default_flags =        '', 
+				setup =        '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
-				warnings_as_errors =   ''
+				warnings_as_errors =   '', 
+				optimize =             '-O', 
+				compile_time_flags =   '-version='
 			)
 			d_compilers[comp._name] = comp
 		elif name == 'ldc2':
 			comp = Compiler(
 				name =                 'ldc2', 
 				path =                  paths[0], 
-				default_flags =        '', 
+				setup =        '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
-				warnings_as_errors =   ''
+				warnings_as_errors =   '', 
+				optimize =             '-O2',
+				compile_time_flags =   '-version='
 			)
 			d_compilers[comp._name] = comp
 
@@ -1766,6 +1791,10 @@ def d_save_compiler(compiler):
 	if config._dc.debug: opts.append(config._dc._opt_debug)
 	if config._dc.warnings_all: opts.append(config._dc._opt_warnings_all)
 	if config._dc.warnings_as_errors: opts.append(config._dc._opt_warnings_as_errors)
+	if config._dc.optimize: opts.append(config._dc._opt_optimize)
+	for compile_time_flag in config._dc.compile_time_flags:
+		opts.append(config._dc._opt_compile_time_flags + compile_time_flag)
+
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files):
@@ -1973,7 +2002,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 19 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.2 - September 20 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
