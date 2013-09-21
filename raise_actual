@@ -34,27 +34,6 @@ import time
 import traceback, inspect
 from collections import namedtuple
 
-global pwd
-global python
-global target_name
-global message_length
-global config
-global modules
-global c_compilers
-global c_linkers
-global cxx_compilers
-global d_compilers
-
-pwd = None
-python = None
-target_name = None
-message_length = None
-config = None
-modules = []
-c_compilers = {}
-c_linkers = {}
-cxx_compilers = {}
-d_compilers = {}
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -64,14 +43,6 @@ def early_exit(message):
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
-
-# Get the path of the rscript file
-pwd = os.sys.path[0]
-
-# Get the name of the current running python program
-python = sys.executable
-if not python:
-	early_exit('Could not find python to run child processes with.')
 
 def before(s, n):
 	i = s.find(n)
@@ -111,29 +82,45 @@ def expand_envs(string):
 			return string
 
 class Config(object):
-	def __init__(self):
-		self._cc = None
-		self._cxx = None
-		self._dc = None
-		self._clinker = None
+	@classmethod
+	def init(cls):
+		cls.modules = []
+		cls.target_name = None
+		cls.message_length = None
+		cls.c_compilers = {}
+		cls.c_linkers = {}
+		cls.cxx_compilers = {}
+		cls.d_compilers = {}
+		cls._cc = None
+		cls._cxx = None
+		cls._dc = None
+		cls._clinker = None
+
+		# Get the path of the rscript file
+		cls.pwd = os.sys.path[0]
+
+		# Get the name of the current running python program
+		cls.python = sys.executable
+		if not cls.python:
+			early_exit('Could not find python to run child processes with.')
 
 		# Figure out the CPU architecture
 		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
-			self._arch = 'x86_32'
-			self._bits = '32'
+			cls._arch = 'x86_32'
+			cls._bits = '32'
 		elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
-			self._arch = 'x86_64'
-			self._bits = '64'
+			cls._arch = 'x86_64'
+			cls._bits = '64'
 		else:
 			early_exit('Unknown architecture {0}.'.format(platform.machine()))
 
 		# Figure out how many cpus there are
-		self._cpus_total = multiprocessing.cpu_count()
-		self._cpus_free = self._cpus_total
+		cls._cpus_total = multiprocessing.cpu_count()
+		cls._cpus_free = cls._cpus_total
 
 		# Figure out the general OS type
 		if 'cygwin' in platform.system().lower():
-			self._os_type = OSType(
+			cls._os_type = OSType(
 				name =                 'Cygwin', 
 				exe_extension =        '', 
 				object_extension =     '.o', 
@@ -141,7 +128,7 @@ class Config(object):
 				static_lib_extension = '.a'
 			)
 		elif 'windows' in platform.system().lower():
-			self._os_type = OSType(
+			cls._os_type = OSType(
 				name =                 'Windows', 
 				exe_extension =        '.exe', 
 				object_extension =     '.obj', 
@@ -149,7 +136,7 @@ class Config(object):
 				static_lib_extension = '.lib'
 			)
 		else:
-			self._os_type = OSType(
+			cls._os_type = OSType(
 				name =                 'Unix', 
 				exe_extension =        '', 
 				object_extension =     '.o', 
@@ -158,22 +145,22 @@ class Config(object):
 			)
 
 		# Figure out how to clear the terminal
-		if self._os_type._name == 'Windows':
-			self._terminal_clear = 'cls'
+		if cls._os_type._name == 'Windows':
+			cls._terminal_clear = 'cls'
 		else:
-			self._terminal_clear = 'clear'
+			cls._terminal_clear = 'clear'
 
 		# FIXME: Have this look for stty first then try the registry
 		# Figure out the terminal width
-		if self._os_type._name == 'Windows':
+		if cls._os_type._name == 'Windows':
 			import _winreg
 			key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
 			val = _winreg.QueryValueEx(key, "ScreenBufferSize")
 			_winreg.CloseKey(key)
 			size = hex(val[0])
-			self._terminal_width = int('0x' + size[-4 : len(size)], 16)
+			cls._terminal_width = int('0x' + size[-4 : len(size)], 16)
 		else:
-			self._terminal_width = int(os.popen('stty size', 'r').read().split()[1])
+			cls._terminal_width = int(os.popen('stty size', 'r').read().split()[1])
 
 
 class OSType(object):
@@ -209,7 +196,7 @@ def do_as_normal_user(cb):
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not config._os_type._name in ['Windows', 'Cygwin']:
+	if not Config._os_type._name in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -231,7 +218,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not config._os_type._name in ['Windows', 'Cygwin']:
+		if not Config._os_type._name in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -253,7 +240,7 @@ class BGColors:
 	ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):
-	width = config._terminal_width
+	width = Config._terminal_width
 
 	if length > (width-3):
 		i = int(width * (int(length / width) + 1)) - 3
@@ -266,43 +253,36 @@ def print_info(message):
 	sys.stdout.flush()
 
 def print_status(message):
-	global message_length
 	message = '{0} ...'.format(message)
-	message_length = len(message)
+	Config.message_length = len(message)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_ok():
-	global message_length
-
-	padding = terminal_pad(message_length)
+	padding = terminal_pad(Config.message_length)
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.OK, Emoticons.SMILE, BGColors.ENDC)
-	message_length = 0
+	Config.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_warning(post_message=None):
-	global message_length
-
-	padding = terminal_pad(message_length, '.')
+	padding = terminal_pad(Config.message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.WARNING, Emoticons.NORMAL, BGColors.ENDC)
 	if post_message:
 		message += post_message + "\n"
-	message_length = 0
+	Config.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_fail(post_fail_message=None):
-	global message_length
-
-	padding = terminal_pad(message_length, '.')
+	padding = terminal_pad(Config.message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.FAIL, Emoticons.FROWN, BGColors.ENDC)
 	if post_fail_message:
 		message += post_fail_message + "\n"
-	message_length = 0
+	Config.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
@@ -317,7 +297,7 @@ def print_exit(message):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if config._os_type._name == 'Windows':
+		if Config._os_type._name == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -439,15 +419,13 @@ class Event(object):
 	is_done = property(get_is_done)
 
 	def run(self):
-		global message_length
-
 		# Show the parallel header
 		if Event.is_parallel:
 			if Event.is_first_parallel:
 				Event.is_first_parallel = False
 				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
-				message_length = 0
+				Config.message_length = 0
 
 		# Run the setup function
 		if not self._setup_cb():
@@ -508,24 +486,24 @@ def parallel_end():
 			# Success. Keep going
 			if event._status == 'success':
 				running_events.remove(event)
-				config._cpus_free += 1
+				Config._cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
 				print_exit("Event failed.")
 
 		# Check for events that need to start
-		while config._cpus_free > 0 and len(ready_events):
+		while Config._cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
 			if event.run():
-				config._cpus_free -= 1
+				Config._cpus_free -= 1
 				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
-		if config._cpus_free == 0 or len(ready_events) == 0:
+		if Config._cpus_free == 0 or len(ready_events) == 0:
 			time.sleep(0.1)
 
 	# Clear all the events
-	config._cpus_free = config._cpus_total
+	Config._cpus_free = Config._cpus_total
 	Event.events = []
 	Event.is_parallel = False
 	Event.is_first_parallel = False
@@ -546,11 +524,11 @@ def require_root():
 	is_root = False
 
 	# Cygwin
-	if config._os_type._name == 'Cygwin':
+	if Config._os_type._name == 'Cygwin':
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif config._os_type._name == 'Windows':
+	elif Config._os_type._name == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot', 'C:\windows')
@@ -568,7 +546,7 @@ def require_root():
 
 def require_not_root():
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if config._os_type._name in ['Windows', 'Cygwin']:
+	if Config._os_type._name in ['Windows', 'Cygwin']:
 		return
 
 	# Make sure we are NOT root
@@ -795,7 +773,7 @@ def ldconfig():
 	print_status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if config._os_type._name == 'Cygwin':
+	if Config._os_type._name == 'Cygwin':
 		print_ok()
 		return
 
@@ -1132,7 +1110,7 @@ def require_python_modules(mod_names):
 		_do_on_fail_exit(
 			"Checking for python module '{0}'".format(mod_name),
 			"Install the python module '{0}' and try again.".format(mod_name),
-			'{0} -c "import {1}"'.format(python, mod_name)
+			'{0} -c "import {1}"'.format(Config.python, mod_name)
 		)
 
 def program_paths(program_name):
@@ -1167,7 +1145,7 @@ def header_path(header_name):
 
 	# Of those paths, get the ones that match the architecture
 	for path in paths:
-		if 'lib' + config._bits in path or config._arch in path:
+		if 'lib' + Config._bits in path or Config._arch in path:
 			retval = path
 
 	# If none were matched specifically from the architecture
@@ -1275,9 +1253,9 @@ class Linker(object):
 def to_native(thing):
 	# Get a dict of the standard extensions and their other os counterparts
 	replaces = {
-		'.o' : config._os_type._object_extension,
-		'.so': config._os_type._shared_lib_extension,
-		'.a' : config._os_type._static_lib_extension
+		'.o' : Config._os_type._object_extension,
+		'.so': Config._os_type._shared_lib_extension,
+		'.a' : Config._os_type._static_lib_extension
 	}
 
 	# Replace the extension
@@ -1291,14 +1269,9 @@ def to_native(thing):
 	return thing
 
 def require_module(name):
-	global modules
-
-	modules.append(name)
+	Config.modules.append(name)
 
 def _c_module_setup():
-	global c_compilers
-	global c_linkers
-
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'clang', 'cl.exe']
 	for name in names:
@@ -1319,7 +1292,7 @@ def _c_module_setup():
 				optimize =             '-O2', 
 				compile_time_flags =   '-D'
 			)
-			c_compilers[comp._name] = comp
+			Config.c_compilers[comp._name] = comp
 		elif name == 'clang':
 			comp = Compiler(
 				name =                 'clang', 
@@ -1333,7 +1306,7 @@ def _c_module_setup():
 				optimize =             '-O2', 
 				compile_time_flags =   '-D'
 			)
-			c_compilers[comp._name] = comp
+			Config.c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
 			# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
 			comp = Compiler(
@@ -1348,10 +1321,10 @@ def _c_module_setup():
 				optimize =             '/O2', 
 				compile_time_flags =   '-D'
 			)
-			c_compilers[comp._name] = comp
+			Config.c_compilers[comp._name] = comp
 
 	# Make sure there is at least one C compiler installed
-	if len(c_compilers) == 0:
+	if len(Config.c_compilers) == 0:
 		print_status("Setting up C module")
 		print_fail()
 		print_exit("No C compiler found. Install one and try again.")
@@ -1370,7 +1343,7 @@ def _c_module_setup():
 				out_file        = '/out:', 
 				shared          = '/dll '
 			)
-			c_linkers[link._name] = link
+			Config.c_linkers[link._name] = link
 		elif name == 'ld':
 			link = Linker(
 				name            = 'ld',
@@ -1378,17 +1351,17 @@ def _c_module_setup():
 				out_file        = '-o ', 
 				shared          = '-G'
 			)
-			c_linkers[link._name] = link
+			Config.c_linkers[link._name] = link
 
 	# Make sure there is at least one linker installed
-	if len(c_linkers) == 0:
+	if len(Config.c_linkers) == 0:
 		print_status("Setting up C module")
 		print_fail()
 		print_exit("No linker found. Install one and try again.")
 
 def _c_require_module():
 	# Just return if setup
-	if c_compilers:
+	if Config.c_compilers:
 		return
 
 	print_status("C module check")
@@ -1396,35 +1369,32 @@ def _c_require_module():
 	print_exit("Call require_module('C') before using any C functions.")
 
 def c_get_default_linker():
-	global c_linkers
 	_c_require_module()
 
-	if config._os_type._name == 'Windows':
-		return c_linkers['link.exe']
+	if Config._os_type._name == 'Windows':
+		return Config.c_linkers['link.exe']
 	else:
-		return c_linkers['ld']
+		return Config.c_linkers['ld']
 
 def c_save_linker(linker):
 	_c_require_module()
 
 	# CLINKER
-	global config
-	config._clinker = linker
-	os.environ['CLINKER'] = config._clinker._name
+	Config._clinker = linker
+	os.environ['CLINKER'] = Config._clinker._name
 
 def c_get_default_compiler():
-	global c_compilers
 	_c_require_module()
 
 	comp = None
 
-	if config._os_type._name == 'Windows':
-		comp = c_compilers['cl.exe']
+	if Config._os_type._name == 'Windows':
+		comp = Config.c_compilers['cl.exe']
 	else:
-		if 'gcc' in c_compilers:
-			comp = c_compilers['gcc']
-		elif 'clang' in c_compilers:
-			comp = c_compilers['clang']
+		if 'gcc' in Config.c_compilers:
+			comp = Config.c_compilers['gcc']
+		elif 'clang' in Config.c_compilers:
+			comp = Config.c_compilers['clang']
 
 	return comp
 
@@ -1432,19 +1402,18 @@ def c_save_compiler(compiler):
 	_c_require_module()
 
 	# CC
-	global config
-	config._cc = compiler
-	os.environ['CC'] = config._cc._name
+	Config._cc = compiler
+	os.environ['CC'] = Config._cc._name
 
 	# CFLAGS
 	opts = []
-	opts.append(config._cc._opt_setup)
-	if config._cc.debug: opts.append(config._cc._opt_debug)
-	if config._cc.warnings_all: opts.append(config._cc._opt_warnings_all)
-	if config._cc.warnings_as_errors: opts.append(config._cc._opt_warnings_as_errors)
-	if config._cc.optimize: opts.append(config._cc._opt_optimize)
-	for compile_time_flag in config._cc.compile_time_flags:
-		opts.append(config._cc._opt_compile_time_flags + compile_time_flag)
+	opts.append(Config._cc._opt_setup)
+	if Config._cc.debug: opts.append(Config._cc._opt_debug)
+	if Config._cc.warnings_all: opts.append(Config._cc._opt_warnings_all)
+	if Config._cc.warnings_as_errors: opts.append(Config._cc._opt_warnings_as_errors)
+	if Config._cc.optimize: opts.append(Config._cc._opt_optimize)
+	for compile_time_flag in Config._cc.compile_time_flags:
+		opts.append(Config._cc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
@@ -1462,8 +1431,8 @@ def c_build_object(o_file, c_files, i_files=[]):
 	plural = 'C objects'
 	singular = 'C object'
 	command = "${CC} ${CFLAGS} " + \
-				config._cc._opt_no_link + ' ' +  \
-				config._cc._opt_out_file + \
+				Config._cc._opt_no_link + ' ' +  \
+				Config._cc._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
@@ -1500,7 +1469,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 	command = '${CC} ${CFLAGS} ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				config._cc._opt_out_file + o_file
+				Config._cc._opt_out_file + o_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -1555,11 +1524,11 @@ def c_build_shared_library(so_file, o_files):
 	plural = 'shared libraries'
 	singular = 'shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
-				config._clinker._name, 
-				config._clinker._opt_setup, 
-				config._clinker._opt_shared, 
+				Config._clinker._name, 
+				Config._clinker._opt_setup, 
+				Config._clinker._opt_shared, 
 				str.join(' ', o_files), 
-				config._clinker._opt_out_file, 
+				Config._clinker._opt_out_file, 
 				so_file)
 
 	def setup():
@@ -1573,8 +1542,6 @@ def c_build_shared_library(so_file, o_files):
 	add_event(event)
 
 def _cxx_module_setup():
-	global cxx_compilers
-
 	# Get the names and paths for know C++ compilers
 	names = ['g++']
 	for name in names:
@@ -1595,17 +1562,17 @@ def _cxx_module_setup():
 				optimize =             '-O2', 
 				compile_time_flags =   '-D'
 			)
-			cxx_compilers[comp._name] = comp
+			Config.cxx_compilers[comp._name] = comp
 
 	# Make sure there is at least one C++ compiler installed
-	if len(cxx_compilers) == 0:
+	if len(Config.cxx_compilers) == 0:
 		print_status("Setting up C++ module")
 		print_fail()
 		print_exit("No C++ compiler found. Install one and try again.")
 
 def _cxx_require_module():
 	# Just return if setup
-	if cxx_compilers:
+	if Config.cxx_compilers:
 		return
 
 	print_status("C++ module check")
@@ -1613,16 +1580,15 @@ def _cxx_require_module():
 	print_exit("Call require_module('C++') before using any C++ functions.")
 
 def cxx_get_default_compiler():
-	global cxx_compilers
 	_cxx_require_module()
 
 	comp = None
 
-	if config._os_type._name == 'Windows':
-		comp = cxx_compilers['cl.exe']
+	if Config._os_type._name == 'Windows':
+		comp = Config.cxx_compilers['cl.exe']
 	else:
-		if 'g++' in cxx_compilers:
-			comp = cxx_compilers['g++']
+		if 'g++' in Config.cxx_compilers:
+			comp = Config.cxx_compilers['g++']
 
 	return comp
 
@@ -1630,19 +1596,18 @@ def cxx_save_compiler(compiler):
 	_cxx_require_module()
 
 	# CXX
-	global config
-	config._cxx = compiler
-	os.environ['CXX'] = config._cxx._name
+	Config._cxx = compiler
+	os.environ['CXX'] = Config._cxx._name
 
 	# CXXFLAGS
 	opts = []
-	opts.append(config._cxx._opt_setup)
-	if config._cxx.debug: opts.append(config._cxx._opt_debug)
-	if config._cxx.warnings_all: opts.append(config._cxx._opt_warnings_all)
-	if config._cxx.warnings_as_errors: opts.append(config._cxx._opt_warnings_as_errors)
-	if config._cxx.optimize: opts.append(config._cxx._opt_optimize)
-	for compile_time_flag in config._cxx.compile_time_flags:
-		opts.append(config._cxx._opt_compile_time_flags + compile_time_flag)
+	opts.append(Config._cxx._opt_setup)
+	if Config._cxx.debug: opts.append(Config._cxx._opt_debug)
+	if Config._cxx.warnings_all: opts.append(Config._cxx._opt_warnings_all)
+	if Config._cxx.warnings_as_errors: opts.append(Config._cxx._opt_warnings_as_errors)
+	if Config._cxx.optimize: opts.append(Config._cxx._opt_optimize)
+	for compile_time_flag in Config._cxx.compile_time_flags:
+		opts.append(Config._cxx._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CXXFLAGS'] = str.join(' ', opts)
 
@@ -1662,7 +1627,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	command = '${CXX} ${CXXFLAGS} ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				config._cxx._opt_out_file + o_file
+				Config._cxx._opt_out_file + o_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -1690,8 +1655,8 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	plural = 'C++ objects'
 	singular = 'C++ object'
 	command = "${CXX} ${CXXFLAGS} " + \
-				config._cxx._opt_no_link + ' ' +  \
-				config._cxx._opt_out_file + \
+				Config._cxx._opt_no_link + ' ' +  \
+				Config._cxx._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files)
@@ -1713,8 +1678,6 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	add_event(event)
 
 def _d_module_setup():
-	global d_compilers
-
 	# Get the names and paths for know D compilers
 	names = ['dmd', 'dmd2', 'ldc2']
 	for name in names:
@@ -1735,7 +1698,7 @@ def _d_module_setup():
 				optimize =             '-O', 
 				compile_time_flags =   '-version='
 			)
-			d_compilers[comp._name] = comp
+			Config.d_compilers[comp._name] = comp
 		elif name == 'ldc2':
 			comp = Compiler(
 				name =                 'ldc2', 
@@ -1749,17 +1712,17 @@ def _d_module_setup():
 				optimize =             '-O2',
 				compile_time_flags =   '-version='
 			)
-			d_compilers[comp._name] = comp
+			Config.d_compilers[comp._name] = comp
 
 	# Make sure there is at least one D compiler installed
-	if len(d_compilers) == 0:
+	if len(Config.d_compilers) == 0:
 		print_status("Setting up D module")
 		print_fail()
 		print_exit("No D compiler found. Install one and try again.")
 
 def _d_require_module():
 	# Just return if setup
-	if d_compilers:
+	if Config.d_compilers:
 		return
 
 	print_status("D module check")
@@ -1767,13 +1730,12 @@ def _d_require_module():
 	print_exit("Call require_module('D') before using any D functions.")
 
 def d_get_default_compiler():
-	global d_compilers
 	_d_require_module()
 
 	comp = None
 	for name in ['dmd', 'dmd2', 'ldc2']:
-		if name in d_compilers:
-			comp = d_compilers[name]
+		if name in Config.d_compilers:
+			comp = Config.d_compilers[name]
 			break
 
 	return comp
@@ -1782,18 +1744,17 @@ def d_save_compiler(compiler):
 	_d_require_module()
 
 	# DC
-	global config
-	config._dc = compiler
-	os.environ['DC'] = config._dc._name
+	Config._dc = compiler
+	os.environ['DC'] = Config._dc._name
 
 	# DFLAGS
 	opts = []
-	if config._dc.debug: opts.append(config._dc._opt_debug)
-	if config._dc.warnings_all: opts.append(config._dc._opt_warnings_all)
-	if config._dc.warnings_as_errors: opts.append(config._dc._opt_warnings_as_errors)
-	if config._dc.optimize: opts.append(config._dc._opt_optimize)
-	for compile_time_flag in config._dc.compile_time_flags:
-		opts.append(config._dc._opt_compile_time_flags + compile_time_flag)
+	if Config._dc.debug: opts.append(Config._dc._opt_debug)
+	if Config._dc.warnings_all: opts.append(Config._dc._opt_warnings_all)
+	if Config._dc.warnings_as_errors: opts.append(Config._dc._opt_warnings_as_errors)
+	if Config._dc.optimize: opts.append(Config._dc._opt_optimize)
+	for compile_time_flag in Config._dc.compile_time_flags:
+		opts.append(Config._dc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
@@ -1810,7 +1771,7 @@ def d_build_interface(d_file, i_files):
 	singular = 'D interface'
 
 	f = self_deleting_named_temporary_file()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + config._dc._opt_out_file + f.name
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + Config._dc._opt_out_file + f.name
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -1841,7 +1802,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	plural = 'D objects'
 	singular = 'D object'
 
-	command = "${DC} ${DFLAGS} -c " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -c " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 
@@ -1873,7 +1834,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	plural = 'D shared libraries'
 	singular = 'D shared library'
 
-	command = "${DC} ${DFLAGS} -shared " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -shared " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1905,7 +1866,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	plural = 'D static libraries'
 	singular = 'D static library'
 
-	command = "${DC} ${DFLAGS} -lib " + config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -lib " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -1932,7 +1893,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	result = out_file
 	plural = 'D programs'
 	singular = 'D program'
-	command = "${DC} ${DFLAGS} " + config._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = "${DC} ${DFLAGS} " + Config._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -1976,7 +1937,7 @@ def load_rscript(g=globals(), l=locals()):
 
 if __name__ == '__main__':
 	# Figure out everything we need to know about the system
-	config = Config()
+	Config.init()
 
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
@@ -1985,13 +1946,13 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Clear the terminal
-	os.system(config._terminal_clear)
+	os.system(Config._terminal_clear)
 
 	# Load the rscript
 	targets = load_rscript()
 
 	# Get the target function name
-	target_name = str(str.join(' ', sys.argv[1:]))
+	Config.target_name = str(str.join(' ', sys.argv[1:]))
 
 	# Get a friendly list of all the targets
 	target_list = []
@@ -2001,8 +1962,8 @@ if __name__ == '__main__':
 		target_list = "'" + str.join("', '", keys) + "'"
 
 	# Exit if there is no target
-	if not target_name:
-		print("Raise software build tool (Version 0.2 - September 20 2013) http://launchpad.net/raise")
+	if not Config.target_name:
+		print("Raise software build tool (Version 0.2 - September 21 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".raise_actual\" or \"raise_actual\".")
@@ -2022,11 +1983,11 @@ if __name__ == '__main__':
 		print_exit("No 'rscript' file found.")
 
 	# Exit if there is no target with that name
-	if not target_name in targets:
-		print_exit("No target named '{0}'. Found targets are {1}.".format(target_name, target_list))
+	if not Config.target_name in targets:
+		print_exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
 
 	# Setup any modules
-	for module in modules:
+	for module in Config.modules:
 		if module == 'C':
 			_c_module_setup()
 		elif module == 'C++':
@@ -2037,7 +1998,7 @@ if __name__ == '__main__':
 			print_exit('Unknown module "{0}"'.format(module))
 
 	# Try running the target
-	target = targets[target_name]
-	print_info("Running target '{0}'".format(target_name))
+	target = targets[Config.target_name]
+	print_info("Running target '{0}'".format(Config.target_name))
 	target()
 
