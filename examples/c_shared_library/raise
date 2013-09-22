@@ -28,11 +28,9 @@
 import os, sys
 import stat
 if sys.version_info < (3, 0):
-	import urllib2
-	globals()['urlopen'] = urllib2.urlopen
+	from urllib2 import urlopen
 else:
-	import urllib.request
-	globals()['urlopen'] = urllib.request.urlopen
+	from urllib.request import urlopen
 
 RAISE_ACTUAL_URL = 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 
@@ -101,7 +99,7 @@ def update():
 
 		def cb_done(data):
 			# Make sure the downloaded file is python
-			if not data.startswith("#!/usr/bin/env python"):
+			if not data.decode().startswith("#!/usr/bin/env python"):
 				print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
 				exit()
 
@@ -135,6 +133,7 @@ if __name__ == '__main__':
 	elif os.path.isfile('../../raise_actual'):
 		actual = '../../raise_actual'
 	else:
+		actual = '.raise_actual'
 		update()
 
 	# Have the raise_actual file handle everything else
