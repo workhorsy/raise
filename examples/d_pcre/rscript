@@ -3,6 +3,7 @@
 
 require_module('C')
 require_module('D')
+require_module('Linker')
 
 def clean():
 	"""Removes any files and directories generated when building."""
@@ -26,8 +27,8 @@ def _configure():
 	dc.warnings_as_errors = True
 	d_save_compiler(dc)
 
-	linker = c_get_default_linker()
-	c_save_linker(linker)
+	linker = linker_get_default_linker()
+	linker_save_linker(linker)
 
 	# FIXME: Make this cache the file lists instead of getting it again
 	require_header_file('libpcre', lambda ver: ver.major == 8)

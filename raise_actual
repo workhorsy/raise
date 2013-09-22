@@ -89,13 +89,13 @@ class Config(object):
 		cls.target_name = None
 		cls.message_length = None
 		cls.c_compilers = {}
-		cls.c_linkers = {}
+		cls.linkers = {}
 		cls.cxx_compilers = {}
 		cls.d_compilers = {}
 		cls._cc = None
 		cls._cxx = None
 		cls._dc = None
-		cls._clinker = None
+		cls._linker = None
 
 		# Get the path of the rscript file
 		cls.pwd = os.sys.path[0]
@@ -1233,7 +1233,7 @@ def link_static_or_shared_paths(lib_names):
 class Compiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors, optimize, 
-				compile_time_flags):
+				compile_time_flags, link):
 
 		self._name = name
 		self._path = path
@@ -1247,6 +1247,7 @@ class Compiler(object):
 		self._opt_warnings_as_errors = warnings_as_errors
 		self._opt_optimize = optimize
 		self._opt_compile_time_flags = compile_time_flags
+		self._opt_link = link
 
 		# Set the default values of the flags
 		self.debug = False
@@ -1284,6 +1285,105 @@ def to_native(thing):
 def require_module(name):
 	Config.modules.append(name)
 
+def _linker_require_module():
+	# Just return if setup
+	if Config.linkers:
+		return
+
+	print_status("Linker module check")
+	print_fail()
+	print_exit("Call require_module('Linker') before using any Linker functions.")
+
+def _linker_module_setup():
+	# Get the names and paths for know linkers
+	names = ['ld', 'link.exe']
+	for name in names:
+		paths = program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'link.exe':
+			link = Linker(
+				name            = 'link.exe',
+				setup           = '/nologo', 
+				out_file        = '/out:', 
+				shared          = '/dll '
+			)
+			Config.linkers[link._name] = link
+		elif name == 'ld':
+			link = Linker(
+				name            = 'ld',
+				setup           = '', 
+				out_file        = '-o ', 
+				shared          = '-G'
+			)
+			Config.linkers[link._name] = link
+
+	# Make sure there is at least one linker installed
+	if len(Config.linkers) == 0:
+		print_status("Setting up Linker module")
+		print_fail()
+		print_exit("No Linker found. Install one and try again.")
+
+def linker_get_default_linker():
+	_linker_require_module()
+
+	if Config._os_type._name == 'Windows':
+		return Config.linkers['link.exe']
+	else:
+		return Config.linkers['ld']
+
+def linker_save_linker(linker):
+	_linker_require_module()
+
+	# LINKER
+	Config._linker = linker
+	os.environ['LINKER'] = Config._linker._name
+
+def linker_link_program(out_file, obj_files, i_files=[]):
+	_linker_require_module()
+
+	# Change file extensions to os format
+	out_file = to_native(out_file)
+	obj_files = to_native(obj_files)
+	i_files = to_native(i_files)
+
+	# Setup the messages
+	task = 'Linking'
+	result = out_file
+	plural = 'programs'
+	singular = 'program'
+	command = "${LINK} " + \
+				Config._linker._opt_out_file + \
+				out_file + ' ' + \
+				str.join(' ', obj_files) + ' ' + \
+				str.join(' ', i_files)
+
+	def setup():
+		# Skip if the files have not changed since last build
+		if not is_outdated(to_update = [out_file], triggers = obj_files):
+			return False
+
+		# Make sure the environmental variable is set
+		if not 'LINK' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'LINK' to the linker, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
+
+def _c_require_module():
+	# Just return if setup
+	if Config.c_compilers:
+		return
+
+	print_status("C module check")
+	print_fail()
+	print_exit("Call require_module('C') before using any C functions.")
+
 def _c_module_setup():
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'clang', 'cl.exe']
@@ -1303,7 +1403,8 @@ def _c_module_setup():
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
-				compile_time_flags =   '-D'
+				compile_time_flags =   '-D', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.c_compilers[comp._name] = comp
 		elif name == 'clang':
@@ -1317,7 +1418,8 @@ def _c_module_setup():
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
-				compile_time_flags =   '-D'
+				compile_time_flags =   '-D', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
@@ -1332,7 +1434,8 @@ def _c_module_setup():
 				warnings_all =         '/Wall', 
 				warnings_as_errors =   '', 
 				optimize =             '/O2', 
-				compile_time_flags =   '-D'
+				compile_time_flags =   '-D', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.c_compilers[comp._name] = comp
 
@@ -1341,60 +1444,6 @@ def _c_module_setup():
 		print_status("Setting up C module")
 		print_fail()
 		print_exit("No C compiler found. Install one and try again.")
-
-	# Get the names and paths for know linkers
-	names = ['ld', 'link.exe']
-	for name in names:
-		paths = program_paths(name)
-		if len(paths) == 0:
-			continue
-
-		if name == 'link.exe':
-			link = Linker(
-				name            = 'link.exe',
-				setup           = '/nologo', 
-				out_file        = '/out:', 
-				shared          = '/dll '
-			)
-			Config.c_linkers[link._name] = link
-		elif name == 'ld':
-			link = Linker(
-				name            = 'ld',
-				setup           = '', 
-				out_file        = '-o ', 
-				shared          = '-G'
-			)
-			Config.c_linkers[link._name] = link
-
-	# Make sure there is at least one linker installed
-	if len(Config.c_linkers) == 0:
-		print_status("Setting up C module")
-		print_fail()
-		print_exit("No linker found. Install one and try again.")
-
-def _c_require_module():
-	# Just return if setup
-	if Config.c_compilers:
-		return
-
-	print_status("C module check")
-	print_fail()
-	print_exit("Call require_module('C') before using any C functions.")
-
-def c_get_default_linker():
-	_c_require_module()
-
-	if Config._os_type._name == 'Windows':
-		return Config.c_linkers['link.exe']
-	else:
-		return Config.c_linkers['ld']
-
-def c_save_linker(linker):
-	_c_require_module()
-
-	# CLINKER
-	Config._clinker = linker
-	os.environ['CLINKER'] = Config._clinker._name
 
 def c_get_default_compiler():
 	_c_require_module()
@@ -1429,6 +1478,37 @@ def c_save_compiler(compiler):
 		opts.append(Config._cc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CFLAGS'] = str.join(' ', opts)
+
+def c_link_program(out_file, obj_files, i_files=[]):
+	_c_require_module()
+
+	# Change file extensions to os format
+	out_file = to_native(out_file)
+	obj_files = to_native(obj_files)
+	i_files = to_native(i_files)
+
+	# Setup the messages
+	task = 'Linking'
+	result = out_file
+	plural = 'C programs'
+	singular = 'C program'
+	command = '${CC} ${CFLAGS} ' + \
+				Config._cc._opt_link + ' ' + \
+				str.join(' ', obj_files) + ' ' + \
+				str.join(' ', i_files) + ' ' + \
+				Config._cc._opt_out_file + out_file
+
+	def setup():
+		# Make sure the environmental variable is set
+		if not 'CC' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CC' to the C compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 
 def c_build_object(o_file, c_files, i_files=[]):
 	_c_require_module()
@@ -1537,11 +1617,11 @@ def c_build_shared_library(so_file, o_files):
 	plural = 'shared libraries'
 	singular = 'shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
-				Config._clinker._name, 
-				Config._clinker._opt_setup, 
-				Config._clinker._opt_shared, 
+				Config._linker._name, 
+				Config._linker._opt_setup, 
+				Config._linker._opt_shared, 
 				str.join(' ', o_files), 
-				Config._clinker._opt_out_file, 
+				Config._linker._opt_out_file, 
 				so_file)
 
 	def setup():
@@ -1573,7 +1653,8 @@ def _cxx_module_setup():
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
-				compile_time_flags =   '-D'
+				compile_time_flags =   '-D', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.cxx_compilers[comp._name] = comp
 
@@ -1654,6 +1735,37 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+def cxx_link_program(out_file, obj_files, i_files=[]):
+	_cxx_require_module()
+
+	# Change file extensions to os format
+	out_file = to_native(out_file)
+	obj_files = to_native(obj_files)
+	i_files = to_native(i_files)
+
+	# Setup the messages
+	task = 'Linking'
+	result = out_file
+	plural = 'C++ programs'
+	singular = 'C++ program'
+	command = '${CXX} ${CXXFLAGS} ' + \
+				Config._cxx._opt_link + ' ' + \
+				str.join(' ', obj_files) + ' ' + \
+				str.join(' ', i_files) + ' ' + \
+				Config._cxx._opt_out_file + out_file
+
+	def setup():
+		# Make sure the environmental variable is set
+		if not 'CXX' in os.environ:
+			print_fail()
+			print_exit("Set the env variable 'CXX' to the C++ compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
+
 def cxx_build_object(o_file, cxx_files, i_files=[]):
 	_cxx_require_module()
 
@@ -1701,29 +1813,31 @@ def _d_module_setup():
 		if name in ['dmd', 'dmd2']:
 			comp = Compiler(
 				name =                 name, 
-				path =                  paths[0], 
-				setup =        '', 
+				path =                 paths[0], 
+				setup =                '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
 				warnings_as_errors =   '', 
 				optimize =             '-O', 
-				compile_time_flags =   '-version='
+				compile_time_flags =   '-version=', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.d_compilers[comp._name] = comp
 		elif name == 'ldc2':
 			comp = Compiler(
 				name =                 'ldc2', 
-				path =                  paths[0], 
-				setup =        '', 
+				path =                 paths[0], 
+				setup =                '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
 				warnings_as_errors =   '', 
 				optimize =             '-O2',
-				compile_time_flags =   '-version='
+				compile_time_flags =   '-version=', 
+				link =                 '-Wl,-as-needed'
 			)
 			Config.d_compilers[comp._name] = comp
 
@@ -2001,7 +2115,9 @@ if __name__ == '__main__':
 
 	# Setup any modules
 	for module in Config.modules:
-		if module == 'C':
+		if module == 'Linker':
+			_linker_module_setup()
+		elif module == 'C':
 			_c_module_setup()
 		elif module == 'C++':
 			_cxx_module_setup()

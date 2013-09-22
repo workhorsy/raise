@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 require_module('C')
+require_module('Linker')
 
 def clean():
 	"""Removes any files and directories generated when building."""
@@ -18,8 +19,8 @@ def _configure():
 	cc.warnings_as_errors = True
 	c_save_compiler(cc)
 
-	linker = c_get_default_linker()
-	c_save_linker(linker)
+	linker = linker_get_default_linker()
+	linker_save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
