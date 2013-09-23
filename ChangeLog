@@ -1,4 +1,4 @@
-* Release 0.2.0
+2013-09-22 Release 0.2.0
 	* Fixed Bug #1223030: 'Make it complain if running in normal Windows terminal'.
 	* Fixed Bug #1225295: 'Add optimization and compile time build options'.
 	* Fixed Bug #1225292: 'Add C++ support'.

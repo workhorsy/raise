@@ -33,10 +33,11 @@ else:
 	from urllib.request import urlopen
 
 RAISE_ACTUAL_URLS = {
-	'0.1' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
+	'0.1.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
+	'0.2.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.2.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
 	'Trunk' : 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 }
-RAISE_ACTUAL_URL = RAISE_ACTUAL_URLS['Trunk']
+RAISE_ACTUAL_URL = RAISE_ACTUAL_URLS['0.2.0']
 
 def friendly_size(data_length):
 	retval = ''
