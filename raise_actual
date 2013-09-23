@@ -2037,13 +2037,28 @@ def d_build_program(out_file, inc_files, link_files=[]):
 
 def _csharp_module_setup():
 	# Get the names and paths for know C# compilers
-	names = ['dmcs']
+	names = ['dmcs', 'csc']
 	for name in names:
 		paths = program_paths(name)
 		if len(paths) == 0:
 			continue
 
 		if name in ['dmcs']:
+			comp = Compiler(
+				name =                 name, 
+				path =                 paths[0], 
+				setup =                '', 
+				out_file =             '-out:', 
+				no_link =              '', 
+				debug =                '-debug', 
+				warnings_all =         '-warn:4', 
+				warnings_as_errors =   '-warnaserror', 
+				optimize =             '-optimize', 
+				compile_time_flags =   '', 
+				link =                 ''
+			)
+			Config.cs_compilers[comp._name] = comp
+		elif name in ['csc']:
 			comp = Compiler(
 				name =                 name, 
 				path =                 paths[0], 
@@ -2078,7 +2093,7 @@ def csharp_get_default_compiler():
 	_csharp_require_module()
 
 	comp = None
-	for name in ['dmcs']:
+	for name in ['dmcs', 'csc']:
 		if name in Config.cs_compilers:
 			comp = Config.cs_compilers[name]
 			break
@@ -2228,4 +2243,5 @@ if __name__ == '__main__':
 	target = targets[Config.target_name]
 	print_info("Running target '{0}'".format(Config.target_name))
 	target()
+
 
