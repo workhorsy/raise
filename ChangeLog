@@ -1,3 +1,6 @@
+* Release 0.3.0
+	* Fixed Bug #1229457: 'Add basic C# support'.
+
 2013-09-22 Release 0.2.0
 	* Fixed Bug #1223030: 'Make it complain if running in normal Windows terminal'.
 	* Fixed Bug #1225295: 'Add optimization and compile time build options'.
