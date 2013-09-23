@@ -922,7 +922,7 @@ def _get_library_files_from_fs(lib_name):
 			for entry in files:
 				# Get the whole file name
 				f = os.path.join(root, entry)
-				if f.split('.')[0].endswith(lib_name) and os.path.isfile(f):
+				if lib_name in f and os.path.isfile(f):
 					matching_files.append(f)
 
 	return matching_files
