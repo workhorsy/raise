@@ -37,7 +37,7 @@ RAISE_ACTUAL_URLS = {
 	'0.2.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.2.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
 	'Trunk' : 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 }
-RAISE_ACTUAL_URL = RAISE_ACTUAL_URLS['0.2.0']
+RAISE_ACTUAL_URL = RAISE_ACTUAL_URLS['Trunk']
 
 def friendly_size(data_length):
 	retval = ''
