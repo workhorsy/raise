@@ -1,7 +1,7 @@
 using System;
 
 namespace MathHelper {
-	class Funcs {
+	public class Funcs {
 		public static int Add(int a, int b) {
 			return a + b;
 		}

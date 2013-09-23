@@ -23,9 +23,11 @@ def test():
 	clean()
 	_configure()
 
+	# Build the library
+	csharp_build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+
 	# Build the program
-	sources = ['main.cs', 'math_helper.cs']
-	csharp_build_program('main.exe', sources)
+	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 
 	# Run the program
 	run_say('./main.exe')
