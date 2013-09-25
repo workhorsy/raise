@@ -32,11 +32,12 @@ if sys.version_info < (3, 0):
 else:
 	from urllib.request import urlopen
 
-RAISE_ACTUAL_URLS = {
-	'0.1' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
+LIB_RAISE_URLS = {
+	'0.1.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
+	'0.2.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.2.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
 	'Trunk' : 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
 }
-RAISE_ACTUAL_URL = RAISE_ACTUAL_URLS['Trunk']
+LIB_RAISE_URL = LIB_RAISE_URLS['Trunk']
 
 def friendly_size(data_length):
 	retval = ''
@@ -86,9 +87,9 @@ def update():
 	print("Downloading newest Raise version ...")
 
 	# Get the file name for actual
-	file_name = '.raise_actual'
-	if os.path.isfile('raise_actual'):
-		file_name = 'raise_actual'
+	file_name = '.lib_raise.py'
+	if os.path.isfile('lib_raise.py'):
+		file_name = 'lib_raise.py'
 
 	try:
 		def cb_progress(chunk, data_length, chunk_size, content_length, percent):
@@ -112,7 +113,7 @@ def update():
 			f.write(data)
 
 		# Download the file and call the cb after each chunk
-		download_file(RAISE_ACTUAL_URL, cb_progress, cb_done)
+		download_file(LIB_RAISE_URL, cb_progress, cb_done)
 
 		# Make the file executable
 		os.chmod(file_name, 0o775 | stat.S_IXOTH)
@@ -128,19 +129,19 @@ if __name__ == '__main__':
 		update()
 		exit()
 
-	# Run update if there is no raise_actual file
+	# Run update if there is no lib_raise file
 	actual = None
-	if os.path.isfile('raise_actual'):
-		actual = 'raise_actual'
-	elif os.path.isfile('.raise_actual'):
-		actual = '.raise_actual'
-	elif os.path.isfile('../../raise_actual'):
-		actual = '../../raise_actual'
+	if os.path.isfile('lib_raise.py'):
+		actual = 'lib_raise.py'
+	elif os.path.isfile('.lib_raise.py'):
+		actual = '.lib_raise.py'
+	elif os.path.isfile('../../lib_raise.py'):
+		actual = '../../lib_raise.py'
 	else:
-		actual = '.raise_actual'
+		actual = '.lib_raise.py'
 		update()
 
-	# Have the raise_actual file handle everything else
+	# Have the lib_raise.py file handle everything else
 	os.system('{0} {1} {2}'.format(sys.executable, actual, args))
 
 
