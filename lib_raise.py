@@ -1387,11 +1387,11 @@ if __name__ == '__main__':
 			linker_module_setup()
 		elif module == 'C':
 			c_module_setup()
-		elif module == 'C++':
+		elif module == 'CXX':
 			cxx_module_setup()
 		elif module == 'D':
 			d_module_setup()
-		elif module == 'C#':
+		elif module == 'CSHARP':
 			csharp_module_setup()
 		else:
 			print_exit('Unknown module "{0}"'.format(module))
