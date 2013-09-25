@@ -31,7 +31,7 @@ if sys.version_info < (3, 0):
 	from urllib2 import urlopen
 else:
 	from urllib.request import urlopen
-
+# FIXME: Update to download each of the modules instead just the main one.
 LIB_RAISE_URLS = {
 	'0.1.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
 	'0.2.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.2.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',

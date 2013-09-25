@@ -82,6 +82,7 @@ def expand_envs(string):
 		if before == string:
 			return string
 
+# FIXME: Update so config does not know about any module specific information
 class Config(object):
 	modules = []
 	target_name = None
@@ -1383,6 +1384,7 @@ if __name__ == '__main__':
 	for module in Config.modules:
 		load_module(module)
 
+		# FIXME: This should be done inside the module loading
 		if module == 'Linker':
 			linker_module_setup()
 		elif module == 'C':

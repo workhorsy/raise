@@ -78,7 +78,7 @@ def _csharp_require_module():
 
 	print_status("C# module check")
 	print_fail()
-	print_exit("Call require_module('C#') before using any C# functions.")
+	print_exit("Call require_module('CSHARP') before using any C# functions.")
 
 def csharp_get_default_compiler():
 	_csharp_require_module()
