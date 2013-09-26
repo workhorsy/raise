@@ -31,13 +31,16 @@ if sys.version_info < (3, 0):
 	from urllib2 import urlopen
 else:
 	from urllib.request import urlopen
-# FIXME: Update to download each of the modules instead just the main one.
-LIB_RAISE_URLS = {
-	'0.1.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.1.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
-	'0.2.0' :   'http://bazaar.launchpad.net/~workhorsy/raise/0.2.0/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual',
-	'Trunk' : 'http://bazaar.launchpad.net/~workhorsy/raise/main/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/raise_actual'
+
+RAISE_VERSION = 'main'
+RAISE_URLS = {
+	'raise'    : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_VERSION),
+	'raise_csharp'   : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_VERSION),
+	'raise_cxx'      : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_VERSION),
+	'raise_d'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_VERSION),
+	'raise_linker'   : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_VERSION),
+	'raise_c'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_VERSION)
 }
-LIB_RAISE_URL = LIB_RAISE_URLS['Trunk']
 
 def friendly_size(data_length):
 	retval = ''
@@ -55,93 +58,104 @@ def friendly_size(data_length):
 
 	return retval
 
-def download_file(url, cb_progress, cb_done):
-	chunk_size = 1024
-	response = ''
+def update(dir_name):
+	print("Downloading newest Raise version ...")
+
+	if not os.path.isdir(dir_name):
+		os.mkdir(dir_name)
+
+	for module, url in RAISE_URLS.iteritems():
+		# Get the file name for script
+		file_name = os.path.join(dir_name, "lib_{0}.py".format(module))
+
+		# Download the file and call the cb after each chunk
+		_download_file(url, file_name)
+
+		# Make the file executable
+		os.chmod(file_name, 0o775 | stat.S_IXOTH)
+
+def _download_file(url, file_name):
+	CHUNK_SIZE = 1024
+
 	try:
+		# Connect with HTTP
 		response = urlopen(url)
 		if response.code != 200:
 			print('Download failed. Exiting ...')
 			exit()
+
+		# Read the HTTP header
+		content_length = int(response.headers['Content-Length'])
+		data = b''
+		data_length = 0
+
+		# Read the HTTP body
+		while True:
+			chunk = response.read(CHUNK_SIZE)
+			if not chunk:
+				break
+
+			data += chunk
+			data_length += len(chunk)
+			percent = round((float(data_length) / content_length)*100, 2)
+
+			_cb_dl_progress(file_name, chunk, data_length, CHUNK_SIZE, content_length, percent)
 	except Exception as e:
 		print('Download failed. Exiting ...')
-		exit()
-	content_length = int(response.headers['Content-Length'])
-	data = b''
-	data_length = 0
-
-	while True:
-		chunk = response.read(chunk_size)
-		if not chunk:
-			break
-
-		data += chunk
-		data_length += len(chunk)
-		percent = round((float(data_length) / content_length)*100, 2)
-
-		cb_progress(chunk, data_length, chunk_size, content_length, percent)
-
-	cb_done(data)
-
-def update():
-	print("Downloading newest Raise version ...")
-
-	# Get the file name for actual
-	file_name = '.lib_raise.py'
-	if os.path.isfile('lib_raise.py'):
-		file_name = 'lib_raise.py'
-
-	try:
-		def cb_progress(chunk, data_length, chunk_size, content_length, percent):
-			# Write the download progress
-			sys.stdout.write("Downloaded {0} of {1} ({2}%)\r".format(friendly_size(data_length), friendly_size(content_length), percent))
-
-			# Write a newline if the download is complete
-			if data_length >= content_length:
-				sys.stdout.write('\n')
-
-			sys.stdout.flush()
-
-		def cb_done(data):
-			# Make sure the downloaded file is python
-			if not data.decode().startswith("#!/usr/bin/env python"):
-				print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
-				exit()
-
-			# Save the file
-			f = open(file_name, 'wb')
-			f.write(data)
-
-		# Download the file and call the cb after each chunk
-		download_file(LIB_RAISE_URL, cb_progress, cb_done)
-
-		# Make the file executable
-		os.chmod(file_name, 0o775 | stat.S_IXOTH)
-	except Exception as e:
 		print(str(e))
+		print(url)
+		exit()
+
+	# Write the file to disk
+	_cb_dl_done(file_name, data)
+
+def _cb_dl_progress(file_name, chunk, data_length, chunk_size, content_length, percent):
+	# Write the download progress
+	sys.stdout.write("    {0} of {1} ({2}%) '{3}'\r".format(friendly_size(data_length), friendly_size(content_length), percent, file_name))
+
+	# Write a newline if the download is complete
+	if data_length >= content_length:
+		sys.stdout.write('\n')
+
+	sys.stdout.flush()
+
+def _cb_dl_done(file_name, data):
+	# Make sure the downloaded file is python
+	if not data.decode().startswith("#!/usr/bin/env python"):
+		print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
+		exit()
+
+	# Save the file
+	with open(file_name, 'wb') as f:
+		f.write(data)
 
 if __name__ == '__main__':
+	needs_update = False
+
 	# Get the arguments
 	args = str(str.join(' ', sys.argv[1:]))
 
+	# Get the location of the module files
+	dir_name = None
+	if os.path.isfile('lib_raise/lib_raise.py'):
+		dir_name = 'lib_raise/'
+	elif os.path.isfile('.lib_raise/lib_raise.py'):
+		dir_name = '.lib_raise/'
+	elif os.path.isfile('../../lib_raise/lib_raise.py'):
+		dir_name = '../../lib_raise/'
+	else:
+		dir_name = '.lib_raise/'
+		needs_update = True
+
 	# Run update if that is the target
 	if args == 'update':
-		update()
+		update(dir_name)
 		exit()
-
-	# Run update if there is no lib_raise file
-	actual = None
-	if os.path.isfile('lib_raise.py'):
-		actual = 'lib_raise.py'
-	elif os.path.isfile('.lib_raise.py'):
-		actual = '.lib_raise.py'
-	elif os.path.isfile('../../lib_raise.py'):
-		actual = '../../lib_raise.py'
-	else:
-		actual = '.lib_raise.py'
-		update()
+	elif needs_update:
+		update(dir_name)
 
 	# Have the lib_raise.py file handle everything else
+	actual = "{0}lib_raise.py".format(dir_name)
 	os.system('{0} {1} {2}'.format(sys.executable, actual, args))
 
 

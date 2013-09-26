@@ -1357,7 +1357,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3 - September 24 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.3 - September 26 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".lib_raise\" or \"lib_raise\".")
