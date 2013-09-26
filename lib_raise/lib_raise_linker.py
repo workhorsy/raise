@@ -25,6 +25,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class Linker(object):
+	def __init__(self, name, setup, out_file, shared):
+		self._name = name
+		
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_shared = shared
 
 def _linker_require_module():
 	# Just return if setup
@@ -115,4 +122,52 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def ldconfig():
+	# Setup the message
+	print_status("Running 'ldconfig'")
+
+	# Skip ldconfig on Cygwin
+	if Config._os_type._name == 'Cygwin':
+		print_ok()
+		return
+
+	# Run the process
+	runner = ProcessRunner("ldconfig")
+	runner.run()
+	runner.wait()
+
+	# Success or failure
+	if runner.is_failure:
+		print_fail(runner.stdall)
+		print_exit("Failed run 'ldconfig'.")
+	elif runner.is_success or runner.is_warning:
+		print_ok()
+
+def link_shared_path(lib_name):
+	return '-L' + get_shared_library(lib_name)
+
+def link_static_path(lib_name):
+	return '-L' + get_static_library(lib_name)
+
+def link_static_or_shared_path(lib_name):
+	return '-L' + static_or_shared_library_path(lib_name)
+
+def link_shared_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_shared_path(lib_name))
+	return str.join(' ', paths)
+
+def link_static_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_static_path(lib_name))
+	return str.join(' ', paths)
+
+def link_static_or_shared_paths(lib_names):
+	paths = []
+	for lib_name in lib_names:
+		paths.append(link_static_or_shared_path(lib_name))
+	return str.join(' ', paths)
 
