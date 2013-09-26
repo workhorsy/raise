@@ -54,7 +54,6 @@ class Config(object):
 	modules = {}
 	modules_to_load = []
 	target_name = None
-	message_length = None
 
 	@classmethod
 	def init(cls):
@@ -87,55 +86,6 @@ class Config(object):
 		load_module('TERMINAL')
 		load_module('FS')
 		load_module('LIBRARIES')
-
-		# Figure out the general OS type
-		if 'cygwin' in platform.system().lower():
-			cls._os_type = OSType(
-				name =                 'Cygwin', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
-			)
-		elif 'windows' in platform.system().lower():
-			cls._os_type = OSType(
-				name =                 'Windows', 
-				exe_extension =        '.exe', 
-				object_extension =     '.obj', 
-				shared_lib_extension = '.dll', 
-				static_lib_extension = '.lib'
-			)
-		else:
-			cls._os_type = OSType(
-				name =                 'Unix', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
-			)
-
-		# Figure out how to clear the terminal
-		if cls._os_type._name == 'Windows':
-			cls._terminal_clear = 'cls'
-		else:
-			cls._terminal_clear = 'clear'
-
-		# FIXME: Have this look for stty first then try the registry
-		# Figure out the terminal width
-		if cls._os_type._name == 'Windows':
-			import _winreg
-			key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
-			val = _winreg.QueryValueEx(key, "ScreenBufferSize")
-			_winreg.CloseKey(key)
-			size = hex(val[0])
-			cls._terminal_width = int('0x' + size[-4 : len(size)], 16)
-		else:
-			cls._terminal_width = int(os.popen('stty size', 'r').read().split()[1])
-
-		# Make sure Windows SDK tools are found
-		if cls._os_type._name == 'Windows':
-			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
-				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
 	@classmethod
 	def require_module(cls, file_name):
@@ -272,7 +222,8 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Clear the terminal
-	os.system(Config._terminal_clear)
+	terminal_mod = Config.require_module('TERMINAL')
+	os.system(terminal_mod._terminal_clear)
 
 	# Load the rscript
 	targets = load_rscript()
@@ -312,11 +263,11 @@ if __name__ == '__main__':
 	if not Config.target_name in targets:
 		print_exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
 
-	# Setup any modules
+	# Setup any modules required in the rscript
 	for module in Config.modules_to_load:
 		load_module(module)
 
-	# Try running the target
+	# Try running the target in the rscript
 	target = targets[Config.target_name]
 	print_info("Running target '{0}'".format(Config.target_name))
 	target()

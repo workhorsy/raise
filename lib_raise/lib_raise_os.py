@@ -28,8 +28,41 @@
 class OSModule(RaiseModule):
 	def __init__(self):
 		super(OSModule, self).__init__("OS")
+		self._os_type = None
 
 	def setup(self):
+		# Figure out the general OS type
+		if 'cygwin' in platform.system().lower():
+			self._os_type = OSType(
+				name =                 'Cygwin', 
+				exe_extension =        '', 
+				object_extension =     '.o', 
+				shared_lib_extension = '.so', 
+				static_lib_extension = '.a'
+			)
+		elif 'windows' in platform.system().lower():
+			self._os_type = OSType(
+				name =                 'Windows', 
+				exe_extension =        '.exe', 
+				object_extension =     '.obj', 
+				shared_lib_extension = '.dll', 
+				static_lib_extension = '.lib'
+			)
+		else:
+			self._os_type = OSType(
+				name =                 'Unix', 
+				exe_extension =        '', 
+				object_extension =     '.o', 
+				shared_lib_extension = '.so', 
+				static_lib_extension = '.a'
+			)
+
+		# Make sure Windows SDK tools are found
+		if self._os_type._name == 'Windows':
+			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
+				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
+
+
 		self.is_setup = True
 
 class OSType(object):
@@ -43,11 +76,13 @@ class OSType(object):
 		self._static_lib_extension = static_lib_extension
 
 def to_native(thing):
+	module = Config.require_module("OS")
+
 	# Get a dict of the standard extensions and their other os counterparts
 	replaces = {
-		'.o' : Config._os_type._object_extension,
-		'.so': Config._os_type._shared_lib_extension,
-		'.a' : Config._os_type._static_lib_extension
+		'.o' : module._os_type._object_extension,
+		'.so': module._os_type._shared_lib_extension,
+		'.a' : module._os_type._static_lib_extension
 	}
 
 	# Replace the extension
@@ -85,10 +120,11 @@ def get_normal_user_id():
 	return int(os.popen('id -u {0}'.format(user_name)).read())
 
 def do_as_normal_user(cb):
+	module = Config.require_module("OS")
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not Config._os_type._name in ['Windows', 'Cygwin']:
+	if not module._os_type._name in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -110,7 +146,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not Config._os_type._name in ['Windows', 'Cygwin']:
+		if not module._os_type._name in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -120,14 +156,15 @@ def do_as_normal_user(cb):
 		print_exit(exception)
 
 def require_root():
+	module = Config.require_module("OS")
 	is_root = False
 
 	# Cygwin
-	if Config._os_type._name == 'Cygwin':
+	if module._os_type._name == 'Cygwin':
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif Config._os_type._name == 'Windows':
+	elif module._os_type._name == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot', 'C:\windows')
@@ -144,8 +181,10 @@ def require_root():
 		print_exit("Must be run as root.")
 
 def require_not_root():
+	module = Config.require_module("OS")
+
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if Config._os_type._name in ['Windows', 'Cygwin']:
+	if module._os_type._name in ['Windows', 'Cygwin']:
 		return
 
 	# Make sure we are NOT root

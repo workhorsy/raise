@@ -34,7 +34,9 @@ class ProcessModule(RaiseModule):
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if Config._os_type._name == 'Windows':
+		module = Config.require_module("OS")
+
+		if module._os_type._name == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -156,13 +158,15 @@ class Event(object):
 	is_done = property(get_is_done)
 
 	def run(self):
+		module = Config.require_module("TERMINAL")
+
 		# Show the parallel header
 		if Event.is_parallel:
 			if Event.is_first_parallel:
 				Event.is_first_parallel = False
 				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
-				Config.message_length = 0
+				module.message_length = 0
 
 		# Run the setup function
 		if not self._setup_cb():

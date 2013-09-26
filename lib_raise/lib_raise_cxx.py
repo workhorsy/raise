@@ -67,10 +67,11 @@ class CXXModule(RaiseModule):
 
 def cxx_get_default_compiler():
 	module = Config.require_module("CXX")
+	os_module = Config.require_module("OS")
 
 	comp = None
 
-	if Config._os_type._name == 'Windows':
+	if os_module._os_type._name == 'Windows':
 		comp = module.cxx_compilers['cl.exe']
 	else:
 		if 'g++' in module.cxx_compilers:

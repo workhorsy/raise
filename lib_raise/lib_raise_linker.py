@@ -75,8 +75,9 @@ class Linker(object):
 
 def linker_get_default_linker():
 	module = Config.require_module("LINKER")
+	os_module = Config.require_module("OS")
 
-	if Config._os_type._name == 'Windows':
+	if os_module._os_type._name == 'Windows':
 		return module.linkers['link.exe']
 	else:
 		return module.linkers['ld']
@@ -124,11 +125,13 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 	add_event(event)
 
 def ldconfig():
+	module = Config.require_module("OS")
+
 	# Setup the message
 	print_status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if Config._os_type._name == 'Cygwin':
+	if module._os_type._name == 'Cygwin':
 		print_ok()
 		return
 
