@@ -25,8 +25,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-def python_module_setup():
-	pass
+class PythonModule(RaiseModule):
+	def __init__(self):
+		super(PythonModule, self).__init__("PYTHON")
+
+	def setup(self):
+		self.is_setup = True
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:

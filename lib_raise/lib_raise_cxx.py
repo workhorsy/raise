@@ -26,79 +26,79 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def cxx_module_setup():
-	# Get the names and paths for know C++ compilers
-	names = ['g++']
-	for name in names:
-		paths = program_paths(name)
-		if len(paths) == 0:
-			continue
+class CXXModule(RaiseModule):
+	def __init__(self):
+		super(CXXModule, self).__init__("CXX")
+		self.cxx_compilers = {}
+		self._cxx = None
 
-		if name == 'g++':
-			comp = Compiler(
-				name =                 'g++', 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-o ', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror', 
-				optimize =             '-O2', 
-				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed'
-			)
-			Config.cxx_compilers[comp._name] = comp
+	def setup(self):
+		# Get the names and paths for know C++ compilers
+		names = ['g++']
+		for name in names:
+			paths = program_paths(name)
+			if len(paths) == 0:
+				continue
 
-	# Make sure there is at least one C++ compiler installed
-	if len(Config.cxx_compilers) == 0:
-		print_status("Setting up C++ module")
-		print_fail()
-		print_exit("No C++ compiler found. Install one and try again.")
+			if name == 'g++':
+				comp = Compiler(
+					name =                 'g++', 
+					path =                 paths[0], 
+					setup =                '', 
+					out_file =             '-o ', 
+					no_link =              '-c', 
+					debug =                '-g', 
+					warnings_all =         '-Wall', 
+					warnings_as_errors =   '-Werror', 
+					optimize =             '-O2', 
+					compile_time_flags =   '-D', 
+					link =                 '-Wl,-as-needed'
+				)
+				self.cxx_compilers[comp._name] = comp
 
-def _cxx_require_module():
-	# Just return if setup
-	if Config.cxx_compilers:
-		return
+		# Make sure there is at least one C++ compiler installed
+		if len(self.cxx_compilers) == 0:
+			print_status("Setting up C++ module")
+			print_fail()
+			print_exit("No C++ compiler found. Install one and try again.")
 
-	print_status("C++ module check")
-	print_fail()
-	print_exit("Call require_module('CXX') before using any C++ functions.")
+		self.is_setup = True
+
 
 def cxx_get_default_compiler():
-	_cxx_require_module()
+	module = Config.require_module("CXX")
 
 	comp = None
 
 	if Config._os_type._name == 'Windows':
-		comp = Config.cxx_compilers['cl.exe']
+		comp = module.cxx_compilers['cl.exe']
 	else:
-		if 'g++' in Config.cxx_compilers:
-			comp = Config.cxx_compilers['g++']
+		if 'g++' in module.cxx_compilers:
+			comp = module.cxx_compilers['g++']
 
 	return comp
 
 def cxx_save_compiler(compiler):
-	_cxx_require_module()
+	module = Config.require_module("CXX")
 
 	# CXX
-	Config._cxx = compiler
-	os.environ['CXX'] = Config._cxx._name
+	module._cxx = compiler
+	os.environ['CXX'] = module._cxx._name
 
 	# CXXFLAGS
 	opts = []
-	opts.append(Config._cxx._opt_setup)
-	if Config._cxx.debug: opts.append(Config._cxx._opt_debug)
-	if Config._cxx.warnings_all: opts.append(Config._cxx._opt_warnings_all)
-	if Config._cxx.warnings_as_errors: opts.append(Config._cxx._opt_warnings_as_errors)
-	if Config._cxx.optimize: opts.append(Config._cxx._opt_optimize)
-	for compile_time_flag in Config._cxx.compile_time_flags:
-		opts.append(Config._cxx._opt_compile_time_flags + compile_time_flag)
+	opts.append(module._cxx._opt_setup)
+	if module._cxx.debug: opts.append(module._cxx._opt_debug)
+	if module._cxx.warnings_all: opts.append(module._cxx._opt_warnings_all)
+	if module._cxx.warnings_as_errors: opts.append(module._cxx._opt_warnings_as_errors)
+	if module._cxx.optimize: opts.append(module._cxx._opt_optimize)
+	for compile_time_flag in module._cxx.compile_time_flags:
+		opts.append(module._cxx._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CXXFLAGS'] = str.join(' ', opts)
 
 def cxx_build_program(o_file, cxx_files, i_files=[]):
-	_cxx_require_module()
+	module = Config.require_module("CXX")
 
 	# Change file extensions to os format
 	o_file = to_native(o_file)
@@ -113,7 +113,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	command = '${CXX} ${CXXFLAGS} ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				Config._cxx._opt_out_file + o_file
+				module._cxx._opt_out_file + o_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -128,7 +128,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	add_event(event)
 
 def cxx_link_program(out_file, obj_files, i_files=[]):
-	_cxx_require_module()
+	module = Config.require_module("CXX")
 
 	# Change file extensions to os format
 	out_file = to_native(out_file)
@@ -141,10 +141,10 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	plural = 'C++ programs'
 	singular = 'C++ program'
 	command = '${CXX} ${CXXFLAGS} ' + \
-				Config._cxx._opt_link + ' ' + \
+				module._cxx._opt_link + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				Config._cxx._opt_out_file + out_file
+				module._cxx._opt_out_file + out_file
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -159,7 +159,7 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	add_event(event)
 
 def cxx_build_object(o_file, cxx_files, i_files=[]):
-	_cxx_require_module()
+	module = Config.require_module("CXX")
 
 	# Change file extensions to os format
 	o_file = to_native(o_file)
@@ -172,8 +172,8 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	plural = 'C++ objects'
 	singular = 'C++ object'
 	command = "${CXX} ${CXXFLAGS} " + \
-				Config._cxx._opt_no_link + ' ' +  \
-				Config._cxx._opt_out_file + \
+				module._cxx._opt_no_link + ' ' +  \
+				module._cxx._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files)

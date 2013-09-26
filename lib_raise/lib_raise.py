@@ -41,7 +41,6 @@ from collections import namedtuple
 # Move stty to module
 # Move registry stuff to windows os type
 
-lib_file_cache = {}
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -52,21 +51,11 @@ def early_exit(message):
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
 
-# FIXME: Update so config does not know about any module specific information
 class Config(object):
 	modules = {}
 	modules_to_load = []
 	target_name = None
 	message_length = None
-	# FIXME: These should be inside the modules
-	c_compilers = {}
-	linkers = {}
-	cxx_compilers = {}
-	d_compilers = {}
-	_cc = None
-	_cxx = None
-	_dc = None
-	_linker = None
 
 	@classmethod
 	def init(cls):
@@ -158,7 +147,7 @@ class Config(object):
 		# Print a message showing the user that they should setup the module
 		print_status("{0} module check".format(file_name))
 		print_fail()
-		print_exit("Call require_module('{0}') before using any {0} functions.".format(file_name))
+		print_exit("Call import_module('{0}') before using any {0} functions.".format(file_name))
 
 
 class RaiseModule(object):
@@ -177,7 +166,7 @@ class RaiseModule(object):
 		# Print a message showing the user that they should setup the module
 		print_status("{0} module check".format(self.name))
 		print_fail()
-		print_exit("Call require_module('{0}') before using any {0} functions.".format(self.name))
+		print_exit("Call import_module('{0}') before using any {0} functions.".format(self.name))
 
 
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
@@ -209,7 +198,7 @@ class Compiler(object):
 		self.compile_time_flags = []
 
 # FIXME: Should this just load the module right away?
-def require_module(name):
+def import_module(name):
 	Config.modules_to_load.append(name)
 
 def load_module(module_name, g=globals(), l=locals()):
@@ -321,18 +310,6 @@ if __name__ == '__main__':
 	# Setup any modules
 	for module in Config.modules_to_load:
 		load_module(module)
-
-		# FIXME: This should be done inside the module loading
-		if module == 'Linker':
-			linker_module_setup()
-		elif module == 'C':
-			c_module_setup()
-		elif module == 'CXX':
-			cxx_module_setup()
-		elif module == 'D':
-			d_module_setup()
-		elif module == 'PYTHON':
-			python_module_setup()
 
 	# Try running the target
 	target = targets[Config.target_name]

@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
-require_module('C')
+import_module('C')
 
 
 def clean():

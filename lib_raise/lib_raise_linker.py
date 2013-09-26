@@ -25,6 +25,46 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+class LinkerModule(RaiseModule):
+	def __init__(self):
+		super(LinkerModule, self).__init__("LINKER")
+		self.linkers = {}
+		self._linker = None
+
+	def setup(self):
+		# Get the names and paths for know linkers
+		names = ['ld', 'link.exe']
+		for name in names:
+			paths = program_paths(name)
+			if len(paths) == 0:
+				continue
+
+			if name == 'link.exe':
+				link = Linker(
+					name            = 'link.exe',
+					setup           = '/nologo', 
+					out_file        = '/out:', 
+					shared          = '/dll '
+				)
+				self.linkers[link._name] = link
+			elif name == 'ld':
+				link = Linker(
+					name            = 'ld',
+					setup           = '', 
+					out_file        = '-o ', 
+					shared          = '-G'
+				)
+				self.linkers[link._name] = link
+
+		# Make sure there is at least one linker installed
+		if len(self.linkers) == 0:
+			print_status("Setting up Linker module")
+			print_fail()
+			print_exit("No Linker found. Install one and try again.")
+
+		self.is_setup = True
+
 class Linker(object):
 	def __init__(self, name, setup, out_file, shared):
 		self._name = name
@@ -33,63 +73,23 @@ class Linker(object):
 		self._opt_out_file = out_file
 		self._opt_shared = shared
 
-def _linker_require_module():
-	# Just return if setup
-	if Config.linkers:
-		return
-
-	print_status("Linker module check")
-	print_fail()
-	print_exit("Call require_module('Linker') before using any Linker functions.")
-
-def linker_module_setup():
-	# Get the names and paths for know linkers
-	names = ['ld', 'link.exe']
-	for name in names:
-		paths = program_paths(name)
-		if len(paths) == 0:
-			continue
-
-		if name == 'link.exe':
-			link = Linker(
-				name            = 'link.exe',
-				setup           = '/nologo', 
-				out_file        = '/out:', 
-				shared          = '/dll '
-			)
-			Config.linkers[link._name] = link
-		elif name == 'ld':
-			link = Linker(
-				name            = 'ld',
-				setup           = '', 
-				out_file        = '-o ', 
-				shared          = '-G'
-			)
-			Config.linkers[link._name] = link
-
-	# Make sure there is at least one linker installed
-	if len(Config.linkers) == 0:
-		print_status("Setting up Linker module")
-		print_fail()
-		print_exit("No Linker found. Install one and try again.")
-
 def linker_get_default_linker():
-	_linker_require_module()
+	module = Config.require_module("LINKER")
 
 	if Config._os_type._name == 'Windows':
-		return Config.linkers['link.exe']
+		return module.linkers['link.exe']
 	else:
-		return Config.linkers['ld']
+		return module.linkers['ld']
 
 def linker_save_linker(linker):
-	_linker_require_module()
+	module = Config.require_module("LINKER")
 
 	# LINKER
-	Config._linker = linker
-	os.environ['LINKER'] = Config._linker._name
+	module._linker = linker
+	os.environ['LINKER'] = module._linker._name
 
 def linker_link_program(out_file, obj_files, i_files=[]):
-	_linker_require_module()
+	module = Config.require_module("LINKER")
 
 	# Change file extensions to os format
 	out_file = to_native(out_file)
@@ -102,7 +102,7 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 	plural = 'programs'
 	singular = 'program'
 	command = "${LINK} " + \
-				Config._linker._opt_out_file + \
+				module._linker._opt_out_file + \
 				out_file + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files)

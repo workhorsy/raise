@@ -26,91 +26,90 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def d_module_setup():
-	# Get the names and paths for know D compilers
-	names = ['dmd', 'dmd2', 'ldc2']
-	for name in names:
-		paths = program_paths(name)
-		if len(paths) == 0:
-			continue
+class DModule(RaiseModule):
+	def __init__(self):
+		super(DModule, self).__init__("D")
+		self.d_compilers = {}
+		self._dc = None
 
-		if name in ['dmd', 'dmd2']:
-			comp = Compiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
-				warnings_as_errors =   '', 
-				optimize =             '-O', 
-				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed'
-			)
-			Config.d_compilers[comp._name] = comp
-		elif name == 'ldc2':
-			comp = Compiler(
-				name =                 'ldc2', 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
-				warnings_as_errors =   '', 
-				optimize =             '-O2',
-				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed'
-			)
-			Config.d_compilers[comp._name] = comp
+	def setup(self):
+		# Get the names and paths for know D compilers
+		names = ['dmd', 'dmd2', 'ldc2']
+		for name in names:
+			paths = program_paths(name)
+			if len(paths) == 0:
+				continue
 
-	# Make sure there is at least one D compiler installed
-	if len(Config.d_compilers) == 0:
-		print_status("Setting up D module")
-		print_fail()
-		print_exit("No D compiler found. Install one and try again.")
+			if name in ['dmd', 'dmd2']:
+				comp = Compiler(
+					name =                 name, 
+					path =                 paths[0], 
+					setup =                '', 
+					out_file =             '-of', 
+					no_link =              '-c', 
+					debug =                '-g', 
+					warnings_all =         '-w', 
+					warnings_as_errors =   '', 
+					optimize =             '-O', 
+					compile_time_flags =   '-version=', 
+					link =                 '-Wl,-as-needed'
+				)
+				self.d_compilers[comp._name] = comp
+			elif name == 'ldc2':
+				comp = Compiler(
+					name =                 'ldc2', 
+					path =                 paths[0], 
+					setup =                '', 
+					out_file =             '-of', 
+					no_link =              '-c', 
+					debug =                '-g', 
+					warnings_all =         '-w', 
+					warnings_as_errors =   '', 
+					optimize =             '-O2',
+					compile_time_flags =   '-version=', 
+					link =                 '-Wl,-as-needed'
+				)
+				self.d_compilers[comp._name] = comp
 
-def _d_require_module():
-	# Just return if setup
-	if Config.d_compilers:
-		return
+		# Make sure there is at least one D compiler installed
+		if len(self.d_compilers) == 0:
+			print_status("Setting up D module")
+			print_fail()
+			print_exit("No D compiler found. Install one and try again.")
 
-	print_status("D module check")
-	print_fail()
-	print_exit("Call require_module('D') before using any D functions.")
+		self.is_setup = True
 
 def d_get_default_compiler():
-	_d_require_module()
+	module = Config.require_module("D")
 
 	comp = None
 	for name in ['dmd', 'dmd2', 'ldc2']:
-		if name in Config.d_compilers:
-			comp = Config.d_compilers[name]
+		if name in module.d_compilers:
+			comp = module.d_compilers[name]
 			break
 
 	return comp
 
 def d_save_compiler(compiler):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	# DC
-	Config._dc = compiler
-	os.environ['DC'] = Config._dc._name
+	module._dc = compiler
+	os.environ['DC'] = module._dc._name
 
 	# DFLAGS
 	opts = []
-	if Config._dc.debug: opts.append(Config._dc._opt_debug)
-	if Config._dc.warnings_all: opts.append(Config._dc._opt_warnings_all)
-	if Config._dc.warnings_as_errors: opts.append(Config._dc._opt_warnings_as_errors)
-	if Config._dc.optimize: opts.append(Config._dc._opt_optimize)
-	for compile_time_flag in Config._dc.compile_time_flags:
-		opts.append(Config._dc._opt_compile_time_flags + compile_time_flag)
+	if module._dc.debug: opts.append(module._dc._opt_debug)
+	if module._dc.warnings_all: opts.append(module._dc._opt_warnings_all)
+	if module._dc.warnings_as_errors: opts.append(module._dc._opt_warnings_as_errors)
+	if module._dc.optimize: opts.append(module._dc._opt_optimize)
+	for compile_time_flag in module._dc.compile_time_flags:
+		opts.append(module._dc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	d_file = to_native(d_file)
 	i_files = to_native(i_files)
@@ -122,7 +121,7 @@ def d_build_interface(d_file, i_files):
 	singular = 'D interface'
 
 	f = self_deleting_named_temporary_file()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + Config._dc._opt_out_file + f.name
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + module._dc._opt_out_file + f.name
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -139,7 +138,7 @@ def d_build_interface(d_file, i_files):
 	add_event(event)
 
 def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	o_file = to_native(o_file)
 	d_files = to_native(d_files)
@@ -153,7 +152,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	plural = 'D objects'
 	singular = 'D object'
 
-	command = "${DC} ${DFLAGS} -c " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -c " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
 
@@ -172,7 +171,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	add_event(event)
 
 def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	o_file = to_native(o_file)
 	d_files = to_native(d_files)
@@ -185,7 +184,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	plural = 'D shared libraries'
 	singular = 'D shared library'
 
-	command = "${DC} ${DFLAGS} -shared " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -shared " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -204,7 +203,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	o_file = to_native(o_file)
 	d_files = to_native(d_files)
@@ -217,7 +216,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	plural = 'D static libraries'
 	singular = 'D static library'
 
-	command = "${DC} ${DFLAGS} -lib " + Config._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -lib " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
 
@@ -233,7 +232,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
-	_d_require_module()
+	module = Config.require_module("D")
 
 	out_file = to_native(out_file)
 	inc_files = to_native(inc_files)
@@ -244,7 +243,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	result = out_file
 	plural = 'D programs'
 	singular = 'D program'
-	command = "${DC} ${DFLAGS} " + Config._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = "${DC} ${DFLAGS} " + module._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():
 		if not 'DC' in os.environ:
