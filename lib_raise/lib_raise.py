@@ -34,12 +34,6 @@ import time
 import traceback, inspect
 from collections import namedtuple
 
-# FIXME: 
-# Move os type to modules
-# Move cpu code to module
-# Move stty to module
-# Move registry stuff to windows os type
-
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
@@ -54,6 +48,8 @@ class Config(object):
 	modules = {}
 	modules_to_load = []
 	target_name = None
+	pwd = None
+	python = None
 
 	@classmethod
 	def init(cls):
@@ -65,21 +61,8 @@ class Config(object):
 		if not cls.python:
 			early_exit('Could not find python to run child processes with.')
 
-		# Figure out the CPU architecture
-		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
-			cls._arch = 'x86_32'
-			cls._bits = '32'
-		elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
-			cls._arch = 'x86_64'
-			cls._bits = '64'
-		else:
-			early_exit('Unknown architecture {0}.'.format(platform.machine()))
-
-		# Figure out how many cpus there are
-		cls._cpus_total = multiprocessing.cpu_count()
-		cls._cpus_free = cls._cpus_total
-
 		# Load the default modules
+		load_module('CPU')
 		load_module('OS')
 		load_module('PROCESS')
 		load_module('HELPERS')

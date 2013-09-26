@@ -350,6 +350,8 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 		print_ok()
 
 def header_path(header_name):
+	module = Config.require_module('CPU')
+
 	retval = None
 
 	# Get any paths that contain the library name
@@ -367,7 +369,7 @@ def header_path(header_name):
 
 	# Of those paths, get the ones that match the architecture
 	for path in paths:
-		if 'lib' + Config._bits in path or Config._arch in path:
+		if 'lib' + module._bits in path or module._arch in path:
 			retval = path
 
 	# If none were matched specifically from the architecture

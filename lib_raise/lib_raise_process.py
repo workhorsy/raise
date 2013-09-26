@@ -214,6 +214,8 @@ def parallel_start():
 	Event.is_first_parallel = True
 
 def parallel_end():
+	module = Config.require_module('CPU')
+
 	ready_events = Event.events
 	running_events = []
 
@@ -227,24 +229,24 @@ def parallel_end():
 			# Success. Keep going
 			if event._status == 'success':
 				running_events.remove(event)
-				Config._cpus_free += 1
+				module._cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
 				print_exit("Event failed.")
 
 		# Check for events that need to start
-		while Config._cpus_free > 0 and len(ready_events):
+		while module._cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
 			if event.run():
-				Config._cpus_free -= 1
+				module._cpus_free -= 1
 				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
-		if Config._cpus_free == 0 or len(ready_events) == 0:
+		if module._cpus_free == 0 or len(ready_events) == 0:
 			time.sleep(0.1)
 
 	# Clear all the events
-	Config._cpus_free = Config._cpus_total
+	module._cpus_free = module._cpus_total
 	Event.events = []
 	Event.is_parallel = False
 	Event.is_first_parallel = False
