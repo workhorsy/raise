@@ -34,12 +34,20 @@ else:
 
 RAISE_VERSION = 'main'
 RAISE_URLS = {
-	'raise'    : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_VERSION),
-	'raise_csharp'   : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_VERSION),
-	'raise_cxx'      : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_VERSION),
-	'raise_d'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_VERSION),
-	'raise_linker'   : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_VERSION),
-	'raise_c'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_VERSION)
+	'raise'               : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_VERSION),
+	'raise_c'             : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_VERSION),
+	'raise_cpu'           : ''.format(RAISE_VERSION),
+	'raise_csharp'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_VERSION),
+	'raise_cxx'           : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_VERSION),
+	'raise_d'             : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_VERSION),
+	'raise_fs'            : ''.format(RAISE_VERSION),
+	'raise_helpers'       : ''.format(RAISE_VERSION),
+	'raise_libraries'     : ''.format(RAISE_VERSION),
+	'raise_linker'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_VERSION),
+	'raise_os'            : ''.format(RAISE_VERSION),
+	'raise_process'       : ''.format(RAISE_VERSION),
+	'raise_python'        : ''.format(RAISE_VERSION),
+	'raise_terminal'      : ''.format(RAISE_VERSION)
 }
 
 def friendly_size(data_length):
