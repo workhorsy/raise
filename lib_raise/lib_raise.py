@@ -25,14 +25,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os, sys, platform
-import tempfile, shutil, filecmp
-import multiprocessing, subprocess
+import os, sys
 import signal, atexit
-import re
-import time
-import traceback, inspect
-from collections import namedtuple
 
 
 def early_exit(message):

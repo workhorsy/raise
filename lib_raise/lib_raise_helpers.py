@@ -25,6 +25,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from collections import namedtuple
+
 class HelpersModule(RaiseModule):
 	def __init__(self):
 		super(HelpersModule, self).__init__("HELPERS")

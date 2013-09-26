@@ -25,6 +25,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import subprocess
+import time
+
 class ProcessModule(RaiseModule):
 	def __init__(self):
 		super(ProcessModule, self).__init__("PROCESS")
