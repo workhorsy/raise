@@ -25,6 +25,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class TerminalModule(RaiseModule):
+	def __init__(self):
+		super(TerminalModule, self).__init__("TERMINAL")
+
+	def setup(self):
+		self.is_setup = True
+
 class Emoticons:
 	SMILE = ':)'
 	NORMAL = ':\\'

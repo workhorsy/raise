@@ -25,6 +25,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class OSModule(RaiseModule):
+	def __init__(self):
+		super(OSModule, self).__init__("OS")
+
+	def setup(self):
+		self.is_setup = True
+
 class OSType(object):
 	def __init__(self, name, exe_extension, object_extension, 
 				shared_lib_extension, static_lib_extension):

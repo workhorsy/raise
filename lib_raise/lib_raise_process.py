@@ -25,6 +25,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class ProcessModule(RaiseModule):
+	def __init__(self):
+		super(ProcessModule, self).__init__("PROCESS")
+
+	def setup(self):
+		self.is_setup = True
 
 class ProcessRunner(object):
 	def __init__(self, command):

@@ -35,7 +35,6 @@ import traceback, inspect
 from collections import namedtuple
 
 # FIXME: 
-# Add a module class that has a setup method that mods use
 # Move os type to modules
 # Move cpu code to module
 # Move stty to module
@@ -221,11 +220,17 @@ def load_module(module_name, g=globals(), l=locals()):
 		exec(code, g, l)
 
 	# Get any new modules and set them up
+	has_module = False
 	for module in RaiseModule.__subclasses__():
 		if not module in existing_modules:
 			mod = module()
 			mod.setup()
 			Config.modules[mod.name] = mod
+			has_module = True
+
+	# Make sure the script actually has a module class in it
+	if not has_module:
+		print_exit("Script file does not contain a module ({0}).".format(script_name))
 
 def load_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file

@@ -25,6 +25,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class HelpersModule(RaiseModule):
+	def __init__(self):
+		super(HelpersModule, self).__init__("HELPERS")
+
+	def setup(self):
+		self.is_setup = True
 
 def before(s, n):
 	i = s.find(n)

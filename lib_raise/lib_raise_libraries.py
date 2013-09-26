@@ -25,6 +25,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+class LibrariesModule(RaiseModule):
+	def __init__(self):
+		super(LibrariesModule, self).__init__("LIBRARIES")
+
+	def setup(self):
+		self.is_setup = True
+
 lib_file_cache = {}
 
 # Returns all the paths that libraries are installed in

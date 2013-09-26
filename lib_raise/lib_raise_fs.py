@@ -26,6 +26,13 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+class FSModule(RaiseModule):
+	def __init__(self):
+		super(FSModule, self).__init__("FS")
+
+	def setup(self):
+		self.is_setup = True
+
 def cd(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),
 					"Failed to change to the dir '{0}'.".format(name),
