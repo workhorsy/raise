@@ -26,91 +26,90 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def csharp_module_setup():
-	# Get the names and paths for know C# compilers
-	names = ['dmcs', 'csc']
-	for name in names:
-		paths = program_paths(name)
-		if len(paths) == 0:
-			continue
+class CSharpModule(RaiseModule):
+	def __init__(self):
+		super(CSharpModule, self).__init__("CSHARP")
+		self.cs_compilers = {}
+		self._csc = None
 
-		if name in ['dmcs']:
-			comp = Compiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-out:', 
-				no_link =              '', 
-				debug =                '-debug', 
-				warnings_all =         '-warn:4', 
-				warnings_as_errors =   '-warnaserror', 
-				optimize =             '-optimize', 
-				compile_time_flags =   '', 
-				link =                 ''
-			)
-			Config.cs_compilers[comp._name] = comp
-		elif name in ['csc']:
-			comp = Compiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-out:', 
-				no_link =              '', 
-				debug =                '-debug', 
-				warnings_all =         '-warn:4', 
-				warnings_as_errors =   '-warnaserror', 
-				optimize =             '-optimize', 
-				compile_time_flags =   '', 
-				link =                 ''
-			)
-			Config.cs_compilers[comp._name] = comp
+	def setup(self):
+		# Get the names and paths for know C# compilers
+		names = ['dmcs', 'csc']
+		for name in names:
+			paths = program_paths(name)
+			if len(paths) == 0:
+				continue
 
-	# Make sure there is at least one C# compiler installed
-	if len(Config.cs_compilers) == 0:
-		print_status("Setting up C# module")
-		print_fail()
-		print_exit("No C# compiler found. Install one and try again.")
+			if name in ['dmcs']:
+				comp = Compiler(
+					name =                 name, 
+					path =                 paths[0], 
+					setup =                '', 
+					out_file =             '-out:', 
+					no_link =              '', 
+					debug =                '-debug', 
+					warnings_all =         '-warn:4', 
+					warnings_as_errors =   '-warnaserror', 
+					optimize =             '-optimize', 
+					compile_time_flags =   '', 
+					link =                 ''
+				)
+				self.cs_compilers[comp._name] = comp
+			elif name in ['csc']:
+				comp = Compiler(
+					name =                 name, 
+					path =                 paths[0], 
+					setup =                '', 
+					out_file =             '-out:', 
+					no_link =              '', 
+					debug =                '-debug', 
+					warnings_all =         '-warn:4', 
+					warnings_as_errors =   '-warnaserror', 
+					optimize =             '-optimize', 
+					compile_time_flags =   '', 
+					link =                 ''
+				)
+				self.cs_compilers[comp._name] = comp
 
-def _csharp_require_module():
-	# Just return if setup
-	if Config.cs_compilers:
-		return
+		# Make sure there is at least one C# compiler installed
+		if len(self.cs_compilers) == 0:
+			print_status("Setting up C# module")
+			print_fail()
+			print_exit("No C# compiler found. Install one and try again.")
 
-	print_status("C# module check")
-	print_fail()
-	print_exit("Call require_module('CSHARP') before using any C# functions.")
+		self.is_setup = True
 
 def csharp_get_default_compiler():
-	_csharp_require_module()
+	module = Config.require_module("CSHARP")
 
 	comp = None
 	for name in ['dmcs', 'csc']:
-		if name in Config.cs_compilers:
-			comp = Config.cs_compilers[name]
+		if name in module.cs_compilers:
+			comp = module.cs_compilers[name]
 			break
 
 	return comp
 
 def csharp_save_compiler(compiler):
-	_csharp_require_module()
+	module = Config.require_module("CSHARP")
 
 	# CSC
-	Config._csc = compiler
-	os.environ['CSC'] = Config._csc._name
+	module._csc = compiler
+	os.environ['CSC'] = module._csc._name
 
 	# DFLAGS
 	opts = []
-	if Config._csc.debug: opts.append(Config._csc._opt_debug)
-	if Config._csc.warnings_all: opts.append(Config._csc._opt_warnings_all)
-	if Config._csc.warnings_as_errors: opts.append(Config._csc._opt_warnings_as_errors)
-	if Config._csc.optimize: opts.append(Config._csc._opt_optimize)
-	for compile_time_flag in Config._csc.compile_time_flags:
-		opts.append(Config._csc._opt_compile_time_flags + compile_time_flag)
+	if module._csc.debug: opts.append(module._csc._opt_debug)
+	if module._csc.warnings_all: opts.append(module._csc._opt_warnings_all)
+	if module._csc.warnings_as_errors: opts.append(module._csc._opt_warnings_as_errors)
+	if module._csc.optimize: opts.append(module._csc._opt_optimize)
+	for compile_time_flag in module._csc.compile_time_flags:
+		opts.append(module._csc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CSFLAGS'] = str.join(' ', opts)
 
 def csharp_build_program(out_file, inc_files, link_files=[]):
-	_csharp_require_module()
+	module = Config.require_module("CSHARP")
 
 	out_file = to_native(out_file)
 	inc_files = to_native(inc_files)
@@ -122,7 +121,7 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	plural = 'C# programs'
 	singular = 'C# program'
 	command = "${CSC} ${CSFLAGS} " + \
-	Config._csc._opt_out_file + out_file + ' ' + \
+	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():
@@ -137,7 +136,7 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	add_event(event)
 
 def csharp_build_shared_library(out_file, inc_files, link_files=[]):
-	_csharp_require_module()
+	module = Config.require_module("CSHARP")
 
 	out_file = to_native(out_file)
 	inc_files = to_native(inc_files)
@@ -149,7 +148,7 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	plural = 'C# shared libraries'
 	singular = 'C# shared library'
 	command = "${CSC} ${CSFLAGS} -target:library " + \
-	Config._csc._opt_out_file + out_file + ' ' + \
+	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
 
 	def setup():

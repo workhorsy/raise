@@ -34,6 +34,13 @@ import time
 import traceback, inspect
 from collections import namedtuple
 
+# FIXME: 
+# Add a module class that has a setup method that mods use
+# Move os type to modules
+# Move cpu code to module
+# Move stty to module
+# Move registry stuff to windows os type
+
 lib_file_cache = {}
 
 def early_exit(message):
@@ -47,18 +54,18 @@ if sys.version_info < (2, 6):
 
 # FIXME: Update so config does not know about any module specific information
 class Config(object):
-	modules = []
+	modules = {}
+	modules_to_load = []
 	target_name = None
 	message_length = None
+	# FIXME: These should be inside the modules
 	c_compilers = {}
 	linkers = {}
 	cxx_compilers = {}
 	d_compilers = {}
-	cs_compilers = {}
 	_cc = None
 	_cxx = None
 	_dc = None
-	_csc = None
 	_linker = None
 
 	@classmethod
@@ -142,6 +149,36 @@ class Config(object):
 			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
 				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
+	@classmethod
+	def require_module(cls, file_name):
+		# Just return if exist and is setup
+		if file_name in cls.modules and cls.modules[file_name].is_setup:
+			return cls.modules[file_name]
+
+		# Print a message showing the user that they should setup the module
+		print_status("{0} module check".format(file_name))
+		print_fail()
+		print_exit("Call require_module('{0}') before using any {0} functions.".format(file_name))
+
+
+class RaiseModule(object):
+	def __init__(self, name):
+		self.is_setup = False
+		self.name = name
+
+	def setup(self):
+		raise NotImplementedError( "This method should setup the module, then set self.is_setup = True." )
+
+	def _require_setup(self):
+		# Just return if setup
+		if self.is_setup:
+			return
+
+		# Print a message showing the user that they should setup the module
+		print_status("{0} module check".format(self.name))
+		print_fail()
+		print_exit("Call require_module('{0}') before using any {0} functions.".format(self.name))
+
 
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
@@ -171,20 +208,35 @@ class Compiler(object):
 		self.optimize = False
 		self.compile_time_flags = []
 
+# FIXME: Should this just load the module right away?
 def require_module(name):
-	Config.modules.append(name)
+	Config.modules_to_load.append(name)
 
 def load_module(module_name, g=globals(), l=locals()):
+	# Skip if already loaded
+	if module_name in Config.modules:
+		return
+
 	script_name = os.path.join(Config.pwd, 'lib_raise_{0}.py'.format(module_name.lower()))
 
 	# Make sure there is an rscript file
 	if not os.path.isfile(script_name):
 		print_exit("No such module '{0}' ({1}).".format(module_name, script_name))
 
+	# Get a list of all the modules
+	existing_modules = [module for module in RaiseModule.__subclasses__()]
+
 	# Load the module file into this namespace
 	with open(script_name, 'rb') as f:
 		code = compile(f.read(), script_name, 'exec')
 		exec(code, g, l)
+
+	# Get any new modules and set them up
+	for module in RaiseModule.__subclasses__():
+		if not module in existing_modules:
+			mod = module()
+			mod.setup()
+			Config.modules[mod.name] = mod
 
 def load_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file
@@ -267,7 +319,7 @@ if __name__ == '__main__':
 		print_exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
 
 	# Setup any modules
-	for module in Config.modules:
+	for module in Config.modules_to_load:
 		load_module(module)
 
 		# FIXME: This should be done inside the module loading
@@ -279,12 +331,8 @@ if __name__ == '__main__':
 			cxx_module_setup()
 		elif module == 'D':
 			d_module_setup()
-		elif module == 'CSHARP':
-			csharp_module_setup()
 		elif module == 'PYTHON':
 			python_module_setup()
-		else:
-			print_exit('Unknown module "{0}"'.format(module))
 
 	# Try running the target
 	target = targets[Config.target_name]
