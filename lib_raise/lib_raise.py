@@ -40,29 +40,10 @@ if sys.version_info < (2, 6):
 
 class Config(object):
 	modules = {}
-	modules_to_load = []
+	modules_to_import = []
 	target_name = None
-	pwd = None
-	python = None
-
-	@classmethod
-	def init(cls):
-		# Get the path of the rscript file
-		cls.pwd = os.sys.path[0]
-
-		# Get the name of the current running python program
-		cls.python = sys.executable
-		if not cls.python:
-			early_exit('Could not find python to run child processes with.')
-
-		# Load the default modules
-		load_module('CPU')
-		load_module('OS')
-		load_module('PROCESS')
-		load_module('HELPERS')
-		load_module('TERMINAL')
-		load_module('FS')
-		load_module('LIBRARIES')
+	pwd = os.sys.path[0]
+	python = sys.executable
 
 	@classmethod
 	def require_module(cls, file_name):
@@ -123,11 +104,10 @@ class Compiler(object):
 		self.optimize = False
 		self.compile_time_flags = []
 
-# FIXME: Should this just load the module right away?
 def import_module(name):
-	Config.modules_to_load.append(name)
+	Config.modules_to_import.append(name)
 
-def load_module(module_name, g=globals(), l=locals()):
+def import_module_immediate(module_name, g=globals(), l=locals()):
 	# Skip if already loaded
 	if module_name in Config.modules:
 		return
@@ -159,7 +139,7 @@ def load_module(module_name, g=globals(), l=locals()):
 	if not has_module:
 		print_exit("Script file does not contain a module ({0}).".format(script_name))
 
-def load_rscript(g=globals(), l=locals()):
+def import_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file
 	if not os.path.isfile('rscript'):
 		return None
@@ -189,8 +169,14 @@ def load_rscript(g=globals(), l=locals()):
 	return targets
 
 if __name__ == '__main__':
-	# Figure out everything we need to know about the system
-	Config.init()
+	# Load the default modules
+	import_module_immediate('CPU')
+	import_module_immediate('OS')
+	import_module_immediate('PROCESS')
+	import_module_immediate('HELPERS')
+	import_module_immediate('TERMINAL')
+	import_module_immediate('FS')
+	import_module_immediate('LIBRARIES')
 
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
@@ -203,7 +189,7 @@ if __name__ == '__main__':
 	os.system(terminal_mod._terminal_clear)
 
 	# Load the rscript
-	targets = load_rscript()
+	targets = import_rscript()
 
 	# Get the target function name
 	Config.target_name = str(str.join(' ', sys.argv[1:]))
@@ -241,8 +227,8 @@ if __name__ == '__main__':
 		print_exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
 
 	# Setup any modules required in the rscript
-	for module in Config.modules_to_load:
-		load_module(module)
+	for module in Config.modules_to_import:
+		import_module_immediate(module)
 
 	# Try running the target in the rscript
 	target = targets[Config.target_name]
