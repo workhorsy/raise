@@ -33,21 +33,22 @@ else:
 	from urllib.request import urlopen
 
 RAISE_VERSION = 'main'
+RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
-	'raise'               : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_VERSION),
-	'raise_c'             : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_VERSION),
-	'raise_cpu'           : ''.format(RAISE_VERSION),
-	'raise_csharp'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_VERSION),
-	'raise_cxx'           : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_VERSION),
-	'raise_d'             : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_VERSION),
-	'raise_fs'            : ''.format(RAISE_VERSION),
-	'raise_helpers'       : ''.format(RAISE_VERSION),
-	'raise_libraries'     : ''.format(RAISE_VERSION),
-	'raise_linker'        : 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_VERSION),
-	'raise_os'            : ''.format(RAISE_VERSION),
-	'raise_process'       : ''.format(RAISE_VERSION),
-	'raise_python'        : ''.format(RAISE_VERSION),
-	'raise_terminal'      : ''.format(RAISE_VERSION)
+	'raise'               : '{0}raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_BASE),
+	'raise_c'             : '{0}lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_BASE),
+	'raise_cpu'           : '{0}lib_raise_cpu.py-20130926223728-aw4afvc65fy8q6yb-1/lib_raise_cpu.py'.format(RAISE_BASE),
+	'raise_csharp'        : '{0}lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_BASE),
+	'raise_cxx'           : '{0}lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_BASE),
+	'raise_d'             : '{0}lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_BASE),
+	'raise_fs'            : '{0}lib_raise_fs.py-20130926135859-5fx3lg4fqvldafr6-1/lib_raise_fs.py'.format(RAISE_BASE),
+	'raise_helpers'       : '{0}lib_raise_helpers.py-20130926135905-4pr2hnirgvbysmts-1/lib_raise_helpers.py'.format(RAISE_BASE),
+	'raise_libraries'     : '{0}lib_raise_libraries.-20130926135917-cld8cx2qb6r0gg2p-1/lib_raise_libraries.py'.format(RAISE_BASE),
+	'raise_linker'        : '{0}lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_BASE),
+	'raise_os'            : '{0}lib_raise_os.py-20130926135933-f37upvzomj5b02bt-1/lib_raise_os.py'.format(RAISE_BASE),
+	'raise_process'       : '{0}lib_raise_process.py-20130926135939-ayh5ule0azobuglj-1/lib_raise_process.py'.format(RAISE_BASE),
+	'raise_python'        : '{0}lib_raise_python.py-20130926135944-772iti7d0besizk2-1/lib_raise_python.py'.format(RAISE_BASE),
+	'raise_terminal'      : '{0}lib_raise_terminal.p-20130926135949-pg14csynoheohu5f-1/lib_raise_terminal.py'.format(RAISE_BASE)
 }
 
 def friendly_size(data_length):
