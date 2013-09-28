@@ -63,18 +63,7 @@ class RaiseModule(object):
 		self.name = name
 
 	def setup(self):
-		raise NotImplementedError( "This method should setup the module, then set self.is_setup = True." )
-
-	def _require_setup(self):
-		# Just return if setup
-		if self.is_setup:
-			return
-
-		# Print a message showing the user that they should setup the module
-		print_status("{0} module check".format(self.name))
-		print_fail()
-		print_exit("Call import_module('{0}') before using any {0} functions.".format(self.name))
-
+		raise NotImplementedError("This method should setup the module, then set self.is_setup = True.")
 
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
@@ -203,7 +192,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3 - September 26 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.3 - September 27 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".lib_raise\" or \"lib_raise\".")
