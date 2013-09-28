@@ -135,8 +135,14 @@ def ldconfig():
 		print_ok()
 		return
 
+	# Find ldconfig
+	prog = program_paths('ldconfig')
+	if not prog:
+		print_fail()
+		print_exit("Could not find 'ldconfig'.")
+
 	# Run the process
-	runner = ProcessRunner("ldconfig")
+	runner = ProcessRunner(prog[0])
 	runner.run()
 	runner.wait()
 
