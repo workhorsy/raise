@@ -195,7 +195,7 @@ if __name__ == '__main__':
 		print("Raise software build tool (Version 0.3 - September 27 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
-		print("    ./raise update - Downloads the newest version of Raise. It will be stored in a file named \".lib_raise\" or \"lib_raise\".")
+		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
 		print("")
 
 		# Print all the targets
