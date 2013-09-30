@@ -35,6 +35,20 @@ class TerminalModule(RaiseModule):
 	def setup(self):
 		os_module = Config.require_module("OS")
 
+		# For black & white mode, don't clear, don't use color, and fix the width to 80
+		if Config.is_bw:
+			self._terminal_clear = None
+			self._terminal_width = 80
+
+			BGColors.MESSAGE = ''
+			BGColors.OK = ''
+			BGColors.WARNING = ''
+			BGColors.FAIL = ''
+			BGColors.ENDC = ''
+
+			self.is_setup = True
+			return
+
 		# Figure out how to clear the terminal
 		if os_module._os_type._name == 'Windows':
 			self._terminal_clear = 'cls'

@@ -44,6 +44,7 @@ class Config(object):
 	target_name = None
 	pwd = os.sys.path[0]
 	python = sys.executable
+	is_bw = False
 
 	@classmethod
 	def require_module(cls, file_name):
@@ -158,6 +159,14 @@ def import_rscript(g=globals(), l=locals()):
 	return targets
 
 if __name__ == '__main__':
+	# Get the args and options
+	args = []
+	for arg in sys.argv[1:]:
+		if arg.startswith('-'):
+			if arg == '-bw': Config.is_bw = True
+		else:
+			args.append(arg)
+
 	# Load the default modules
 	import_module_immediate('CPU')
 	import_module_immediate('OS')
@@ -175,13 +184,14 @@ if __name__ == '__main__':
 
 	# Clear the terminal
 	terminal_mod = Config.require_module('TERMINAL')
-	os.system(terminal_mod._terminal_clear)
+	if terminal_mod._terminal_clear:
+		os.system(terminal_mod._terminal_clear)
+
+	# Get the target function name
+	Config.target_name = str(str.join(' ', args))
 
 	# Load the rscript
 	targets = import_rscript()
-
-	# Get the target function name
-	Config.target_name = str(str.join(' ', sys.argv[1:]))
 
 	# Get a friendly list of all the targets
 	target_list = []
