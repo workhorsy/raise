@@ -30,7 +30,7 @@ class TerminalModule(RaiseModule):
 		super(TerminalModule, self).__init__("TERMINAL")
 		self._terminal_clear = None
 		self._terminal_width = None
-		self.message_length = None
+		self.message_length = 0
 
 	def setup(self):
 		os_module = Config.require_module("OS")
