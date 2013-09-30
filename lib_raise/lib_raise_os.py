@@ -154,7 +154,7 @@ def do_as_normal_user(cb):
 			os.seteuid(prev_id)
 
 	if is_exiting:
-		exit()
+		exit(1)
 	if exception:
 		print_exit(exception)
 

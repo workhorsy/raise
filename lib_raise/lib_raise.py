@@ -32,7 +32,7 @@ import signal, atexit
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
 	sys.stdout.flush()
-	exit()
+	exit(1)
 
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
 		print_exit('Exit called by the keyboard.')
-		exit()
+		exit(1)
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Clear the terminal
@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3 - September 27 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.3 - September 30 2013) http://launchpad.net/raise")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")

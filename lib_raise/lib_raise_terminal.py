@@ -125,5 +125,5 @@ def print_exit(message):
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
-	exit()
+	exit(1)
 

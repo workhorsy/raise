@@ -91,7 +91,7 @@ def _download_file(url, file_name):
 		response = urlopen(url)
 		if response.code != 200:
 			print('Download failed. Exiting ...')
-			exit()
+			exit(1)
 
 		# Read the HTTP header
 		content_length = int(response.headers['Content-Length'])
@@ -113,7 +113,7 @@ def _download_file(url, file_name):
 		print('Download failed. Exiting ...')
 		print(str(e))
 		print(url)
-		exit()
+		exit(1)
 
 	# Write the file to disk
 	_cb_dl_done(file_name, data)
@@ -132,7 +132,7 @@ def _cb_dl_done(file_name, data):
 	# Make sure the downloaded file is python
 	if not data.decode().startswith("#!/usr/bin/env python"):
 		print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
-		exit()
+		exit(1)
 
 	# Save the file
 	with open(file_name, 'wb') as f:
@@ -152,6 +152,8 @@ if __name__ == '__main__':
 		dir_name = '.lib_raise/'
 	elif os.path.isfile('../../lib_raise/lib_raise.py'):
 		dir_name = '../../lib_raise/'
+	elif os.path.isfile('../lib_raise/lib_raise.py'):
+		dir_name = '../lib_raise/'
 	else:
 		dir_name = '.lib_raise/'
 		needs_update = True
@@ -159,13 +161,16 @@ if __name__ == '__main__':
 	# Run update if that is the target
 	if args == 'update':
 		update(dir_name)
-		exit()
+		exit(0)
 	elif needs_update:
 		update(dir_name)
 
 	# Have the lib_raise.py file handle everything else
 	actual = "{0}lib_raise.py".format(dir_name)
-	os.system('{0} {1} {2}'.format(sys.executable, actual, args))
+	rc = os.system('{0} {1} {2}'.format(sys.executable, actual, args))
+	if os.WIFEXITED(rc):
+		rc = os.WEXITSTATUS(rc)
+	exit(rc)
 
 
 
