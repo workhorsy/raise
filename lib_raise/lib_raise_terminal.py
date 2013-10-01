@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 class TerminalModule(RaiseModule):
 	def __init__(self):
 		super(TerminalModule, self).__init__("TERMINAL")
@@ -35,10 +36,10 @@ class TerminalModule(RaiseModule):
 	def setup(self):
 		os_module = Config.require_module("OS")
 
-		# For black & white mode, don't clear, don't use color, and fix the width to 80
+		# For black & white mode, don't clear, don't use color, and fix the width to 79
 		if Config.is_bw:
 			self._terminal_clear = None
-			self._terminal_width = 80
+			self._terminal_width = 79
 
 			BGColors.MESSAGE = ''
 			BGColors.OK = ''
