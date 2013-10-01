@@ -222,6 +222,15 @@ Running command ...                                                         :)
 
 		self.assertProcessOutput(command, expected)
 
+	def test_build_interface(self):
+		command = '{0} raise -bw build_interface'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_interface'
+Building D interface 'lib_math.di' ...                                      :)'''
+
+		self.assertProcessOutput(command, expected)
+
 
 if __name__ == '__main__':
 	unittest.main()

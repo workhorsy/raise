@@ -108,7 +108,7 @@ def d_save_compiler(compiler):
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
-def d_build_interface(d_file, i_files):
+def d_build_interface(d_file, i_files=[]):
 	module = Config.require_module("D")
 
 	d_file = to_native(d_file)
@@ -170,6 +170,7 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
+# FIXME: Remove this, as there are no shared libraries in D
 def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 

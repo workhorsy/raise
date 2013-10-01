@@ -45,3 +45,9 @@ def build_static_library():
 
 	run_say('./main')
 
+def build_interface():
+	clean()
+	_configure()
+
+	d_build_interface('lib_math.d')
+
