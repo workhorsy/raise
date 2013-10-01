@@ -86,6 +86,25 @@ class TestProcessRunner(object):
 	stdout = property(get_stdout)
 
 class TestRaise(unittest.TestCase):
+	def init(self, test_dir):
+		# Change to the test directory
+		self.pwd = os.getcwd()
+		os.chdir(test_dir)
+
+		# Get all the entries in the directory
+		self.entries = []
+		for entry in os.listdir(os.getcwd()):
+			self.entries.append(entry)
+
+	def tearDown(self):
+		# Remove all the files generated from the test
+		for entry in os.listdir(os.getcwd()):
+			if not entry in self.entries:
+				os.remove(entry)
+
+		# Change back to the original directory
+		os.chdir(self.pwd)
+
 	def assertNotDiff(self, expected, actual):
 		if expected == actual:
 			return
@@ -98,25 +117,18 @@ class TestRaise(unittest.TestCase):
 		process = TestProcessRunner(command)
 		process.run()
 
-		self.assertTrue(process.is_success)
 		self.assertNotDiff(expected, process.stdout)
+		self.assertTrue(process.is_success)
 
 class TestC(TestRaise):
 	def setUp(self):
-		self.pwd = os.getcwd()
-		os.chdir('C')
-
-	def tearDown(self):
-		os.chdir(self.pwd)
+		self.init('C')
 
 	def test_build_object(self):
 		command = '{0} raise -bw build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
-Removing the file 'lib_math.o' ...                                          :)
-Removing the file 'main.o' ...                                              :)
-Removing the file 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building C object 'main.o' ...                                              :)
 Building C program 'main' ...                                               :)
@@ -131,9 +143,20 @@ Running command ...                                                         :)
 
 		expected = \
 '''Running target 'build_program'
-Removing the file 'lib_math.o' ...                                          :)
-Removing the file 'main.o' ...                                              :)
-Removing the file 'main' ...                                                :)
+Building C program 'main' ...                                               :)
+Running command ...                                                         :)
+./main
+7 * 12 = 84'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_shared_library(self):
+		command = '{0} raise -bw build_shared_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_shared_library'
+Building C object 'lib_math.o' ...                                          :)
+Building shared library 'lib_math.so' ...                                   :)
 Building C program 'main' ...                                               :)
 Running command ...                                                         :)
 ./main

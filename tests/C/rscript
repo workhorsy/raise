@@ -3,13 +3,11 @@
 
 import os
 import_module('C')
-
+import_module('Linker')
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rmfile_f('lib_math.o')
-	rmfile_f('main.o')
-	rmfile_f('main')
+	pass
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -18,6 +16,11 @@ def _configure():
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
 	c_save_compiler(cc)
+
+	linker = linker_get_default_linker()
+	linker_save_linker(linker)
+
+	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 def build_object():
 	clean()
@@ -38,5 +41,16 @@ def build_program():
 
 	run_say('./main')
 
+def build_shared_library():
+	clean()
+	_configure()
+
+	# Build the library
+	c_build_object('lib_math.o', ['lib_math.c'])
+	c_build_shared_library('lib_math.so', ['lib_math.o'])
+
+	c_build_program('main', ['main.c', 'lib_math.so'])
+
+	run_say('./main')
 
 
