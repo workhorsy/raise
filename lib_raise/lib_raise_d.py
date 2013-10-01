@@ -137,7 +137,7 @@ def d_build_interface(d_file, i_files):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
+def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	module = Config.require_module("D")
 
 	o_file = to_native(o_file)
@@ -170,7 +170,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
+def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
 	o_file = to_native(o_file)
@@ -202,7 +202,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
+def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
 	o_file = to_native(o_file)

@@ -164,6 +164,65 @@ Running command ...                                                         :)
 
 		self.assertProcessOutput(command, expected)
 
+	def test_build_static_library(self):
+		command = '{0} raise -bw build_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_static_library'
+Building C object 'lib_math.o' ...                                          :)
+Building static library 'lib_math.a' ...                                    :)
+Building C program 'main' ...                                               :)
+Running command ...                                                         :)
+./main
+7 * 12 = 84'''
+
+		self.assertProcessOutput(command, expected)
+
+class TestD(TestRaise):
+	def setUp(self):
+		self.init('D')
+
+	def test_build_program(self):
+		command = '{0} raise -bw build_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_program'
+Building D program 'main' ...                                               :)
+Running command ...                                                         :)
+./main
+9 * 12 = 108'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_object(self):
+		command = '{0} raise -bw build_object'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_object'
+Building D object 'lib_math.o' ...                                          :)
+Building D object 'main.o' ...                                              :)
+Building D program 'main' ...                                               :)
+Running command ...                                                         :)
+./main
+9 * 12 = 108'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_static_library(self):
+		command = '{0} raise -bw build_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_static_library'
+Building D object 'lib_math.o' ...                                          :)
+Building D static library 'lib_math.a' ...                                  :)
+Building D program 'main' ...                                               :)
+Running command ...                                                         :)
+./main
+9 * 12 = 108'''
+
+		self.assertProcessOutput(command, expected)
+
+
 if __name__ == '__main__':
 	unittest.main()
 

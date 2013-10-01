@@ -53,4 +53,15 @@ def build_shared_library():
 
 	run_say('./main')
 
+def build_static_library():
+	clean()
+	_configure()
+
+	# Build the library
+	c_build_object('lib_math.o', ['lib_math.c'])
+	ar_build_static_library('lib_math.a', ['lib_math.o'])
+
+	c_build_program('main', ['main.c', 'lib_math.a'])
+
+	run_say('./main')
 
