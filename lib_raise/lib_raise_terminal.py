@@ -36,8 +36,8 @@ class TerminalModule(RaiseModule):
 	def setup(self):
 		os_module = Config.require_module("OS")
 
-		# For black & white mode, don't clear, don't use color, and fix the width to 79
-		if Config.is_bw:
+		# For plain mode, don't clear, don't use color, and fix the width to 79
+		if Config.is_plain:
 			self._terminal_clear = None
 			self._terminal_width = 79
 

@@ -125,7 +125,7 @@ class TestC(TestRaise):
 		self.init('C')
 
 	def test_build_object(self):
-		command = '{0} raise -bw build_object'.format(sys.executable)
+		command = '{0} raise -plain build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -139,7 +139,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_program(self):
-		command = '{0} raise -bw build_program'.format(sys.executable)
+		command = '{0} raise -plain build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -151,7 +151,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -bw build_shared_library'.format(sys.executable)
+		command = '{0} raise -plain build_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_shared_library'
@@ -165,7 +165,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -bw build_static_library'.format(sys.executable)
+		command = '{0} raise -plain build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'
@@ -183,7 +183,7 @@ class TestD(TestRaise):
 		self.init('D')
 
 	def test_build_program(self):
-		command = '{0} raise -bw build_program'.format(sys.executable)
+		command = '{0} raise -plain build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -195,7 +195,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -bw build_object'.format(sys.executable)
+		command = '{0} raise -plain build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -209,7 +209,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -bw build_static_library'.format(sys.executable)
+		command = '{0} raise -plain build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'
@@ -223,7 +223,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_interface(self):
-		command = '{0} raise -bw build_interface'.format(sys.executable)
+		command = '{0} raise -plain build_interface'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_interface'
@@ -236,7 +236,7 @@ class TestCXX(TestRaise):
 		self.init('CXX')
 
 	def test_build_program(self):
-		command = '{0} raise -bw build_program'.format(sys.executable)
+		command = '{0} raise -plain build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -248,7 +248,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -bw build_object'.format(sys.executable)
+		command = '{0} raise -plain build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -262,7 +262,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -bw build_shared_library'.format(sys.executable)
+		command = '{0} raise -plain build_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_shared_library'
@@ -276,7 +276,7 @@ Running command ...                                                         :)
 		self.assertProcessOutput(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -bw build_static_library'.format(sys.executable)
+		command = '{0} raise -plain build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'

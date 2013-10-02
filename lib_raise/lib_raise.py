@@ -44,7 +44,7 @@ class Config(object):
 	target_name = None
 	pwd = os.sys.path[0]
 	python = sys.executable
-	is_bw = False
+	is_plain = False
 
 	@classmethod
 	def require_module(cls, file_name):
@@ -163,7 +163,7 @@ if __name__ == '__main__':
 	args = []
 	for arg in sys.argv[1:]:
 		if arg.startswith('-'):
-			if arg == '-bw': Config.is_bw = True
+			if arg == '-plain': Config.is_plain = True
 		else:
 			args.append(arg)
 
@@ -202,7 +202,9 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3 - October 1 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.3 - October 2 2013) http://launchpad.net/raise")
+		print("OPTIONS:")
+		print("    -plain - Don't clear, don't use color, and fix the width to 79")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
