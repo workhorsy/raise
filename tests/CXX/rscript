@@ -4,6 +4,7 @@
 import os
 import_module('C')
 import_module('CXX')
+import_module('AR')
 import_module('Linker')
 
 def clean():

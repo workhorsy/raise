@@ -228,34 +228,6 @@ def c_build_program(o_file, c_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-
-# FIXME: Move this to an AR module
-def ar_build_static_library(ar_file, o_files):
-	module = Config.require_module("C")
-
-	# Change file extensions to os format
-	ar_file = to_native(ar_file)
-	o_files = to_native(o_files)
-
-	# Setup the messages
-	task = 'Building'
-	result = ar_file
-	plural = 'static libraries'
-	singular = 'static library'
-	command = "ar rcs " + \
-			ar_file + " " + \
-			str.join(' ', o_files)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		if not is_outdated(to_update = [ar_file], triggers = o_files):
-			return False
-		return True
-
-	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
-	add_event(event)
-
 # FIXME: Change to use the linker through the compiler
 def c_build_shared_library(so_file, o_files):
 	module = Config.require_module("LINKER")
