@@ -289,6 +289,35 @@ Running command ...                                                         :)
 
 		self.assertProcessOutput(command, expected)
 
+class TestCSharp(TestRaise):
+	def setUp(self):
+		self.init('CSharp')
+
+	def test_build_program(self):
+		command = '{0} raise -plain build_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_program'
+Building C# program 'main.exe' ...                                          :)
+Running command ...                                                         :)
+./main.exe
+10 - 4 = 6'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_shared_library(self):
+		command = '{0} raise -plain build_shared_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_shared_library'
+Building C# shared library 'lib_math.dll' ...                               :)
+Building C# program 'main.exe' ...                                          :)
+Running command ...                                                         :)
+./main.exe
+10 - 4 = 6'''
+
+		self.assertProcessOutput(command, expected)
+
 
 if __name__ == '__main__':
 	unittest.main()

@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import_module('CSharp')
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	pass
+
+def _configure():
+	csc = csharp_get_default_compiler()
+	csc.debug = True
+	csc.optimize = True
+	csc.warnings_all = True
+	csc.warnings_as_errors = True
+	csharp_save_compiler(csc)
+
+def build_program():
+	clean()
+	_configure()
+
+	csharp_build_program('main.exe', ['main.cs', 'lib_math.cs'])
+
+	run_say('./main.exe')
+
+def build_shared_library():
+	clean()
+	_configure()
+
+	csharp_build_shared_library('lib_math.dll', ['lib_math.cs'])
+	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
+
+	run_say('./main.exe')
+
