@@ -36,6 +36,7 @@ RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
 	'raise'               : '{0}raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_BASE),
+	'raise_ar'            : '{0}lib_raise_ar.py-20131002010124-c22ldygq1nz33jv5-1/lib_raise_ar.py'.format(RAISE_BASE),
 	'raise_c'             : '{0}lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_BASE),
 	'raise_cpu'           : '{0}lib_raise_cpu.py-20130926223728-aw4afvc65fy8q6yb-1/lib_raise_cpu.py'.format(RAISE_BASE),
 	'raise_csharp'        : '{0}lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_BASE),
