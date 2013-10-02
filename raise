@@ -91,7 +91,8 @@ def _download_file(url, file_name):
 		# Connect with HTTP
 		response = urlopen(url)
 		if response.code != 200:
-			print('Download failed. Exiting ...')
+			sys.stderr.write('Download failed. Exiting ...\n')
+			sys.stderr.flush()
 			exit(1)
 
 		# Read the HTTP header
@@ -111,9 +112,10 @@ def _download_file(url, file_name):
 
 			_cb_dl_progress(file_name, chunk, data_length, CHUNK_SIZE, content_length, percent)
 	except Exception as e:
-		print('Download failed. Exiting ...')
-		print(str(e))
-		print(url)
+		sys.stderr.write('Download failed. Exiting ...\n')
+		sys.stderr.write(str(e) + '\n')
+		sys.stderr.write(url + '\n')
+		sys.stderr.flush()
 		exit(1)
 
 	# Write the file to disk
@@ -132,7 +134,8 @@ def _cb_dl_progress(file_name, chunk, data_length, chunk_size, content_length, p
 def _cb_dl_done(file_name, data):
 	# Make sure the downloaded file is python
 	if not data.decode().startswith("#!/usr/bin/env python"):
-		print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
+		sys.stderr.write('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...\n')
+		sys.stderr.flush()
 		exit(1)
 
 	# Save the file
