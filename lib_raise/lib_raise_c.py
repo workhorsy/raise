@@ -229,7 +229,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 	add_event(event)
 
 
-# FIXME: Rename to c_build_static_library
+# FIXME: Move this to an AR module
 def ar_build_static_library(ar_file, o_files):
 	module = Config.require_module("C")
 

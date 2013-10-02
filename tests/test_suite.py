@@ -231,6 +231,64 @@ Building D interface 'lib_math.di' ...                                      :)''
 
 		self.assertProcessOutput(command, expected)
 
+class TestCXX(TestRaise):
+	def setUp(self):
+		self.init('CXX')
+
+	def test_build_program(self):
+		command = '{0} raise -bw build_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_program'
+Building C++ program 'main' ...                                             :)
+Running command ...                                                         :)
+./main
+7 + 9 = 16'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_object(self):
+		command = '{0} raise -bw build_object'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_object'
+Building C++ object 'lib_math.o' ...                                        :)
+Building C++ object 'main.o' ...                                            :)
+Building C++ program 'main' ...                                             :)
+Running command ...                                                         :)
+./main
+7 + 9 = 16'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_shared_library(self):
+		command = '{0} raise -bw build_shared_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_shared_library'
+Building C++ object 'lib_math.o' ...                                        :)
+Building shared library 'lib_math.so' ...                                   :)
+Building C++ program 'main' ...                                             :)
+Running command ...                                                         :)
+./main
+7 + 9 = 16'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_static_library(self):
+		command = '{0} raise -bw build_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_static_library'
+Building C++ object 'lib_math.o' ...                                        :)
+Building static library 'lib_math.a' ...                                    :)
+Building C++ program 'main' ...                                             :)
+Running command ...                                                         :)
+./main
+7 + 9 = 16'''
+
+		self.assertProcessOutput(command, expected)
+
 
 if __name__ == '__main__':
 	unittest.main()
