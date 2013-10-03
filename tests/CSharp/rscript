@@ -22,7 +22,7 @@ def build_program():
 
 	csharp_build_program('main.exe', ['main.cs', 'lib_math.cs'])
 
-	run_say('./main.exe')
+	csharp_run_say('main.exe')
 
 def build_shared_library():
 	clean()
@@ -31,5 +31,5 @@ def build_shared_library():
 	csharp_build_shared_library('lib_math.dll', ['lib_math.cs'])
 	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
 
-	run_say('./main.exe')
+	csharp_run_say('main.exe')
 

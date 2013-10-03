@@ -299,8 +299,8 @@ class TestCSharp(TestRaise):
 		expected = \
 '''Running target 'build_program'
 Building C# program 'main.exe' ...                                          :)
-Running command ...                                                         :)
-./main.exe
+Running C# program ...                                                      :)
+main.exe
 10 - 4 = 6'''
 
 		self.assertProcessOutput(command, expected)
@@ -312,8 +312,8 @@ Running command ...                                                         :)
 '''Running target 'build_shared_library'
 Building C# shared library 'lib_math.dll' ...                               :)
 Building C# program 'main.exe' ...                                          :)
-Running command ...                                                         :)
-./main.exe
+Running C# program ...                                                      :)
+main.exe
 10 - 4 = 6'''
 
 		self.assertProcessOutput(command, expected)

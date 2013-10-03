@@ -30,7 +30,9 @@ class CSharpModule(RaiseModule):
 	def __init__(self):
 		super(CSharpModule, self).__init__("CSHARP")
 		self.cs_compilers = {}
+		self.cs_runtimes = {}
 		self._csc = None
+		self._runtime = None
 
 	def setup(self):
 		# Get the names and paths for know C# compilers
@@ -55,6 +57,7 @@ class CSharpModule(RaiseModule):
 					link =                 ''
 				)
 				self.cs_compilers[comp._name] = comp
+				self.cs_runtimes[comp._name] = 'mono'
 			elif name in ['csc']:
 				comp = Compiler(
 					name =                 name, 
@@ -70,6 +73,7 @@ class CSharpModule(RaiseModule):
 					link =                 ''
 				)
 				self.cs_compilers[comp._name] = comp
+				self.cs_runtimes[comp._name] = ''
 
 		# Make sure there is at least one C# compiler installed
 		if len(self.cs_compilers) == 0:
@@ -95,6 +99,7 @@ def csharp_save_compiler(compiler):
 
 	# CSC
 	module._csc = compiler
+	module._runtime = module.cs_runtimes[module._csc._name]
 	os.environ['CSC'] = module._csc._name
 
 	# DFLAGS
@@ -161,4 +166,24 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def csharp_run_say(command):
+	module = Config.require_module("CSHARP")
+
+	print_status("Running C# program")
+
+	mono_command = '{0} {1}'.format(module._runtime, command)
+	runner = ProcessRunner(mono_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 
