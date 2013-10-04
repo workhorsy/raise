@@ -32,7 +32,7 @@ def build_object():
 
 	c_build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	run_say('./main.exe')
+	c_run_say('./main.exe')
 
 def build_program():
 	clean()
@@ -40,7 +40,7 @@ def build_program():
 
 	c_build_program('main.exe', ['lib_math.c', 'main.c'])
 
-	run_say('./main.exe')
+	c_run_say('./main.exe')
 
 def build_shared_library():
 	clean()
@@ -52,7 +52,7 @@ def build_shared_library():
 
 	c_build_program('main.exe', ['main.c', 'lib_math.so'])
 
-	run_say('./main.exe')
+	c_run_say('./main.exe')
 
 def build_static_library():
 	clean()
@@ -64,5 +64,5 @@ def build_static_library():
 
 	c_build_program('main.exe', ['main.c', 'lib_math.a'])
 
-	run_say('./main.exe')
+	c_run_say('./main.exe')
 

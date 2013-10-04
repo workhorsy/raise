@@ -33,6 +33,31 @@ class CXXModule(RaiseModule):
 		self._cxx = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		entension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			entension_map = {
+				'.exe' : '.exe',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+		elif os_module._os_type._name == 'Windows':
+			entension_map = {
+				'.exe' : '.exe',
+				'.o' : '.obj',
+				'.so' : '.dll',
+				'.a' : '.lib'
+			}
+		else:
+			entension_map = {
+				'.exe' : '',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+
 		# Get the names and paths for know C++ compilers
 		names = ['g++']
 		for name in names:
@@ -52,7 +77,8 @@ class CXXModule(RaiseModule):
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					entension_map = entension_map
 				)
 				self.cxx_compilers[comp._name] = comp
 
@@ -105,11 +131,6 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	if not o_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(o_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(o_file)
-	save_native(cxx_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -119,6 +140,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cxx._opt_out_file + o_file
+	command = module._cxx.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -139,11 +161,6 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	if not out_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(out_file)
-	save_native(obj_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
@@ -154,6 +171,7 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cxx._opt_out_file + out_file
+	command = module._cxx.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -174,11 +192,6 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	if not o_file.endswith('.o'):
 		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(o_file)
-	save_native(cxx_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -190,6 +203,7 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 				o_file + ' ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files)
+	command = module._cxx.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -206,4 +220,24 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def cxx_run_say(command):
+	module = Config.require_module("CXX")
+
+	print_status("Running C++ program")
+
+	native_command = module._cxx.to_native(command)
+	runner = ProcessRunner(native_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 

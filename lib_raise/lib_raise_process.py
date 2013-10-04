@@ -183,8 +183,7 @@ class Event(object):
 			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Start the process
-		native_command = to_native(self._command)
-		self._runner = ProcessRunner(native_command)
+		self._runner = ProcessRunner(self._command)
 		self._status = 'running'
 		self._runner.run()
 		return True
@@ -262,8 +261,7 @@ def parallel_end():
 def run_say(command):
 	print_status("Running command")
 
-	native_command = to_native(command)
-	runner = ProcessRunner(native_command)
+	runner = ProcessRunner(command)
 	runner.run()
 	runner.wait()
 
@@ -278,8 +276,7 @@ def run_say(command):
 		print_exit('Failed to run command.')
 
 def run_and_get_stdout(command):
-	native_command = to_native(command)
-	runner = ProcessRunner(native_command)
+	runner = ProcessRunner(command)
 	runner.run()
 	runner.wait()
 	if runner.is_failure:
@@ -300,8 +297,7 @@ def _do_on_fail_exit(start_message, fail_message, cb):
 			print_exit(fail_message)
 	# Or run it as a process if a string
 	elif type(cb) == str:
-		native_command = to_native(cb)
-		runner = ProcessRunner(native_command)
+		runner = ProcessRunner(cb)
 		runner.run()
 		runner.wait()
 		if runner.is_success or runner.is_warning:

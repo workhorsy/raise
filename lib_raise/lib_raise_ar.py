@@ -40,10 +40,6 @@ def ar_build_static_library(ar_file, o_files):
 	if not ar_file.endswith('.a'):
 		print_exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(ar_file)
-	save_native(o_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = ar_file

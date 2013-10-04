@@ -34,6 +34,31 @@ class CModule(RaiseModule):
 		self._cc = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		entension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			entension_map = {
+				'.exe' : '.exe',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+		elif os_module._os_type._name == 'Windows':
+			entension_map = {
+				'.exe' : '.exe',
+				'.o' : '.obj',
+				'.so' : '.dll',
+				'.a' : '.lib'
+			}
+		else:
+			entension_map = {
+				'.exe' : '',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+
 		# Get the names and paths for know C compilers
 		names = ['gcc', 'clang', 'cl.exe']
 		for name in names:
@@ -53,7 +78,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					entension_map = entension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'clang':
@@ -68,7 +94,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					entension_map = entension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'cl.exe':
@@ -84,7 +111,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '', 
 					optimize =             '/O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					entension_map = entension_map
 				)
 				self.c_compilers[comp._name] = comp
 
@@ -138,11 +166,6 @@ def c_link_program(out_file, obj_files, i_files=[]):
 	if not out_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(out_file)
-	save_native(obj_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
@@ -153,6 +176,7 @@ def c_link_program(out_file, obj_files, i_files=[]):
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cc._opt_out_file + out_file
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -173,11 +197,6 @@ def c_build_object(o_file, c_files, i_files=[]):
 	if not o_file.endswith('.o'):
 		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(o_file)
-	save_native(c_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -189,6 +208,7 @@ def c_build_object(o_file, c_files, i_files=[]):
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -213,11 +233,6 @@ def c_build_program(o_file, c_files, i_files=[]):
 	if not o_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(o_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(o_file)
-	save_native(c_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = o_file
@@ -227,6 +242,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cc._opt_out_file + o_file
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -248,10 +264,6 @@ def c_build_shared_library(so_file, o_files):
 	if not so_file.endswith('.so'):
 		print_exit("Out file extension should be '.so' not '.{0}'.".format(so_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(so_file)
-	save_native(o_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = so_file
@@ -264,6 +276,7 @@ def c_build_shared_library(so_file, o_files):
 				str.join(' ', o_files), 
 				module._linker._opt_out_file, 
 				so_file)
+	command = module._linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -274,4 +287,24 @@ def c_build_shared_library(so_file, o_files):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def c_run_say(command):
+	module = Config.require_module("C")
+
+	print_status("Running C program")
+
+	native_command = module._cc.to_native(command)
+	runner = ProcessRunner(native_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 

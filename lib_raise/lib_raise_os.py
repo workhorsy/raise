@@ -32,33 +32,20 @@ class OSModule(RaiseModule):
 	def __init__(self):
 		super(OSModule, self).__init__("OS")
 		self._os_type = None
-		self._file_map = {}
 
 	def setup(self):
 		# Figure out the general OS type
 		if 'cygwin' in platform.system().lower():
 			self._os_type = OSType(
-				name =                 'Cygwin', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
+				name =                 'Cygwin'
 			)
 		elif 'windows' in platform.system().lower():
 			self._os_type = OSType(
-				name =                 'Windows', 
-				exe_extension =        '.exe', 
-				object_extension =     '.obj', 
-				shared_lib_extension = '.dll', 
-				static_lib_extension = '.lib'
+				name =                 'Windows'
 			)
 		else:
 			self._os_type = OSType(
-				name =                 'Unix', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
+				name =                 'Unix'
 			)
 
 		# Make sure Windows SDK tools are found
@@ -70,52 +57,9 @@ class OSModule(RaiseModule):
 		self.is_setup = True
 
 class OSType(object):
-	def __init__(self, name, exe_extension, object_extension, 
-				shared_lib_extension, static_lib_extension):
+	def __init__(self, name):
 
 		self._name = name
-		self._exe_extension = exe_extension
-		self._object_extension = object_extension
-		self._shared_lib_extension = shared_lib_extension
-		self._static_lib_extension = static_lib_extension
-
-def _rename_to_native(string, before, after):
-	module = Config.require_module("OS")
-
-	for word in string.split():
-		if before in word and not word in module._file_map:
-			module._file_map[word] = word.replace(before, after)
-
-	return string.replace(before, after)
-
-def save_native(thing):
-	module = Config.require_module("OS")
-
-	# Get a dict of the standard extensions and their other os counterparts
-	replaces = {
-		'.exe' : module._os_type._exe_extension,
-		'.o'   : module._os_type._object_extension,
-		'.so'  : module._os_type._shared_lib_extension,
-		'.a'   : module._os_type._static_lib_extension
-	}
-
-	# Replace the extension
-	if type(thing) == list:
-		for before, after in replaces.items():
-			thing = [_rename_to_native(o, before, after) for o in thing]
-	else:
-		for before, after in replaces.items():
-			thing = _rename_to_native(thing, before, after)
-
-	return thing
-
-def to_native(command):
-	module = Config.require_module("OS")
-
-	for before, after in module._file_map.items():
-		command = command.replace(before, after)
-
-	return command
 
 def expand_envs(string):
 	while True:

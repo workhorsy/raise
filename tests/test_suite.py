@@ -132,7 +132,7 @@ class TestC(TestRaise):
 Building C object 'lib_math.o' ...                                          :)
 Building C object 'main.o' ...                                              :)
 Building C program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
@@ -144,7 +144,7 @@ Running command ...                                                         :)
 		expected = \
 '''Running target 'build_program'
 Building C program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
@@ -158,7 +158,7 @@ Running command ...                                                         :)
 Building C object 'lib_math.o' ...                                          :)
 Building shared library 'lib_math.so' ...                                   :)
 Building C program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
@@ -172,7 +172,7 @@ Running command ...                                                         :)
 Building C object 'lib_math.o' ...                                          :)
 Building static library 'lib_math.a' ...                                    :)
 Building C program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
@@ -188,7 +188,7 @@ class TestD(TestRaise):
 		expected = \
 '''Running target 'build_program'
 Building D program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
@@ -202,7 +202,7 @@ Running command ...                                                         :)
 Building D object 'lib_math.o' ...                                          :)
 Building D object 'main.o' ...                                              :)
 Building D program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
@@ -216,7 +216,7 @@ Running command ...                                                         :)
 Building D object 'lib_math.o' ...                                          :)
 Building D static library 'lib_math.a' ...                                  :)
 Building D program 'main.exe' ...                                           :)
-Running command ...                                                         :)
+Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
@@ -241,7 +241,7 @@ class TestCXX(TestRaise):
 		expected = \
 '''Running target 'build_program'
 Building C++ program 'main.exe' ...                                         :)
-Running command ...                                                         :)
+Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
@@ -255,7 +255,7 @@ Running command ...                                                         :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building C++ object 'main.o' ...                                            :)
 Building C++ program 'main.exe' ...                                         :)
-Running command ...                                                         :)
+Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
@@ -269,7 +269,7 @@ Running command ...                                                         :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building shared library 'lib_math.so' ...                                   :)
 Building C++ program 'main.exe' ...                                         :)
-Running command ...                                                         :)
+Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
@@ -283,7 +283,7 @@ Running command ...                                                         :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building static library 'lib_math.a' ...                                    :)
 Building C++ program 'main.exe' ...                                         :)
-Running command ...                                                         :)
+Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 

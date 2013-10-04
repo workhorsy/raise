@@ -35,6 +35,25 @@ class CSharpModule(RaiseModule):
 		self._runtime = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		entension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			entension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+		elif os_module._os_type._name == 'Windows':
+			entension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+		else:
+			entension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+
 		# Get the names and paths for know C# compilers
 		names = ['dmcs', 'csc']
 		for name in names:
@@ -54,7 +73,8 @@ class CSharpModule(RaiseModule):
 					warnings_as_errors =   '-warnaserror', 
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
-					link =                 ''
+					link =                 '', 
+					entension_map = entension_map
 				)
 				self.cs_compilers[comp._name] = comp
 				self.cs_runtimes[comp._name] = 'mono'
@@ -70,7 +90,8 @@ class CSharpModule(RaiseModule):
 					warnings_as_errors =   '-warnaserror', 
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
-					link =                 ''
+					link =                 '', 
+					entension_map = entension_map
 				)
 				self.cs_compilers[comp._name] = comp
 				self.cs_runtimes[comp._name] = ''
@@ -120,11 +141,6 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	if not out_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(out_file)
-	save_native(inc_files)
-	save_native(link_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = out_file
@@ -133,6 +149,7 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	command = "${CSC} ${CSFLAGS} " + \
 	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = module._csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -152,11 +169,6 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	if not out_file.endswith('.dll'):
 		print_exit("Out file extension should be '.dll' not '.{0}'.".format(out_file.split('.')[-1]))
 
-	# Save the file extensions in the os format
-	save_native(out_file)
-	save_native(inc_files)
-	save_native(link_files)
-
 	# Setup the messages
 	task = 'Building'
 	result = out_file
@@ -165,6 +177,7 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	command = "${CSC} ${CSFLAGS} -target:library " + \
 	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = module._csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -182,8 +195,9 @@ def csharp_run_say(command):
 
 	print_status("Running C# program")
 
-	mono_command = '{0} {1}'.format(module._runtime, command)
-	runner = ProcessRunner(mono_command)
+	native_command = '{0} {1}'.format(module._runtime, command)
+	native_command = module._csc.to_native(native_command)
+	runner = ProcessRunner(native_command)
 	runner.run()
 	runner.wait()
 

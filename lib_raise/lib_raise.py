@@ -71,7 +71,7 @@ class RaiseModule(object):
 class Compiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors, optimize, 
-				compile_time_flags, link):
+				compile_time_flags, link, entension_map):
 
 		self._name = name
 		self._path = path
@@ -93,6 +93,14 @@ class Compiler(object):
 		self.warnings_as_errors = False
 		self.optimize = False
 		self.compile_time_flags = []
+
+		self.entension_map = entension_map
+
+	def to_native(self, command):
+		for before, after in self.entension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 def import_module(name):
 	Config.modules_to_import.append(name)
