@@ -131,9 +131,9 @@ class TestC(TestRaise):
 '''Running target 'build_object'
 Building C object 'lib_math.o' ...                                          :)
 Building C object 'main.o' ...                                              :)
-Building C program 'main' ...                                               :)
+Building C program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 * 12 = 84'''
 
 		self.assertProcessOutput(command, expected)
@@ -143,9 +143,9 @@ Running command ...                                                         :)
 
 		expected = \
 '''Running target 'build_program'
-Building C program 'main' ...                                               :)
+Building C program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 * 12 = 84'''
 
 		self.assertProcessOutput(command, expected)
@@ -157,9 +157,9 @@ Running command ...                                                         :)
 '''Running target 'build_shared_library'
 Building C object 'lib_math.o' ...                                          :)
 Building shared library 'lib_math.so' ...                                   :)
-Building C program 'main' ...                                               :)
+Building C program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 * 12 = 84'''
 
 		self.assertProcessOutput(command, expected)
@@ -171,9 +171,9 @@ Running command ...                                                         :)
 '''Running target 'build_static_library'
 Building C object 'lib_math.o' ...                                          :)
 Building static library 'lib_math.a' ...                                    :)
-Building C program 'main' ...                                               :)
+Building C program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 * 12 = 84'''
 
 		self.assertProcessOutput(command, expected)
@@ -187,9 +187,9 @@ class TestD(TestRaise):
 
 		expected = \
 '''Running target 'build_program'
-Building D program 'main' ...                                               :)
+Building D program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 9 * 12 = 108'''
 
 		self.assertProcessOutput(command, expected)
@@ -201,9 +201,9 @@ Running command ...                                                         :)
 '''Running target 'build_object'
 Building D object 'lib_math.o' ...                                          :)
 Building D object 'main.o' ...                                              :)
-Building D program 'main' ...                                               :)
+Building D program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 9 * 12 = 108'''
 
 		self.assertProcessOutput(command, expected)
@@ -215,9 +215,9 @@ Running command ...                                                         :)
 '''Running target 'build_static_library'
 Building D object 'lib_math.o' ...                                          :)
 Building D static library 'lib_math.a' ...                                  :)
-Building D program 'main' ...                                               :)
+Building D program 'main.exe' ...                                           :)
 Running command ...                                                         :)
-./main
+./main.exe
 9 * 12 = 108'''
 
 		self.assertProcessOutput(command, expected)
@@ -240,9 +240,9 @@ class TestCXX(TestRaise):
 
 		expected = \
 '''Running target 'build_program'
-Building C++ program 'main' ...                                             :)
+Building C++ program 'main.exe' ...                                         :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 + 9 = 16'''
 
 		self.assertProcessOutput(command, expected)
@@ -254,9 +254,9 @@ Running command ...                                                         :)
 '''Running target 'build_object'
 Building C++ object 'lib_math.o' ...                                        :)
 Building C++ object 'main.o' ...                                            :)
-Building C++ program 'main' ...                                             :)
+Building C++ program 'main.exe' ...                                         :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 + 9 = 16'''
 
 		self.assertProcessOutput(command, expected)
@@ -268,9 +268,9 @@ Running command ...                                                         :)
 '''Running target 'build_shared_library'
 Building C++ object 'lib_math.o' ...                                        :)
 Building shared library 'lib_math.so' ...                                   :)
-Building C++ program 'main' ...                                             :)
+Building C++ program 'main.exe' ...                                         :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 + 9 = 16'''
 
 		self.assertProcessOutput(command, expected)
@@ -282,9 +282,9 @@ Running command ...                                                         :)
 '''Running target 'build_static_library'
 Building C++ object 'lib_math.o' ...                                        :)
 Building static library 'lib_math.a' ...                                    :)
-Building C++ program 'main' ...                                             :)
+Building C++ program 'main.exe' ...                                         :)
 Running command ...                                                         :)
-./main
+./main.exe
 7 + 9 = 16'''
 
 		self.assertProcessOutput(command, expected)

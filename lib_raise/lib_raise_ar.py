@@ -36,9 +36,13 @@ class ARModule(RaiseModule):
 def ar_build_static_library(ar_file, o_files):
 	module = Config.require_module("AR")
 
-	# Change file extensions to os format
-	ar_file = to_native(ar_file)
-	o_files = to_native(o_files)
+	# Make sure the extension is valid
+	if not ar_file.endswith('.a'):
+		print_exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(ar_file)
+	save_native(o_files)
 
 	# Setup the messages
 	task = 'Building'

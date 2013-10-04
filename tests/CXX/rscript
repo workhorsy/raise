@@ -31,17 +31,17 @@ def build_object():
 	cxx_build_object('lib_math.o', ['lib_math.cc'])
 	cxx_build_object('main.o', ['main.cc'])
 
-	cxx_build_program('main', ['lib_math.o', 'main.o'])
+	cxx_build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	run_say('./main')
+	run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	cxx_build_program('main', ['lib_math.cc', 'main.cc'])
+	cxx_build_program('main.exe', ['lib_math.cc', 'main.cc'])
 
-	run_say('./main')
+	run_say('./main.exe')
 
 def build_shared_library():
 	clean()
@@ -51,9 +51,9 @@ def build_shared_library():
 	cxx_build_object('lib_math.o', ['lib_math.cc'])
 	c_build_shared_library('lib_math.so', ['lib_math.o'])
 
-	cxx_build_program('main', ['main.cc', 'lib_math.so'])
+	cxx_build_program('main.exe', ['main.cc', 'lib_math.so'])
 
-	run_say('./main')
+	run_say('./main.exe')
 
 def build_static_library():
 	clean()
@@ -63,7 +63,7 @@ def build_static_library():
 	cxx_build_object('lib_math.o', ['lib_math.cc'])
 	ar_build_static_library('lib_math.a', ['lib_math.o'])
 
-	cxx_build_program('main', ['main.cc', 'lib_math.a'])
+	cxx_build_program('main.exe', ['main.cc', 'lib_math.a'])
 
-	run_say('./main')
+	run_say('./main.exe')
 

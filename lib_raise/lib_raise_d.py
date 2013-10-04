@@ -111,8 +111,9 @@ def d_save_compiler(compiler):
 def d_build_interface(d_file, i_files=[]):
 	module = Config.require_module("D")
 
-	d_file = to_native(d_file)
-	i_files = to_native(i_files)
+	# Save the file extensions in the os format
+	save_native(d_file)
+	save_native(i_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -140,11 +141,16 @@ def d_build_interface(d_file, i_files=[]):
 def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
-	h_files = to_native(h_files)
+	# Make sure the extension is valid
+	if not o_file.endswith('.o'):
+		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(o_file)
+	save_native(d_files)
+	save_native(i_files)
+	save_native(l_files)
+	save_native(h_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -174,10 +180,15 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
+	# Make sure the extension is valid
+	if not o_file.endswith('.so'):
+		print_exit("Out file extension should be '.so' not '.{0}'.".format(o_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(o_file)
+	save_native(d_files)
+	save_native(i_files)
+	save_native(l_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -206,10 +217,15 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
+	# Make sure the extension is valid
+	if not o_file.endswith('.a'):
+		print_exit("Out file extension should be '.a' not '.{0}'.".format(o_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(o_file)
+	save_native(d_files)
+	save_native(i_files)
+	save_native(l_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -235,9 +251,14 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 def d_build_program(out_file, inc_files, link_files=[]):
 	module = Config.require_module("D")
 
-	out_file = to_native(out_file)
-	inc_files = to_native(inc_files)
-	link_files = to_native(link_files)
+	# Make sure the extension is valid
+	if not out_file.endswith('.exe'):
+		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(out_file)
+	save_native(inc_files)
+	save_native(link_files)
 
 	# Setup the messages
 	task = 'Building'

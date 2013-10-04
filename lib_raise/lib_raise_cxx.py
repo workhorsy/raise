@@ -101,10 +101,14 @@ def cxx_save_compiler(compiler):
 def cxx_build_program(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
-	# Change file extensions to os format
-	o_file = to_native(o_file)
-	cxx_files = to_native(cxx_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	if not o_file.endswith('.exe'):
+		print_exit("Out file extension should be '.exe' not '.{0}'.".format(o_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(o_file)
+	save_native(cxx_files)
+	save_native(i_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -131,10 +135,14 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 def cxx_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("CXX")
 
-	# Change file extensions to os format
-	out_file = to_native(out_file)
-	obj_files = to_native(obj_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	if not out_file.endswith('.exe'):
+		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(out_file)
+	save_native(obj_files)
+	save_native(i_files)
 
 	# Setup the messages
 	task = 'Linking'
@@ -162,10 +170,14 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 def cxx_build_object(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
-	# Change file extensions to os format
-	o_file = to_native(o_file)
-	cxx_files = to_native(cxx_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	if not o_file.endswith('.o'):
+		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
+
+	# Save the file extensions in the os format
+	save_native(o_file)
+	save_native(cxx_files)
+	save_native(i_files)
 
 	# Setup the messages
 	task = 'Building'
