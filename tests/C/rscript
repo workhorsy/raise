@@ -8,7 +8,8 @@ import_module('AR')
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	pass
+	rm_binaries('lib_math')
+	rm_binaries('main')
 
 def _configure():
 	cc = c_get_default_compiler()

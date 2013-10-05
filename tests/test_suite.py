@@ -91,17 +91,7 @@ class TestRaise(unittest.TestCase):
 		self.pwd = os.getcwd()
 		os.chdir(test_dir)
 
-		# Get all the entries in the directory
-		self.entries = []
-		for entry in os.listdir(os.getcwd()):
-			self.entries.append(entry)
-
 	def tearDown(self):
-		# Remove all the files generated from the test
-		for entry in os.listdir(os.getcwd()):
-			if not entry in self.entries:
-				os.remove(entry)
-
 		# Change back to the original directory
 		os.chdir(self.pwd)
 
@@ -129,6 +119,8 @@ class TestC(TestRaise):
 
 		expected = \
 '''Running target 'build_object'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building C object 'main.o' ...                                              :)
 Building C program 'main.exe' ...                                           :)
@@ -143,6 +135,8 @@ Running C program ...                                                       :)
 
 		expected = \
 '''Running target 'build_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C program 'main.exe' ...                                           :)
 Running C program ...                                                       :)
 ./main.exe
@@ -155,6 +149,8 @@ Running C program ...                                                       :)
 
 		expected = \
 '''Running target 'build_shared_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building shared library 'lib_math.so' ...                                   :)
 Building C program 'main.exe' ...                                           :)
@@ -169,6 +165,8 @@ Running C program ...                                                       :)
 
 		expected = \
 '''Running target 'build_static_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building static library 'lib_math.a' ...                                    :)
 Building C program 'main.exe' ...                                           :)
@@ -187,6 +185,9 @@ class TestD(TestRaise):
 
 		expected = \
 '''Running target 'build_program'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building D program 'main.exe' ...                                           :)
 Running D program ...                                                       :)
 ./main.exe
@@ -199,6 +200,9 @@ Running D program ...                                                       :)
 
 		expected = \
 '''Running target 'build_object'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building D object 'lib_math.o' ...                                          :)
 Building D object 'main.o' ...                                              :)
 Building D program 'main.exe' ...                                           :)
@@ -213,6 +217,9 @@ Running D program ...                                                       :)
 
 		expected = \
 '''Running target 'build_static_library'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building D object 'lib_math.o' ...                                          :)
 Building D static library 'lib_math.a' ...                                  :)
 Building D program 'main.exe' ...                                           :)
@@ -227,6 +234,9 @@ Running D program ...                                                       :)
 
 		expected = \
 '''Running target 'build_interface'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building D interface 'lib_math.di' ...                                      :)'''
 
 		self.assertProcessOutput(command, expected)
@@ -240,6 +250,8 @@ class TestCXX(TestRaise):
 
 		expected = \
 '''Running target 'build_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C++ program 'main.exe' ...                                         :)
 Running C++ program ...                                                     :)
 ./main.exe
@@ -252,6 +264,8 @@ Running C++ program ...                                                     :)
 
 		expected = \
 '''Running target 'build_object'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building C++ object 'main.o' ...                                            :)
 Building C++ program 'main.exe' ...                                         :)
@@ -266,6 +280,8 @@ Running C++ program ...                                                     :)
 
 		expected = \
 '''Running target 'build_shared_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building shared library 'lib_math.so' ...                                   :)
 Building C++ program 'main.exe' ...                                         :)
@@ -280,6 +296,8 @@ Running C++ program ...                                                     :)
 
 		expected = \
 '''Running target 'build_static_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building static library 'lib_math.a' ...                                    :)
 Building C++ program 'main.exe' ...                                         :)
@@ -298,6 +316,8 @@ class TestCSharp(TestRaise):
 
 		expected = \
 '''Running target 'build_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C# program 'main.exe' ...                                          :)
 Running C# program ...                                                      :)
 main.exe
@@ -310,6 +330,8 @@ main.exe
 
 		expected = \
 '''Running target 'build_shared_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
 Building C# shared library 'lib_math.dll' ...                               :)
 Building C# program 'main.exe' ...                                          :)
 Running C# program ...                                                      :)

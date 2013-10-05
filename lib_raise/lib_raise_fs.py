@@ -138,6 +138,24 @@ def rmfile_f(name):
 
 	print_ok()
 
+def rm_binaries(name):
+	print_status("Removing binaries '{0}'".format(name))
+
+	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc']
+
+	for entry in os.listdir(os.getcwd()):
+		extension = os.path.splitext(entry)[-1].lower()
+		if os.path.isfile(entry):
+			if extension in extensions or entry == name:
+				os.remove(entry)
+
+	try:
+		pass
+	except Exception as e:
+		pass
+
+	print_ok()
+
 def symlink(source, link_name):
 	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
