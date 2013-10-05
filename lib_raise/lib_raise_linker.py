@@ -105,11 +105,6 @@ def linker_save_linker(linker):
 def linker_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("LINKER")
 
-	# Save the file extensions in the os format
-	save_native(out_file)
-	save_native(obj_files)
-	save_native(i_files)
-
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
@@ -120,6 +115,7 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 				out_file + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files)
+	command = module._linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
