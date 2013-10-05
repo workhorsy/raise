@@ -340,6 +340,43 @@ main.exe
 
 		self.assertProcessOutput(command, expected)
 
+class TestLibraries(TestRaise):
+	def setUp(self):
+		self.init('Libraries')
+
+	def test_find_installed_library(self):
+		command = '{0} raise -plain find_installed_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_library'
+Removing binaries 'main' ...                                                :)
+Checking for shared library 'libSDL' ...                                    :)'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_find_missing_library(self):
+		command = '{0} raise -plain find_missing_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_missing_library'
+Checking for shared library 'libDoesNotExist' ..............................:(
+Shared library 'libDoesNotExist (Any version)' not installed. Install and try 
+again. Exiting ...
+'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_find_installed_library_bad_version(self):
+		command = '{0} raise -plain find_installed_library_bad_version'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_library_bad_version'
+Checking for shared library 'libSDL' ......................................:(
+Shared library 'libSDL (ver >= (99))' not installed. Install and try again. E
+xiting ...
+'''
+
+		self.assertProcessOutput(command, expected)
 
 if __name__ == '__main__':
 	unittest.main()
