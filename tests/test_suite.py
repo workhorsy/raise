@@ -85,6 +85,10 @@ class TestProcessRunner(object):
 		return self._stdout
 	stdout = property(get_stdout)
 
+	def get_stdall(self):
+		return self._stdout + self._stderr
+	stdall = property(get_stdall)
+
 class TestRaise(unittest.TestCase):
 	def init(self, test_dir):
 		# Change to the test directory
@@ -103,12 +107,12 @@ class TestRaise(unittest.TestCase):
 		diff = '\n' + str.join('', diff_lines)
 		raise AssertionError(diff)
 
-	def assertProcessOutput(self, command, expected):
+	def assertProcessOutput(self, command, expected, is_success = True):
 		process = TestProcessRunner(command)
 		process.run()
 
-		self.assertNotDiff(expected, process.stdout)
-		self.assertTrue(process.is_success)
+		self.assertNotDiff(expected, process.stdall)
+		self.assertEqual(process.is_success, is_success)
 
 class TestC(TestRaise):
 	def setUp(self):
@@ -349,7 +353,6 @@ class TestLibraries(TestRaise):
 
 		expected = \
 '''Running target 'find_installed_library'
-Removing binaries 'main' ...                                                :)
 Checking for shared library 'libSDL' ...                                    :)'''
 
 		self.assertProcessOutput(command, expected)
@@ -360,11 +363,9 @@ Checking for shared library 'libSDL' ...                                    :)''
 		expected = \
 '''Running target 'find_missing_library'
 Checking for shared library 'libDoesNotExist' ..............................:(
-Shared library 'libDoesNotExist (Any version)' not installed. Install and try 
-again. Exiting ...
-'''
+Shared library 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
 
-		self.assertProcessOutput(command, expected)
+		self.assertProcessOutput(command, expected, False)
 
 	def test_find_installed_library_bad_version(self):
 		command = '{0} raise -plain find_installed_library_bad_version'.format(sys.executable)
@@ -372,11 +373,9 @@ again. Exiting ...
 		expected = \
 '''Running target 'find_installed_library_bad_version'
 Checking for shared library 'libSDL' ......................................:(
-Shared library 'libSDL (ver >= (99))' not installed. Install and try again. E
-xiting ...
-'''
+Shared library 'libSDL (ver >= (99))' not installed. Install and try again. Exiting ...'''
 
-		self.assertProcessOutput(command, expected)
+		self.assertProcessOutput(command, expected, False)
 
 if __name__ == '__main__':
 	unittest.main()
