@@ -29,7 +29,121 @@
 import os, sys
 import subprocess
 import difflib
-import unittest
+import inspect
+import threading
+import time
+import multiprocessing
+
+
+class TestCase(object):
+	def setUp(self):
+		pass
+
+	def init(self, test_dir):
+		# Change to the test directory
+		self.pwd = os.getcwd()
+		os.chdir(test_dir)
+
+	def tearDown(self):
+		# Change back to the original directory
+		os.chdir(self.pwd)
+
+	def assertEqual(self, a, b):
+		if a == b:
+			return
+		raise AssertionError("{0} != {1}".format(a, b))
+
+	def assertNotDiff(self, expected, actual):
+		if expected == actual:
+			return
+
+		diff_lines = difflib.ndiff(expected.splitlines(1), actual.splitlines(1))
+		diff = '\n' + str.join('', diff_lines)
+		raise AssertionError(diff)
+
+	def assertProcessOutput(self, command, expected, is_success = True):
+		process = TestProcessRunner(command)
+		process.run()
+
+		self.assertNotDiff(expected, process.stdall)
+		self.assertEqual(process.is_success, is_success)
+
+class TestThread(threading.Thread):
+	def __init__(self, test_case, test_member):
+		threading.Thread.__init__(self)
+		self.test_case = test_case
+		self.test_member = test_member
+
+	def run(self):
+		self.err = None
+		try:
+			self.test_case.setUp()
+			self.test_member()
+		except Exception as err:
+			self.err = err
+		finally:
+			self.test_case.tearDown()
+
+class ConcurrentTestRunner(object):
+	def __init__(self):
+		self.test_cases = []
+		self.fails = []
+
+	def add(self, test_case):
+		self.test_cases.append(test_case)
+
+	def run(self):
+		# Get the number of CPU cores
+		cpus_total = 1 #multiprocessing.cpu_count() # FIXME
+		cpus_free = cpus_total
+		ready_members = []
+
+		# Get each test instance and method
+		for test_case_cls in self.test_cases:
+			test_case = test_case_cls()
+			members = inspect.getmembers(test_case, predicate=inspect.ismethod)
+
+			for name, member in members:
+				if not name.startswith('test_'):
+					continue
+
+				pair = (test_case, member)
+				ready_members.append(pair)
+
+		# Run one thread per CPU core, until all the threads are done
+		running_threads = []
+		while True:
+			while cpus_free and ready_members:
+				test_case, member = ready_members.pop()
+
+				t = TestThread(test_case, member)
+				t.start()
+				running_threads.append(t)
+				cpus_free -= 1
+
+			for t in running_threads[:]:
+				#print(cpus_free, len(ready_members), len(running_threads))
+				if t.isAlive():
+					continue
+
+				cpus_free += 1
+				running_threads.remove(t)
+				t.join()
+				if t.err:
+					self.fails.append(t.err)
+					sys.stdout.write('F')
+				else:
+					sys.stdout.write('.')
+				sys.stdout.flush()
+
+			if not ready_members and not running_threads:
+				break
+
+			time.sleep(0.2)
+
+		sys.stdout.write('\n')
+		for fail in self.fails:
+			print(fail)
 
 class TestProcessRunner(object):
 	def __init__(self, command):
@@ -89,32 +203,9 @@ class TestProcessRunner(object):
 		return self._stdout + self._stderr
 	stdall = property(get_stdall)
 
-class TestRaise(unittest.TestCase):
-	def init(self, test_dir):
-		# Change to the test directory
-		self.pwd = os.getcwd()
-		os.chdir(test_dir)
 
-	def tearDown(self):
-		# Change back to the original directory
-		os.chdir(self.pwd)
 
-	def assertNotDiff(self, expected, actual):
-		if expected == actual:
-			return
-
-		diff_lines = difflib.ndiff(expected.splitlines(1), actual.splitlines(1))
-		diff = '\n' + str.join('', diff_lines)
-		raise AssertionError(diff)
-
-	def assertProcessOutput(self, command, expected, is_success = True):
-		process = TestProcessRunner(command)
-		process.run()
-
-		self.assertNotDiff(expected, process.stdall)
-		self.assertEqual(process.is_success, is_success)
-
-class TestC(TestRaise):
+class TestC(TestCase):
 	def setUp(self):
 		self.init('C')
 
@@ -180,7 +271,7 @@ Running C program ...                                                       :)
 
 		self.assertProcessOutput(command, expected)
 
-class TestD(TestRaise):
+class TestD(TestCase):
 	def setUp(self):
 		self.init('D')
 
@@ -245,7 +336,7 @@ Building D interface 'lib_math.di' ...                                      :)''
 
 		self.assertProcessOutput(command, expected)
 
-class TestCXX(TestRaise):
+class TestCXX(TestCase):
 	def setUp(self):
 		self.init('CXX')
 
@@ -311,7 +402,7 @@ Running C++ program ...                                                     :)
 
 		self.assertProcessOutput(command, expected)
 
-class TestCSharp(TestRaise):
+class TestCSharp(TestCase):
 	def setUp(self):
 		self.init('CSharp')
 
@@ -344,7 +435,7 @@ main.exe
 
 		self.assertProcessOutput(command, expected)
 
-class TestLibraries(TestRaise):
+class TestLibraries(TestCase):
 	def setUp(self):
 		self.init('Libraries')
 
@@ -378,7 +469,10 @@ Shared library 'libSDL (ver >= (99))' not installed. Install and try again. Exit
 		self.assertProcessOutput(command, expected, False)
 
 if __name__ == '__main__':
-	unittest.main()
+	runner = ConcurrentTestRunner()
+	for cls in TestCase.__subclasses__():
+		runner.add(cls)
+	runner.run()
 
 
 
