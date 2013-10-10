@@ -30,23 +30,28 @@ import os, sys
 import subprocess
 import difflib
 import inspect
-import threading
 import time
 import multiprocessing
+import shutil
 
 
 class TestCase(object):
-	def setUp(self):
+	def setUp(self, id):
 		pass
 
-	def init(self, test_dir):
+	def init(self, test_dir, id):
+		self.id = id
+
 		# Change to the test directory
 		self.pwd = os.getcwd()
-		os.chdir(test_dir)
+		self.build_dir = 'build_{0}'.format(self.id)
+		shutil.copytree(test_dir, self.build_dir)
+		os.chdir(self.build_dir)
 
 	def tearDown(self):
 		# Change back to the original directory
 		os.chdir(self.pwd)
+		shutil.rmtree(self.build_dir)
 
 	def assertEqual(self, a, b):
 		if a == b:
@@ -68,35 +73,31 @@ class TestCase(object):
 		self.assertNotDiff(expected, process.stdall)
 		self.assertEqual(process.is_success, is_success)
 
-class TestThread(threading.Thread):
-	def __init__(self, test_case, test_member):
-		threading.Thread.__init__(self)
-		self.test_case = test_case
-		self.test_member = test_member
-
-	def run(self):
-		self.err = None
-		try:
-			self.test_case.setUp()
-			self.test_member()
-		except Exception as err:
-			self.err = err
-		finally:
-			self.test_case.tearDown()
+def test_runner(queue, test_case, member, id):
+	try:
+		test_case.setUp(id)
+		member()
+		queue.put('ok')
+	except Exception as err:
+		queue.put(str(err))
+	finally:
+		test_case.tearDown()
 
 class ConcurrentTestRunner(object):
 	def __init__(self):
 		self.test_cases = []
 		self.fails = []
+		self.next_id = 0
 
 	def add(self, test_case):
 		self.test_cases.append(test_case)
 
 	def run(self):
 		# Get the number of CPU cores
-		cpus_total = 1 #multiprocessing.cpu_count() # FIXME
+		cpus_total = multiprocessing.cpu_count()
 		cpus_free = cpus_total
 		ready_members = []
+		queue = multiprocessing.Queue()
 
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
@@ -111,32 +112,35 @@ class ConcurrentTestRunner(object):
 				ready_members.append(pair)
 
 		# Run one thread per CPU core, until all the threads are done
-		running_threads = []
+		running_processes = []
 		while True:
 			while cpus_free and ready_members:
 				test_case, member = ready_members.pop()
 
-				t = TestThread(test_case, member)
-				t.start()
-				running_threads.append(t)
+				self.next_id += 1
+				args = (queue, test_case, member, self.next_id)
+				p = multiprocessing.Process(target=test_runner, args=args)
+				p.start()
+				running_processes.append(p)
 				cpus_free -= 1
 
-			for t in running_threads[:]:
-				#print(cpus_free, len(ready_members), len(running_threads))
-				if t.isAlive():
+			for p in running_processes[:]:
+				#print(cpus_free, len(ready_members), len(running_processes))
+				if p.is_alive():
 					continue
 
 				cpus_free += 1
-				running_threads.remove(t)
-				t.join()
-				if t.err:
-					self.fails.append(t.err)
-					sys.stdout.write('F')
-				else:
+				running_processes.remove(p)
+				p.join()
+				message = queue.get()
+				if message == 'ok':
 					sys.stdout.write('.')
+				else:
+					self.fails.append(message)
+					sys.stdout.write('F')
 				sys.stdout.flush()
 
-			if not ready_members and not running_threads:
+			if not ready_members and not running_processes:
 				break
 
 			time.sleep(0.2)
@@ -206,8 +210,8 @@ class TestProcessRunner(object):
 
 
 class TestC(TestCase):
-	def setUp(self):
-		self.init('C')
+	def setUp(self, id):
+		self.init('C', id)
 
 	def test_build_object(self):
 		command = '{0} raise -plain build_object'.format(sys.executable)
@@ -272,8 +276,8 @@ Running C program ...                                                       :)
 		self.assertProcessOutput(command, expected)
 
 class TestD(TestCase):
-	def setUp(self):
-		self.init('D')
+	def setUp(self, id):
+		self.init('D', id)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
@@ -337,8 +341,8 @@ Building D interface 'lib_math.di' ...                                      :)''
 		self.assertProcessOutput(command, expected)
 
 class TestCXX(TestCase):
-	def setUp(self):
-		self.init('CXX')
+	def setUp(self, id):
+		self.init('CXX', id)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
@@ -403,8 +407,8 @@ Running C++ program ...                                                     :)
 		self.assertProcessOutput(command, expected)
 
 class TestCSharp(TestCase):
-	def setUp(self):
-		self.init('CSharp')
+	def setUp(self, id):
+		self.init('CSharp', id)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
@@ -436,8 +440,8 @@ main.exe
 		self.assertProcessOutput(command, expected)
 
 class TestLibraries(TestCase):
-	def setUp(self):
-		self.init('Libraries')
+	def setUp(self, id):
+		self.init('Libraries', id)
 
 	def test_find_installed_library(self):
 		command = '{0} raise -plain find_installed_library'.format(sys.executable)
