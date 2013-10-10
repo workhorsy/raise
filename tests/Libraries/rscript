@@ -37,5 +37,5 @@ def find_installed_library_bad_version():
 	clean()
 	_configure()
 
-	require_shared_library('libSDL', lambda ver: ver >= (99))
+	require_shared_library('libSDL', lambda ver: ver >= (99, 0))
 
