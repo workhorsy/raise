@@ -98,6 +98,8 @@ class ConcurrentTestRunner(object):
 		cpus_free = cpus_total
 		ready_members = []
 		queue = multiprocessing.Queue()
+		total = 0
+		successful = 0
 
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
@@ -110,8 +112,9 @@ class ConcurrentTestRunner(object):
 
 				pair = (test_case, member)
 				ready_members.append(pair)
+				total += 1
 
-		# Run one thread per CPU core, until all the threads are done
+		# Run one process per CPU core, until all the processes are done
 		running_processes = []
 		while True:
 			while cpus_free and ready_members:
@@ -134,6 +137,7 @@ class ConcurrentTestRunner(object):
 				p.join()
 				message = queue.get()
 				if message == 'ok':
+					successful += 1
 					sys.stdout.write('.')
 				else:
 					self.fails.append(message)
@@ -145,7 +149,10 @@ class ConcurrentTestRunner(object):
 
 			time.sleep(0.2)
 
-		sys.stdout.write('\n')
+		# Print the results
+		print('')
+		print('Unit Test Results:')
+		print('{0} total, {1} successful, {2} failed'.format(total, successful, len(self.fails)))
 		for fail in self.fails:
 			print(fail)
 
@@ -468,7 +475,7 @@ Shared library 'libDoesNotExist (Any version)' not installed. Install and try ag
 		expected = \
 '''Running target 'find_installed_library_bad_version'
 Checking for shared library 'libSDL' ......................................:(
-Shared library 'libSDL (ver >= (99))' not installed. Install and try again. Exiting ...'''
+Shared library 'libSDL (ver >= (99, 0))' not installed. Install and try again. Exiting ...'''
 
 		self.assertProcessOutput(command, expected, False)
 
