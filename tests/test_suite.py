@@ -73,14 +73,15 @@ class TestCase(object):
 		self.assertNotDiff(expected, process.stdall)
 		self.assertEqual(process.is_success, is_success)
 
-def test_runner(queue, test_case, member, id):
+def test_runner(conn, test_case, member, id):
 	try:
 		test_case.setUp(id)
 		member()
-		queue.put('ok')
+		conn.send('ok')
 	except Exception as err:
-		queue.put(str(err))
+		conn.send(str(err))
 	finally:
+		conn.close()
 		test_case.tearDown()
 
 class ConcurrentTestRunner(object):
@@ -89,7 +90,7 @@ class ConcurrentTestRunner(object):
 		self.fails = []
 		self.next_id = 0
 
-	def add(self, test_case):
+	def add_test_case(self, test_case):
 		self.test_cases.append(test_case)
 
 	def run(self):
@@ -97,7 +98,6 @@ class ConcurrentTestRunner(object):
 		cpus_total = multiprocessing.cpu_count()
 		cpus_free = cpus_total
 		ready_members = []
-		queue = multiprocessing.Queue()
 		total = 0
 		successful = 0
 
@@ -115,27 +115,29 @@ class ConcurrentTestRunner(object):
 				total += 1
 
 		# Run one process per CPU core, until all the processes are done
-		running_processes = []
+		running_processes = {}
 		while True:
 			while cpus_free and ready_members:
 				test_case, member = ready_members.pop()
 
 				self.next_id += 1
-				args = (queue, test_case, member, self.next_id)
-				p = multiprocessing.Process(target=test_runner, args=args)
-				p.start()
-				running_processes.append(p)
+				parent_conn, child_conn = multiprocessing.Pipe()
+				args = (child_conn, test_case, member, self.next_id)
+				process = multiprocessing.Process(target=test_runner, args=args)
+				process.start()
+				running_processes[process] = parent_conn
 				cpus_free -= 1
 
-			for p in running_processes[:]:
+			for process in running_processes.keys():
 				#print(cpus_free, len(ready_members), len(running_processes))
-				if p.is_alive():
+				if process.is_alive():
 					continue
 
 				cpus_free += 1
-				running_processes.remove(p)
-				p.join()
-				message = queue.get()
+				parent_conn = running_processes[process]
+				del running_processes[process]
+				process.join()
+				message = parent_conn.recv()
 				if message == 'ok':
 					successful += 1
 					sys.stdout.write('.')
@@ -482,7 +484,7 @@ Shared library 'libSDL (ver >= (99, 0))' not installed. Install and try again. E
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	for cls in TestCase.__subclasses__():
-		runner.add(cls)
+		runner.add_test_case(cls)
 	runner.run()
 
 
