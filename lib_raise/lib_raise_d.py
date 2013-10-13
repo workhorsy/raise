@@ -34,24 +34,24 @@ class DModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
-		entension_map = {}
+		extension_map = {}
 		# Figure out the extensions for this OS
 		if os_module._os_type._name == 'Cygwin':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
 		elif os_module._os_type._name == 'Windows':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
 				'.so' : '.dll',
 				'.a' : '.lib'
 			}
 		else:
-			entension_map = {
+			extension_map = {
 				'.exe' : '',
 				'.o' : '.o',
 				'.so' : '.so',
@@ -78,7 +78,7 @@ class DModule(RaiseModule):
 					optimize =             '-O', 
 					compile_time_flags =   '-version=', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.d_compilers[comp._name] = comp
 			elif name == 'ldc2':
@@ -94,7 +94,7 @@ class DModule(RaiseModule):
 					optimize =             '-O2',
 					compile_time_flags =   '-version=', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.d_compilers[comp._name] = comp
 
@@ -166,7 +166,7 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.o')
+	require_file_extension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
@@ -198,7 +198,7 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.so')
+	require_file_extension(o_file, '.so')
 
 	# Setup the messages
 	task = 'Building'
@@ -229,7 +229,7 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.a')
+	require_file_extension(o_file, '.a')
 
 	# Setup the messages
 	task = 'Building'
@@ -257,7 +257,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	require_file_entension(out_file, '.exe')
+	require_file_extension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'

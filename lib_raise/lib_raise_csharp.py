@@ -36,20 +36,20 @@ class CSharpModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
-		entension_map = {}
+		extension_map = {}
 		# Figure out the extensions for this OS
 		if os_module._os_type._name == 'Cygwin':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.dll' : '.dll'
 			}
 		elif os_module._os_type._name == 'Windows':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.dll' : '.dll'
 			}
 		else:
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.dll' : '.dll'
 			}
@@ -74,7 +74,7 @@ class CSharpModule(RaiseModule):
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
 					link =                 '', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.cs_compilers[comp._name] = comp
 				self.cs_runtimes[comp._name] = 'mono'
@@ -91,7 +91,7 @@ class CSharpModule(RaiseModule):
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
 					link =                 '', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.cs_compilers[comp._name] = comp
 				self.cs_runtimes[comp._name] = ''

@@ -35,24 +35,24 @@ class CModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
-		entension_map = {}
+		extension_map = {}
 		# Figure out the extensions for this OS
 		if os_module._os_type._name == 'Cygwin':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
 		elif os_module._os_type._name == 'Windows':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
 				'.so' : '.dll',
 				'.a' : '.lib'
 			}
 		else:
-			entension_map = {
+			extension_map = {
 				'.exe' : '',
 				'.o' : '.o',
 				'.so' : '.so',
@@ -79,7 +79,7 @@ class CModule(RaiseModule):
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'clang':
@@ -95,7 +95,7 @@ class CModule(RaiseModule):
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'cl.exe':
@@ -112,7 +112,7 @@ class CModule(RaiseModule):
 					optimize =             '/O2', 
 					compile_time_flags =   '-D', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 
@@ -163,7 +163,7 @@ def c_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("C")
 
 	# Make sure the extension is valid
-	require_file_entension(out_file, '.exe')
+	require_file_extension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Linking'
@@ -193,7 +193,7 @@ def c_build_object(o_file, c_files, i_files=[]):
 	module = Config.require_module("C")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.o')
+	require_file_extension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
@@ -228,7 +228,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 	module = Config.require_module("C")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.exe')
+	require_file_extension(o_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'
@@ -258,7 +258,7 @@ def c_build_shared_library(so_file, o_files):
 	module = Config.require_module("LINKER")
 
 	# Make sure the extension is valid
-	require_file_entension(so_file, '.so')
+	require_file_extension(so_file, '.so')
 
 	# Setup the messages
 	task = 'Building'

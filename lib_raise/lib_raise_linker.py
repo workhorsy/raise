@@ -34,7 +34,7 @@ class LinkerModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
-		entension_map = {}
+		extension_map = {}
 
 		# Get the names and paths for know linkers
 		names = ['ld', 'link.exe']
@@ -49,7 +49,7 @@ class LinkerModule(RaiseModule):
 					setup           = '/nologo', 
 					out_file        = '/out:', 
 					shared          = '/dll ',
-					entension_map   = entension_map
+					extension_map   = extension_map
 				)
 				self.linkers[link._name] = link
 			elif name == 'ld':
@@ -58,7 +58,7 @@ class LinkerModule(RaiseModule):
 					setup           = '', 
 					out_file        = '-o ', 
 					shared          = '-G', 
-					entension_map   = entension_map
+					extension_map   = extension_map
 				)
 				self.linkers[link._name] = link
 
@@ -71,17 +71,17 @@ class LinkerModule(RaiseModule):
 		self.is_setup = True
 
 class Linker(object):
-	def __init__(self, name, setup, out_file, shared, entension_map):
+	def __init__(self, name, setup, out_file, shared, extension_map):
 		self._name = name
 		
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_shared = shared
 
-		self.entension_map = entension_map
+		self.extension_map = extension_map
 
 	def to_native(self, command):
-		for before, after in self.entension_map.items():
+		for before, after in self.extension_map.items():
 			command = command.replace(before, after)
 
 		return command

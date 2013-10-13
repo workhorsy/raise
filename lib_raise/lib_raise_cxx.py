@@ -34,24 +34,24 @@ class CXXModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
-		entension_map = {}
+		extension_map = {}
 		# Figure out the extensions for this OS
 		if os_module._os_type._name == 'Cygwin':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
 		elif os_module._os_type._name == 'Windows':
-			entension_map = {
+			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
 				'.so' : '.dll',
 				'.a' : '.lib'
 			}
 		else:
-			entension_map = {
+			extension_map = {
 				'.exe' : '',
 				'.o' : '.o',
 				'.so' : '.so',
@@ -78,7 +78,7 @@ class CXXModule(RaiseModule):
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
 					link =                 '-Wl,-as-needed', 
-					entension_map = entension_map
+					extension_map = extension_map
 				)
 				self.cxx_compilers[comp._name] = comp
 
@@ -128,7 +128,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.exe')
+	require_file_extension(o_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'
@@ -157,7 +157,7 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	require_file_entension(out_file, '.exe')
+	require_file_extension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Linking'
@@ -187,7 +187,7 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	require_file_entension(o_file, '.o')
+	require_file_extension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'

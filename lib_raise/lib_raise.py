@@ -71,7 +71,7 @@ class RaiseModule(object):
 class Compiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors, optimize, 
-				compile_time_flags, link, entension_map):
+				compile_time_flags, link, extension_map):
 
 		self._name = name
 		self._path = path
@@ -94,10 +94,10 @@ class Compiler(object):
 		self.optimize = False
 		self.compile_time_flags = []
 
-		self.entension_map = entension_map
+		self.extension_map = extension_map
 
 	def to_native(self, command):
-		for before, after in self.entension_map.items():
+		for before, after in self.extension_map.items():
 			command = command.replace(before, after)
 
 		return command
