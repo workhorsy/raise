@@ -128,7 +128,7 @@ class ConcurrentTestRunner(object):
 				running_processes[process] = parent_conn
 				cpus_free -= 1
 
-			for process in running_processes.keys():
+			for process in list(running_processes.keys()):
 				#print(cpus_free, len(ready_members), len(running_processes))
 				if process.is_alive():
 					continue
