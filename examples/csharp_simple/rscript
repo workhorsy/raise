@@ -5,8 +5,8 @@ import_module('CSHARP')
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rmfile_f('main.exe.mdb')
-	rmfile_f('main.exe')
+	rm_binaries('lib_math_helper')
+	rm_binaries('main')
 
 def _configure():
 	csc = csharp_get_default_compiler()

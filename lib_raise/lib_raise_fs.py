@@ -141,18 +141,14 @@ def rmfile_f(name):
 def rm_binaries(name):
 	print_status("Removing binaries '{0}'".format(name))
 
-	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc']
+	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc',
+				'.exe.mdb', '.dll.mdb']
 
 	for entry in os.listdir(os.getcwd()):
-		extension = os.path.splitext(entry)[-1].lower()
-		if os.path.isfile(entry):
+		if entry.startswith(name) and os.path.isfile(entry):
+			extension = '.' + str.join('.', entry.lower().split('.')[1:])
 			if extension in extensions or entry == name:
 				os.remove(entry)
-
-	try:
-		pass
-	except Exception as e:
-		pass
 
 	print_ok()
 

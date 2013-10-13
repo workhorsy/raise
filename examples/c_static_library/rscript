@@ -7,9 +7,8 @@ import_module('AR')
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rmfile_f('raise_example')
-	rmfile_f('libexample.o')
-	rmfile_f('libexample.a')
+	rm_binaries('raise_example')
+	rm_binaries('libexample')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -31,10 +30,10 @@ def test():
 	ar_build_static_library('libexample.a', ['libexample.o'])
 
 	# Build the program and link against the library
-	c_build_program('raise_example', ['main.c'], ['libexample.a'])
+	c_build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 
 	# Run the program
-	run_say('./raise_example')
+	c_run_say('./raise_example.exe')
 
 def _remove():
 	rmfile_f('/usr/bin/raise_example')
@@ -61,7 +60,7 @@ def install():
 	def actual_build():
 		c_build_object('libexample.o', ['libexample.c'])
 		ar_build_static_library('libexample.a', ['libexample.o'])
-		c_build_program('raise_example', ['main.c'], ['libexample.a'])
+		c_build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 	do_as_normal_user(actual_build)
 
 	# Remove old install

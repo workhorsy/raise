@@ -166,8 +166,7 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	if not o_file.endswith('.o'):
-		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
+	require_file_entension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
@@ -199,8 +198,7 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	if not o_file.endswith('.so'):
-		print_exit("Out file extension should be '.so' not '.{0}'.".format(o_file.split('.')[-1]))
+	require_file_entension(o_file, '.so')
 
 	# Setup the messages
 	task = 'Building'
@@ -231,8 +229,7 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	if not o_file.endswith('.a'):
-		print_exit("Out file extension should be '.a' not '.{0}'.".format(o_file.split('.')[-1]))
+	require_file_entension(o_file, '.a')
 
 	# Setup the messages
 	task = 'Building'
@@ -260,8 +257,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	module = Config.require_module("D")
 
 	# Make sure the extension is valid
-	if not out_file.endswith('.exe'):
-		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
+	require_file_entension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'

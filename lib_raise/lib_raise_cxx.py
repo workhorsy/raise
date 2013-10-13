@@ -128,8 +128,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	if not o_file.endswith('.exe'):
-		print_exit("Out file extension should be '.exe' not '.{0}'.".format(o_file.split('.')[-1]))
+	require_file_entension(o_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'
@@ -158,8 +157,7 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	if not out_file.endswith('.exe'):
-		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
+	require_file_entension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Linking'
@@ -189,8 +187,7 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	module = Config.require_module("CXX")
 
 	# Make sure the extension is valid
-	if not o_file.endswith('.o'):
-		print_exit("Out file extension should be '.o' not '.{0}'.".format(o_file.split('.')[-1]))
+	require_file_entension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
