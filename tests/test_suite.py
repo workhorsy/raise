@@ -217,6 +217,37 @@ class TestProcessRunner(object):
 	stdall = property(get_stdall)
 
 
+class TestBasics(TestCase):
+	def setUp(self, id):
+		self.init('Basics', id)
+
+	def test_ok(self):
+		command = '{0} raise -plain simple_ok'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_ok'
+Simple ok ...                                                               :)'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_fail(self):
+		command = '{0} raise -plain simple_fail'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_fail'
+Simple fail ................................................................:('''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_warning(self):
+		command = '{0} raise -plain simple_warning'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_warning'
+Simple warning .............................................................:\\'''
+
+		self.assertProcessOutput(command, expected)
+
 
 class TestC(TestCase):
 	def setUp(self, id):
