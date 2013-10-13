@@ -117,6 +117,7 @@ class ConcurrentTestRunner(object):
 		# Run one process per CPU core, until all the processes are done
 		running_processes = {}
 		while True:
+			# Start the next processes
 			while cpus_free and ready_members:
 				test_case, member = ready_members.pop()
 
@@ -128,6 +129,7 @@ class ConcurrentTestRunner(object):
 				running_processes[process] = parent_conn
 				cpus_free -= 1
 
+			# Check all the running processes and stop any that are done
 			for process in list(running_processes.keys()):
 				#print(cpus_free, len(ready_members), len(running_processes))
 				if process.is_alive():
@@ -135,7 +137,6 @@ class ConcurrentTestRunner(object):
 
 				cpus_free += 1
 				parent_conn = running_processes[process]
-				del running_processes[process]
 				process.join()
 				message = parent_conn.recv()
 				if message == 'ok':
@@ -146,9 +147,13 @@ class ConcurrentTestRunner(object):
 					sys.stdout.write('F')
 				sys.stdout.flush()
 
+				del running_processes[process]
+
+			# Break if there are no more processes
 			if not ready_members and not running_processes:
 				break
 
+			# Sleep for a bit if there are more processes to run
 			time.sleep(0.2)
 
 		# Print the results
