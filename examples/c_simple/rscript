@@ -5,8 +5,8 @@ import_module('C')
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rmfile_f('raise_example')
-	rmfile_f('main.o')
+	rm_binaries('raise_example')
+	rm_binaries('main')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -24,10 +24,10 @@ def test():
 	_configure()
 
 	# Build the program
-	c_build_program('raise_example', ['main.c'])
+	c_build_program('raise_example.exe', ['main.c'])
 
 	# Run the program
-	run_say('./raise_example')
+	c_run_say('./raise_example.exe')
 
 def _remove():
 	rmfile_f('/usr/bin/raise_example')
@@ -50,7 +50,7 @@ def install():
 
 	# Build as a normal user
 	def actual_build():
-		c_build_program('raise_example', ['main.c'])
+		c_build_program('raise_example.exe', ['main.c'])
 	do_as_normal_user(actual_build)
 
 	# Remove old install

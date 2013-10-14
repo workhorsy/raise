@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import_module('C')
+import_module('Linker')
+import_module('AR')
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	rm_binaries('lib_math')
+	rm_binaries('main')
+
+def _configure():
+	cc = c_get_default_compiler()
+	cc.debug = True
+	cc.optimize = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	c_save_compiler(cc)
+
+	linker = linker_get_default_linker()
+	linker_save_linker(linker)
+
+	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
+
+def build_object():
+	clean()
+	_configure()
+
+	c_build_object('lib_math.o', ['lib_math.c'])
+	c_build_object('main.o', ['main.c'])
+
+	c_build_program('main.exe', ['lib_math.o', 'main.o'])
+
+	c_run_say('./main.exe')
+
+def build_program():
+	clean()
+	_configure()
+
+	c_build_program('main.exe', ['lib_math.c', 'main.c'])
+
+	c_run_say('./main.exe')
+
+def build_shared_library():
+	clean()
+	_configure()
+
+	# Build the library
+	c_build_object('lib_math.o', ['lib_math.c'])
+	c_build_shared_library('lib_math.so', ['lib_math.o'])
+
+	c_build_program('main.exe', ['main.c', 'lib_math.so'])
+
+	c_run_say('./main.exe')
+
+def build_static_library():
+	clean()
+	_configure()
+
+	# Build the library
+	c_build_object('lib_math.o', ['lib_math.c'])
+	ar_build_static_library('lib_math.a', ['lib_math.o'])
+
+	c_build_program('main.exe', ['main.c', 'lib_math.a'])
+
+	c_run_say('./main.exe')
+

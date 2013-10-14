@@ -34,6 +34,31 @@ class CModule(RaiseModule):
 		self._cc = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		extension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			extension_map = {
+				'.exe' : '.exe',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+		elif os_module._os_type._name == 'Windows':
+			extension_map = {
+				'.exe' : '.exe',
+				'.o' : '.obj',
+				'.so' : '.dll',
+				'.a' : '.lib'
+			}
+		else:
+			extension_map = {
+				'.exe' : '',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+
 		# Get the names and paths for know C compilers
 		names = ['gcc', 'clang', 'cl.exe']
 		for name in names:
@@ -53,7 +78,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'clang':
@@ -68,7 +94,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 			elif name == 'cl.exe':
@@ -84,7 +111,8 @@ class CModule(RaiseModule):
 					warnings_as_errors =   '', 
 					optimize =             '/O2', 
 					compile_time_flags =   '-D', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
 				)
 				self.c_compilers[comp._name] = comp
 
@@ -134,10 +162,8 @@ def c_save_compiler(compiler):
 def c_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("C")
 
-	# Change file extensions to os format
-	out_file = to_native(out_file)
-	obj_files = to_native(obj_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	require_file_extension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Linking'
@@ -149,6 +175,7 @@ def c_link_program(out_file, obj_files, i_files=[]):
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cc._opt_out_file + out_file
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -165,10 +192,8 @@ def c_link_program(out_file, obj_files, i_files=[]):
 def c_build_object(o_file, c_files, i_files=[]):
 	module = Config.require_module("C")
 
-	# Change file extensions to os format
-	o_file = to_native(o_file)
-	c_files = to_native(c_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	require_file_extension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
@@ -181,6 +206,7 @@ def c_build_object(o_file, c_files, i_files=[]):
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -201,10 +227,8 @@ def c_build_object(o_file, c_files, i_files=[]):
 def c_build_program(o_file, c_files, i_files=[]):
 	module = Config.require_module("C")
 
-	# Change file extensions to os format
-	o_file = to_native(o_file)
-	c_files = to_native(c_files)
-	i_files = to_native(i_files)
+	# Make sure the extension is valid
+	require_file_extension(o_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'
@@ -215,6 +239,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				module._cc._opt_out_file + o_file
+	command = module._cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -228,41 +253,12 @@ def c_build_program(o_file, c_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-
-# FIXME: Rename to c_build_static_library
-def ar_build_static_library(ar_file, o_files):
-	module = Config.require_module("C")
-
-	# Change file extensions to os format
-	ar_file = to_native(ar_file)
-	o_files = to_native(o_files)
-
-	# Setup the messages
-	task = 'Building'
-	result = ar_file
-	plural = 'static libraries'
-	singular = 'static library'
-	command = "ar rcs " + \
-			ar_file + " " + \
-			str.join(' ', o_files)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		if not is_outdated(to_update = [ar_file], triggers = o_files):
-			return False
-		return True
-
-	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
-	add_event(event)
-
 # FIXME: Change to use the linker through the compiler
 def c_build_shared_library(so_file, o_files):
 	module = Config.require_module("LINKER")
 
-	# Change file extensions to os format
-	so_file = to_native(so_file)
-	o_files = to_native(o_files)
+	# Make sure the extension is valid
+	require_file_extension(so_file, '.so')
 
 	# Setup the messages
 	task = 'Building'
@@ -276,6 +272,7 @@ def c_build_shared_library(so_file, o_files):
 				str.join(' ', o_files), 
 				module._linker._opt_out_file, 
 				so_file)
+	command = module._linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -286,4 +283,24 @@ def c_build_shared_library(so_file, o_files):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def c_run_say(command):
+	module = Config.require_module("C")
+
+	print_status("Running C program")
+
+	native_command = module._cc.to_native(command)
+	runner = ProcessRunner(native_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 

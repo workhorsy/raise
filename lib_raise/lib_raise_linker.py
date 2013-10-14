@@ -33,6 +33,9 @@ class LinkerModule(RaiseModule):
 		self._linker = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		extension_map = {}
+
 		# Get the names and paths for know linkers
 		names = ['ld', 'link.exe']
 		for name in names:
@@ -45,7 +48,8 @@ class LinkerModule(RaiseModule):
 					name            = 'link.exe',
 					setup           = '/nologo', 
 					out_file        = '/out:', 
-					shared          = '/dll '
+					shared          = '/dll ',
+					extension_map   = extension_map
 				)
 				self.linkers[link._name] = link
 			elif name == 'ld':
@@ -53,7 +57,8 @@ class LinkerModule(RaiseModule):
 					name            = 'ld',
 					setup           = '', 
 					out_file        = '-o ', 
-					shared          = '-G'
+					shared          = '-G', 
+					extension_map   = extension_map
 				)
 				self.linkers[link._name] = link
 
@@ -66,12 +71,20 @@ class LinkerModule(RaiseModule):
 		self.is_setup = True
 
 class Linker(object):
-	def __init__(self, name, setup, out_file, shared):
+	def __init__(self, name, setup, out_file, shared, extension_map):
 		self._name = name
 		
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_shared = shared
+
+		self.extension_map = extension_map
+
+	def to_native(self, command):
+		for before, after in self.extension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 def linker_get_default_linker():
 	module = Config.require_module("LINKER")
@@ -92,11 +105,6 @@ def linker_save_linker(linker):
 def linker_link_program(out_file, obj_files, i_files=[]):
 	module = Config.require_module("LINKER")
 
-	# Change file extensions to os format
-	out_file = to_native(out_file)
-	obj_files = to_native(obj_files)
-	i_files = to_native(i_files)
-
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
@@ -107,6 +115,7 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 				out_file + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files)
+	command = module._linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build

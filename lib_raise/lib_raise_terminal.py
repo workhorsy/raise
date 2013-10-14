@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 class TerminalModule(RaiseModule):
 	def __init__(self):
 		super(TerminalModule, self).__init__("TERMINAL")
@@ -34,6 +35,20 @@ class TerminalModule(RaiseModule):
 
 	def setup(self):
 		os_module = Config.require_module("OS")
+
+		# For plain mode, don't clear, don't use color, and fix the width to 79
+		if Config.is_plain:
+			self._terminal_clear = None
+			self._terminal_width = 79
+
+			BGColors.MESSAGE = ''
+			BGColors.OK = ''
+			BGColors.WARNING = ''
+			BGColors.FAIL = ''
+			BGColors.ENDC = ''
+
+			self.is_setup = True
+			return
 
 		# Figure out how to clear the terminal
 		if os_module._os_type._name == 'Windows':
@@ -125,5 +140,5 @@ def print_exit(message):
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
-	exit()
+	exit(1)
 

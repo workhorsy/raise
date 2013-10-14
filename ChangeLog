@@ -1,6 +1,7 @@
 * Release 0.3.0
 	* Fixed Bug #1225296: 'Break raise_actual into modules'.
 	* Fixed Bug #1229457: 'Add basic C# support'.
+	* Fixed Bug #1228904: 'Make a test suite'.
 
 2013-09-22 Release 0.2.0
 	* Fixed Bug #1223030: 'Make it complain if running in normal Windows terminal'.

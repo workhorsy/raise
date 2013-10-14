@@ -73,7 +73,10 @@ class ProcessRunner(object):
 		self._process.wait()
 
 		# Get the return code
-		self._return_code = self._process.returncode
+		rc = self._process.returncode
+		if os.WIFEXITED(rc):
+			rc = os.WEXITSTATUS(rc)
+		self._return_code = rc
 
 		# Get the standard out and error text
 		self._stderr  = self._process.stderr.read().rstrip()

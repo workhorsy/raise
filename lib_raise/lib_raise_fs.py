@@ -40,24 +40,16 @@ def cd(name):
 				lambda: os.chdir(name))
 
 def mvfile(source, dest):
-	source = to_native(source)
-	dest = to_native(dest)
-
 	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
 def cpfile(source, dest):
-	source = to_native(source)
-	dest = to_native(dest)
 	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
 def cp_new_file(source, dest):
-	source = to_native(source)
-	dest = to_native(dest)
-
 	if not os.path.isfile(os.path.abspath(dest)):
 		cpfile(source, dest)
 	elif not filecmp.cmp(source, dest):
@@ -123,8 +115,6 @@ def rmdir(name):
 	print_ok()
 
 def rmfile(name):
-	name = to_native(name)
-
 	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
@@ -137,8 +127,6 @@ def rmfile(name):
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
 def rmfile_f(name):
-	name = to_native(name)
-
 	print_status("Removing the file '{0}'".format(name))
 	try:
 		if os.path.islink(name):
@@ -150,10 +138,21 @@ def rmfile_f(name):
 
 	print_ok()
 
-def symlink(source, link_name):
-	source = to_native(source)
-	link_name = to_native(link_name)
+def rm_binaries(name):
+	print_status("Removing binaries '{0}'".format(name))
 
+	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc',
+				'.exe.mdb', '.dll.mdb']
+
+	for entry in os.listdir(os.getcwd()):
+		if entry.startswith(name) and os.path.isfile(entry):
+			extension = '.' + str.join('.', entry.lower().split('.')[1:])
+			if extension in extensions or entry == name:
+				os.remove(entry)
+
+	print_ok()
+
+def symlink(source, link_name):
 	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))

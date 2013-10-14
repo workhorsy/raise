@@ -37,27 +37,15 @@ class OSModule(RaiseModule):
 		# Figure out the general OS type
 		if 'cygwin' in platform.system().lower():
 			self._os_type = OSType(
-				name =                 'Cygwin', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
+				name =                 'Cygwin'
 			)
 		elif 'windows' in platform.system().lower():
 			self._os_type = OSType(
-				name =                 'Windows', 
-				exe_extension =        '.exe', 
-				object_extension =     '.obj', 
-				shared_lib_extension = '.dll', 
-				static_lib_extension = '.lib'
+				name =                 'Windows'
 			)
 		else:
 			self._os_type = OSType(
-				name =                 'Unix', 
-				exe_extension =        '', 
-				object_extension =     '.o', 
-				shared_lib_extension = '.so', 
-				static_lib_extension = '.a'
+				name =                 'Unix'
 			)
 
 		# Make sure Windows SDK tools are found
@@ -69,34 +57,9 @@ class OSModule(RaiseModule):
 		self.is_setup = True
 
 class OSType(object):
-	def __init__(self, name, exe_extension, object_extension, 
-				shared_lib_extension, static_lib_extension):
+	def __init__(self, name):
 
 		self._name = name
-		self._exe_extension = exe_extension
-		self._object_extension = object_extension
-		self._shared_lib_extension = shared_lib_extension
-		self._static_lib_extension = static_lib_extension
-
-def to_native(thing):
-	module = Config.require_module("OS")
-
-	# Get a dict of the standard extensions and their other os counterparts
-	replaces = {
-		'.o' : module._os_type._object_extension,
-		'.so': module._os_type._shared_lib_extension,
-		'.a' : module._os_type._static_lib_extension
-	}
-
-	# Replace the extension
-	if type(thing) == list:
-		for before, after in replaces.items():
-			thing = [o.replace(before, after) for o in thing]
-	else:
-		for before, after in replaces.items():
-			thing = thing.replace(before, after)
-
-	return thing
 
 def expand_envs(string):
 	while True:
@@ -154,7 +117,7 @@ def do_as_normal_user(cb):
 			os.seteuid(prev_id)
 
 	if is_exiting:
-		exit()
+		exit(1)
 	if exception:
 		print_exit(exception)
 

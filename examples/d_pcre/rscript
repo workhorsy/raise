@@ -8,9 +8,8 @@ import_module('Linker')
 def clean():
 	"""Removes any files and directories generated when building."""
 	rmfile_f('a.out')
-	rmfile_f('raise_example.o')
-	rmfile_f('raise_example')
-	rmfile_f('lib_regex.o')
+	rm_binaries('raise_example')
+	rm_binaries('lib_regex')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -48,10 +47,10 @@ def test():
 	# Build the D program using the C object file
 	# FIXME: It should automatically get the library path from the require above
 	link = '-L-l:' + get_shared_library('libpcre')
-	d_build_program('raise_example', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
+	d_build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
-	run_say('./raise_example')
+	d_run_say('./raise_example.exe')
 
 def _remove():
 	rmfile_f('/usr/bin/raise_example')
@@ -79,7 +78,7 @@ def install():
 	def actual_build():
 		c_build_object('lib_regex.o', ['lib_regex.c'])
 		c_build_shared_library('lib_regex.so', ['lib_regex.o'])
-		d_build_program('raise_example', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
+		d_build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
 	do_as_normal_user(actual_build)
 
 	# Remove old install

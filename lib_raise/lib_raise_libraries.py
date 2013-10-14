@@ -52,9 +52,9 @@ def _get_all_library_paths():
 
 	return paths
 
-def _get_shared_library_from_library_files(library_name, entension, library_files):
+def _get_shared_library_from_library_files(library_name, extension, library_files):
 	library_name = library_name.lstrip('lib')
-	whole_name = library_name + entension
+	whole_name = library_name + extension
 
 	for entry in library_files:
 		if whole_name in entry:
@@ -62,12 +62,12 @@ def _get_shared_library_from_library_files(library_name, entension, library_file
 
 	return None
 
-def _get_static_library_from_library_files(library_name, entension, library_files):
+def _get_static_library_from_library_files(library_name, extension, library_files):
 	library_name = library_name.lstrip('lib')
-	whole_name = library_name + entension
+	whole_name = library_name + extension
 
 	for entry in library_files:
-		if whole_name in entry and entry.endswith(entension):
+		if whole_name in entry and entry.endswith(extension):
 			return entry
 
 	return None

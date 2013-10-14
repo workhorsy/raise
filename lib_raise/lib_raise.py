@@ -32,7 +32,7 @@ import signal, atexit
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
 	sys.stdout.flush()
-	exit()
+	exit(1)
 
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
@@ -44,6 +44,7 @@ class Config(object):
 	target_name = None
 	pwd = os.sys.path[0]
 	python = sys.executable
+	is_plain = False
 
 	@classmethod
 	def require_module(cls, file_name):
@@ -70,7 +71,7 @@ class RaiseModule(object):
 class Compiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors, optimize, 
-				compile_time_flags, link):
+				compile_time_flags, link, extension_map):
 
 		self._name = name
 		self._path = path
@@ -92,6 +93,14 @@ class Compiler(object):
 		self.warnings_as_errors = False
 		self.optimize = False
 		self.compile_time_flags = []
+
+		self.extension_map = extension_map
+
+	def to_native(self, command):
+		for before, after in self.extension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 def import_module(name):
 	Config.modules_to_import.append(name)
@@ -158,6 +167,14 @@ def import_rscript(g=globals(), l=locals()):
 	return targets
 
 if __name__ == '__main__':
+	# Get the args and options
+	args = []
+	for arg in sys.argv[1:]:
+		if arg.startswith('-'):
+			if arg == '-plain': Config.is_plain = True
+		else:
+			args.append(arg)
+
 	# Load the default modules
 	import_module_immediate('CPU')
 	import_module_immediate('OS')
@@ -170,18 +187,19 @@ if __name__ == '__main__':
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
 		print_exit('Exit called by the keyboard.')
-		exit()
+		exit(1)
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Clear the terminal
 	terminal_mod = Config.require_module('TERMINAL')
-	os.system(terminal_mod._terminal_clear)
+	if terminal_mod._terminal_clear:
+		os.system(terminal_mod._terminal_clear)
+
+	# Get the target function name
+	Config.target_name = str(str.join(' ', args))
 
 	# Load the rscript
 	targets = import_rscript()
-
-	# Get the target function name
-	Config.target_name = str(str.join(' ', sys.argv[1:]))
 
 	# Get a friendly list of all the targets
 	target_list = []
@@ -192,7 +210,9 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3 - September 27 2013) http://launchpad.net/raise")
+		print("Raise software build tool (Version 0.3 - October 13 2013) http://launchpad.net/raise")
+		print("OPTIONS:")
+		print("    -plain - Don't clear, don't use color, and fix the width to 79")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")

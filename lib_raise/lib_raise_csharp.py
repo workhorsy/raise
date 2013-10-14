@@ -30,9 +30,30 @@ class CSharpModule(RaiseModule):
 	def __init__(self):
 		super(CSharpModule, self).__init__("CSHARP")
 		self.cs_compilers = {}
+		self.cs_runtimes = {}
 		self._csc = None
+		self._runtime = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		extension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			extension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+		elif os_module._os_type._name == 'Windows':
+			extension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+		else:
+			extension_map = {
+				'.exe' : '.exe',
+				'.dll' : '.dll'
+			}
+
 		# Get the names and paths for know C# compilers
 		names = ['dmcs', 'csc']
 		for name in names:
@@ -52,9 +73,11 @@ class CSharpModule(RaiseModule):
 					warnings_as_errors =   '-warnaserror', 
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
-					link =                 ''
+					link =                 '', 
+					extension_map = extension_map
 				)
 				self.cs_compilers[comp._name] = comp
+				self.cs_runtimes[comp._name] = 'mono'
 			elif name in ['csc']:
 				comp = Compiler(
 					name =                 name, 
@@ -67,9 +90,11 @@ class CSharpModule(RaiseModule):
 					warnings_as_errors =   '-warnaserror', 
 					optimize =             '-optimize', 
 					compile_time_flags =   '', 
-					link =                 ''
+					link =                 '', 
+					extension_map = extension_map
 				)
 				self.cs_compilers[comp._name] = comp
+				self.cs_runtimes[comp._name] = ''
 
 		# Make sure there is at least one C# compiler installed
 		if len(self.cs_compilers) == 0:
@@ -95,6 +120,7 @@ def csharp_save_compiler(compiler):
 
 	# CSC
 	module._csc = compiler
+	module._runtime = module.cs_runtimes[module._csc._name]
 	os.environ['CSC'] = module._csc._name
 
 	# DFLAGS
@@ -111,9 +137,9 @@ def csharp_save_compiler(compiler):
 def csharp_build_program(out_file, inc_files, link_files=[]):
 	module = Config.require_module("CSHARP")
 
-	out_file = to_native(out_file)
-	inc_files = to_native(inc_files)
-	link_files = to_native(link_files)
+	# Make sure the extension is valid
+	if not out_file.endswith('.exe'):
+		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
 
 	# Setup the messages
 	task = 'Building'
@@ -123,6 +149,7 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	command = "${CSC} ${CSFLAGS} " + \
 	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = module._csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -138,9 +165,9 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	module = Config.require_module("CSHARP")
 
-	out_file = to_native(out_file)
-	inc_files = to_native(inc_files)
-	link_files = to_native(link_files)
+	# Make sure the extension is valid
+	if not out_file.endswith('.dll'):
+		print_exit("Out file extension should be '.dll' not '.{0}'.".format(out_file.split('.')[-1]))
 
 	# Setup the messages
 	task = 'Building'
@@ -150,6 +177,7 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	command = "${CSC} ${CSFLAGS} -target:library " + \
 	module._csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = module._csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -161,4 +189,25 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def csharp_run_say(command):
+	module = Config.require_module("CSHARP")
+
+	print_status("Running C# program")
+
+	native_command = '{0} {1}'.format(module._runtime, command)
+	native_command = module._csc.to_native(native_command)
+	runner = ProcessRunner(native_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 

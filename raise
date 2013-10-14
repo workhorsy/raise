@@ -36,6 +36,7 @@ RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
 	'raise'               : '{0}raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_BASE),
+	'raise_ar'            : '{0}lib_raise_ar.py-20131002010124-c22ldygq1nz33jv5-1/lib_raise_ar.py'.format(RAISE_BASE),
 	'raise_c'             : '{0}lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_BASE),
 	'raise_cpu'           : '{0}lib_raise_cpu.py-20130926223728-aw4afvc65fy8q6yb-1/lib_raise_cpu.py'.format(RAISE_BASE),
 	'raise_csharp'        : '{0}lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_BASE),
@@ -90,8 +91,9 @@ def _download_file(url, file_name):
 		# Connect with HTTP
 		response = urlopen(url)
 		if response.code != 200:
-			print('Download failed. Exiting ...')
-			exit()
+			sys.stderr.write('Download failed. Exiting ...\n')
+			sys.stderr.flush()
+			exit(1)
 
 		# Read the HTTP header
 		content_length = int(response.headers['Content-Length'])
@@ -110,10 +112,11 @@ def _download_file(url, file_name):
 
 			_cb_dl_progress(file_name, chunk, data_length, CHUNK_SIZE, content_length, percent)
 	except Exception as e:
-		print('Download failed. Exiting ...')
-		print(str(e))
-		print(url)
-		exit()
+		sys.stderr.write('Download failed. Exiting ...\n')
+		sys.stderr.write(str(e) + '\n')
+		sys.stderr.write(url + '\n')
+		sys.stderr.flush()
+		exit(1)
 
 	# Write the file to disk
 	_cb_dl_done(file_name, data)
@@ -131,8 +134,9 @@ def _cb_dl_progress(file_name, chunk, data_length, chunk_size, content_length, p
 def _cb_dl_done(file_name, data):
 	# Make sure the downloaded file is python
 	if not data.decode().startswith("#!/usr/bin/env python"):
-		print('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...')
-		exit()
+		sys.stderr.write('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...\n')
+		sys.stderr.flush()
+		exit(1)
 
 	# Save the file
 	with open(file_name, 'wb') as f:
@@ -152,6 +156,8 @@ if __name__ == '__main__':
 		dir_name = '.lib_raise/'
 	elif os.path.isfile('../../lib_raise/lib_raise.py'):
 		dir_name = '../../lib_raise/'
+	elif os.path.isfile('../lib_raise/lib_raise.py'):
+		dir_name = '../lib_raise/'
 	else:
 		dir_name = '.lib_raise/'
 		needs_update = True
@@ -159,13 +165,16 @@ if __name__ == '__main__':
 	# Run update if that is the target
 	if args == 'update':
 		update(dir_name)
-		exit()
+		exit(0)
 	elif needs_update:
 		update(dir_name)
 
 	# Have the lib_raise.py file handle everything else
 	actual = "{0}lib_raise.py".format(dir_name)
-	os.system('{0} {1} {2}'.format(sys.executable, actual, args))
+	rc = os.system('{0} {1} {2}'.format(sys.executable, actual, args))
+	if os.WIFEXITED(rc):
+		rc = os.WEXITSTATUS(rc)
+	exit(rc)
 
 
 

@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+
+def simple_ok():
+	print_status('Simple ok')
+	print_ok()
+
+def simple_fail():
+	print_status('Simple fail')
+	print_fail()
+
+def simple_warning():
+	print_status('Simple warning')
+	print_warning()
+

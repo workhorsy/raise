@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import_module('C')
+import_module('D')
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	rmfile_f('lib_math.di')
+	rm_binaries('lib_math')
+	rm_binaries('main')
+
+def _configure():
+	dc = d_get_default_compiler()
+	dc.debug = True
+	dc.optimize = True
+	dc.warnings_all = True
+	dc.warnings_as_errors = True
+	d_save_compiler(dc)
+
+def build_object():
+	clean()
+	_configure()
+
+	d_build_object('lib_math.o', ['lib_math.d'])
+	d_build_object('main.o', ['main.d'])
+	d_build_program('main.exe', ['main.o', 'lib_math.o'])
+
+	d_run_say('./main.exe')
+
+def build_program():
+	clean()
+	_configure()
+
+	d_build_program('main.exe', ['main.d', 'lib_math.d'])
+
+	d_run_say('./main.exe')
+
+def build_static_library():
+	clean()
+	_configure()
+
+	d_build_object('lib_math.o', ['lib_math.d'])
+	d_build_static_library('lib_math.a', ['lib_math.o'])
+	d_build_program('main.exe', ['main.d', 'lib_math.a'])
+
+	d_run_say('./main.exe')
+
+def build_interface():
+	clean()
+	_configure()
+
+	d_build_interface('lib_math.d')
+

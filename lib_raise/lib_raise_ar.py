@@ -25,48 +25,37 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from collections import namedtuple
 
-class HelpersModule(RaiseModule):
+class ARModule(RaiseModule):
 	def __init__(self):
-		super(HelpersModule, self).__init__("HELPERS")
+		super(ARModule, self).__init__("AR")
 
 	def setup(self):
 		self.is_setup = True
 
-def before(s, n):
-	i = s.find(n)
-	if i == -1:
-		return s
-	else:
-		return s[0 : i]
+def ar_build_static_library(ar_file, o_files):
+	module = Config.require_module("AR")
 
-def after(s, n):
-	i = s.find(n)
-	if i == -1:
-		return s
-	else:
-		return s[i+len(n) : ]
+	# Make sure the extension is valid
+	if not ar_file.endswith('.a'):
+		print_exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))
 
-def between(s, l, r):
-	return before(after(s, l), r)
+	# Setup the messages
+	task = 'Building'
+	result = ar_file
+	plural = 'static libraries'
+	singular = 'static library'
+	command = "ar rcs " + \
+			ar_file + " " + \
+			str.join(' ', o_files)
 
-def version_string_to_tuple(version_string):
-	# Get the version number
-	Version = namedtuple('Version', 'major minor micro')
-	major, minor, micro = 0, 0, 0
-	try:
-		version = version_string.split('.')
-		major = int(version[0])
-		minor = int(version[1])
-		micro = int(version[2])
-	except Exception as e:
-		pass
-	return Version(major, minor, micro)
+	def setup():
+		# Skip if the files have not changed since last build
+		if not is_outdated(to_update = [ar_file], triggers = o_files):
+			return False
+		return True
 
-def require_file_extension(file_name, required_extension):
-	extension = os.path.splitext(file_name)[-1].lower()
-	if extension != required_extension:
-		print_exit("File extension should be '{0}' on '{1}'.".format(required_extension, file_name))
-
+	# Create the event
+	event = Event(task, result, plural, singular, command, setup)
+	add_event(event)
 

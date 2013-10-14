@@ -33,6 +33,31 @@ class DModule(RaiseModule):
 		self._dc = None
 
 	def setup(self):
+		os_module = Config.require_module("OS")
+		extension_map = {}
+		# Figure out the extensions for this OS
+		if os_module._os_type._name == 'Cygwin':
+			extension_map = {
+				'.exe' : '.exe',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+		elif os_module._os_type._name == 'Windows':
+			extension_map = {
+				'.exe' : '.exe',
+				'.o' : '.obj',
+				'.so' : '.dll',
+				'.a' : '.lib'
+			}
+		else:
+			extension_map = {
+				'.exe' : '',
+				'.o' : '.o',
+				'.so' : '.so',
+				'.a' : '.a'
+			}
+
 		# Get the names and paths for know D compilers
 		names = ['dmd', 'dmd2', 'ldc2']
 		for name in names:
@@ -52,7 +77,8 @@ class DModule(RaiseModule):
 					warnings_as_errors =   '', 
 					optimize =             '-O', 
 					compile_time_flags =   '-version=', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
 				)
 				self.d_compilers[comp._name] = comp
 			elif name == 'ldc2':
@@ -67,7 +93,8 @@ class DModule(RaiseModule):
 					warnings_as_errors =   '', 
 					optimize =             '-O2',
 					compile_time_flags =   '-version=', 
-					link =                 '-Wl,-as-needed'
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
 				)
 				self.d_compilers[comp._name] = comp
 
@@ -108,11 +135,8 @@ def d_save_compiler(compiler):
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
-def d_build_interface(d_file, i_files):
+def d_build_interface(d_file, i_files=[]):
 	module = Config.require_module("D")
-
-	d_file = to_native(d_file)
-	i_files = to_native(i_files)
 
 	# Setup the messages
 	task = 'Building'
@@ -122,6 +146,7 @@ def d_build_interface(d_file, i_files):
 
 	f = self_deleting_named_temporary_file()
 	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + module._dc._opt_out_file + f.name
+	command = module._dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -137,14 +162,11 @@ def d_build_interface(d_file, i_files):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
+def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
-	h_files = to_native(h_files)
+	# Make sure the extension is valid
+	require_file_extension(o_file, '.o')
 
 	# Setup the messages
 	task = 'Building'
@@ -155,6 +177,7 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	command = "${DC} ${DFLAGS} -c " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
+	command = module._dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [o_file], triggers = d_files):
@@ -170,13 +193,12 @@ def d_build_object(o_file, d_files, i_files, l_files=[], h_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_headers=False):
+# FIXME: Remove this, as there are no shared libraries in D
+def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
+	# Make sure the extension is valid
+	require_file_extension(o_file, '.so')
 
 	# Setup the messages
 	task = 'Building'
@@ -187,6 +209,7 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	command = "${DC} ${DFLAGS} -shared " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
+	command = module._dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [o_file], triggers = d_files):
@@ -202,13 +225,11 @@ def d_build_shared_library(o_file, d_files, i_files, l_files=[], generate_header
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
 
-def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=False):
+def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	module = Config.require_module("D")
 
-	o_file = to_native(o_file)
-	d_files = to_native(d_files)
-	i_files = to_native(i_files)
-	l_files = to_native(l_files)
+	# Make sure the extension is valid
+	require_file_extension(o_file, '.a')
 
 	# Setup the messages
 	task = 'Building'
@@ -219,6 +240,7 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 	command = "${DC} ${DFLAGS} -lib " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
+	command = module._dc.to_native(command)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -234,9 +256,8 @@ def d_build_static_library(o_file, d_files, i_files, l_files, generate_headers=F
 def d_build_program(out_file, inc_files, link_files=[]):
 	module = Config.require_module("D")
 
-	out_file = to_native(out_file)
-	inc_files = to_native(inc_files)
-	link_files = to_native(link_files)
+	# Make sure the extension is valid
+	require_file_extension(out_file, '.exe')
 
 	# Setup the messages
 	task = 'Building'
@@ -244,6 +265,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	plural = 'D programs'
 	singular = 'D program'
 	command = "${DC} ${DFLAGS} " + module._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = module._dc.to_native(command)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -255,5 +277,25 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+def d_run_say(command):
+	module = Config.require_module("D")
+
+	print_status("Running D program")
+
+	native_command = module._dc.to_native(command)
+	runner = ProcessRunner(native_command)
+	runner.run()
+	runner.wait()
+
+	if runner.is_success or runner.is_warning:
+		print_ok()
+		print(command)
+		print(runner.stdall)
+	elif runner.is_failure:
+		print_fail()
+		print(command)
+		print(runner.stdall)
+		print_exit('Failed to run command.')
 
 
