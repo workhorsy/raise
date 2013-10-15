@@ -38,7 +38,6 @@ class Helpers(object):
 
 		cls.is_setup = True
 
-Helpers.setup()
 
 def before(s, n):
 	i = s.find(n)
@@ -75,4 +74,6 @@ def require_file_extension(file_name, required_extension):
 	if extension != required_extension:
 		print_exit("File extension should be '{0}' on '{1}'.".format(required_extension, file_name))
 
+
+Helpers.setup()
 

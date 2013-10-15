@@ -33,6 +33,7 @@ from lib_raise_helpers import *
 
 
 class Libraries(object):
+	lib_file_cache = {}
 	is_setup = False
 
 	@classmethod
@@ -42,9 +43,6 @@ class Libraries(object):
 
 		cls.is_setup = True
 
-Libraries.setup()
-
-lib_file_cache = {}
 
 # Returns all the paths that libraries are installed in
 def _get_all_library_paths():
@@ -97,8 +95,8 @@ def _get_library_files(lib_name, version_cb = None):
 	files = []
 
 	# Return the file names if already cached
-	if lib_name in lib_file_cache:
-		return lib_file_cache[lib_name]
+	if lib_name in Libraries.lib_file_cache:
+		return Libraries.lib_file_cache[lib_name]
 
 	# Try finding the library with pkg-config
 	if not files and program_paths('pkg-config'):
@@ -122,7 +120,7 @@ def _get_library_files(lib_name, version_cb = None):
 
 	# Save the file names in the cache
 	if files:
-		lib_file_cache[lib_name] = files
+		Libraries.lib_file_cache[lib_name] = files
 
 	return files
 
@@ -443,4 +441,7 @@ def program_paths(program_name):
 			if os.access(pext, os.X_OK):
 				paths.append(pext)
 	return paths
+
+
+Libraries.setup()
 

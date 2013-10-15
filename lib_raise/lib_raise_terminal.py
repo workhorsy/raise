@@ -31,7 +31,7 @@ from lib_raise_os import *
 
 class Terminal(object):
 	terminal_clear = None
-	terminal_width = None
+	terminal_width = 79
 	message_length = 0
 	is_setup = False
 
@@ -39,8 +39,6 @@ class Terminal(object):
 	def setup(cls):
 		if cls.is_setup:
 			return
-
-		terminal_set_fancy()
 
 		cls.is_setup = True
 

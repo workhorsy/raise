@@ -113,7 +113,6 @@ class D(object):
 
 		cls.is_setup = True
 
-D.setup()
 
 def d_get_default_compiler():
 	comp = None
@@ -291,4 +290,6 @@ def d_run_say(command):
 		print(runner.stdall)
 		print_exit('Failed to run command.')
 
+
+D.setup()
 

@@ -97,7 +97,6 @@ class CXX(object):
 
 		cls.is_setup = True
 
-CXX.setup()
 
 def cxx_get_default_compiler():
 	comp = None
@@ -232,4 +231,7 @@ def cxx_run_say(command):
 		print(command)
 		print(runner.stdall)
 		print_exit('Failed to run command.')
+
+
+CXX.setup()
 

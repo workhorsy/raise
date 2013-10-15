@@ -38,7 +38,6 @@ class AR(object):
 
 		cls.is_setup = True
 
-AR.setup()
 
 def ar_build_static_library(ar_file, o_files):
 	# Make sure the extension is valid
@@ -63,4 +62,7 @@ def ar_build_static_library(ar_file, o_files):
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
 	add_event(event)
+
+
+AR.setup()
 

@@ -102,9 +102,11 @@ if __name__ == '__main__':
 		exit(1)
 	signal.signal(signal.SIGINT, signal_handler)
 
-	# Set the terminal to plain if desired
+	# Set the terminal to plain or fancy
 	if Config.is_plain:
 		terminal_set_plain()
+	else:
+		terminal_set_fancy()
 
 	# Clear the terminal if desired
 	if Terminal.terminal_clear:

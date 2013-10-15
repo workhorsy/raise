@@ -109,7 +109,6 @@ class CSharp(object):
 
 		cls.is_setup = True
 
-CSharp.setup()
 
 def csharp_get_default_compiler():
 	comp = None
@@ -208,4 +207,6 @@ def csharp_run_say(command):
 		print(runner.stdall)
 		print_exit('Failed to run command.')
 
+
+CSharp.setup()
 

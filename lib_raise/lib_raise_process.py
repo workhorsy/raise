@@ -42,7 +42,6 @@ class Process(object):
 
 		cls.is_setup = True
 
-Process.setup()
 
 class ProcessRunner(object):
 	def __init__(self, command):
@@ -317,4 +316,6 @@ def _do_on_fail_pass(start_message, cb):
 		pass
 	print_ok()
 
+
+Process.setup()
 

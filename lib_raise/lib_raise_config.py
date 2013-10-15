@@ -27,6 +27,7 @@
 
 import os, sys
 
+
 class Config(object):
 	target_name = None
 	pwd = os.sys.path[0]

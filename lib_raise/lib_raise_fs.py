@@ -40,7 +40,6 @@ class FS(object):
 
 		cls.is_setup = True
 
-FS.setup()
 
 def cd(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),
@@ -205,4 +204,7 @@ def self_deleting_named_temporary_file():
 	atexit.register(cb)
 
 	return f
+
+
+FS.setup()
 

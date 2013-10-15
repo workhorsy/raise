@@ -36,7 +36,6 @@ class Python(object):
 
 		cls.is_setup = True
 
-Python.setup()
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
@@ -45,5 +44,7 @@ def require_python_modules(mod_names):
 			"Install the python module '{0}' and try again.".format(mod_name),
 			'{0} -c "import {1}"'.format(Config.python, mod_name)
 		)
+
+Python.setup()
 
 
