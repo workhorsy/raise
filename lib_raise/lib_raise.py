@@ -37,15 +37,6 @@ def early_exit(message):
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
-'''
-class RaiseModule(object):
-	def __init__(self, name):
-		self.is_setup = False
-		self.name = name
-
-	def setup(self):
-		raise NotImplementedError("This method should setup the module, then set self.is_setup = True.")
-'''
 
 def import_rscript(g=globals(), l=locals()):
 	# Make sure there is an rscript file
