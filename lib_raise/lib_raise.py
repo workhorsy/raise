@@ -52,16 +52,14 @@ def import_rscript(g=globals(), l=locals()):
 	if not os.path.isfile('rscript'):
 		return None
 
-	# Get a list of all the functions
-	before = []
-	for key in globals().keys():
-		before.append(key)
-
 	# Load the rscript file into this namespace
+	# Get a list of all the things in the script
+	names = []
 	with open('rscript', 'rb') as f:
 		code = None
 		try:
 			code = compile(f.read(), 'rscript', 'exec')
+			names = [name for name in code.co_names]
 		except Exception as e:
 			print_exit(e)
 
@@ -69,10 +67,10 @@ def import_rscript(g=globals(), l=locals()):
 
 	# Get just the target functions
 	targets = {}
-	for key in globals().keys():
-		if not key in before:
-			if not key.startswith('_') and hasattr(globals()[key], '__call__'):
-				targets[key] = globals()[key]
+	for name in names:
+		if name in globals() and not name.startswith('_'):
+			if hasattr(globals()[name], '__call__'):
+				targets[name] = globals()[name]
 
 	return targets
 
