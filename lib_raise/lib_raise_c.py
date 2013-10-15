@@ -25,26 +25,32 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from lib_raise_config import *
+from lib_raise_os import *
+from lib_raise_libraries import *
+from lib_raise_fs import *
+from lib_raise_linker import *
 
+class C(object):
+	c_compilers = {}
+	cc = None
+	is_setup = False
 
-class CModule(RaiseModule):
-	def __init__(self):
-		super(CModule, self).__init__("C")
-		self.c_compilers = {}
-		self._cc = None
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
 
-	def setup(self):
-		os_module = Config.require_module("OS")
 		extension_map = {}
 		# Figure out the extensions for this OS
-		if os_module._os_type._name == 'Cygwin':
+		if OS.os_type._name == 'Cygwin':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
-		elif os_module._os_type._name == 'Windows':
+		elif OS.os_type._name == 'Windows':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
@@ -81,7 +87,7 @@ class CModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.c_compilers[comp._name] = comp
+				C.c_compilers[comp._name] = comp
 			elif name == 'clang':
 				comp = Compiler(
 					name =                 'clang', 
@@ -97,7 +103,7 @@ class CModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.c_compilers[comp._name] = comp
+				C.c_compilers[comp._name] = comp
 			elif name == 'cl.exe':
 				# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
 				comp = Compiler(
@@ -114,54 +120,48 @@ class CModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.c_compilers[comp._name] = comp
+				C.c_compilers[comp._name] = comp
 
 		# Make sure there is at least one C compiler installed
-		if len(self.c_compilers) == 0:
+		if len(C.c_compilers) == 0:
 			print_status("Setting up C module")
 			print_fail()
 			print_exit("No C compiler found. Install one and try again.")
 
-		self.is_setup = True
+		cls.is_setup = True
+
 
 def c_get_default_compiler():
-	module = Config.require_module("C")
-	os_module = Config.require_module("OS")
-
 	comp = None
 
-	if os_module._os_type._name == 'Windows':
-		comp = module.c_compilers['cl.exe']
+	if OS.os_type._name == 'Windows':
+		comp = C.c_compilers['cl.exe']
 	else:
-		if 'gcc' in module.c_compilers:
-			comp = module.c_compilers['gcc']
-		elif 'clang' in module.c_compilers:
-			comp = module.c_compilers['clang']
+		if 'gcc' in C.c_compilers:
+			comp = C.c_compilers['gcc']
+		elif 'clang' in C.c_compilers:
+			comp = C.c_compilers['clang']
 
 	return comp
 
 def c_save_compiler(compiler):
-	module = Config.require_module("C")
-
 	# CC
-	module._cc = compiler
-	os.environ['CC'] = module._cc._name
+	C.cc = compiler
+	os.environ['CC'] = C.cc._name
 
 	# CFLAGS
 	opts = []
-	opts.append(module._cc._opt_setup)
-	if module._cc.debug: opts.append(module._cc._opt_debug)
-	if module._cc.warnings_all: opts.append(module._cc._opt_warnings_all)
-	if module._cc.warnings_as_errors: opts.append(module._cc._opt_warnings_as_errors)
-	if module._cc.optimize: opts.append(module._cc._opt_optimize)
-	for compile_time_flag in module._cc.compile_time_flags:
-		opts.append(module._cc._opt_compile_time_flags + compile_time_flag)
+	opts.append(C.cc._opt_setup)
+	if C.cc.debug: opts.append(C.cc._opt_debug)
+	if C.cc.warnings_all: opts.append(C.cc._opt_warnings_all)
+	if C.cc.warnings_as_errors: opts.append(C.cc._opt_warnings_as_errors)
+	if C.cc.optimize: opts.append(C.cc._opt_optimize)
+	for compile_time_flag in C.cc.compile_time_flags:
+		opts.append(C.cc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
 def c_link_program(out_file, obj_files, i_files=[]):
-	module = Config.require_module("C")
-
 	# Make sure the extension is valid
 	require_file_extension(out_file, '.exe')
 
@@ -171,11 +171,11 @@ def c_link_program(out_file, obj_files, i_files=[]):
 	plural = 'C programs'
 	singular = 'C program'
 	command = '${CC} ${CFLAGS} ' + \
-				module._cc._opt_link + ' ' + \
+				C.cc._opt_link + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				module._cc._opt_out_file + out_file
-	command = module._cc.to_native(command)
+				C.cc._opt_out_file + out_file
+	command = C.cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -190,8 +190,6 @@ def c_link_program(out_file, obj_files, i_files=[]):
 	add_event(event)
 
 def c_build_object(o_file, c_files, i_files=[]):
-	module = Config.require_module("C")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.o')
 
@@ -201,12 +199,12 @@ def c_build_object(o_file, c_files, i_files=[]):
 	plural = 'C objects'
 	singular = 'C object'
 	command = "${CC} ${CFLAGS} " + \
-				module._cc._opt_no_link + ' ' +  \
-				module._cc._opt_out_file + \
+				C.cc._opt_no_link + ' ' +  \
+				C.cc._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files)
-	command = module._cc.to_native(command)
+	command = C.cc.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -225,8 +223,6 @@ def c_build_object(o_file, c_files, i_files=[]):
 	add_event(event)
 
 def c_build_program(o_file, c_files, i_files=[]):
-	module = Config.require_module("C")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.exe')
 
@@ -238,8 +234,8 @@ def c_build_program(o_file, c_files, i_files=[]):
 	command = '${CC} ${CFLAGS} ' + \
 				str.join(' ', c_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				module._cc._opt_out_file + o_file
-	command = module._cc.to_native(command)
+				C.cc._opt_out_file + o_file
+	command = C.cc.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -255,8 +251,6 @@ def c_build_program(o_file, c_files, i_files=[]):
 
 # FIXME: Change to use the linker through the compiler
 def c_build_shared_library(so_file, o_files):
-	module = Config.require_module("LINKER")
-
 	# Make sure the extension is valid
 	require_file_extension(so_file, '.so')
 
@@ -266,13 +260,13 @@ def c_build_shared_library(so_file, o_files):
 	plural = 'shared libraries'
 	singular = 'shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
-				module._linker._name, 
-				module._linker._opt_setup, 
-				module._linker._opt_shared, 
+				LinkerModule.linker._name, 
+				LinkerModule.linker._opt_setup, 
+				LinkerModule.linker._opt_shared, 
 				str.join(' ', o_files), 
-				module._linker._opt_out_file, 
+				LinkerModule.linker._opt_out_file, 
 				so_file)
-	command = module._linker.to_native(command)
+	command = LinkerModule.linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -285,11 +279,9 @@ def c_build_shared_library(so_file, o_files):
 	add_event(event)
 
 def c_run_say(command):
-	module = Config.require_module("C")
-
 	print_status("Running C program")
 
-	native_command = module._cc.to_native(command)
+	native_command = C.cc.to_native(command)
 	runner = ProcessRunner(native_command)
 	runner.run()
 	runner.wait()
@@ -303,4 +295,7 @@ def c_run_say(command):
 		print(command)
 		print(runner.stdall)
 		print_exit('Failed to run command.')
+
+C.setup()
+
 

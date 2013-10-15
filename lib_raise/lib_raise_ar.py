@@ -25,17 +25,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from lib_raise_process import *
+from lib_raise_fs import *
 
-class ARModule(RaiseModule):
-	def __init__(self):
-		super(ARModule, self).__init__("AR")
+class AR(object):
+	is_setup = False
 
-	def setup(self):
-		self.is_setup = True
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.is_setup = True
+
+AR.setup()
 
 def ar_build_static_library(ar_file, o_files):
-	module = Config.require_module("AR")
-
 	# Make sure the extension is valid
 	if not ar_file.endswith('.a'):
 		print_exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))

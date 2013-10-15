@@ -25,25 +25,32 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from lib_raise_config import *
+from lib_raise_os import *
+from lib_raise_libraries import *
+from lib_raise_fs import *
+from lib_raise_linker import *
 
-class CXXModule(RaiseModule):
-	def __init__(self):
-		super(CXXModule, self).__init__("CXX")
-		self.cxx_compilers = {}
-		self._cxx = None
+class CXX(object):
+	cxx_compilers = {}
+	cxx = None
+	is_setup = False
 
-	def setup(self):
-		os_module = Config.require_module("OS")
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
 		extension_map = {}
 		# Figure out the extensions for this OS
-		if os_module._os_type._name == 'Cygwin':
+		if OS.os_type._name == 'Cygwin':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
-		elif os_module._os_type._name == 'Windows':
+		elif OS.os_type._name == 'Windows':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
@@ -80,53 +87,47 @@ class CXXModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.cxx_compilers[comp._name] = comp
+				CXX.cxx_compilers[comp._name] = comp
 
 		# Make sure there is at least one C++ compiler installed
-		if len(self.cxx_compilers) == 0:
+		if len(CXX.cxx_compilers) == 0:
 			print_status("Setting up C++ module")
 			print_fail()
 			print_exit("No C++ compiler found. Install one and try again.")
 
-		self.is_setup = True
+		cls.is_setup = True
 
+CXX.setup()
 
 def cxx_get_default_compiler():
-	module = Config.require_module("CXX")
-	os_module = Config.require_module("OS")
-
 	comp = None
 
-	if os_module._os_type._name == 'Windows':
-		comp = module.cxx_compilers['cl.exe']
+	if OS.os_type._name == 'Windows':
+		comp = CXX.cxx_compilers['cl.exe']
 	else:
-		if 'g++' in module.cxx_compilers:
-			comp = module.cxx_compilers['g++']
+		if 'g++' in CXX.cxx_compilers:
+			comp = CXX.cxx_compilers['g++']
 
 	return comp
 
 def cxx_save_compiler(compiler):
-	module = Config.require_module("CXX")
-
 	# CXX
-	module._cxx = compiler
-	os.environ['CXX'] = module._cxx._name
+	CXX.cxx = compiler
+	os.environ['CXX'] = CXX.cxx._name
 
 	# CXXFLAGS
 	opts = []
-	opts.append(module._cxx._opt_setup)
-	if module._cxx.debug: opts.append(module._cxx._opt_debug)
-	if module._cxx.warnings_all: opts.append(module._cxx._opt_warnings_all)
-	if module._cxx.warnings_as_errors: opts.append(module._cxx._opt_warnings_as_errors)
-	if module._cxx.optimize: opts.append(module._cxx._opt_optimize)
-	for compile_time_flag in module._cxx.compile_time_flags:
-		opts.append(module._cxx._opt_compile_time_flags + compile_time_flag)
+	opts.append(CXX.cxx._opt_setup)
+	if CXX.cxx.debug: opts.append(CXX.cxx._opt_debug)
+	if CXX.cxx.warnings_all: opts.append(CXX.cxx._opt_warnings_all)
+	if CXX.cxx.warnings_as_errors: opts.append(CXX.cxx._opt_warnings_as_errors)
+	if CXX.cxx.optimize: opts.append(CXX.cxx._opt_optimize)
+	for compile_time_flag in CXX.cxx.compile_time_flags:
+		opts.append(CXX.cxx._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CXXFLAGS'] = str.join(' ', opts)
 
 def cxx_build_program(o_file, cxx_files, i_files=[]):
-	module = Config.require_module("CXX")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.exe')
 
@@ -138,8 +139,8 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	command = '${CXX} ${CXXFLAGS} ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				module._cxx._opt_out_file + o_file
-	command = module._cxx.to_native(command)
+				CXX.cxx._opt_out_file + o_file
+	command = CXX.cxx.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -154,8 +155,6 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	add_event(event)
 
 def cxx_link_program(out_file, obj_files, i_files=[]):
-	module = Config.require_module("CXX")
-
 	# Make sure the extension is valid
 	require_file_extension(out_file, '.exe')
 
@@ -165,11 +164,11 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	plural = 'C++ programs'
 	singular = 'C++ program'
 	command = '${CXX} ${CXXFLAGS} ' + \
-				module._cxx._opt_link + ' ' + \
+				CXX.cxx._opt_link + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
-				module._cxx._opt_out_file + out_file
-	command = module._cxx.to_native(command)
+				CXX.cxx._opt_out_file + out_file
+	command = CXX.cxx.to_native(command)
 
 	def setup():
 		# Make sure the environmental variable is set
@@ -184,8 +183,6 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	add_event(event)
 
 def cxx_build_object(o_file, cxx_files, i_files=[]):
-	module = Config.require_module("CXX")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.o')
 
@@ -195,12 +192,12 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	plural = 'C++ objects'
 	singular = 'C++ object'
 	command = "${CXX} ${CXXFLAGS} " + \
-				module._cxx._opt_no_link + ' ' +  \
-				module._cxx._opt_out_file + \
+				CXX.cxx._opt_no_link + ' ' +  \
+				CXX.cxx._opt_out_file + \
 				o_file + ' ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files)
-	command = module._cxx.to_native(command)
+	command = CXX.cxx.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -219,11 +216,9 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	add_event(event)
 
 def cxx_run_say(command):
-	module = Config.require_module("CXX")
-
 	print_status("Running C++ program")
 
-	native_command = module._cxx.to_native(command)
+	native_command = CXX.cxx.to_native(command)
 	runner = ProcessRunner(native_command)
 	runner.run()
 	runner.wait()

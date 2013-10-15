@@ -25,50 +25,24 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import sys, os
+from lib_raise_config import *
+from lib_raise_os import *
 
-class TerminalModule(RaiseModule):
-	def __init__(self):
-		super(TerminalModule, self).__init__("TERMINAL")
-		self._terminal_clear = None
-		self._terminal_width = None
-		self.message_length = 0
+class Terminal(object):
+	terminal_clear = None
+	terminal_width = None
+	message_length = 0
+	is_setup = False
 
-	def setup(self):
-		os_module = Config.require_module("OS")
-
-		# For plain mode, don't clear, don't use color, and fix the width to 79
-		if Config.is_plain:
-			self._terminal_clear = None
-			self._terminal_width = 79
-
-			BGColors.MESSAGE = ''
-			BGColors.OK = ''
-			BGColors.WARNING = ''
-			BGColors.FAIL = ''
-			BGColors.ENDC = ''
-
-			self.is_setup = True
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
 			return
 
-		# Figure out how to clear the terminal
-		if os_module._os_type._name == 'Windows':
-			self._terminal_clear = 'cls'
-		else:
-			self._terminal_clear = 'clear'
+		terminal_set_fancy()
 
-		# FIXME: Have this look for stty first then try the registry
-		# Figure out the terminal width
-		if os_module._os_type._name == 'Windows':
-			import _winreg
-			key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
-			val = _winreg.QueryValueEx(key, "ScreenBufferSize")
-			_winreg.CloseKey(key)
-			size = hex(val[0])
-			self._terminal_width = int('0x' + size[-4 : len(size)], 16)
-		else:
-			self._terminal_width = int(os.popen('stty size', 'r').read().split()[1])
-
-		self.is_setup = True
+		cls.is_setup = True
 
 class Emoticons:
 	SMILE = ':)'
@@ -76,15 +50,51 @@ class Emoticons:
 	FROWN = ':('
 
 class BGColors:
-	MESSAGE = '\033[44m\033[37m'
-	OK = '\033[42m\033[37m'
-	WARNING = '\033[43m\033[30m'
-	FAIL = '\033[41m\033[37m'
-	ENDC = '\033[0m'
+	MESSAGE = ''
+	OK = ''
+	WARNING = ''
+	FAIL = ''
+	ENDC = ''
+
+# For plain mode, don't clear, don't use color, and fix the width to 79
+def terminal_set_plain():
+	Terminal.terminal_clear = None
+	Terminal.terminal_width = 79
+
+	BGColors.MESSAGE = ''
+	BGColors.OK = ''
+	BGColors.WARNING = ''
+	BGColors.FAIL = ''
+	BGColors.ENDC = ''
+
+# For fancy mode, clear, use color, and use the real terminal width
+def terminal_set_fancy():
+	# Figure out how to clear the terminal
+	if OS.os_type._name == 'Windows':
+		Terminal.terminal_clear = 'cls'
+	else:
+		Terminal.terminal_clear = 'clear'
+
+	# FIXME: Have this look for stty first then try the registry
+	# Figure out the terminal width
+	if OS.os_type._name == 'Windows':
+		import _winreg
+		key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
+		val = _winreg.QueryValueEx(key, "ScreenBufferSize")
+		_winreg.CloseKey(key)
+		size = hex(val[0])
+		Terminal.terminal_width = int('0x' + size[-4 : len(size)], 16)
+	else:
+		Terminal.terminal_width = int(os.popen('stty size', 'r').read().split()[1])
+
+	BGColors.MESSAGE = '\033[44m\033[37m'
+	BGColors.OK = '\033[42m\033[37m'
+	BGColors.WARNING = '\033[43m\033[30m'
+	BGColors.FAIL = '\033[41m\033[37m'
+	BGColors.ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):
-	module = Config.require_module("TERMINAL")
-	width = module._terminal_width
+	width = Terminal.terminal_width
 
 	if length > (width-3):
 		i = int(width * (int(length / width) + 1)) - 3
@@ -97,40 +107,36 @@ def print_info(message):
 	sys.stdout.flush()
 
 def print_status(message):
-	module = Config.require_module("TERMINAL")
 	message = '{0} ...'.format(message)
-	module.message_length = len(message)
+	Terminal.message_length = len(message)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_ok():
-	module = Config.require_module("TERMINAL")
-	padding = terminal_pad(module.message_length)
+	padding = terminal_pad(Terminal.message_length)
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.OK, Emoticons.SMILE, BGColors.ENDC)
-	module.message_length = 0
+	Terminal.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_warning(post_message=None):
-	module = Config.require_module("TERMINAL")
-	padding = terminal_pad(module.message_length, '.')
+	padding = terminal_pad(Terminal.message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.WARNING, Emoticons.NORMAL, BGColors.ENDC)
 	if post_message:
 		message += post_message + "\n"
-	module.message_length = 0
+	Terminal.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
 def print_fail(post_fail_message=None):
-	module = Config.require_module("TERMINAL")
-	padding = terminal_pad(module.message_length, '.')
+	padding = terminal_pad(Terminal.message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.FAIL, Emoticons.FROWN, BGColors.ENDC)
 	if post_fail_message:
 		message += post_fail_message + "\n"
-	module.message_length = 0
+	Terminal.message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
@@ -141,4 +147,7 @@ def print_exit(message):
 	sys.stdout.write(message)
 	sys.stdout.flush()
 	exit(1)
+
+
+Terminal.setup()
 

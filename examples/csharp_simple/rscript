@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import_module('CSHARP')
+from lib_raise_csharp import *
 
 def clean():
 	"""Removes any files and directories generated when building."""

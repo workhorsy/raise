@@ -26,13 +26,21 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tempfile, shutil, filecmp
+import atexit
+from lib_raise_terminal import *
 
-class FSModule(RaiseModule):
-	def __init__(self):
-		super(FSModule, self).__init__("FS")
 
-	def setup(self):
-		self.is_setup = True
+class FS(object):
+	is_setup = False
+
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.is_setup = True
+
+FS.setup()
 
 def cd(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),

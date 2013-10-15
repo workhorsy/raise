@@ -27,19 +27,26 @@
 
 import subprocess
 import time
+from lib_raise_cpu import *
+from lib_raise_os import *
+from lib_raise_terminal import *
 
-class ProcessModule(RaiseModule):
-	def __init__(self):
-		super(ProcessModule, self).__init__("PROCESS")
 
-	def setup(self):
-		self.is_setup = True
+class Process(object):
+	is_setup = False
+
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.is_setup = True
+
+Process.setup()
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		module = Config.require_module("OS")
-
-		if module._os_type._name == 'Windows':
+		if OS.os_type._name == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -164,15 +171,13 @@ class Event(object):
 	is_done = property(get_is_done)
 
 	def run(self):
-		module = Config.require_module("TERMINAL")
-
 		# Show the parallel header
 		if Event.is_parallel:
 			if Event.is_first_parallel:
 				Event.is_first_parallel = False
 				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
-				module.message_length = 0
+				Terminal.message_length = 0
 
 		# Run the setup function
 		if not self._setup_cb():
@@ -220,8 +225,6 @@ def parallel_start():
 	Event.is_first_parallel = True
 
 def parallel_end():
-	module = Config.require_module('CPU')
-
 	ready_events = Event.events
 	running_events = []
 
@@ -235,24 +238,24 @@ def parallel_end():
 			# Success. Keep going
 			if event._status == 'success':
 				running_events.remove(event)
-				module._cpus_free += 1
+				CPU.cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
 				print_exit("Event failed.")
 
 		# Check for events that need to start
-		while module._cpus_free > 0 and len(ready_events):
+		while CPU.cpus_free > 0 and len(ready_events):
 			event = ready_events.pop()
 			if event.run():
-				module._cpus_free -= 1
+				CPU.cpus_free -= 1
 				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
-		if module._cpus_free == 0 or len(ready_events) == 0:
+		if CPU.cpus_free == 0 or len(ready_events) == 0:
 			time.sleep(0.1)
 
 	# Clear all the events
-	module._cpus_free = module._cpus_total
+	CPU.cpus_free = CPU.cpus_total
 	Event.events = []
 	Event.is_parallel = False
 	Event.is_first_parallel = False

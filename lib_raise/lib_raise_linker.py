@@ -26,14 +26,21 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-class LinkerModule(RaiseModule):
-	def __init__(self):
-		super(LinkerModule, self).__init__("LINKER")
-		self.linkers = {}
-		self._linker = None
+import os
+from lib_raise_config import *
+from lib_raise_os import *
+from lib_raise_libraries import *
 
-	def setup(self):
-		os_module = Config.require_module("OS")
+class LinkerModule(object):
+	linkers = {}
+	linker = None
+	is_setup = False
+
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
 		extension_map = {}
 
 		# Get the names and paths for know linkers
@@ -51,7 +58,7 @@ class LinkerModule(RaiseModule):
 					shared          = '/dll ',
 					extension_map   = extension_map
 				)
-				self.linkers[link._name] = link
+				cls.linkers[link._name] = link
 			elif name == 'ld':
 				link = Linker(
 					name            = 'ld',
@@ -60,15 +67,15 @@ class LinkerModule(RaiseModule):
 					shared          = '-G', 
 					extension_map   = extension_map
 				)
-				self.linkers[link._name] = link
+				cls.linkers[link._name] = link
 
 		# Make sure there is at least one linker installed
-		if len(self.linkers) == 0:
+		if len(cls.linkers) == 0:
 			print_status("Setting up Linker module")
 			print_fail()
 			print_exit("No Linker found. Install one and try again.")
 
-		self.is_setup = True
+		cls.is_setup = True
 
 class Linker(object):
 	def __init__(self, name, setup, out_file, shared, extension_map):
@@ -87,35 +94,28 @@ class Linker(object):
 		return command
 
 def linker_get_default_linker():
-	module = Config.require_module("LINKER")
-	os_module = Config.require_module("OS")
-
-	if os_module._os_type._name == 'Windows':
-		return module.linkers['link.exe']
+	if OS.os_type._name == 'Windows':
+		return LinkerModule.linkers['link.exe']
 	else:
-		return module.linkers['ld']
+		return LinkerModule.linkers['ld']
 
 def linker_save_linker(linker):
-	module = Config.require_module("LINKER")
-
 	# LINKER
-	module._linker = linker
-	os.environ['LINKER'] = module._linker._name
+	LinkerModule.linker = linker
+	os.environ['LINKER'] = LinkerModule.linker._name
 
 def linker_link_program(out_file, obj_files, i_files=[]):
-	module = Config.require_module("LINKER")
-
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
 	plural = 'programs'
 	singular = 'program'
 	command = "${LINK} " + \
-				module._linker._opt_out_file + \
+				LinkerModule.linker._opt_out_file + \
 				out_file + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files)
-	command = module._linker.to_native(command)
+	command = LinkerModule.linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
@@ -134,13 +134,11 @@ def linker_link_program(out_file, obj_files, i_files=[]):
 	add_event(event)
 
 def ldconfig():
-	module = Config.require_module("OS")
-
 	# Setup the message
 	print_status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if module._os_type._name == 'Cygwin':
+	if OS.os_type._name == 'Cygwin':
 		print_ok()
 		return
 
@@ -188,4 +186,7 @@ def link_static_or_shared_paths(lib_names):
 	for lib_name in lib_names:
 		paths.append(link_static_or_shared_path(lib_name))
 	return str.join(' ', paths)
+
+
+LinkerModule.setup()
 

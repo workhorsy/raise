@@ -26,24 +26,29 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-class CSharpModule(RaiseModule):
-	def __init__(self):
-		super(CSharpModule, self).__init__("CSHARP")
-		self.cs_compilers = {}
-		self.cs_runtimes = {}
-		self._csc = None
-		self._runtime = None
+from lib_raise_os import *
+from lib_raise_libraries import *
 
-	def setup(self):
-		os_module = Config.require_module("OS")
+class CSharp(object):
+	cs_compilers = {}
+	cs_runtimes = {}
+	csc = None
+	runtime = None
+	is_setup = False
+
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
 		extension_map = {}
 		# Figure out the extensions for this OS
-		if os_module._os_type._name == 'Cygwin':
+		if OS.os_type._name == 'Cygwin':
 			extension_map = {
 				'.exe' : '.exe',
 				'.dll' : '.dll'
 			}
-		elif os_module._os_type._name == 'Windows':
+		elif OS.os_type._name == 'Windows':
 			extension_map = {
 				'.exe' : '.exe',
 				'.dll' : '.dll'
@@ -76,8 +81,8 @@ class CSharpModule(RaiseModule):
 					link =                 '', 
 					extension_map = extension_map
 				)
-				self.cs_compilers[comp._name] = comp
-				self.cs_runtimes[comp._name] = 'mono'
+				CSharp.cs_compilers[comp._name] = comp
+				CSharp.cs_runtimes[comp._name] = 'mono'
 			elif name in ['csc']:
 				comp = Compiler(
 					name =                 name, 
@@ -93,50 +98,46 @@ class CSharpModule(RaiseModule):
 					link =                 '', 
 					extension_map = extension_map
 				)
-				self.cs_compilers[comp._name] = comp
-				self.cs_runtimes[comp._name] = ''
+				CSharp.cs_compilers[comp._name] = comp
+				CSharp.cs_runtimes[comp._name] = ''
 
 		# Make sure there is at least one C# compiler installed
-		if len(self.cs_compilers) == 0:
+		if len(cls.cs_compilers) == 0:
 			print_status("Setting up C# module")
 			print_fail()
 			print_exit("No C# compiler found. Install one and try again.")
 
-		self.is_setup = True
+		cls.is_setup = True
+
+CSharp.setup()
 
 def csharp_get_default_compiler():
-	module = Config.require_module("CSHARP")
-
 	comp = None
 	for name in ['dmcs', 'csc']:
-		if name in module.cs_compilers:
-			comp = module.cs_compilers[name]
+		if name in CSharp.cs_compilers:
+			comp = CSharp.cs_compilers[name]
 			break
 
 	return comp
 
 def csharp_save_compiler(compiler):
-	module = Config.require_module("CSHARP")
-
 	# CSC
-	module._csc = compiler
-	module._runtime = module.cs_runtimes[module._csc._name]
-	os.environ['CSC'] = module._csc._name
+	CSharp.csc = compiler
+	CSharp.runtime = CSharp.cs_runtimes[CSharp.csc._name]
+	os.environ['CSC'] = CSharp.csc._name
 
 	# DFLAGS
 	opts = []
-	if module._csc.debug: opts.append(module._csc._opt_debug)
-	if module._csc.warnings_all: opts.append(module._csc._opt_warnings_all)
-	if module._csc.warnings_as_errors: opts.append(module._csc._opt_warnings_as_errors)
-	if module._csc.optimize: opts.append(module._csc._opt_optimize)
-	for compile_time_flag in module._csc.compile_time_flags:
-		opts.append(module._csc._opt_compile_time_flags + compile_time_flag)
+	if CSharp.csc.debug: opts.append(CSharp.csc._opt_debug)
+	if CSharp.csc.warnings_all: opts.append(CSharp.csc._opt_warnings_all)
+	if CSharp.csc.warnings_as_errors: opts.append(CSharp.csc._opt_warnings_as_errors)
+	if CSharp.csc.optimize: opts.append(CSharp.csc._opt_optimize)
+	for compile_time_flag in CSharp.csc.compile_time_flags:
+		opts.append(CSharp.csc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CSFLAGS'] = str.join(' ', opts)
 
 def csharp_build_program(out_file, inc_files, link_files=[]):
-	module = Config.require_module("CSHARP")
-
 	# Make sure the extension is valid
 	if not out_file.endswith('.exe'):
 		print_exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
@@ -147,9 +148,9 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	plural = 'C# programs'
 	singular = 'C# program'
 	command = "${CSC} ${CSFLAGS} " + \
-	module._csc._opt_out_file + out_file + ' ' + \
+	CSharp.csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = module._csc.to_native(command)
+	command = CSharp.csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -163,8 +164,6 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	add_event(event)
 
 def csharp_build_shared_library(out_file, inc_files, link_files=[]):
-	module = Config.require_module("CSHARP")
-
 	# Make sure the extension is valid
 	if not out_file.endswith('.dll'):
 		print_exit("Out file extension should be '.dll' not '.{0}'.".format(out_file.split('.')[-1]))
@@ -175,9 +174,9 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	plural = 'C# shared libraries'
 	singular = 'C# shared library'
 	command = "${CSC} ${CSFLAGS} -target:library " + \
-	module._csc._opt_out_file + out_file + ' ' + \
+	CSharp.csc._opt_out_file + out_file + ' ' + \
 	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = module._csc.to_native(command)
+	command = CSharp.csc.to_native(command)
 
 	def setup():
 		if not 'CSC' in os.environ:
@@ -191,12 +190,10 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	add_event(event)
 
 def csharp_run_say(command):
-	module = Config.require_module("CSHARP")
-
 	print_status("Running C# program")
 
-	native_command = '{0} {1}'.format(module._runtime, command)
-	native_command = module._csc.to_native(native_command)
+	native_command = '{0} {1}'.format(CSharp.runtime, command)
+	native_command = CSharp.csc.to_native(native_command)
 	runner = ProcessRunner(native_command)
 	runner.run()
 	runner.wait()
@@ -210,4 +207,5 @@ def csharp_run_say(command):
 		print(command)
 		print(runner.stdall)
 		print_exit('Failed to run command.')
+
 

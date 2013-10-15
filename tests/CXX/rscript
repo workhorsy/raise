@@ -2,10 +2,11 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import_module('C')
-import_module('CXX')
-import_module('AR')
-import_module('Linker')
+from lib_raise_c import *
+from lib_raise_cxx import *
+from lib_raise_ar import *
+from lib_raise_linker import *
+
 
 def clean():
 	"""Removes any files and directories generated when building."""

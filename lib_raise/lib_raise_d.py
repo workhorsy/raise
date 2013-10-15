@@ -25,25 +25,32 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
+from lib_raise_config import *
+from lib_raise_os import *
+from lib_raise_fs import *
+from lib_raise_libraries import *
 
-class DModule(RaiseModule):
-	def __init__(self):
-		super(DModule, self).__init__("D")
-		self.d_compilers = {}
-		self._dc = None
+class D(object):
+	d_compilers = {}
+	dc = None
+	is_setup = False
 
-	def setup(self):
-		os_module = Config.require_module("OS")
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
 		extension_map = {}
 		# Figure out the extensions for this OS
-		if os_module._os_type._name == 'Cygwin':
+		if OS.os_type._name == 'Cygwin':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.o',
 				'.so' : '.so',
 				'.a' : '.a'
 			}
-		elif os_module._os_type._name == 'Windows':
+		elif OS.os_type._name == 'Windows':
 			extension_map = {
 				'.exe' : '.exe',
 				'.o' : '.obj',
@@ -80,7 +87,7 @@ class DModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.d_compilers[comp._name] = comp
+				D.d_compilers[comp._name] = comp
 			elif name == 'ldc2':
 				comp = Compiler(
 					name =                 'ldc2', 
@@ -96,48 +103,44 @@ class DModule(RaiseModule):
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
 				)
-				self.d_compilers[comp._name] = comp
+				D.d_compilers[comp._name] = comp
 
 		# Make sure there is at least one D compiler installed
-		if len(self.d_compilers) == 0:
+		if len(D.d_compilers) == 0:
 			print_status("Setting up D module")
 			print_fail()
 			print_exit("No D compiler found. Install one and try again.")
 
-		self.is_setup = True
+		cls.is_setup = True
+
+D.setup()
 
 def d_get_default_compiler():
-	module = Config.require_module("D")
-
 	comp = None
 	for name in ['dmd', 'dmd2', 'ldc2']:
-		if name in module.d_compilers:
-			comp = module.d_compilers[name]
+		if name in D.d_compilers:
+			comp = D.d_compilers[name]
 			break
 
 	return comp
 
 def d_save_compiler(compiler):
-	module = Config.require_module("D")
-
 	# DC
-	module._dc = compiler
-	os.environ['DC'] = module._dc._name
+	D.dc = compiler
+	os.environ['DC'] = D.dc._name
 
 	# DFLAGS
 	opts = []
-	if module._dc.debug: opts.append(module._dc._opt_debug)
-	if module._dc.warnings_all: opts.append(module._dc._opt_warnings_all)
-	if module._dc.warnings_as_errors: opts.append(module._dc._opt_warnings_as_errors)
-	if module._dc.optimize: opts.append(module._dc._opt_optimize)
-	for compile_time_flag in module._dc.compile_time_flags:
-		opts.append(module._dc._opt_compile_time_flags + compile_time_flag)
+	if D.dc.debug: opts.append(D.dc._opt_debug)
+	if D.dc.warnings_all: opts.append(D.dc._opt_warnings_all)
+	if D.dc.warnings_as_errors: opts.append(D.dc._opt_warnings_as_errors)
+	if D.dc.optimize: opts.append(D.dc._opt_optimize)
+	for compile_time_flag in D.dc.compile_time_flags:
+		opts.append(D.dc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
 def d_build_interface(d_file, i_files=[]):
-	module = Config.require_module("D")
-
 	# Setup the messages
 	task = 'Building'
 	result = d_file + 'i'
@@ -145,8 +148,8 @@ def d_build_interface(d_file, i_files=[]):
 	singular = 'D interface'
 
 	f = self_deleting_named_temporary_file()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + module._dc._opt_out_file + f.name
-	command = module._dc.to_native(command)
+	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + D.dc._opt_out_file + f.name
+	command = D.dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
@@ -163,8 +166,6 @@ def d_build_interface(d_file, i_files=[]):
 	add_event(event)
 
 def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
-	module = Config.require_module("D")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.o')
 
@@ -174,10 +175,10 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	plural = 'D objects'
 	singular = 'D object'
 
-	command = "${DC} ${DFLAGS} -c " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -c " + D.dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if h_files:
 		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
-	command = module._dc.to_native(command)
+	command = D.dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [o_file], triggers = d_files):
@@ -195,8 +196,6 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 
 # FIXME: Remove this, as there are no shared libraries in D
 def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
-	module = Config.require_module("D")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.so')
 
@@ -206,10 +205,10 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	plural = 'D shared libraries'
 	singular = 'D shared library'
 
-	command = "${DC} ${DFLAGS} -shared " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -shared " + D.dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
-	command = module._dc.to_native(command)
+	command = D.dc.to_native(command)
 
 	def setup():
 		if not is_outdated(to_update = [o_file], triggers = d_files):
@@ -226,8 +225,6 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
-	module = Config.require_module("D")
-
 	# Make sure the extension is valid
 	require_file_extension(o_file, '.a')
 
@@ -237,10 +234,10 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	plural = 'D static libraries'
 	singular = 'D static library'
 
-	command = "${DC} ${DFLAGS} -lib " + module._dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
+	command = "${DC} ${DFLAGS} -lib " + D.dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
 	if generate_headers:
 		command += "  -Hdimport -H"
-	command = module._dc.to_native(command)
+	command = D.dc.to_native(command)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -254,8 +251,6 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
-	module = Config.require_module("D")
-
 	# Make sure the extension is valid
 	require_file_extension(out_file, '.exe')
 
@@ -264,8 +259,8 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	result = out_file
 	plural = 'D programs'
 	singular = 'D program'
-	command = "${DC} ${DFLAGS} " + module._dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = module._dc.to_native(command)
+	command = "${DC} ${DFLAGS} " + D.dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
+	command = D.dc.to_native(command)
 
 	def setup():
 		if not 'DC' in os.environ:
@@ -279,11 +274,9 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	add_event(event)
 
 def d_run_say(command):
-	module = Config.require_module("D")
-
 	print_status("Running D program")
 
-	native_command = module._dc.to_native(command)
+	native_command = D.dc.to_native(command)
 	runner = ProcessRunner(native_command)
 	runner.run()
 	runner.wait()

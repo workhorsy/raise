@@ -25,36 +25,40 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
+import atexit
 import platform
 import traceback
 
-class OSModule(RaiseModule):
-	def __init__(self):
-		super(OSModule, self).__init__("OS")
-		self._os_type = None
+class OS(object):
+	os_type = None
+	is_setup = False
 
-	def setup(self):
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
 		# Figure out the general OS type
 		if 'cygwin' in platform.system().lower():
-			self._os_type = OSType(
+			cls.os_type = OSType(
 				name =                 'Cygwin'
 			)
 		elif 'windows' in platform.system().lower():
-			self._os_type = OSType(
+			cls.os_type = OSType(
 				name =                 'Windows'
 			)
 		else:
-			self._os_type = OSType(
+			cls.os_type = OSType(
 				name =                 'Unix'
 			)
 
 		# Make sure Windows SDK tools are found
-		if self._os_type._name == 'Windows':
+		if cls.os_type._name == 'Windows':
 			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
 				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
-
-		self.is_setup = True
+		cls.is_setup = True
 
 class OSType(object):
 	def __init__(self, name):
@@ -86,11 +90,10 @@ def get_normal_user_id():
 	return int(os.popen('id -u {0}'.format(user_name)).read())
 
 def do_as_normal_user(cb):
-	module = Config.require_module("OS")
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not module._os_type._name in ['Windows', 'Cygwin']:
+	if not OS.os_type._name in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -112,7 +115,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not module._os_type._name in ['Windows', 'Cygwin']:
+		if not OS.os_type._name in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -122,15 +125,14 @@ def do_as_normal_user(cb):
 		print_exit(exception)
 
 def require_root():
-	module = Config.require_module("OS")
 	is_root = False
 
 	# Cygwin
-	if module._os_type._name == 'Cygwin':
+	if OS.os_type._name == 'Cygwin':
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif module._os_type._name == 'Windows':
+	elif OS.os_type._name == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot', 'C:\windows')
@@ -147,10 +149,8 @@ def require_root():
 		print_exit("Must be run as root.")
 
 def require_not_root():
-	module = Config.require_module("OS")
-
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if module._os_type._name in ['Windows', 'Cygwin']:
+	if OS.os_type._name in ['Windows', 'Cygwin']:
 		return
 
 	# Make sure we are NOT root
@@ -161,4 +161,7 @@ def call_on_exit(cb):
 	# Set a cleanup function to run on exit
 	if cb:
 		atexit.register(cb)
+
+
+OS.setup()
 

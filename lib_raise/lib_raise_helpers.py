@@ -25,14 +25,20 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
 from collections import namedtuple
 
-class HelpersModule(RaiseModule):
-	def __init__(self):
-		super(HelpersModule, self).__init__("HELPERS")
+class Helpers(object):
+	is_setup = False
 
-	def setup(self):
-		self.is_setup = True
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.is_setup = True
+
+Helpers.setup()
 
 def before(s, n):
 	i = s.find(n)

@@ -25,14 +25,24 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
 import inspect
+from lib_raise_terminal import *
+from lib_raise_process import *
+from lib_raise_helpers import *
 
-class LibrariesModule(RaiseModule):
-	def __init__(self):
-		super(LibrariesModule, self).__init__("LIBRARIES")
 
-	def setup(self):
-		self.is_setup = True
+class Libraries(object):
+	is_setup = False
+
+	@classmethod
+	def setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.is_setup = True
+
+Libraries.setup()
 
 lib_file_cache = {}
 
@@ -352,8 +362,6 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 		print_ok()
 
 def header_path(header_name):
-	module = Config.require_module('CPU')
-
 	retval = None
 
 	# Get any paths that contain the library name
@@ -371,7 +379,7 @@ def header_path(header_name):
 
 	# Of those paths, get the ones that match the architecture
 	for path in paths:
-		if 'lib' + module._bits in path or module._arch in path:
+		if 'lib' + CPU.bits in path or CPU.arch in path:
 			retval = path
 
 	# If none were matched specifically from the architecture

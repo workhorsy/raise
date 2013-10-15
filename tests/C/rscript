@@ -2,9 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import_module('C')
-import_module('Linker')
-import_module('AR')
+from lib_raise_c import *
+from lib_raise_linker import *
+from lib_raise_ar import *
 
 def clean():
 	"""Removes any files and directories generated when building."""

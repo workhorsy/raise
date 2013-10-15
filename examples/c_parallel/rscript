@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import_module('C')
+from lib_raise_c import *
 
 
 def clean():

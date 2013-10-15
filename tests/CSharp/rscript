@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import_module('CSharp')
+from lib_raise_csharp import *
 
 def clean():
 	"""Removes any files and directories generated when building."""

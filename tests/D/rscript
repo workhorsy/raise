@@ -2,8 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import_module('C')
-import_module('D')
+from lib_raise_c import *
+from lib_raise_d import *
+
 
 def clean():
 	"""Removes any files and directories generated when building."""
