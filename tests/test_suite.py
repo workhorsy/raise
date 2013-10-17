@@ -484,6 +484,39 @@ main.exe
 
 		self.assertProcessOutput(command, expected)
 
+class TestJava(TestCase):
+	def setUp(self, id):
+		self.init('Java', id)
+
+	def test_build_program(self):
+		command = '{0} raise -plain build_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building Java program 'main.class' ...                                      :)
+Running Java program ...                                                    :)
+java main
+8 - 1 = 7'''
+
+		self.assertProcessOutput(command, expected)
+
+	def test_build_shared_library(self):
+		command = '{0} raise -plain build_jar'.format(sys.executable)
+
+		expected = \
+'''Running target 'build_jar'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building Java jar 'lib_math.jar' ...                                        :)
+Building Java program 'main.class' ...                                      :)
+Running Java program ...                                                    :)
+java main
+8 - 1 = 7'''
+
+		self.assertProcessOutput(command, expected)
+
 class TestLibraries(TestCase):
 	def setUp(self, id):
 		self.init('Libraries', id)

@@ -149,7 +149,7 @@ def rm_binaries(name):
 	print_status("Removing binaries '{0}'".format(name))
 
 	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc',
-				'.exe.mdb', '.dll.mdb']
+				'.exe.mdb', '.dll.mdb', '.jar', '.class']
 
 	for entry in os.listdir(os.getcwd()):
 		if entry.startswith(name) and os.path.isfile(entry):

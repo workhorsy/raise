@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+from lib_raise_java import *
+
+def clean():
+	"""Removes any files and directories generated when building."""
+	rm_binaries('lib_math')
+	rm_binaries('main')
+
+def _configure():
+	javac = java_get_default_compiler()
+	javac.debug = True
+	javac.warnings = True
+	javac.verbose = False
+	javac.deprecation = False
+	java_save_compiler(javac)
+
+def build_program():
+	clean()
+	_configure()
+
+	java_build_program('main.class', ['main.java', 'lib_math.java'])
+
+	java_run_say('main')
+
+def build_jar():
+	clean()
+	_configure()
+
+	java_build_jar('lib_math.jar', ['lib_math.java'])
+	java_build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
+
+	java_run_say('main')
+
