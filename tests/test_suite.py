@@ -158,10 +158,10 @@ class ConcurrentTestRunner(object):
 
 		# Print the results
 		print('')
-		print('Unit Test Results:')
-		print('{0} total, {1} successful, {2} failed'.format(total, successful, len(self.fails)))
 		for fail in self.fails:
 			print(fail)
+		print('Unit Test Results:')
+		print('{0} total, {1} successful, {2} failed'.format(total, successful, len(self.fails)))
 
 class TestProcessRunner(object):
 	def __init__(self, command):
@@ -185,7 +185,7 @@ class TestProcessRunner(object):
 
 		# Get the return code
 		rc = self._process.returncode
-		if os.WIFEXITED(rc):
+		if hasattr(os, 'WIFEXITED') and os.WIFEXITED(rc):
 			rc = os.WEXITSTATUS(rc)
 		self._return_code = rc
 
@@ -225,6 +225,23 @@ class TestProcessRunner(object):
 class TestBasics(TestCase):
 	def setUp(self, id):
 		self.init('Basics', id)
+
+	def test_nothing(self):
+		command = '{0} raise -plain simple_nothing'.format(sys.executable)
+
+		expected = \
+"Running target 'simple_nothing'"
+
+		self.assertProcessOutput(command, expected)
+
+	def test_status(self):
+		command = '{0} raise -plain simple_status'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_status'
+Simple status ...'''
+
+		self.assertProcessOutput(command, expected)
 
 	def test_ok(self):
 		command = '{0} raise -plain simple_ok'.format(sys.executable)
@@ -555,6 +572,7 @@ if __name__ == '__main__':
 	for cls in TestCase.__subclasses__():
 		runner.add_test_case(cls)
 	runner.run()
+
 
 
 

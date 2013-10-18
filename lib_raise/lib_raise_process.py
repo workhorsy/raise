@@ -80,7 +80,7 @@ class ProcessRunner(object):
 
 		# Get the return code
 		rc = self._process.returncode
-		if os.WIFEXITED(rc):
+		if hasattr(os, 'WIFEXITED') and os.WIFEXITED(rc):
 			rc = os.WEXITSTATUS(rc)
 		self._return_code = rc
 
@@ -318,4 +318,5 @@ def _do_on_fail_pass(start_message, cb):
 
 
 Process.setup()
+
 

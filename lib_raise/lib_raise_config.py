@@ -27,6 +27,10 @@
 
 import os, sys
 
+def early_exit(message):
+	sys.stdout.write('{0} Exiting ...\n'.format(message))
+	sys.stdout.flush()
+	exit(1)
 
 class Config(object):
 	target_name = None
@@ -71,5 +75,6 @@ class Compiler(object):
 			command = command.replace(before, after)
 
 		return command
+
 
 

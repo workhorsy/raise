@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+def simple_nothing():
+	pass
+
+def simple_status():
+	print_status('Simple status')
 
 def simple_ok():
 	print_status('Simple ok')
@@ -13,4 +18,5 @@ def simple_fail():
 def simple_warning():
 	print_status('Simple warning')
 	print_warning()
+
 

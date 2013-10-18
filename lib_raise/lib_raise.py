@@ -29,11 +29,6 @@ import os, sys
 import signal
 
 
-def early_exit(message):
-	sys.stdout.write('{0} Exiting ...\n'.format(message))
-	sys.stdout.flush()
-	exit(1)
-
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
@@ -145,5 +140,6 @@ if __name__ == '__main__':
 	target = targets[Config.target_name]
 	print_info("Running target '{0}'".format(Config.target_name))
 	target()
+
 
 
