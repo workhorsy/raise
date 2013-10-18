@@ -32,6 +32,7 @@ if sys.version_info < (3, 0):
 else:
 	from urllib.request import urlopen
 
+LIB_RAISE_VERSION = '0.3.0'
 RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
@@ -71,7 +72,7 @@ def friendly_size(data_length):
 	return retval
 
 def update(dir_name):
-	print("Downloading newest Raise version ...")
+	print("Downloading Lib Raise version {0} ...".format(LIB_RAISE_VERSION))
 
 	if not os.path.isdir(dir_name):
 		os.mkdir(dir_name)
