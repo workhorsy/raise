@@ -29,6 +29,7 @@ import os
 from collections import namedtuple
 from lib_raise_config import *
 
+
 class Helpers(RaiseModule):
 	@classmethod
 	def setup(cls):

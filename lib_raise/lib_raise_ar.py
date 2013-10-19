@@ -28,8 +28,8 @@
 from lib_raise_process import *
 from lib_raise_fs import *
 
-class AR(RaiseModule):
 
+class AR(RaiseModule):
 	@classmethod
 	def setup(cls):
 		pass

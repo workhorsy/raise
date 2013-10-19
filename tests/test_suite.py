@@ -25,7 +25,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 import os, sys
 import subprocess
 import difflib
@@ -36,7 +35,7 @@ import shutil
 
 
 class TestCase(object):
-	def setUp(self, id):
+	def set_up(self, id):
 		pass
 
 	def init(self, test_dir, id):
@@ -48,17 +47,17 @@ class TestCase(object):
 		shutil.copytree(test_dir, self.build_dir)
 		os.chdir(self.build_dir)
 
-	def tearDown(self):
+	def tear_down(self):
 		# Change back to the original directory
 		os.chdir(self.pwd)
 		shutil.rmtree(self.build_dir)
 
-	def assertEqual(self, a, b):
+	def assert_equal(self, a, b):
 		if a == b:
 			return
 		raise AssertionError("{0} != {1}".format(a, b))
 
-	def assertNotDiff(self, expected, actual):
+	def assert_not_diff(self, expected, actual):
 		if expected == actual:
 			return
 
@@ -66,23 +65,25 @@ class TestCase(object):
 		diff = '\n' + str.join('', diff_lines)
 		raise AssertionError(diff)
 
-	def assertProcessOutput(self, command, expected, is_success = True):
+	def assert_process_output(self, command, expected, is_success = True):
 		process = TestProcessRunner(command)
 		process.run()
 
-		self.assertNotDiff(expected, process.stdall)
-		self.assertEqual(process.is_success, is_success)
+		self.assert_not_diff(expected, process.stdall)
+		self.assert_equal(process.is_success, is_success)
+
 
 def test_runner(conn, test_case, member, id):
 	try:
-		test_case.setUp(id)
+		test_case.set_up(id)
 		member()
 		conn.send('ok')
 	except Exception as err:
 		conn.send(str(err))
 	finally:
 		conn.close()
-		test_case.tearDown()
+		test_case.tear_down()
+
 
 class ConcurrentTestRunner(object):
 	def __init__(self):
@@ -163,6 +164,7 @@ class ConcurrentTestRunner(object):
 		print('Unit Test Results:')
 		print('{0} total, {1} successful, {2} failed'.format(total, successful, len(self.fails)))
 
+
 class TestProcessRunner(object):
 	def __init__(self, command):
 		self._command = command
@@ -223,7 +225,7 @@ class TestProcessRunner(object):
 
 
 class TestBasics(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('Basics', id)
 
 	def test_nothing(self):
@@ -232,7 +234,7 @@ class TestBasics(TestCase):
 		expected = \
 "Running target 'simple_nothing'"
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_status(self):
 		command = '{0} raise -plain simple_status'.format(sys.executable)
@@ -241,7 +243,7 @@ class TestBasics(TestCase):
 '''Running target 'simple_status'
 Simple status ...'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_ok(self):
 		command = '{0} raise -plain simple_ok'.format(sys.executable)
@@ -250,7 +252,7 @@ Simple status ...'''
 '''Running target 'simple_ok'
 Simple ok ...                                                               :)'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_fail(self):
 		command = '{0} raise -plain simple_fail'.format(sys.executable)
@@ -259,7 +261,7 @@ Simple ok ...                                                               :)''
 '''Running target 'simple_fail'
 Simple fail ................................................................:('''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_warning(self):
 		command = '{0} raise -plain simple_warning'.format(sys.executable)
@@ -268,11 +270,11 @@ Simple fail ................................................................:(''
 '''Running target 'simple_warning'
 Simple warning .............................................................:\\'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 
 class TestC(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('C', id)
 
 	def test_build_object(self):
@@ -289,7 +291,7 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
@@ -303,7 +305,7 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
 		command = '{0} raise -plain build_shared_library'.format(sys.executable)
@@ -319,7 +321,7 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
 		command = '{0} raise -plain build_static_library'.format(sys.executable)
@@ -335,10 +337,10 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 class TestD(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('D', id)
 
 	def test_build_program(self):
@@ -354,7 +356,7 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_object(self):
 		command = '{0} raise -plain build_object'.format(sys.executable)
@@ -371,7 +373,7 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
 		command = '{0} raise -plain build_static_library'.format(sys.executable)
@@ -388,7 +390,7 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_interface(self):
 		command = '{0} raise -plain build_interface'.format(sys.executable)
@@ -400,10 +402,10 @@ Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building D interface 'lib_math.di' ...                                      :)'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 class TestCXX(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('CXX', id)
 
 	def test_build_program(self):
@@ -418,7 +420,7 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_object(self):
 		command = '{0} raise -plain build_object'.format(sys.executable)
@@ -434,7 +436,7 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
 		command = '{0} raise -plain build_shared_library'.format(sys.executable)
@@ -450,7 +452,7 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
 		command = '{0} raise -plain build_static_library'.format(sys.executable)
@@ -466,10 +468,10 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 class TestCSharp(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('CSharp', id)
 
 	def test_build_program(self):
@@ -484,7 +486,7 @@ Running C# program ...                                                      :)
 main.exe
 10 - 4 = 6'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
 		command = '{0} raise -plain build_shared_library'.format(sys.executable)
@@ -499,10 +501,10 @@ Running C# program ...                                                      :)
 main.exe
 10 - 4 = 6'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 class TestJava(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('Java', id)
 
 	def test_build_program(self):
@@ -517,7 +519,7 @@ Running Java program ...                                                    :)
 java main
 8 - 1 = 7'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
 		command = '{0} raise -plain build_jar'.format(sys.executable)
@@ -532,10 +534,10 @@ Running Java program ...                                                    :)
 java main
 8 - 1 = 7'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 class TestLibraries(TestCase):
-	def setUp(self, id):
+	def set_up(self, id):
 		self.init('Libraries', id)
 
 	def test_find_installed_library(self):
@@ -545,7 +547,7 @@ class TestLibraries(TestCase):
 '''Running target 'find_installed_library'
 Checking for shared library 'libSDL' ...                                    :)'''
 
-		self.assertProcessOutput(command, expected)
+		self.assert_process_output(command, expected)
 
 	def test_find_missing_library(self):
 		command = '{0} raise -plain find_missing_library'.format(sys.executable)
@@ -555,7 +557,7 @@ Checking for shared library 'libSDL' ...                                    :)''
 Checking for shared library 'libDoesNotExist' ..............................:(
 Shared library 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
 
-		self.assertProcessOutput(command, expected, False)
+		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_library_bad_version(self):
 		command = '{0} raise -plain find_installed_library_bad_version'.format(sys.executable)
@@ -565,7 +567,8 @@ Shared library 'libDoesNotExist (Any version)' not installed. Install and try ag
 Checking for shared library 'libSDL' ......................................:(
 Shared library 'libSDL (ver >= (99, 0))' not installed. Install and try again. Exiting ...'''
 
-		self.assertProcessOutput(command, expected, False)
+		self.assert_process_output(command, expected, False)
+
 
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()

@@ -39,6 +39,7 @@ class Terminal(RaiseModule):
 	def setup(cls):
 		pass
 
+
 class Emoticons:
 	SMILE = ':)'
 	NORMAL = ':\\'
@@ -50,6 +51,7 @@ class BGColors:
 	WARNING = ''
 	FAIL = ''
 	ENDC = ''
+
 
 # For plain mode, don't clear, don't use color, and fix the width to 79
 def terminal_set_plain():

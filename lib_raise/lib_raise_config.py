@@ -27,6 +27,7 @@
 
 import os, sys
 
+
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
 	sys.stdout.flush()
@@ -58,6 +59,7 @@ def import_rscript(globals_var, locals_var):
 				targets[name] = globals_var[name]
 
 	return targets
+
 
 class Config(object):
 	target_name = None

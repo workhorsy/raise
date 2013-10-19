@@ -25,9 +25,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 from lib_raise_os import *
 from lib_raise_libraries import *
+
 
 class CSharp(RaiseModule):
 	cs_compilers = {}
@@ -119,7 +119,7 @@ def csharp_save_compiler(compiler):
 	CSharp.runtime = CSharp.cs_runtimes[CSharp.csc._name]
 	os.environ['CSC'] = CSharp.csc._name
 
-	# DFLAGS
+	# CSFLAGS
 	opts = []
 	if CSharp.csc.debug: opts.append(CSharp.csc._opt_debug)
 	if CSharp.csc.warnings_all: opts.append(CSharp.csc._opt_warnings_all)

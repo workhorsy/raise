@@ -207,6 +207,7 @@ class Event(object):
 			print_exit("{0} failed. Try again.".format(self._task))
 			self._status = 'failure'
 
+
 def add_event(event):
 	Event.events.append(event)
 

@@ -31,6 +31,7 @@ import platform
 import traceback
 from lib_raise_config import *
 
+
 class OS(RaiseModule):
 	os_type = None
 

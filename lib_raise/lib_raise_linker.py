@@ -25,11 +25,11 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 import os
 from lib_raise_config import *
 from lib_raise_os import *
 from lib_raise_libraries import *
+
 
 class LinkerModule(RaiseModule):
 	linkers = {}

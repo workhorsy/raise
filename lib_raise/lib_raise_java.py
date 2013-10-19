@@ -25,9 +25,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 from lib_raise_os import *
 from lib_raise_libraries import *
+
 
 class Java(RaiseModule):
 	java_compilers = {}
