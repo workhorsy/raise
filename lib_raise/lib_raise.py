@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # This file is part of Raise.
-# Raise is a small software build tool that ships with your code.
+# Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
 # Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise software build tool (Version 0.3.0 - October 19 2013) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.3.0 - October 19 2013) http://launchpad.net/raise")
 		print("OPTIONS:")
 		print("    -plain - Don't clear, don't use color, and fix the width to 79")
 		print("")
