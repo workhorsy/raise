@@ -29,6 +29,7 @@ import os
 import atexit
 import platform
 import traceback
+from lib_raise_config import *
 
 class OS(object):
 	os_type = None

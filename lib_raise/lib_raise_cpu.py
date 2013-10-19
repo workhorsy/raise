@@ -28,6 +28,7 @@
 import platform
 import multiprocessing
 import re
+from lib_raise_config import *
 
 
 class CPU(object):

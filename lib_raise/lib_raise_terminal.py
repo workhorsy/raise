@@ -29,6 +29,7 @@ import sys, os
 from lib_raise_config import *
 from lib_raise_os import *
 
+
 class Terminal(object):
 	terminal_clear = None
 	terminal_width = 79
@@ -73,7 +74,6 @@ def terminal_set_fancy():
 	else:
 		Terminal.terminal_clear = 'clear'
 
-	# FIXME: Have this look for stty first then try the registry
 	# Figure out the terminal width
 	if OS.os_type._name == 'Windows':
 		import _winreg
@@ -85,6 +85,7 @@ def terminal_set_fancy():
 	else:
 		Terminal.terminal_width = int(os.popen('stty size', 'r').read().split()[1])
 
+	# Figure out the terminal colors
 	if OS.os_type._name != 'Windows':
 		BGColors.MESSAGE = '\033[44m\033[37m'
 		BGColors.OK = '\033[42m\033[37m'

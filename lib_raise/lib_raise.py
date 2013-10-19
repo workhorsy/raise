@@ -33,41 +33,15 @@ import signal
 if sys.version_info < (2, 6):
 	early_exit("Python 2.6 or greater is required.")
 
-def import_rscript(g=globals(), l=locals()):
-	# Make sure there is an rscript file
-	if not os.path.isfile('rscript'):
-		return None
-
-	# Load the rscript file into this namespace
-	# Get a list of all the things in the script
-	names = []
-	with open('rscript', 'rb') as f:
-		code = None
-		try:
-			code = compile(f.read(), 'rscript', 'exec')
-			names = [name for name in code.co_names]
-		except Exception as e:
-			print_exit(e)
-
-		exec(code, g, l)
-
-	# Get just the target functions
-	targets = {}
-	for name in names:
-		if name in globals() and not name.startswith('_'):
-			if hasattr(globals()[name], '__call__'):
-				targets[name] = globals()[name]
-
-	return targets
 
 # Load the default modules
 from lib_raise_config import *
+from lib_raise_helpers import *
 from lib_raise_cpu import *
 from lib_raise_os import *
-from lib_raise_process import *
-from lib_raise_helpers import *
 from lib_raise_terminal import *
 from lib_raise_fs import *
+from lib_raise_process import *
 from lib_raise_libraries import *
 
 
@@ -100,7 +74,7 @@ if __name__ == '__main__':
 	Config.target_name = str(str.join(' ', args))
 
 	# Load the rscript
-	targets = import_rscript()
+	targets = import_rscript(globals(), locals())
 
 	# Get a friendly list of all the targets
 	target_list = []

@@ -32,6 +32,33 @@ def early_exit(message):
 	sys.stdout.flush()
 	exit(1)
 
+def import_rscript(globals_var, locals_var):
+	# Make sure there is an rscript file
+	if not os.path.isfile('rscript'):
+		return None
+
+	# Load the rscript file into this namespace
+	# Get a list of all the things in the script
+	names = []
+	with open('rscript', 'rb') as f:
+		code = None
+		try:
+			code = compile(f.read(), 'rscript', 'exec')
+			names = [name for name in code.co_names]
+		except Exception as e:
+			print_exit(e)
+
+		exec(code, globals_var, locals_var)
+
+	# Get just the target functions
+	targets = {}
+	for name in names:
+		if name in globals_var and not name.startswith('_'):
+			if hasattr(globals_var[name], '__call__'):
+				targets[name] = globals_var[name]
+
+	return targets
+
 class Config(object):
 	target_name = None
 	pwd = os.sys.path[0]
