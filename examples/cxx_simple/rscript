@@ -5,8 +5,8 @@ from lib_raise_cxx import *
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rm_binaries('raise_example')
-	rm_binaries('main')
+	remove_binaries('raise_example')
+	remove_binaries('main')
 
 def _configure():
 	cxx = cxx_get_default_compiler()

@@ -36,43 +36,44 @@ class FS(RaiseModule):
 		pass
 
 
-def cd(name):
+def change_dir(name):
 	_do_on_fail_exit("Changing to dir '{0}'".format(name),
 					"Failed to change to the dir '{0}'.".format(name),
 				lambda: os.chdir(name))
 
-def mvfile(source, dest):
+def move_file(source, dest):
 	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
-def cpfile(source, dest):
+def copy_file(source, dest):
 	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
-def cp_new_file(source, dest):
+def copy_new_file(source, dest):
 	if not os.path.isfile(os.path.abspath(dest)):
-		cpfile(source, dest)
+		copy_file(source, dest)
 	elif not filecmp.cmp(source, dest):
-		cpfile(source, dest)
+		copy_file(source, dest)
 
-def cpdir(source, dest, symlinks = False):
+def copy_dir(source, dest, symlinks = False):
 	_do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the dir '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copytree(source, dest, symlinks = symlinks))
 
-def mkdir_f(source):
-	_do_on_fail_pass("Making the dir '{0}'".format(source),
-				lambda: os.mkdir(source))
+def make_dir(source, ignore_failure = False):
+	if ignore_failure:
+		_do_on_fail_pass("Making the dir '{0}'".format(source),
+					lambda: os.mkdir(source))
+	else:
+		_do_on_fail_exit("Making the dir '{0}'".format(source),
+						"Failed to make the dir '{0}'.".format(source),
+					lambda: os.mkdir(source))
 
-def mkdir(source):
-	_do_on_fail_exit("Making the dir '{0}'".format(source),
-					"Failed to make the dir '{0}'.".format(source),
-				lambda: os.mkdir(source))
-
-def rmdir_and_children(name):
+def remove_dir(name, and_children = False):
 	print_status("Removing the dir '{0}'".format(name))
+	success = False
 
 	# Make sure we are not removing the current directory
 	if name == os.getcwd():
@@ -83,64 +84,42 @@ def rmdir_and_children(name):
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isdir(name):
-			shutil.rmtree(name)
-		print_ok()
+			if and_children:
+				shutil.rmtree(name)
+			else:
+				os.rmdir(name)
+		success = True
 	except OSError as e:
 		if 'No such file or directory' in e:
-			print_ok()
-			return
+			success = True
+
+	if success:
+		print_ok()
+	else:
 		print_fail()
 		print_exit("Failed to remove the dir '{0}'.".format(name))
 
-def rmdir(name):
-	print_status("Removing the dir '{0}'".format(name))
-
-	# Make sure we are not removing the current directory
-	if name == os.getcwd():
-		print_fail()
-		print_exit("Can't remove the current directory '{0}'.".format(name))
-
-	try:
-		if os.path.islink(name):
-			os.unlink(name)
-		elif os.path.isdir(name):
-			os.rmdir(name)
-	except OSError as e:
-		if 'Directory not empty' in e:
-			pass
-		elif 'No such file or directory' in e:
-			pass
-		else:
-			print_fail()
-			print_exit("Failed to remove the dir '{0}'.".format(name))
-
-	print_ok()
-
-def rmfile(name):
+def remove_file(name, ignore_failure = False):
 	print_status("Removing the file '{0}'".format(name))
+	success = False
+
 	try:
 		if os.path.islink(name):
 			os.unlink(name)
 		elif os.path.isfile(name):
 			os.remove(name)
-		print_ok()
+		success = True
 	except Exception as e:
+		if ignore_failure:
+			success = True
+
+	if success:
+		print_ok()
+	else:
 		print_fail()
 		print_exit("Failed to remove the file '{0}'.".format(name))
 
-def rmfile_f(name):
-	print_status("Removing the file '{0}'".format(name))
-	try:
-		if os.path.islink(name):
-			os.unlink(name)
-		elif os.path.isfile(name):
-			os.remove(name)
-	except Exception as e:
-		pass
-
-	print_ok()
-
-def rm_binaries(name):
+def remove_binaries(name):
 	print_status("Removing binaries '{0}'".format(name))
 
 	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc',

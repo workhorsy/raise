@@ -5,6 +5,7 @@
 	* Fixed Bug #1225293: 'Add basic Java support'.
 	* Fixed Bug #1230068: 'Downloading should include version number'.
 	* Fixed Bug #1216446: 'Text coloring should only show in terminals that can support it'.
+	* Fixed Bug #1239799: 'File system functions have inconsistent naming conventions'.
 
 2013-09-22 Release 0.2.0
 	* Fixed Bug #1223030: 'Make it complain if running in normal Windows terminal'.

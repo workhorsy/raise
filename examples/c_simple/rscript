@@ -5,8 +5,8 @@ from lib_raise_c import *
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rm_binaries('raise_example')
-	rm_binaries('main')
+	remove_binaries('raise_example')
+	remove_binaries('main')
 
 def _configure():
 	cc = c_get_default_compiler()
@@ -30,7 +30,7 @@ def test():
 	c_run_say('./raise_example.exe')
 
 def _remove():
-	rmfile_f('/usr/bin/raise_example')
+	remove_file('/usr/bin/raise_example', ignore_failure = True)
 
 def remove():
 	"""Uninstalls the program."""
@@ -57,7 +57,7 @@ def install():
 	_remove()
 
 	# Install
-	cpfile('raise_example', '/usr/bin/raise_example')
+	copy_file('raise_example', '/usr/bin/raise_example')
 
 
 

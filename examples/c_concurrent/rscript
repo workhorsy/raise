@@ -7,10 +7,10 @@ from lib_raise_c import *
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rm_binaries('main')
-	rm_binaries('a')
-	rm_binaries('b')
-	rm_binaries('c')
+	remove_binaries('main')
+	remove_binaries('a')
+	remove_binaries('b')
+	remove_binaries('c')
 
 def _configure():
 	cc = c_get_default_compiler()

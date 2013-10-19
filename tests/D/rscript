@@ -8,9 +8,9 @@ from lib_raise_d import *
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	rmfile_f('lib_math.di')
-	rm_binaries('lib_math')
-	rm_binaries('main')
+	remove_file('lib_math.di', ignore_failure = True)
+	remove_binaries('lib_math')
+	remove_binaries('main')
 
 def _configure():
 	dc = d_get_default_compiler()
