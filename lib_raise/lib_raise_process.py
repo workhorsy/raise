@@ -150,8 +150,8 @@ class ProcessRunner(object):
 
 
 class Event(object):
-	is_parallel = False
-	is_first_parallel = False
+	is_concurrent = False
+	is_first_concurrent = False
 	events = []
 
 	def __init__(self, task, result, plural, singular, command, setup_cb):
@@ -170,11 +170,11 @@ class Event(object):
 	is_done = property(get_is_done)
 
 	def run(self):
-		# Show the parallel header
-		if Event.is_parallel:
-			if Event.is_first_parallel:
-				Event.is_first_parallel = False
-				sys.stdout.write("{0} {1} in parallel ...\n".format(self._task, self._plural))
+		# Show the concurrent header
+		if Event.is_concurrent:
+			if Event.is_first_concurrent:
+				Event.is_first_concurrent = False
+				sys.stdout.write("{0} {1} in concurrently ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
 				Terminal.message_length = 0
 
@@ -183,7 +183,7 @@ class Event(object):
 			return False
 
 		# Show the serial message
-		if not Event.is_parallel:
+		if not Event.is_concurrent:
 			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Start the process
@@ -197,7 +197,7 @@ class Event(object):
 		self._runner.wait()
 
 		# Display the message
-		if Event.is_parallel:
+		if Event.is_concurrent:
 			print_status("   '{0}'".format(self._result))
 
 		# Success or failure
@@ -215,15 +215,15 @@ class Event(object):
 def add_event(event):
 	Event.events.append(event)
 
-	# If not parallel, run the event now
-	if not Event.is_parallel:
-		parallel_end()
+	# If not concurrent, run the event now
+	if not Event.is_concurrent:
+		concurrent_end()
 
-def parallel_start():
-	Event.is_parallel = True
-	Event.is_first_parallel = True
+def concurrent_start():
+	Event.is_concurrent = True
+	Event.is_first_concurrent = True
 
-def parallel_end():
+def concurrent_end():
 	ready_events = Event.events
 	running_events = []
 
@@ -256,8 +256,8 @@ def parallel_end():
 	# Clear all the events
 	CPU.cpus_free = CPU.cpus_total
 	Event.events = []
-	Event.is_parallel = False
-	Event.is_first_parallel = False
+	Event.is_concurrent = False
+	Event.is_first_concurrent = False
 
 # FIXME: Rename to run_print
 def run_say(command):

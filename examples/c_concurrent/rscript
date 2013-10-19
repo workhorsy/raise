@@ -38,13 +38,13 @@ def _build():
 	code_files = ['a', 'b', 'c', 'main']
 
 	# Build each c++ file into an object
-	# All the events between parallel_start() and parallel_end() will be run in parallel
-	parallel_start()
+	# All the events between concurrent_start() and concurrent_end() will be run concurrently
+	concurrent_start()
 	for f in code_files:
 		object_name = '{0}.o'.format(f)
 		code_name = '{0}.c'.format(f)
 		c_build_object(object_name, [code_name])
-	parallel_end()
+	concurrent_end()
 
 	# Link all the objects into the program
 	object_files = [s + '.o' for s in code_files]
