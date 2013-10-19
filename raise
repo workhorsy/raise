@@ -77,7 +77,7 @@ def update(dir_name):
 	if not os.path.isdir(dir_name):
 		os.mkdir(dir_name)
 
-	for module, url in RAISE_URLS.iteritems():
+	for module, url in RAISE_URLS.items():
 		# Get the file name for script
 		file_name = os.path.join(dir_name, "lib_{0}.py".format(module))
 
