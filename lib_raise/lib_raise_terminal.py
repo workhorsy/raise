@@ -30,18 +30,14 @@ from lib_raise_config import *
 from lib_raise_os import *
 
 
-class Terminal(object):
+class Terminal(RaiseModule):
 	terminal_clear = None
 	terminal_width = 79
 	message_length = 0
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 class Emoticons:
 	SMILE = ':)'
@@ -149,5 +145,5 @@ def print_exit(message):
 	exit(1)
 
 
-Terminal.setup()
+Terminal.call_setup()
 

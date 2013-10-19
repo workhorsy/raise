@@ -28,15 +28,11 @@
 from lib_raise_process import *
 from lib_raise_fs import *
 
-class AR(object):
-	is_setup = False
+class AR(RaiseModule):
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 def ar_build_static_library(ar_file, o_files):
@@ -64,5 +60,5 @@ def ar_build_static_library(ar_file, o_files):
 	add_event(event)
 
 
-AR.setup()
+AR.call_setup()
 

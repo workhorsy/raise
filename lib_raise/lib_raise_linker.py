@@ -31,16 +31,12 @@ from lib_raise_config import *
 from lib_raise_os import *
 from lib_raise_libraries import *
 
-class LinkerModule(object):
+class LinkerModule(RaiseModule):
 	linkers = {}
 	linker = None
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
 		extension_map = {}
 
 		# Get the names and paths for know linkers
@@ -75,7 +71,6 @@ class LinkerModule(object):
 			print_fail()
 			print_exit("No Linker found. Install one and try again.")
 
-		cls.is_setup = True
 
 class Linker(object):
 	def __init__(self, name, setup, out_file, shared, extension_map):
@@ -188,5 +183,5 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 
-LinkerModule.setup()
+LinkerModule.call_setup()
 

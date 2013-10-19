@@ -31,18 +31,14 @@ import re
 from lib_raise_config import *
 
 
-class CPU(object):
+class CPU(RaiseModule):
 	arch = None
 	bits = None
 	cpus_total = None
 	cpus_free = None
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
 		# Figure out the CPU architecture
 		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
 			cls.arch = 'x86_32'
@@ -57,7 +53,6 @@ class CPU(object):
 		cls.cpus_total = multiprocessing.cpu_count()
 		cls.cpus_free = cls.cpus_total
 
-		cls.is_setup = True
 
-CPU.setup()
+CPU.call_setup()
 

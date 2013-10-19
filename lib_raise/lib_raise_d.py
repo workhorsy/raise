@@ -31,16 +31,12 @@ from lib_raise_os import *
 from lib_raise_fs import *
 from lib_raise_libraries import *
 
-class D(object):
+class D(RaiseModule):
 	d_compilers = {}
 	dc = None
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
 		extension_map = {}
 		# Figure out the extensions for this OS
 		if OS.os_type._name == 'Cygwin':
@@ -110,8 +106,6 @@ class D(object):
 			print_status("Setting up D module")
 			print_fail()
 			print_exit("No D compiler found. Install one and try again.")
-
-		cls.is_setup = True
 
 
 def d_get_default_compiler():
@@ -291,5 +285,5 @@ def d_run_say(command):
 		print_exit('Failed to run command.')
 
 
-D.setup()
+D.call_setup()
 

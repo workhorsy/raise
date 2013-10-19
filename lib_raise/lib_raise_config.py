@@ -66,6 +66,23 @@ class Config(object):
 	is_plain = False
 
 
+class RaiseModule(object):
+	is_setup = False
+
+	@classmethod
+	def call_setup(cls):
+		if cls.is_setup:
+			return
+
+		cls.setup()
+
+		cls.is_setup = True
+
+	@classmethod
+	def setup(cls):
+		raise NotImplementedError("The class method 'setup' should be overridden in child classes.")
+
+
 # FIXME: This should be in the C module?
 # Other C compilers: Clang, DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers

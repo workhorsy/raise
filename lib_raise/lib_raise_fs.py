@@ -30,15 +30,10 @@ import atexit
 from lib_raise_terminal import *
 
 
-class FS(object):
-	is_setup = False
-
+class FS(RaiseModule):
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 def cd(name):
@@ -206,5 +201,5 @@ def self_deleting_named_temporary_file():
 	return f
 
 
-FS.setup()
+FS.call_setup()
 

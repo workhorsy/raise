@@ -32,15 +32,10 @@ from lib_raise_os import *
 from lib_raise_terminal import *
 
 
-class Process(object):
-	is_setup = False
-
+class Process(RaiseModule):
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 class ProcessRunner(object):
@@ -317,6 +312,6 @@ def _do_on_fail_pass(start_message, cb):
 	print_ok()
 
 
-Process.setup()
+Process.call_setup()
 
 

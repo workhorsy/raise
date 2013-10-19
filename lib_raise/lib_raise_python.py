@@ -26,15 +26,10 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-class Python(object):
-	is_setup = False
-
+class Python(RaiseModule):
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 def require_python_modules(mod_names):
@@ -45,6 +40,6 @@ def require_python_modules(mod_names):
 			'{0} -c "import {1}"'.format(Config.python, mod_name)
 		)
 
-Python.setup()
+Python.call_setup()
 
 

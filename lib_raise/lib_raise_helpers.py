@@ -27,16 +27,12 @@
 
 import os
 from collections import namedtuple
+from lib_raise_config import *
 
-class Helpers(object):
-	is_setup = False
-
+class Helpers(RaiseModule):
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 def before(s, n):
@@ -75,5 +71,5 @@ def require_file_extension(file_name, required_extension):
 		print_exit("File extension should be '{0}' on '{1}'.".format(required_extension, file_name))
 
 
-Helpers.setup()
+Helpers.call_setup()
 

@@ -31,15 +31,11 @@ import platform
 import traceback
 from lib_raise_config import *
 
-class OS(object):
+class OS(RaiseModule):
 	os_type = None
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
 		# Figure out the general OS type
 		if 'cygwin' in platform.system().lower():
 			cls.os_type = OSType(
@@ -59,7 +55,6 @@ class OS(object):
 			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
 				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
-		cls.is_setup = True
 
 class OSType(object):
 	def __init__(self, name):
@@ -164,5 +159,5 @@ def call_on_exit(cb):
 		atexit.register(cb)
 
 
-OS.setup()
+OS.call_setup()
 

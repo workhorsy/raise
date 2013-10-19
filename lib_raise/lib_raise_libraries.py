@@ -32,16 +32,12 @@ from lib_raise_process import *
 from lib_raise_helpers import *
 
 
-class Libraries(object):
+class Libraries(RaiseModule):
 	lib_file_cache = {}
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.is_setup = True
+		pass
 
 
 # Returns all the paths that libraries are installed in
@@ -443,5 +439,5 @@ def program_paths(program_name):
 	return paths
 
 
-Libraries.setup()
+Libraries.call_setup()
 

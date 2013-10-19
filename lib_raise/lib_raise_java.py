@@ -29,20 +29,16 @@
 from lib_raise_os import *
 from lib_raise_libraries import *
 
-class Java(object):
+class Java(RaiseModule):
 	java_compilers = {}
 	java_runtimes = {}
 	java_jars = {}
 	javac = None
 	jar = None
 	runtime = None
-	is_setup = False
 
 	@classmethod
 	def setup(cls):
-		if cls.is_setup:
-			return
-
 		extension_map = {}
 		# Figure out the extensions for this OS
 		extension_map = {
@@ -77,7 +73,6 @@ class Java(object):
 			print_fail()
 			print_exit("No Java compiler found. Install one and try again.")
 
-		cls.is_setup = True
 
 class JavaCompiler(object):
 	def __init__(self, name, path, debug, no_warnings, verbose, 
@@ -205,5 +200,5 @@ def java_run_say(command):
 		print_exit('Failed to run command.')
 
 
-Java.setup()
+Java.call_setup()
 
