@@ -85,11 +85,12 @@ def terminal_set_fancy():
 	else:
 		Terminal.terminal_width = int(os.popen('stty size', 'r').read().split()[1])
 
-	BGColors.MESSAGE = '\033[44m\033[37m'
-	BGColors.OK = '\033[42m\033[37m'
-	BGColors.WARNING = '\033[43m\033[30m'
-	BGColors.FAIL = '\033[41m\033[37m'
-	BGColors.ENDC = '\033[0m'
+	if OS.os_type._name != 'Windows':
+		BGColors.MESSAGE = '\033[44m\033[37m'
+		BGColors.OK = '\033[42m\033[37m'
+		BGColors.WARNING = '\033[43m\033[30m'
+		BGColors.FAIL = '\033[41m\033[37m'
+		BGColors.ENDC = '\033[0m'
 
 def terminal_pad(length, pad_char=' '):
 	width = Terminal.terminal_width
