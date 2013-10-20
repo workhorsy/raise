@@ -110,8 +110,8 @@ def _get_library_files(lib_name, version_cb = None):
 	if not files and program_paths('pkg_info'):
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
 
-	# Try finding the library in the file system
-	if not files:
+	# Try finding the library in the file system. But only if there is no version requirement.
+	if not version_cb and not files:
 		files = _get_library_files_from_fs(lib_name)
 
 	# Save the file names in the cache
@@ -294,11 +294,11 @@ def require_header_file(header_name, version_cb = None):
 
 	# If the header is not installed, make them install it to continue
 	if not get_header_file(header_name, version_cb):
-		ver = "Any version"
+		ver = "(Any version)"
 		if version_cb:
 			ver = between(inspect.getsource(version_cb), ': ', ')')
 
-		message = "Header file '{0} ({1})' not installed. Install and try again."
+		message = "Header file '{0} {1}' not installed. Install and try again."
 		print_fail()
 		print_exit(message.format(header_name, ver))
 	else:
@@ -310,11 +310,11 @@ def require_static_library(lib_name, version_cb = None):
 	# If the static library is not installed, make them install it to continue
 	if not get_static_library(lib_name, version_cb):
 		# Get the version requirement lambda as a printable string
-		ver = "Any version"
+		ver = "(Any version)"
 		if version_cb:
 			ver = between(inspect.getsource(version_cb), ': ', ')')
 
-		message = "Static library '{0} ({1})' not installed. Install and try again."
+		message = "Static library '{0} {1}' not installed. Install and try again."
 		print_fail()
 		print_exit(message.format(lib_name, ver))
 	else:
@@ -326,11 +326,11 @@ def require_shared_library(lib_name, version_cb = None):
 	# If the shared library is not installed, make them install it to continue
 	if not get_shared_library(lib_name, version_cb):
 		# Get the version requirement lambda as a printable string
-		ver = "Any version"
+		ver = "(Any version)"
 		if version_cb:
 			ver = between(inspect.getsource(version_cb), ': ', ')')
 
-		message = "Shared library '{0} ({1})' not installed. Install and try again."
+		message = "Shared library '{0} {1}' not installed. Install and try again."
 		print_fail()
 		print_exit(message.format(lib_name, ver))
 	else:
@@ -345,11 +345,11 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 	# Make them install the lib if neither was found
 	if not shared_file and not static_file:
 		# Get the version requirement lambda as a printable string
-		ver = "Any version"
+		ver = "(Any version)"
 		if version_cb:
 			ver = between(inspect.getsource(version_cb), ': ', ')')
 
-		message = "Shared/Static library '{0} ({1})' not installed. Install and try again."
+		message = "Shared/Static library '{0} {1}' not installed. Install and try again."
 		print_fail()
 		print_exit(message.format(lib_name, ver))
 	else:

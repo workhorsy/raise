@@ -339,6 +339,7 @@ Running C program ...                                                       :)
 
 		self.assert_process_output(command, expected)
 
+
 class TestD(TestCase):
 	def set_up(self, id):
 		self.init('D', id)
@@ -403,6 +404,7 @@ Removing binaries 'main' ...                                                :)
 Building D interface 'lib_math.di' ...                                      :)'''
 
 		self.assert_process_output(command, expected)
+
 
 class TestCXX(TestCase):
 	def set_up(self, id):
@@ -470,6 +472,7 @@ Running C++ program ...                                                     :)
 
 		self.assert_process_output(command, expected)
 
+
 class TestCSharp(TestCase):
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -502,6 +505,7 @@ main.exe
 10 - 4 = 6'''
 
 		self.assert_process_output(command, expected)
+
 
 class TestJava(TestCase):
 	def set_up(self, id):
@@ -536,6 +540,7 @@ java main
 
 		self.assert_process_output(command, expected)
 
+
 class TestLibraries(TestCase):
 	def set_up(self, id):
 		self.init('Libraries', id)
@@ -564,8 +569,8 @@ Shared library 'libDoesNotExist (Any version)' not installed. Install and try ag
 
 		expected = \
 '''Running target 'find_installed_library_bad_version'
-Checking for shared library 'libSDL' ......................................:(
-Shared library 'libSDL (ver >= (99, 0))' not installed. Install and try again. Exiting ...'''
+Checking for shared library 'libSDL' .......................................:(
+Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
 
 		self.assert_process_output(command, expected, False)
 

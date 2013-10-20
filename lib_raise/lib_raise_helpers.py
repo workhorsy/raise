@@ -43,6 +43,13 @@ def before(s, n):
 	else:
 		return s[0 : i]
 
+def before_last(s, n):
+	i = s.rfind(n)
+	if i == -1:
+		return s
+	else:
+		return s[0 : i]
+
 def after(s, n):
 	i = s.find(n)
 	if i == -1:
@@ -51,7 +58,7 @@ def after(s, n):
 		return s[i+len(n) : ]
 
 def between(s, l, r):
-	return before(after(s, l), r)
+	return before_last(after(s, l), r)
 
 def version_string_to_tuple(version_string):
 	# Get the version number
