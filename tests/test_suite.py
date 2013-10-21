@@ -359,6 +359,16 @@ class TestD(TestCase):
 	def set_up(self, id):
 		self.init('D', id)
 
+	def test_setup_failure(self):
+		command = '{0} raise -plain setup_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'setup_failure'
+Setting up D module ........................................................:(
+No D compiler found. Install one and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
+
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
 
@@ -424,6 +434,16 @@ Building D interface 'lib_math.di' ...                                      :)''
 class TestCXX(TestCase):
 	def set_up(self, id):
 		self.init('CXX', id)
+
+	def test_setup_failure(self):
+		command = '{0} raise -plain setup_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'setup_failure'
+Setting up C++ module ......................................................:(
+No C++ compiler found. Install one and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
@@ -492,6 +512,16 @@ class TestCSharp(TestCase):
 	def set_up(self, id):
 		self.init('CSharp', id)
 
+	def test_setup_failure(self):
+		command = '{0} raise -plain setup_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'setup_failure'
+Setting up C# module .......................................................:(
+No C# compiler found. Install one and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
+
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)
 
@@ -525,6 +555,16 @@ main.exe
 class TestJava(TestCase):
 	def set_up(self, id):
 		self.init('Java', id)
+
+	def test_setup_failure(self):
+		command = '{0} raise -plain setup_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'setup_failure'
+Setting up Java module .....................................................:(
+No Java compiler found. Install one and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
 		command = '{0} raise -plain build_program'.format(sys.executable)

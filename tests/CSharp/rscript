@@ -17,6 +17,16 @@ def _configure():
 	csc.warnings_as_errors = True
 	csharp_save_compiler(csc)
 
+def setup_failure():
+	# Empty the path and reset the CSharp module so it finds no compilers
+	os.environ['PATH'] = ''
+	CSharp.is_setup = False
+	CSharp.cs_compilers = {}
+	CSharp.cs_runtimes = {}
+	CSharp.csc = None
+	CSharp.runtime = None
+	CSharp.call_setup()
+
 def build_program():
 	clean()
 	_configure()

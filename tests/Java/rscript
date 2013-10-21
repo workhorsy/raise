@@ -17,6 +17,18 @@ def _configure():
 	javac.deprecation = False
 	java_save_compiler(javac)
 
+def setup_failure():
+	# Empty the path and reset the Java module so it finds no compilers
+	os.environ['PATH'] = ''
+	Java.is_setup = False
+	Java.java_compilers = {}
+	Java.java_runtimes = {}
+	Java.java_jars = {}
+	Java.javac = None
+	Java.jar = None
+	Java.runtime = None
+	Java.call_setup()
+
 def build_program():
 	clean()
 	_configure()

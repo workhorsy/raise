@@ -20,6 +20,14 @@ def _configure():
 	dc.warnings_as_errors = True
 	d_save_compiler(dc)
 
+def setup_failure():
+	# Empty the path and reset the D module so it finds no compilers
+	os.environ['PATH'] = ''
+	D.is_setup = False
+	D.d_compilers = {}
+	D.dc = None
+	D.call_setup()
+
 def build_object():
 	clean()
 	_configure()

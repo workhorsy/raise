@@ -26,6 +26,14 @@ def _configure():
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
+def setup_failure():
+	# Empty the path and reset the CXX module so it finds no compilers
+	os.environ['PATH'] = ''
+	CXX.is_setup = False
+	CXX.cxx_compilers = {}
+	CXX.cxx = None
+	CXX.call_setup()
+
 def build_object():
 	clean()
 	_configure()
