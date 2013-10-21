@@ -52,11 +52,6 @@ class TestCase(object):
 		os.chdir(self.pwd)
 		shutil.rmtree(self.build_dir)
 
-	def assert_equal(self, a, b):
-		if a == b:
-			return
-		raise AssertionError("{0} != {1}".format(a, b))
-
 	def assert_not_diff(self, expected, actual):
 		if expected == actual:
 			return
@@ -69,8 +64,17 @@ class TestCase(object):
 		process = TestProcessRunner(command)
 		process.run()
 
+		# Make sure the text returned is as expected
 		self.assert_not_diff(expected, process.stdall)
-		self.assert_equal(process.is_success, is_success)
+
+		# Make sure the return code is as expected
+		if process.is_success == is_success:
+			return
+
+		if is_success:
+			raise AssertionError("Process return code expected to be 0 but was {0}.".format(process._return_code))
+		else:
+			raise AssertionError("Process return code expected to NOT be 0 but was {0}.".format(process._return_code))
 
 
 def test_runner(conn, test_case, member, id):
@@ -111,8 +115,8 @@ class ConcurrentTestRunner(object):
 				if not name.startswith('test_'):
 					continue
 
-				pair = (test_case, member)
-				ready_members.append(pair)
+				data = (test_case, member, test_case_cls.__name__ + '.' + name)
+				ready_members.append(data)
 				total += 1
 
 		# Run one process per CPU core, until all the processes are done
@@ -120,13 +124,14 @@ class ConcurrentTestRunner(object):
 		while True:
 			# Start the next processes
 			while cpus_free and ready_members:
-				test_case, member = ready_members.pop()
+				test_case, member, name = ready_members.pop()
 
 				self.next_id += 1
 				parent_conn, child_conn = multiprocessing.Pipe()
 				args = (child_conn, test_case, member, self.next_id)
 				process = multiprocessing.Process(target=test_runner, args=args)
 				process.start()
+				process.test_function_name = name
 				running_processes[process] = parent_conn
 				cpus_free -= 1
 
@@ -144,7 +149,7 @@ class ConcurrentTestRunner(object):
 					successful += 1
 					sys.stdout.write('.')
 				else:
-					self.fails.append(message)
+					self.fails.append(process.test_function_name + '\n' + message)
 					sys.stdout.write('F')
 				sys.stdout.flush()
 
@@ -276,6 +281,16 @@ Simple warning .............................................................:\\'
 class TestC(TestCase):
 	def set_up(self, id):
 		self.init('C', id)
+
+	def test_setup_failure(self):
+		command = '{0} raise -plain setup_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'setup_failure'
+Setting up C module ........................................................:(
+No C compiler found. Install one and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_object(self):
 		command = '{0} raise -plain build_object'.format(sys.executable)
