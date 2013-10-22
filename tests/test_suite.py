@@ -34,7 +34,25 @@ import multiprocessing
 import shutil
 
 
+def program_paths(program_name):
+	paths = []
+	exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
+	path = os.environ['PATH']
+	for p in os.environ['PATH'].split(os.pathsep):
+		p = os.path.join(p, program_name)
+		if os.access(p, os.X_OK):
+			paths.append(p)
+		for e in exts:
+			pext = p + e
+			if os.access(pext, os.X_OK):
+				paths.append(pext)
+	return paths
+
 class TestCase(object):
+	@classmethod
+	def has_prerequisites(cls):
+		raise NotImplementedError("The has_prerequisites class method should be overridden on any child classes.")
+
 	def set_up(self, id):
 		pass
 
@@ -108,6 +126,12 @@ class ConcurrentTestRunner(object):
 
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
+			# Skip this test suite if it does not have the prerequisites
+			if not test_case_cls.has_prerequisites():
+				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
+				continue
+
+			# Find all the tests in the suite
 			test_case = test_case_cls()
 			members = inspect.getmembers(test_case, predicate=inspect.ismethod)
 
@@ -230,6 +254,10 @@ class TestProcessRunner(object):
 
 
 class TestBasics(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
 	def set_up(self, id):
 		self.init('Basics', id)
 
@@ -279,6 +307,14 @@ Simple warning .............................................................:\\'
 
 
 class TestC(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		for prog in ['gcc', 'clang', 'cl.exe']:
+			if program_paths(prog):
+				return True
+
+		return False
+
 	def set_up(self, id):
 		self.init('C', id)
 
@@ -356,6 +392,14 @@ Running C program ...                                                       :)
 
 
 class TestD(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		for prog in ['dmd', 'dmd2', 'ldc2']:
+			if program_paths(prog):
+				return True
+
+		return False
+
 	def set_up(self, id):
 		self.init('D', id)
 
@@ -432,6 +476,14 @@ Building D interface 'lib_math.di' ...                                      :)''
 
 
 class TestCXX(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		for prog in ['g++']:
+			if program_paths(prog):
+				return True
+
+		return False
+
 	def set_up(self, id):
 		self.init('CXX', id)
 
@@ -509,6 +561,14 @@ Running C++ program ...                                                     :)
 
 
 class TestCSharp(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		for prog in ['dmcs', 'csc']:
+			if program_paths(prog):
+				return True
+
+		return False
+
 	def set_up(self, id):
 		self.init('CSharp', id)
 
@@ -553,6 +613,14 @@ main.exe
 
 
 class TestJava(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		for prog in ['javac']:
+			if program_paths(prog):
+				return True
+
+		return False
+
 	def set_up(self, id):
 		self.init('Java', id)
 
@@ -597,6 +665,10 @@ java main
 
 
 class TestLibraries(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
 	def set_up(self, id):
 		self.init('Libraries', id)
 
@@ -632,8 +704,13 @@ Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
-	for cls in TestCase.__subclasses__():
-		runner.add_test_case(cls)
+	runner.add_test_case(TestBasics)
+	runner.add_test_case(TestLibraries)
+	runner.add_test_case(TestC)
+	runner.add_test_case(TestCXX)
+	runner.add_test_case(TestD)
+	runner.add_test_case(TestCSharp)
+	runner.add_test_case(TestJava)
 	runner.run()
 
 
