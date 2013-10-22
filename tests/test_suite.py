@@ -79,8 +79,12 @@ class TestCase(object):
 		raise AssertionError(diff)
 
 	def assert_process_output(self, command, expected, is_success = True):
+		# Run the process and wait for it to complete
 		process = TestProcessRunner(command)
 		process.run()
+
+		# Convert the line endings to the native style
+		expected = expected.replace('\n', os.linesep)
 
 		# Make sure the text returned is as expected
 		self.assert_not_diff(expected, process.stdall)
