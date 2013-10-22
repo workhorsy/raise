@@ -31,8 +31,8 @@ import signal
 
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
-	early_exit("Python 2.6 or greater is required.")
-
+	print("Python 2.6 or greater is required. Exiting ...")
+	exit(1)
 
 # Load the default modules
 from lib_raise_config import *

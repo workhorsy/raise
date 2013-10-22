@@ -25,13 +25,21 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os, sys
+# Make sure we are in at least python 2.6
+import sys
+if sys.version_info < (2, 6):
+	print("Python 2.6 or greater is required. Exiting ...")
+	exit(1)
+
+# Load the default imports
+import os
 import stat
 if sys.version_info < (3, 0):
 	from urllib2 import urlopen
 else:
 	from urllib.request import urlopen
 
+# Get the location of Lib Raise for this version
 LIB_RAISE_VERSION = '0.3.0'
 RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
