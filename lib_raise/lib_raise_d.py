@@ -43,9 +43,9 @@ class D(RaiseModule):
 		if OS.os_type._name == 'Cygwin':
 			extension_map = {
 				'.exe' : '.exe',
-				'.o' : '.o',
-				'.so' : '.so',
-				'.a' : '.a'
+				'.o' : '.obj',
+				'.so' : '.dll',
+				'.a' : '.lib'
 			}
 		elif OS.os_type._name == 'Windows':
 			extension_map = {
