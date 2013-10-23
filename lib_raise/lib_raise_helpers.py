@@ -35,6 +35,12 @@ class Helpers(RaiseModule):
 	def setup(cls):
 		pass
 
+def chomp(s):
+	for sep in ['\r\n', '\n', '\r']:
+		if s.endswith(sep):
+			return s[:-len(sep)]
+
+	return s
 
 def before(s, n):
 	i = s.find(n)

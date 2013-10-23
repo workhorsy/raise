@@ -48,6 +48,13 @@ def program_paths(program_name):
 				paths.append(pext)
 	return paths
 
+def chomp(s):
+	for sep in ['\r\n', '\n', '\r']:
+		if s.endswith(sep):
+			return s[:-len(sep)]
+
+	return s
+
 class TestCase(object):
 	@classmethod
 	def has_prerequisites(cls):
@@ -249,10 +256,8 @@ class TestProcessRunner(object):
 			pass
 
 		# Chomp the terminating newline off the ends of output
-		if self._stdout.endswith(os.linesep):
-			self._stdout = self._stdout[:-len(os.linesep)]
-		if self._stderr.endswith(os.linesep):
-			self._stderr = self._stderr[:-len(os.linesep)]
+		self._stdout = chomp(self._stdout)
+		self._stderr = chomp(self._stderr)
 
 	def get_is_success(self):
 		return self._return_code == 0

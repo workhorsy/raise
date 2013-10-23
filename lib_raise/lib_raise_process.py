@@ -27,6 +27,7 @@
 
 import subprocess
 import time
+from lib_raise_helpers import *
 from lib_raise_cpu import *
 from lib_raise_os import *
 from lib_raise_terminal import *
@@ -93,10 +94,8 @@ class ProcessRunner(object):
 			pass
 
 		# Chomp the terminating newline off the ends of output
-		if self._stdout.endswith(os.linesep):
-			self._stdout = self._stdout[:-len(os.linesep)]
-		if self._stderr.endswith(os.linesep):
-			self._stderr = self._stderr[:-len(os.linesep)]
+		self._stdout = chomp(self._stdout)
+		self._stderr = chomp(self._stderr)
 
 		# :( Failure
 		if self._return_code:
