@@ -273,16 +273,17 @@ def d_run_say(command):
 	native_command = D.dc.to_native(command)
 	runner = ProcessRunner(native_command)
 	runner.run()
+	runner.is_done
 	runner.wait()
 
 	if runner.is_success or runner.is_warning:
 		print_ok()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 	elif runner.is_failure:
 		print_fail()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
 

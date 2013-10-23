@@ -60,6 +60,9 @@ class ProcessRunner(object):
 		for key, value in os.environ.items():
 			env[key] = expand_envs(value)
 
+		self._stdout = ''
+		self._stderr = ''
+
 		# Start the process and save the output
 		self._process = subprocess.Popen(
 			self._command, 
@@ -70,7 +73,7 @@ class ProcessRunner(object):
 		)
 
 	def wait(self):
-		# Wait for the process to exit
+		# Wait for the process to actually exit
 		self._process.wait()
 
 		# Get the return code
@@ -79,9 +82,7 @@ class ProcessRunner(object):
 			rc = os.WEXITSTATUS(rc)
 		self._return_code = rc
 
-		# Get the standard out and error text
-		self._stderr  = self._process.stderr.read().rstrip()
-		self._stdout = self._process.stdout.read().rstrip()
+		# Get the standard out and error in the correct format
 		try:
 			self._stderr = str(self._stderr, 'UTF-8')
 		except Exception as err:
@@ -90,6 +91,12 @@ class ProcessRunner(object):
 			self._stdout = str(self._stdout, 'UTF-8')
 		except Exception as err:
 			pass
+
+		# Chomp the terminating newline off the ends of output
+		if self._stdout.endswith(os.linesep):
+			self._stdout = self._stdout[:-len(os.linesep)]
+		if self._stderr.endswith(os.linesep):
+			self._stderr = self._stderr[:-len(os.linesep)]
 
 		# :( Failure
 		if self._return_code:
@@ -106,6 +113,13 @@ class ProcessRunner(object):
 		# You have to poll a process to update the retval. Even if it has stopped already
 		if self._process.returncode == None:
 			self._process.poll()
+
+		# Read the output from the buffer
+		sout, serr = self._process.communicate()
+		self._stdout += sout
+		self._stderr += serr
+
+		# Return true if there is a return code
 		return self._process.returncode != None
 	is_done = property(get_is_done)
 
@@ -261,21 +275,23 @@ def run_say(command):
 
 	runner = ProcessRunner(command)
 	runner.run()
+	runner.is_done
 	runner.wait()
 
 	if runner.is_success or runner.is_warning:
 		print_ok()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 	elif runner.is_failure:
 		print_fail()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
 def run_and_get_stdout(command):
 	runner = ProcessRunner(command)
 	runner.run()
+	runner.is_done
 	runner.wait()
 	if runner.is_failure:
 		return None
@@ -297,6 +313,7 @@ def _do_on_fail_exit(start_message, fail_message, cb):
 	elif type(cb) == str:
 		runner = ProcessRunner(cb)
 		runner.run()
+		runner.is_done
 		runner.wait()
 		if runner.is_success or runner.is_warning:
 			print_ok()
@@ -314,5 +331,6 @@ def _do_on_fail_pass(start_message, cb):
 
 
 Process.call_setup()
+
 
 

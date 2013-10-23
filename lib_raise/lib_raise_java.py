@@ -187,16 +187,17 @@ def java_run_say(command):
 	native_command = Java.javac.to_native(native_command)
 	runner = ProcessRunner(native_command)
 	runner.run()
+	runner.is_done
 	runner.wait()
 
 	if runner.is_success or runner.is_warning:
 		print_ok()
-		print(native_command)
-		print(runner.stdall)
+		sys.stdout.write(native_command + '\n')
+		sys.stdout.write(runner.stdall)
 	elif runner.is_failure:
 		print_fail()
-		print(native_command)
-		print(runner.stdall)
+		sys.stdout.write(native_command + '\n')
+		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
 

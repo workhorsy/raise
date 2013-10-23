@@ -146,6 +146,7 @@ def ldconfig():
 	# Run the process
 	runner = ProcessRunner(prog[0])
 	runner.run()
+	runner.is_done
 	runner.wait()
 
 	# Success or failure

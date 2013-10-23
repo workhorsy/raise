@@ -84,10 +84,10 @@ class TestCase(object):
 		process.run()
 
 		# Convert the line endings to the native style
-		expected = expected.replace('\n', os.linesep)
+		actual = process.stdall.replace(os.linesep, '\n')
 
 		# Make sure the text returned is as expected
-		self.assert_not_diff(expected, process.stdall)
+		self.assert_not_diff(expected, actual)
 
 		# Make sure the return code is as expected
 		if process.is_success == is_success:
@@ -215,6 +215,20 @@ class TestProcessRunner(object):
 			shell = True
 		)
 
+		self._stdout = ''
+		self._stderr = ''
+
+		while True:
+			sout, serr = self._process.communicate()
+			self._stdout += sout
+			self._stderr += serr
+
+			self._process.poll()
+			if self._process.returncode != None:
+				break
+
+			time.sleep(0.2)
+
 		# Wait for the process to exit
 		self._process.wait()
 
@@ -225,8 +239,6 @@ class TestProcessRunner(object):
 		self._return_code = rc
 
 		# Get the standard out and error text
-		self._stderr  = self._process.stderr.read().rstrip()
-		self._stdout = self._process.stdout.read().rstrip()
 		try:
 			self._stderr = str(self._stderr, 'UTF-8')
 		except Exception as err:
@@ -235,6 +247,12 @@ class TestProcessRunner(object):
 			self._stdout = str(self._stdout, 'UTF-8')
 		except Exception as err:
 			pass
+
+		# Chomp the terminating newline off the ends of output
+		if self._stdout.endswith(os.linesep):
+			self._stdout = self._stdout[:-len(os.linesep)]
+		if self._stderr.endswith(os.linesep):
+			self._stderr = self._stderr[:-len(os.linesep)]
 
 	def get_is_success(self):
 		return self._return_code == 0
@@ -482,7 +500,7 @@ Building D interface 'lib_math.di' ...                                      :)''
 class TestCXX(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['g++']:
+		for prog in ['g++', 'cl.exe']:
 			if program_paths(prog):
 				return True
 

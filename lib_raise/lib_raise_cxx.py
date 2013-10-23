@@ -63,7 +63,7 @@ class CXX(RaiseModule):
 			}
 
 		# Get the names and paths for know C++ compilers
-		names = ['g++']
+		names = ['g++', 'cl.exe']
 		for name in names:
 			paths = program_paths(name)
 			if len(paths) == 0:
@@ -80,6 +80,23 @@ class CXX(RaiseModule):
 					warnings_all =         '-Wall', 
 					warnings_as_errors =   '-Werror', 
 					optimize =             '-O2', 
+					compile_time_flags =   '-D', 
+					link =                 '-Wl,-as-needed', 
+					extension_map = extension_map
+				)
+				CXX.cxx_compilers[comp._name] = comp
+			elif name == 'cl.exe':
+				# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
+				comp = Compiler(
+					name =                 'cl.exe', 
+					path =                 paths[0], 
+					setup =                '/nologo /EHsc', 
+					out_file =             '/Fe', 
+					no_link =              '/c', 
+					debug =                '', 
+					warnings_all =         '/Wall', 
+					warnings_as_errors =   '', 
+					optimize =             '/O2', 
 					compile_time_flags =   '-D', 
 					link =                 '-Wl,-as-needed', 
 					extension_map = extension_map
@@ -215,18 +232,20 @@ def cxx_run_say(command):
 	native_command = CXX.cxx.to_native(command)
 	runner = ProcessRunner(native_command)
 	runner.run()
+	runner.is_done
 	runner.wait()
 
 	if runner.is_success or runner.is_warning:
 		print_ok()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 	elif runner.is_failure:
 		print_fail()
-		print(command)
-		print(runner.stdall)
+		sys.stdout.write(command + '\n')
+		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
 
 CXX.call_setup()
+
 
