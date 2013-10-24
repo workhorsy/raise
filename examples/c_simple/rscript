@@ -30,13 +30,14 @@ def test():
 	c_run_say('./raise_example.exe')
 
 def _remove():
-	remove_file('/usr/bin/raise_example', ignore_failure = True)
+	c_remove_program('raise_example.exe')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
 	require_root()
 	clean()
+	_configure()
 
 	# Remove the old files
 	_remove()
@@ -57,7 +58,7 @@ def install():
 	_remove()
 
 	# Install
-	copy_file('raise_example', '/usr/bin/raise_example')
+	c_install_program('raise_example.exe')
 
 
 

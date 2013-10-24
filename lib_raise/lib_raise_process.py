@@ -297,7 +297,7 @@ def run_and_get_stdout(command):
 	else:
 		return runner.stdout
 
-def _do_on_fail_exit(start_message, fail_message, cb):
+def do_on_fail_exit(start_message, fail_message, cb):
 	print_status(start_message)
 
 	# Run it if it is a function
@@ -320,7 +320,7 @@ def _do_on_fail_exit(start_message, fail_message, cb):
 			print_fail()
 			print_exit(fail_message)
 
-def _do_on_fail_pass(start_message, cb):
+def do_on_fail_pass(start_message, cb):
 	print_status(start_message)
 	try:
 		cb()

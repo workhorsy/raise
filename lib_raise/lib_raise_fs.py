@@ -37,17 +37,17 @@ class FS(RaiseModule):
 
 
 def change_dir(name):
-	_do_on_fail_exit("Changing to dir '{0}'".format(name),
+	do_on_fail_exit("Changing to dir '{0}'".format(name),
 					"Failed to change to the dir '{0}'.".format(name),
 				lambda: os.chdir(name))
 
 def move_file(source, dest):
-	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
+	do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
 def copy_file(source, dest):
-	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
+	do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
@@ -58,16 +58,16 @@ def copy_new_file(source, dest):
 		copy_file(source, dest)
 
 def copy_dir(source, dest, symlinks = False):
-	_do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
+	do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the dir '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copytree(source, dest, symlinks = symlinks))
 
 def make_dir(source, ignore_failure = False):
 	if ignore_failure:
-		_do_on_fail_pass("Making the dir '{0}'".format(source),
+		do_on_fail_pass("Making the dir '{0}'".format(source),
 					lambda: os.mkdir(source))
 	else:
-		_do_on_fail_exit("Making the dir '{0}'".format(source),
+		do_on_fail_exit("Making the dir '{0}'".format(source),
 						"Failed to make the dir '{0}'.".format(source),
 					lambda: os.mkdir(source))
 
@@ -134,7 +134,7 @@ def remove_binaries(name):
 	print_ok()
 
 def symlink(source, link_name):
-	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
+	do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))
 

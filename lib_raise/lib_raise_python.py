@@ -34,7 +34,7 @@ class Python(RaiseModule):
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
-		_do_on_fail_exit(
+		do_on_fail_exit(
 			"Checking for python module '{0}'".format(mod_name),
 			"Install the python module '{0}' and try again.".format(mod_name),
 			'{0} -c "import {1}"'.format(Config.python, mod_name)

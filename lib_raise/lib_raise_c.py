@@ -292,6 +292,51 @@ def c_run_say(command):
 		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
+def c_install_program(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.exe')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/bin/'
+
+	# Get the native install source and dest
+	source = C.cc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	do_on_fail_exit("Installing the program '{0}'".format(name),
+					"Failed to install the program '{0}'.".format(name),
+				lambda: shutil.copy2(source, dest))
+
+def c_remove_program(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.exe')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/bin/'
+
+	# Get the native install source and dest
+	source = C.cc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Remove the file if it exists
+	def fn():
+		if os.path.isfile(dest):
+			os.remove(dest)
+
+	do_on_fail_exit("Removing the program '{0}'".format(name),
+					"Failed to remove the program '{0}'.".format(name),
+				lambda: fn())
+
 C.call_setup()
 
 
