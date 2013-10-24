@@ -44,14 +44,15 @@ def test():
 	c_run_say('./raise_example.exe')
 
 def _remove():
-	remove_file('/usr/bin/raise_example', ignore_failure = True)
-	remove_file('/usr/lib/libexample.so', ignore_failure = True)
+	c_uninstall_program('raise_example.exe')
+	c_uninstall_library('libexample.so')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
 	require_root()
 	clean()
+	_configure()
 
 	# Remove the old files
 	_remove()
@@ -76,8 +77,8 @@ def install():
 	_remove()
 
 	# Install
-	copy_file('raise_example', '/usr/bin/raise_example')
-	copy_file('libexample.so', '/usr/lib/libexample.so')
+	c_install_program('raise_example.exe')
+	c_install_library('libexample.so')
 
 	ldconfig()
 

@@ -30,7 +30,7 @@ def test():
 	c_run_say('./raise_example.exe')
 
 def _remove():
-	c_remove_program('raise_example.exe')
+	c_uninstall_program('raise_example.exe')
 
 def remove():
 	"""Uninstalls the program."""
