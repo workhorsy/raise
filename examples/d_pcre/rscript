@@ -53,14 +53,15 @@ def test():
 	d_run_say('./raise_example.exe')
 
 def _remove():
-	remove_file('/usr/bin/raise_example', ignore_failure = True)
-	remove_file('/usr/lib/lib_regex.so', ignore_failure = True)
+	d_uninstall_program('raise_example.exe')
+	c_uninstall_library('lib_regex.so')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
 	require_root()
 	clean()
+	_configure()
 
 	# Remove the files
 	_remove()
@@ -85,8 +86,8 @@ def install():
 	_remove()
 
 	# Install
-	copy_file('raise_example', '/usr/bin/raise_example')
-	copy_file('lib_regex.so', '/usr/lib/lib_regex.so')
+	d_install_program('raise_example.exe')
+	c_install_library('lib_regex.so')
 
 	ldconfig()
 

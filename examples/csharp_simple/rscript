@@ -30,9 +30,41 @@ def test():
 	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 
 	# Run the program
-	run_say('./main.exe')
+	csharp_run_say('./main.exe')
 
+def _remove():
+	csharp_uninstall_program('raise_example.exe')
+	csharp_uninstall_library('lib_math_helper.dll')
 
+def remove():
+	"""Uninstalls the program."""
+	# Setup
+	require_root()
+	clean()
+	_configure()
+
+	# Remove the old files
+	_remove()
+
+def install():
+	"""Installs the program."""
+	# Setup
+	require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		csharp_build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+		csharp_build_program('raise_example.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
+	do_as_normal_user(actual_build)
+
+	# Remove old install
+	_remove()
+
+	# Install
+	csharp_install_program('raise_example.exe')
+	csharp_install_library('lib_math_helper.dll')
 
 
 

@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import shutil
 from lib_raise_os import *
 from lib_raise_libraries import *
 
@@ -202,6 +203,121 @@ def csharp_run_say(command):
 		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
+def csharp_install_program(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.exe')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/bin/'
+
+	# Get the native install source and dest
+	source = CSharp.csc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Install
+	def fn():
+		# Make the dir if needed
+		if dir_name and not os.path.isdir(install_dir):
+			os.mkdir(install_dir)
+
+		# Copy the file
+		shutil.copy2(source, dest)
+
+	do_on_fail_exit("Installing the program '{0}'".format(name),
+					"Failed to install the program '{0}'.".format(name),
+				lambda: fn())
+
+def csharp_uninstall_program(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.exe')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/bin/'
+
+	# Get the native install source and dest
+	source = CSharp.csc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Remove
+	def fn():
+		# Remove the file
+		if os.path.isfile(dest):
+			os.remove(dest)
+		# Remove the dir if empty
+		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
+			shutil.rmtree(install_dir)
+
+	do_on_fail_exit("Uninstalling the program '{0}'".format(name),
+					"Failed to uninstall the program '{0}'.".format(name),
+				lambda: fn())
+
+def csharp_install_library(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.dll')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = CSharp.csc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Install
+	def fn():
+		# Make the dir if needed
+		if dir_name and not os.path.isdir(install_dir):
+			os.mkdir(install_dir)
+
+		# Copy the file
+		shutil.copy2(source, dest)
+
+	do_on_fail_exit("Installing the library '{0}'".format(name),
+					"Failed to install the library '{0}'.".format(name),
+				lambda: fn())
+
+def csharp_uninstall_library(name, dir_name=None):
+	# Make sure the extension is valid
+	require_file_extension(name, '.dll')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = CSharp.csc.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Remove
+	def fn():
+		# Remove the file
+		if os.path.isfile(dest):
+			os.remove(dest)
+		# Remove the dir if empty
+		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
+			shutil.rmtree(install_dir)
+
+	do_on_fail_exit("Uninstalling the library '{0}'".format(name),
+					"Failed to uninstall the library '{0}'.".format(name),
+				lambda: fn())
 
 CSharp.call_setup()
 

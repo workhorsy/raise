@@ -38,6 +38,8 @@ def test():
 
 def _remove():
 	c_uninstall_program('raise_example.exe')
+	c_uninstall_library('libexample.a')
+	c_uninstall_header('libexample.h')
 
 def remove():
 	"""Uninstalls the program."""
@@ -70,6 +72,8 @@ def install():
 
 	# Install
 	c_install_program('raise_example.exe')
+	c_install_library('libexample.a')
+	c_install_header('libexample.h')
 
 	ldconfig()
 

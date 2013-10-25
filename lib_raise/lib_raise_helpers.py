@@ -79,10 +79,10 @@ def version_string_to_tuple(version_string):
 		pass
 	return Version(major, minor, micro)
 
-def require_file_extension(file_name, required_extension):
+def require_file_extension(file_name, *required_extensions):
 	extension = os.path.splitext(file_name)[-1].lower()
-	if extension != required_extension:
-		print_exit("File extension should be '{0}' on '{1}'.".format(required_extension, file_name))
+	if not extension in required_extensions:
+		print_exit("File extension should be '{0}' on '{1}'.".format(str.join(', ', required_extensions), file_name))
 
 
 Helpers.call_setup()
