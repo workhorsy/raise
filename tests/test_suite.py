@@ -332,6 +332,44 @@ Simple warning .............................................................:\\'
 
 		self.assert_process_output(command, expected)
 
+	def test_require_program(self):
+		command = '{0} raise -plain simple_require_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_require_program'
+Checking for program 'gcc' ...                                              :)'''
+
+		self.assert_process_output(command, expected)
+
+	def test_require_program_failure(self):
+		command = '{0} raise -plain simple_require_program_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_require_program_failure'
+Checking for program 'no_such_program' .....................................:(
+Install the program 'no_such_program' and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, is_success = False)
+
+	def test_require_not_root(self):
+		command = '{0} raise -plain simple_require_not_root'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_require_not_root'
+'''
+
+		self.assert_process_output(command, expected, is_success = False)
+
+
+	def test_require_root_failure(self):
+		command = '{0} raise -plain simple_require_root_failure'.format(sys.executable)
+
+		expected = \
+'''Running target 'simple_require_root_failure'
+'''
+
+		self.assert_process_output(command, expected, is_success = False)
+
 
 class TestC(TestCase):
 	@classmethod

@@ -26,6 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import shutil
+import stat
 from lib_raise_os import *
 from lib_raise_libraries import *
 
@@ -203,7 +204,7 @@ def csharp_run_say(command):
 		sys.stdout.write(runner.stdall)
 		print_exit('Failed to run command.')
 
-def csharp_install_program(name, dir_name=None):
+def csharp_install_program(name, dir_name):
 	# Make sure the extension is valid
 	require_file_extension(name, '.exe')
 
@@ -212,7 +213,7 @@ def csharp_install_program(name, dir_name=None):
 	if OS.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
-		prog_root = '/usr/bin/'
+		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
 	source = CSharp.csc.to_native(name)
@@ -228,11 +229,24 @@ def csharp_install_program(name, dir_name=None):
 		# Copy the file
 		shutil.copy2(source, dest)
 
+		if OS.os_type._name != 'Windows':
+			script_name = before(name, '.')
+			script_path = '/usr/bin/' + script_name
+			with open(script_path, 'wb') as f:
+				f.write("#!/usr/bin/env bash\n")
+				f.write("\n")
+				f.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/{0}\n".format(script_name))
+				f.write("THIS_EXE=\"/usr/lib/{0}/{0}.exe\"\n".format(script_name))
+				f.write("exec mono $THIS_EXE \"$@\"\n")
+				f.write("\n")
+			st = os.stat(script_path)
+			os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
 	do_on_fail_exit("Installing the program '{0}'".format(name),
 					"Failed to install the program '{0}'.".format(name),
 				lambda: fn())
 
-def csharp_uninstall_program(name, dir_name=None):
+def csharp_uninstall_program(name, dir_name):
 	# Make sure the extension is valid
 	require_file_extension(name, '.exe')
 
@@ -241,7 +255,7 @@ def csharp_uninstall_program(name, dir_name=None):
 	if OS.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
-		prog_root = '/usr/bin/'
+		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
 	source = CSharp.csc.to_native(name)
@@ -256,6 +270,11 @@ def csharp_uninstall_program(name, dir_name=None):
 		# Remove the dir if empty
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
+
+		if OS.os_type._name != 'Windows':
+			script_name = before(name, '.')
+			if os.path.isfile('/usr/bin/' + script_name):
+				os.remove('/usr/bin/' + script_name)
 
 	do_on_fail_exit("Uninstalling the program '{0}'".format(name),
 					"Failed to uninstall the program '{0}'.".format(name),

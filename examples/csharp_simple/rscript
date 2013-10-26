@@ -33,8 +33,8 @@ def test():
 	csharp_run_say('./main.exe')
 
 def _remove():
-	csharp_uninstall_program('raise_example.exe')
-	csharp_uninstall_library('lib_math_helper.dll')
+	csharp_uninstall_program('raise_example.exe', 'raise_example')
+	csharp_uninstall_library('lib_math_helper.dll', 'raise_example')
 
 def remove():
 	"""Uninstalls the program."""
@@ -63,8 +63,8 @@ def install():
 	_remove()
 
 	# Install
-	csharp_install_program('raise_example.exe')
-	csharp_install_library('lib_math_helper.dll')
+	csharp_install_program('raise_example.exe', 'raise_example')
+	csharp_install_library('lib_math_helper.dll', 'raise_example')
 
 
 

@@ -19,4 +19,15 @@ def simple_warning():
 	print_status('Simple warning')
 	print_warning()
 
+def simple_require_program():
+	require_programs(['gcc'])
+
+def simple_require_program_failure():
+	require_programs(['no_such_program'])
+
+def simple_require_not_root():
+	require_not_root()
+
+def simple_require_root_failure():
+	require_root()
 
