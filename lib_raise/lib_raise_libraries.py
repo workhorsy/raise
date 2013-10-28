@@ -27,17 +27,13 @@
 
 import os
 import inspect
-from lib_raise_terminal import *
-from lib_raise_process import *
-from lib_raise_helpers import *
+import lib_raise_config as Config
+import lib_raise_terminal as Print
+import lib_raise_process as Process
+import lib_raise_helpers as Helpers
 
 
-class Libraries(RaiseModule):
-	lib_file_cache = {}
-
-	@classmethod
-	def setup(cls):
-		pass
+lib_file_cache = {}
 
 
 # Returns all the paths that libraries are installed in
@@ -88,11 +84,12 @@ def _get_header_from_library_files(library_name, library_files):
 # http://en.wikipedia.org/wiki/List_of_software_package_management_systems
 # Returns the full path of a library file or None
 def _get_library_files(lib_name, version_cb = None):
+	global lib_file_cache
 	files = []
 
 	# Return the file names if already cached
-	if lib_name in Libraries.lib_file_cache:
-		return Libraries.lib_file_cache[lib_name]
+	if lib_name in lib_file_cache:
+		return lib_file_cache[lib_name]
 
 	# Try finding the library with pkg-config
 	if not files and program_paths('pkg-config'):
@@ -116,7 +113,7 @@ def _get_library_files(lib_name, version_cb = None):
 
 	# Save the file names in the cache
 	if files:
-		Libraries.lib_file_cache[lib_name] = files
+		lib_file_cache[lib_name] = files
 
 	return files
 
@@ -125,7 +122,7 @@ def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 	lib_name = lib_name.lstrip('lib')
 
 	# Find all packages that contain the name
-	result = run_and_get_stdout("pkg-config --list-all | grep -i {0}".format(lib_name))
+	result = Process.run_and_get_stdout("pkg-config --list-all | grep -i {0}".format(lib_name))
 	if not result:
 		return matching_files
 
@@ -137,12 +134,12 @@ def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 			continue
 
 		# Get the version, libdir, and includedir
-		version = run_and_get_stdout("pkg-config --modversion {0}".format(name))
-		libdir = run_and_get_stdout("pkg-config --variable=libdir {0}".format(name))
-		includedir = run_and_get_stdout("pkg-config --variable=includedir {0}".format(name))
+		version = Process.run_and_get_stdout("pkg-config --modversion {0}".format(name))
+		libdir = Process.run_and_get_stdout("pkg-config --variable=libdir {0}".format(name))
+		includedir = Process.run_and_get_stdout("pkg-config --variable=includedir {0}".format(name))
 		if not version or not libdir or not includedir:
 			continue
-		version = version_string_to_tuple(version)
+		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
@@ -177,23 +174,23 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	result = run_and_get_stdout("dpkg --list | grep -i {0}".format(lib_name))
+	result = Process.run_and_get_stdout("dpkg --list | grep -i {0}".format(lib_name))
 	if not result:
 		return matching_files
 
 	# For each package
 	for package in result.split("\n"):
 		# Get the name and version
-		name = before(package.split()[1], ':')
-		version = between(package.split()[2], ':', '-')
-		version = version_string_to_tuple(version)
+		name = Helpers.before(package.split()[1], ':')
+		version = Helpers.between(package.split()[2], ':', '-')
+		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
 			continue
 
 		# Get all the files and directories
-		result = run_and_get_stdout("dpkg -L {0}".format(name))
+		result = Process.run_and_get_stdout("dpkg -L {0}".format(name))
 		if not result:
 			continue
 
@@ -210,26 +207,26 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	result = run_and_get_stdout("rpm -qa | grep -i {0}".format(lib_name))
+	result = Process.run_and_get_stdout("rpm -qa | grep -i {0}".format(lib_name))
 	if not result:
 		return matching_files
 
 	# For each package
 	for package in result.split("\n"):
 		# Get the name and version
-		result = run_and_get_stdout("rpm -qi {0}".format(package))
+		result = Process.run_and_get_stdout("rpm -qi {0}".format(package))
 		if not result:
 			continue
-		name = between(result, 'Name        : ', '\n')
-		version = between(result, 'Version     : ', '\n')
-		version = version_string_to_tuple(version)
+		name = Helpers.between(result, 'Name        : ', '\n')
+		version = Helpers.between(result, 'Version     : ', '\n')
+		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
 			continue
 
 		# Get all the files and directories
-		result = run_and_get_stdout("rpm -ql {0}".format(package))
+		result = Process.run_and_get_stdout("rpm -ql {0}".format(package))
 		if not result:
 			continue
 
@@ -246,7 +243,7 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	result = run_and_get_stdout("pkg_info -Ix {0}".format(lib_name))
+	result = Process.run_and_get_stdout("pkg_info -Ix {0}".format(lib_name))
 	if not result:
 		return matching_files
 
@@ -254,15 +251,15 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 	for package in result.split("\n"):
 		# Get the name and version
 		name = package.split()[0]
-		version = before(name.split('-')[-1], '_')
-		version = version_string_to_tuple(version)
+		version = Helpers.before(name.split('-')[-1], '_')
+		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
 			continue
 
 		# Get all the files and directories
-		result = run_and_get_stdout("pkg_info -L {0}".format(name))
+		result = Process.run_and_get_stdout("pkg_info -L {0}".format(name))
 		if not result:
 			continue
 
@@ -290,54 +287,54 @@ def get_shared_library(lib_name, version_cb = None):
 	return shared_file
 
 def require_header_file(header_name, version_cb = None):
-	print_status("Checking for header file '{0}'".format(header_name))
+	Print.status("Checking for header file '{0}'".format(header_name))
 
 	# If the header is not installed, make them install it to continue
 	if not get_header_file(header_name, version_cb):
 		ver = "(Any version)"
 		if version_cb:
-			ver = between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Header file '{0} {1}' not installed. Install and try again."
-		print_fail()
-		print_exit(message.format(header_name, ver))
+		Print.fail()
+		Print.exit(message.format(header_name, ver))
 	else:
-		print_ok()
+		Print.ok()
 
 def require_static_library(lib_name, version_cb = None):
-	print_status("Checking for static library '{0}'".format(lib_name))
+	Print.status("Checking for static library '{0}'".format(lib_name))
 
 	# If the static library is not installed, make them install it to continue
 	if not get_static_library(lib_name, version_cb):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Static library '{0} {1}' not installed. Install and try again."
-		print_fail()
-		print_exit(message.format(lib_name, ver))
+		Print.fail()
+		Print.exit(message.format(lib_name, ver))
 	else:
-		print_ok()
+		Print.ok()
 
 def require_shared_library(lib_name, version_cb = None):
-	print_status("Checking for shared library '{0}'".format(lib_name))
+	Print.status("Checking for shared library '{0}'".format(lib_name))
 
 	# If the shared library is not installed, make them install it to continue
 	if not get_shared_library(lib_name, version_cb):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Shared library '{0} {1}' not installed. Install and try again."
-		print_fail()
-		print_exit(message.format(lib_name, ver))
+		Print.fail()
+		Print.exit(message.format(lib_name, ver))
 	else:
-		print_ok()
+		Print.ok()
 
 def require_static_or_shared_library(lib_name, version_cb = None):
-	print_status("Checking for static/shared library '{0}'".format(lib_name))
+	Print.status("Checking for static/shared library '{0}'".format(lib_name))
 
 	shared_file = get_shared_library(lib_name, version_cb)
 	static_file = get_shared_library(lib_name, version_cb)
@@ -347,13 +344,13 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Shared/Static library '{0} {1}' not installed. Install and try again."
-		print_fail()
-		print_exit(message.format(lib_name, ver))
+		Print.fail()
+		Print.exit(message.format(lib_name, ver))
 	else:
-		print_ok()
+		Print.ok()
 
 def header_path(header_name):
 	retval = None
@@ -417,12 +414,12 @@ def static_or_shared_library_path(lib_name):
 
 def require_programs(prog_names):
 	for prog_name in prog_names:
-		print_status("Checking for program '{0}'".format(prog_name))
+		Print.status("Checking for program '{0}'".format(prog_name))
 		if len(program_paths(prog_name)):
-			print_ok()
+			Print.ok()
 		else:
-			print_fail()
-			print_exit("Install the program '{0}' and try again.".format(prog_name))
+			Print.fail()
+			Print.exit("Install the program '{0}' and try again.".format(prog_name))
 
 def program_paths(program_name):
 	paths = []
@@ -438,6 +435,4 @@ def program_paths(program_name):
 				paths.append(pext)
 	return paths
 
-
-Libraries.call_setup()
 

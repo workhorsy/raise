@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from lib_raise_c import *
-from lib_raise_linker import *
-from lib_raise_ar import *
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_linker as Linker
+import lib_raise_ar as AR
+import lib_raise_c as C
+import lib_raise_fs as FS
 
 
 def clean():
@@ -11,31 +15,31 @@ def clean():
 	pass
 
 def _configure():
-	cc = c_get_default_compiler()
+	cc = C.c_get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_compiler(cc)
+	C.c_save_compiler(cc)
 
-	linker = linker_get_default_linker()
-	linker_save_linker(linker)
+	linker = Linker.linker_get_default_linker()
+	Linker.linker_save_linker(linker)
 
 def find_installed_library():
 	clean()
 	_configure()
 
-	require_shared_library('libSDL', lambda ver: ver >= (1, 2))
+	Libraries.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
 
 def find_missing_library():
 	clean()
 	_configure()
 
-	require_shared_library('libDoesNotExist')
+	Libraries.require_shared_library('libDoesNotExist')
 
 def find_installed_library_bad_version():
 	clean()
 	_configure()
 
-	require_shared_library('libSDL', lambda ver: ver >= (99, 0))
+	Libraries.require_shared_library('libSDL', lambda ver: ver >= (99, 0))
 

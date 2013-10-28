@@ -27,13 +27,9 @@
 
 import os
 from collections import namedtuple
-from lib_raise_config import *
+import lib_raise_config as Config
+import lib_raise_terminal as Print
 
-
-class Helpers(RaiseModule):
-	@classmethod
-	def setup(cls):
-		pass
 
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:
@@ -82,8 +78,7 @@ def version_string_to_tuple(version_string):
 def require_file_extension(file_name, *required_extensions):
 	extension = os.path.splitext(file_name)[-1].lower()
 	if not extension in required_extensions:
-		print_exit("File extension should be '{0}' on '{1}'.".format(str.join(', ', required_extensions), file_name))
+		Print.exit("File extension should be '{0}' on '{1}'.".format(str.join(', ', required_extensions), file_name))
 
 
-Helpers.call_setup()
 

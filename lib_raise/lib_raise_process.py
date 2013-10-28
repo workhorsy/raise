@@ -25,18 +25,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
 import subprocess
 import time
-from lib_raise_helpers import *
-from lib_raise_cpu import *
-from lib_raise_os import *
-from lib_raise_terminal import *
-
-
-class Process(RaiseModule):
-	@classmethod
-	def setup(cls):
-		pass
+import lib_raise_config as Config
+import lib_raise_helpers as Helpers
+import lib_raise_cpu as CPU
+import lib_raise_os as OS
+import lib_raise_terminal as Print
 
 
 class ProcessRunner(object):
@@ -59,7 +55,7 @@ class ProcessRunner(object):
 		# Recursively expand all environmental variables
 		env = {}
 		for key, value in os.environ.items():
-			env[key] = expand_envs(value)
+			env[key] = OS.expand_envs(value)
 
 		self._stdout = ''
 		self._stderr = ''
@@ -94,19 +90,19 @@ class ProcessRunner(object):
 			pass
 
 		# Chomp the terminating newline off the ends of output
-		self._stdout = chomp(self._stdout)
-		self._stderr = chomp(self._stderr)
+		self._stdout = Helpers.chomp(self._stdout)
+		self._stderr = Helpers.chomp(self._stderr)
 
 		# :( Failure
 		if self._return_code:
-			self._status = Emoticons.FROWN
+			self._status = Print.Emoticons.FROWN
 		else:
 			# :\ Warning
 			if len(self._stderr):
-				self._status = Emoticons.NORMAL
+				self._status = Print.Emoticons.NORMAL
 			# :) Success
 			else:
-				self._status = Emoticons.SMILE
+				self._status = Print.Emoticons.SMILE
 
 	def get_is_done(self):
 		# You have to poll a process to update the retval. Even if it has stopped already
@@ -124,17 +120,17 @@ class ProcessRunner(object):
 
 	def get_is_success(self):
 		self._require_wait()
-		return self._status == Emoticons.SMILE
+		return self._status == Print.Emoticons.SMILE
 	is_success = property(get_is_success)
 
 	def get_is_warning(self):
 		self._require_wait()
-		return self._status == Emoticons.NORMAL
+		return self._status == Print.Emoticons.NORMAL
 	is_warning = property(get_is_warning)
 
 	def get_is_failure(self):
 		self._require_wait()
-		return self._status == Emoticons.FROWN
+		return self._status == Print.Emoticons.FROWN
 	is_failure = property(get_is_failure)
 
 	def get_stderr(self):
@@ -184,7 +180,7 @@ class Event(object):
 				Event.is_first_concurrent = False
 				sys.stdout.write("{0} {1} in concurrently ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
-				Terminal.message_length = 0
+				Print.message_length = 0
 
 		# Run the setup function
 		if not self._setup_cb():
@@ -192,7 +188,7 @@ class Event(object):
 
 		# Show the serial message
 		if not Event.is_concurrent:
-			print_status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
+			Print.status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Start the process
 		self._runner = ProcessRunner(self._command)
@@ -206,18 +202,18 @@ class Event(object):
 
 		# Display the message
 		if Event.is_concurrent:
-			print_status("   '{0}'".format(self._result))
+			Print.status("   '{0}'".format(self._result))
 
 		# Success or failure
 		if self._runner.is_success:
-			print_ok()
+			Print.ok()
 			self._status = 'success'
 		elif self._runner.is_warning:
-			print_warning(self._runner.stderr)
+			Print.warning(self._runner.stderr)
 			self._status = 'success'
 		else:
-			print_fail(self._runner.stdall)
-			print_exit("{0} failed. Try again.".format(self._task))
+			Print.fail(self._runner.stdall)
+			Print.exit("{0} failed. Try again.".format(self._task))
 			self._status = 'failure'
 
 
@@ -249,7 +245,7 @@ def concurrent_end():
 				CPU.cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
-				print_exit("Event failed.")
+				Print.exit("Event failed.")
 
 		# Check for events that need to start
 		while CPU.cpus_free > 0 and len(ready_events):
@@ -270,7 +266,7 @@ def concurrent_end():
 
 # FIXME: Rename to run_print
 def run_say(command):
-	print_status("Running command")
+	Print.status("Running command")
 
 	runner = ProcessRunner(command)
 	runner.run()
@@ -278,14 +274,14 @@ def run_say(command):
 	runner.wait()
 
 	if runner.is_success or runner.is_warning:
-		print_ok()
+		Print.ok()
 		sys.stdout.write(command + '\n')
 		sys.stdout.write(runner.stdall)
 	elif runner.is_failure:
-		print_fail()
+		Print.fail()
 		sys.stdout.write(command + '\n')
 		sys.stdout.write(runner.stdall)
-		print_exit('Failed to run command.')
+		Print.exit('Failed to run command.')
 
 def run_and_get_stdout(command):
 	runner = ProcessRunner(command)
@@ -298,16 +294,16 @@ def run_and_get_stdout(command):
 		return runner.stdout
 
 def do_on_fail_exit(start_message, fail_message, cb):
-	print_status(start_message)
+	Print.status(start_message)
 
 	# Run it if it is a function
 	if hasattr(cb, '__call__'):
 		try:
 			cb()
-			print_ok()
+			Print.ok()
 		except Exception as e:
-			print_fail()
-			print_exit(fail_message)
+			Print.fail()
+			Print.exit(fail_message)
 	# Or run it as a process if a string
 	elif type(cb) == str:
 		runner = ProcessRunner(cb)
@@ -315,21 +311,18 @@ def do_on_fail_exit(start_message, fail_message, cb):
 		runner.is_done
 		runner.wait()
 		if runner.is_success or runner.is_warning:
-			print_ok()
+			Print.ok()
 		elif runner.is_failure:
-			print_fail()
-			print_exit(fail_message)
+			Print.fail()
+			Print.exit(fail_message)
 
 def do_on_fail_pass(start_message, cb):
-	print_status(start_message)
+	Print.status(start_message)
 	try:
 		cb()
 	except Exception as e:
 		pass
-	print_ok()
-
-
-Process.call_setup()
+	Print.ok()
 
 
 

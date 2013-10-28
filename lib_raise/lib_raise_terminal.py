@@ -26,18 +26,13 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import sys, os
-from lib_raise_config import *
-from lib_raise_os import *
+import lib_raise_config as Config
+import lib_raise_os as OS
 
 
-class Terminal(RaiseModule):
-	terminal_clear = None
-	terminal_width = 79
-	message_length = 0
-
-	@classmethod
-	def setup(cls):
-		pass
+clear = None
+width = 79
+message_length = 0
 
 
 class Emoticons:
@@ -54,9 +49,12 @@ class BGColors:
 
 
 # For plain mode, don't clear, don't use color, and fix the width to 79
-def terminal_set_plain():
-	Terminal.terminal_clear = None
-	Terminal.terminal_width = 79
+def set_plain():
+	global clear
+	global width
+
+	clear = None
+	width = 79
 
 	BGColors.MESSAGE = ''
 	BGColors.OK = ''
@@ -65,12 +63,15 @@ def terminal_set_plain():
 	BGColors.ENDC = ''
 
 # For fancy mode, clear, use color, and use the real terminal width
-def terminal_set_fancy():
+def set_fancy():
+	global clear
+	global width
+
 	# Figure out how to clear the terminal
 	if OS.os_type._name == 'Windows':
-		Terminal.terminal_clear = 'cls'
+		clear = 'cls'
 	else:
-		Terminal.terminal_clear = 'clear'
+		clear = 'clear'
 
 	# Figure out the terminal width
 	if OS.os_type._name == 'Windows':
@@ -79,9 +80,9 @@ def terminal_set_fancy():
 		val = _winreg.QueryValueEx(key, "ScreenBufferSize")
 		_winreg.CloseKey(key)
 		size = hex(val[0])
-		Terminal.terminal_width = int('0x' + size[-4 : len(size)], 16)
+		width = int('0x' + size[-4 : len(size)], 16)
 	else:
-		Terminal.terminal_width = int(os.popen('stty size', 'r').read().split()[1])
+		width = int(os.popen('stty size', 'r').read().split()[1])
 
 	# Figure out the terminal colors
 	if OS.os_type._name != 'Windows':
@@ -91,8 +92,8 @@ def terminal_set_fancy():
 		BGColors.FAIL = '\033[41m\033[37m'
 		BGColors.ENDC = '\033[0m'
 
-def terminal_pad(length, pad_char=' '):
-	width = Terminal.terminal_width
+def pad(length, pad_char=' '):
+	global width
 
 	if length > (width-3):
 		i = int(width * (int(length / width) + 1)) - 3
@@ -100,52 +101,55 @@ def terminal_pad(length, pad_char=' '):
 		i = width - 3
 	return ''.ljust(i-length, pad_char)
 
-def print_info(message):
+def info(message):
 	sys.stdout.write('{0}{1}{2}\n'.format(BGColors.MESSAGE, message, BGColors.ENDC))
 	sys.stdout.flush()
 
-def print_status(message):
+def status(message):
+	global message_length
 	message = '{0} ...'.format(message)
-	Terminal.message_length = len(message)
+	message_length = len(message)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
-def print_ok():
-	padding = terminal_pad(Terminal.message_length)
+def ok():
+	global message_length
+	padding = pad(message_length)
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.OK, Emoticons.SMILE, BGColors.ENDC)
-	Terminal.message_length = 0
+	message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
-def print_warning(post_message=None):
-	padding = terminal_pad(Terminal.message_length, '.')
+def warning(post_message=None):
+	global message_length
+	padding = pad(message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.WARNING, Emoticons.NORMAL, BGColors.ENDC)
 	if post_message:
 		message += post_message + "\n"
-	Terminal.message_length = 0
+	message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
-def print_fail(post_fail_message=None):
-	padding = terminal_pad(Terminal.message_length, '.')
+def fail(post_fail_message=None):
+	global message_length
+	padding = pad(message_length, '.')
 	message = "{0}{1}{2}{3}\n".format(padding, BGColors.FAIL, Emoticons.FROWN, BGColors.ENDC)
 	if post_fail_message:
 		message += post_fail_message + "\n"
-	Terminal.message_length = 0
+	message_length = 0
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
 
-def print_exit(message):
+def exit(message):
 	message = '{0}{1} Exiting ...{2}\n'.format(BGColors.FAIL, message, BGColors.ENDC)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
-	exit(1)
+	sys.exit(1)
 
 
-Terminal.call_setup()
 

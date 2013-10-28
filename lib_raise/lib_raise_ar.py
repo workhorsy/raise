@@ -25,20 +25,15 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from lib_raise_process import *
-from lib_raise_fs import *
-
-
-class AR(RaiseModule):
-	@classmethod
-	def setup(cls):
-		pass
+import lib_raise_config as Config
+import lib_raise_process as Process
+import lib_raise_fs as FS
 
 
 def ar_build_static_library(ar_file, o_files):
 	# Make sure the extension is valid
 	if not ar_file.endswith('.a'):
-		print_exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))
+		Print.exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))
 
 	# Setup the messages
 	task = 'Building'
@@ -51,14 +46,13 @@ def ar_build_static_library(ar_file, o_files):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not is_outdated(to_update = [ar_file], triggers = o_files):
+		if not FS.is_outdated(to_update = [ar_file], triggers = o_files):
 			return False
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
-	add_event(event)
+	event = Process.Event(task, result, plural, singular, command, setup)
+	Process.add_event(event)
 
 
-AR.call_setup()
 

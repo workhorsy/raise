@@ -26,50 +26,50 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
-from lib_raise_config import *
-from lib_raise_os import *
-from lib_raise_libraries import *
+import lib_raise_config as Config
+import lib_raise_os as OS
+import lib_raise_libraries as Libraries
+import lib_raise_terminal as Print
 
 
-class LinkerModule(RaiseModule):
-	linkers = {}
-	linker = None
+linkers = {}
+linker = None
 
-	@classmethod
-	def setup(cls):
-		extension_map = {}
+def setup():
+	global linkers
+	extension_map = {}
 
-		# Get the names and paths for know linkers
-		names = ['ld', 'link.exe']
-		for name in names:
-			paths = program_paths(name)
-			if len(paths) == 0:
-				continue
+	# Get the names and paths for know linkers
+	names = ['ld', 'link.exe']
+	for name in names:
+		paths = Libraries.program_paths(name)
+		if len(paths) == 0:
+			continue
 
-			if name == 'link.exe':
-				link = Linker(
-					name            = 'link.exe',
-					setup           = '/nologo', 
-					out_file        = '/out:', 
-					shared          = '/dll ',
-					extension_map   = extension_map
-				)
-				cls.linkers[link._name] = link
-			elif name == 'ld':
-				link = Linker(
-					name            = 'ld',
-					setup           = '', 
-					out_file        = '-o ', 
-					shared          = '-G', 
-					extension_map   = extension_map
-				)
-				cls.linkers[link._name] = link
+		if name == 'link.exe':
+			link = Linker(
+				name            = 'link.exe',
+				setup           = '/nologo', 
+				out_file        = '/out:', 
+				shared          = '/dll ',
+				extension_map   = extension_map
+			)
+			linkers[link._name] = link
+		elif name == 'ld':
+			link = Linker(
+				name            = 'ld',
+				setup           = '', 
+				out_file        = '-o ', 
+				shared          = '-G', 
+				extension_map   = extension_map
+			)
+			linkers[link._name] = link
 
-		# Make sure there is at least one linker installed
-		if len(cls.linkers) == 0:
-			print_status("Setting up Linker module")
-			print_fail()
-			print_exit("No Linker found. Install one and try again.")
+	# Make sure there is at least one linker installed
+	if len(linkers) == 0:
+		Print.status("Setting up Linker module")
+		Print.fail()
+		Print.exit("No Linker found. Install one and try again.")
 
 
 class Linker(object):
@@ -89,72 +89,78 @@ class Linker(object):
 		return command
 
 def linker_get_default_linker():
-	if OS.os_type._name == 'Windows':
-		return LinkerModule.linkers['link.exe']
-	else:
-		return LinkerModule.linkers['ld']
+	global linkers
 
-def linker_save_linker(linker):
+	if OS.os_type._name == 'Windows':
+		return linkers['link.exe']
+	else:
+		return linkers['ld']
+
+def linker_save_linker(new_linker):
+	global linker
+
 	# LINKER
-	LinkerModule.linker = linker
-	os.environ['LINKER'] = LinkerModule.linker._name
+	linker = new_linker
+	os.environ['LINKER'] = linker._name
 
 def linker_link_program(out_file, obj_files, i_files=[]):
+	global linker
+
 	# Setup the messages
 	task = 'Linking'
 	result = out_file
 	plural = 'programs'
 	singular = 'program'
 	command = "${LINK} " + \
-				LinkerModule.linker._opt_out_file + \
+				linker._opt_out_file + \
 				out_file + ' ' + \
 				str.join(' ', obj_files) + ' ' + \
 				str.join(' ', i_files)
-	command = LinkerModule.linker.to_native(command)
+	command = linker.to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not is_outdated(to_update = [out_file], triggers = obj_files):
+		if not FS.is_outdated(to_update = [out_file], triggers = obj_files):
 			return False
 
 		# Make sure the environmental variable is set
 		if not 'LINK' in os.environ:
-			print_fail()
-			print_exit("Set the env variable 'LINK' to the linker, and try again.")
+			Print.fail()
+			Print.exit("Set the env variable 'LINK' to the linker, and try again.")
 
 		return True
 
 	# Create the event
 	event = Event(task, result, plural, singular, command, setup)
-	add_event(event)
+	Process.add_event(event)
 
 def ldconfig():
 	# Setup the message
-	print_status("Running 'ldconfig'")
+	Print.status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
 	if OS.os_type._name == 'Cygwin':
-		print_ok()
+		Print.ok()
 		return
 
 	# Find ldconfig
-	prog = program_paths('ldconfig')
+	prog = Libraries.program_paths('ldconfig')
 	if not prog:
-		print_fail()
-		print_exit("Could not find 'ldconfig'.")
+		Print.fail()
+		Print.exit("Could not find 'ldconfig'.")
 
 	# Run the process
-	runner = ProcessRunner(prog[0])
+	runner = Process.ProcessRunner(prog[0])
 	runner.run()
 	runner.is_done
 	runner.wait()
 
 	# Success or failure
 	if runner.is_failure:
-		print_fail(runner.stdall)
-		print_exit("Failed run 'ldconfig'.")
+		Print.fail(runner.stdall)
+		Print.exit("Failed run 'ldconfig'.")
 	elif runner.is_success or runner.is_warning:
-		print_ok()
+		Print.ok()
 
 def link_shared_path(lib_name):
 	return '-L' + get_shared_library(lib_name)
@@ -184,5 +190,5 @@ def link_static_or_shared_paths(lib_names):
 	return str.join(' ', paths)
 
 
-LinkerModule.call_setup()
+setup()
 

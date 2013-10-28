@@ -2,25 +2,30 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_c import *
-from lib_raise_linker import *
-from lib_raise_ar import *
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_c as C
+import lib_raise_linker as Linker
+import lib_raise_ar as AR
+import lib_raise_fs as FS
+
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('lib_math')
-	remove_binaries('main')
+	FS.remove_binaries('lib_math')
+	FS.remove_binaries('main')
 
 def _configure():
-	cc = c_get_default_compiler()
+	cc = C.c_get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_compiler(cc)
+	C.c_save_compiler(cc)
 
-	linker = linker_get_default_linker()
-	linker_save_linker(linker)
+	linker = Linker.linker_get_default_linker()
+	Linker.linker_save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -36,42 +41,42 @@ def build_object():
 	clean()
 	_configure()
 
-	c_build_object('lib_math.o', ['lib_math.c'])
-	c_build_object('main.o', ['main.c'])
+	C.c_build_object('lib_math.o', ['lib_math.c'])
+	C.c_build_object('main.o', ['main.c'])
 
-	c_build_program('main.exe', ['lib_math.o', 'main.o'])
+	C.c_build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	c_run_say('./main.exe')
+	C.c_run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	c_build_program('main.exe', ['lib_math.c', 'main.c'])
+	C.c_build_program('main.exe', ['lib_math.c', 'main.c'])
 
-	c_run_say('./main.exe')
+	C.c_run_say('./main.exe')
 
 def build_shared_library():
 	clean()
 	_configure()
 
 	# Build the library
-	c_build_object('lib_math.o', ['lib_math.c'])
-	c_build_shared_library('lib_math.so', ['lib_math.o'])
+	C.c_build_object('lib_math.o', ['lib_math.c'])
+	C.c_build_shared_library('lib_math.so', ['lib_math.o'])
 
-	c_build_program('main.exe', ['main.c', 'lib_math.so'])
+	C.c_build_program('main.exe', ['main.c', 'lib_math.so'])
 
-	c_run_say('./main.exe')
+	C.c_run_say('./main.exe')
 
 def build_static_library():
 	clean()
 	_configure()
 
 	# Build the library
-	c_build_object('lib_math.o', ['lib_math.c'])
-	ar_build_static_library('lib_math.a', ['lib_math.o'])
+	C.c_build_object('lib_math.o', ['lib_math.c'])
+	AR.ar_build_static_library('lib_math.a', ['lib_math.o'])
 
-	c_build_program('main.exe', ['main.c', 'lib_math.a'])
+	C.c_build_program('main.exe', ['main.c', 'lib_math.a'])
 
-	c_run_say('./main.exe')
+	C.c_run_say('./main.exe')
 

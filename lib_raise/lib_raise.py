@@ -32,17 +32,17 @@ import signal
 # Make sure we are in at least python 2.6
 if sys.version_info < (2, 6):
 	print("Python 2.6 or greater is required. Exiting ...")
-	exit(1)
+	sys.exit(1)
 
 # Load the default modules
-from lib_raise_config import *
-from lib_raise_helpers import *
-from lib_raise_cpu import *
-from lib_raise_os import *
-from lib_raise_terminal import *
-from lib_raise_fs import *
-from lib_raise_process import *
-from lib_raise_libraries import *
+import lib_raise_config as Config
+import lib_raise_helpers as Helpers
+import lib_raise_cpu as CPU
+import lib_raise_os as OS
+import lib_raise_terminal as Print
+import lib_raise_fs as FS
+import lib_raise_process as Process
+import lib_raise_libraries as Libraries
 
 
 if __name__ == '__main__':
@@ -56,25 +56,25 @@ if __name__ == '__main__':
 
 	# Have all KeyboardInterrupt exceptions quit with a clean message
 	def signal_handler(signal, frame):
-		print_exit('Exit called by the keyboard.')
-		exit(1)
+		Print.exit('Exit called by the keyboard.')
+		sys.exit(1)
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# Set the terminal to plain or fancy
 	if Config.is_plain:
-		terminal_set_plain()
+		Print.set_plain()
 	else:
-		terminal_set_fancy()
+		Print.set_fancy()
 
 	# Clear the terminal if desired
-	if Terminal.terminal_clear:
-		os.system(Terminal.terminal_clear)
+	if Print.clear:
+		os.system(Print.clear)
 
 	# Get the target function name
 	Config.target_name = str(str.join(' ', args))
 
 	# Load the rscript
-	targets = import_rscript(globals(), locals())
+	targets = Config.import_rscript(globals(), locals())
 
 	# Get a friendly list of all the targets
 	target_list = []
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.3.0 - October 24 2013) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.3.0 - October 27 2013) http://launchpad.net/raise")
 		print("OPTIONS:")
 		print("    -plain - Don't clear, don't use color, and fix the width to 79")
 		print("")
@@ -101,18 +101,18 @@ if __name__ == '__main__':
 				doc = targets[t].__doc__ or no_doc
 				print("    ./raise {0} - {1}".format(t, doc))
 				print("")
-			print_exit("No target specified. Found targets are {0}.".format(target_list))
+			Print.exit("No target specified. Found targets are {0}.".format(target_list))
 
 	if not targets:
-		print_exit("No 'rscript' file found.")
+		Print.exit("No 'rscript' file found.")
 
 	# Exit if there is no target with that name
 	if not Config.target_name in targets:
-		print_exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
+		Print.exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
 
 	# Try running the target in the rscript
 	target = targets[Config.target_name]
-	print_info("Running target '{0}'".format(Config.target_name))
+	Print.info("Running target '{0}'".format(Config.target_name))
 	target()
 
 

@@ -2,20 +2,25 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_java import *
+import os
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_java as Java
+import lib_raise_fs as FS
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('lib_math')
-	remove_binaries('main')
+	FS.remove_binaries('lib_math')
+	FS.remove_binaries('main')
 
 def _configure():
-	javac = java_get_default_compiler()
+	javac = Java.java_get_default_compiler()
 	javac.debug = True
 	javac.warnings = True
 	javac.verbose = False
 	javac.deprecation = False
-	java_save_compiler(javac)
+	Java.java_save_compiler(javac)
 
 def setup_failure():
 	# Empty the path and reset the Java module so it finds no compilers
@@ -33,16 +38,16 @@ def build_program():
 	clean()
 	_configure()
 
-	java_build_program('main.class', ['main.java', 'lib_math.java'])
+	Java.java_build_program('main.class', ['main.java', 'lib_math.java'])
 
-	java_run_say('main')
+	Java.java_run_say('main')
 
 def build_jar():
 	clean()
 	_configure()
 
-	java_build_jar('lib_math.jar', ['lib_math.java'])
-	java_build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
+	Java.java_build_jar('lib_math.jar', ['lib_math.java'])
+	Java.java_build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
 
-	java_run_say('main')
+	Java.java_run_say('main')
 

@@ -288,6 +288,14 @@ class TestBasics(TestCase):
 	def set_up(self, id):
 		self.init('Basics', id)
 
+	def test_raise(self):
+		command = '{0} raise -plain'.format(sys.executable)
+
+		expected = \
+"blah"
+
+		self.assert_process_output(command, expected)
+
 	def test_nothing(self):
 		command = '{0} raise -plain simple_nothing'.format(sys.executable)
 

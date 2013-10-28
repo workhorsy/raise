@@ -29,32 +29,34 @@ import os
 import atexit
 import platform
 import traceback
-from lib_raise_config import *
+import lib_raise_config as Config
+import lib_raise_terminal as Print
 
 
-class OS(RaiseModule):
-	os_type = None
+os_type = None
 
-	@classmethod
-	def setup(cls):
-		# Figure out the general OS type
-		if 'cygwin' in platform.system().lower():
-			cls.os_type = OSType(
-				name =                 'Cygwin'
-			)
-		elif 'windows' in platform.system().lower():
-			cls.os_type = OSType(
-				name =                 'Windows'
-			)
-		else:
-			cls.os_type = OSType(
-				name =                 'Unix'
-			)
 
-		# Make sure Windows SDK tools are found
-		if cls.os_type._name == 'Windows':
-			if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
-				early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
+def setup():
+	global os_type
+
+	# Figure out the general OS type
+	if 'cygwin' in platform.system().lower():
+		os_type = OSType(
+			name =                 'Cygwin'
+		)
+	elif 'windows' in platform.system().lower():
+		os_type = OSType(
+			name =                 'Windows'
+		)
+	else:
+		os_type = OSType(
+			name =                 'Unix'
+		)
+
+	# Make sure Windows SDK tools are found
+	if os_type._name == 'Windows':
+		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
+			Config.early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
 
 class OSType(object):
@@ -78,7 +80,7 @@ def get_normal_user_name():
 
 	# Make sure we got a name
 	if not user_name:
-		print_exit('Failed to get the normal user name.')
+		Print.exit('Failed to get the normal user name.')
 
 	return user_name
 
@@ -87,10 +89,11 @@ def get_normal_user_id():
 	return int(os.popen('id -u {0}'.format(user_name)).read())
 
 def do_as_normal_user(cb):
+	global os_type
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not OS.os_type._name in ['Windows', 'Cygwin']:
+	if not os_type._name in ['Windows', 'Cygwin']:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -112,24 +115,25 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not OS.os_type._name in ['Windows', 'Cygwin']:
+		if not os_type._name in ['Windows', 'Cygwin']:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
 	if is_exiting:
-		exit(1)
+		sys.exit(1)
 	if exception:
-		print_exit(exception)
+		Print.exit(exception)
 
 def require_root():
+	global os_type
 	is_root = False
 
 	# Cygwin
-	if OS.os_type._name == 'Cygwin':
+	if os_type._name == 'Cygwin':
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif OS.os_type._name == 'Windows':
+	elif os_type._name == 'Windows':
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot', 'C:\windows')
@@ -143,16 +147,18 @@ def require_root():
 
 	# Make sure we are root
 	if not is_root:
-		print_exit("Must be run as root.")
+		Print.exit("Must be run as root.")
 
 def require_not_root():
+	global os_type
+
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if OS.os_type._name in ['Windows', 'Cygwin']:
+	if os_type._name in ['Windows', 'Cygwin']:
 		return
 
 	# Make sure we are NOT root
 	if os.getuid() == 0:
-		print_exit("Must not be run as root.")
+		Print.exit("Must not be run as root.")
 
 def call_on_exit(cb):
 	# Set a cleanup function to run on exit
@@ -160,5 +166,5 @@ def call_on_exit(cb):
 		atexit.register(cb)
 
 
-OS.call_setup()
+setup()
 
