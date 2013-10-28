@@ -35,7 +35,7 @@ def setup_failure():
 	C.is_setup = False
 	C.c_compilers = {}
 	C.cc = None
-	C.call_setup()
+	C.setup()
 
 def build_object():
 	clean()

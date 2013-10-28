@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import os
 import lib_raise_terminal as Print
 import lib_raise_libraries as Libraries
 import lib_raise_os as OS
@@ -32,7 +31,7 @@ def setup_failure():
 	Java.javac = None
 	Java.jar = None
 	Java.runtime = None
-	Java.call_setup()
+	Java.setup()
 
 def build_program():
 	clean()

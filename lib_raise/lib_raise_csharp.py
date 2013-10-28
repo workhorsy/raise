@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import sys, os
 import shutil
 import stat
 import lib_raise_config as Config
@@ -70,7 +71,7 @@ def setup():
 			continue
 
 		if name in ['dmcs']:
-			comp = Compiler(
+			comp = Config.Compiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
@@ -87,7 +88,7 @@ def setup():
 			cs_compilers[comp._name] = comp
 			cs_runtimes[comp._name] = 'mono'
 		elif name in ['csc']:
-			comp = Compiler(
+			comp = Config.Compiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 

@@ -25,11 +25,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os
+import sys, os
 import lib_raise_config as Config
+import lib_raise_terminal as Print
 import lib_raise_os as OS
 import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
+import lib_raise_process as Process
 import lib_raise_helpers as Helpers
 
 
@@ -71,7 +73,7 @@ def setup():
 			continue
 
 		if name in ['dmd', 'dmd2']:
-			comp = Compiler(
+			comp = Config.Compiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
@@ -87,7 +89,7 @@ def setup():
 			)
 			d_compilers[comp._name] = comp
 		elif name == 'ldc2':
-			comp = Compiler(
+			comp = Config.Compiler(
 				name =                 'ldc2', 
 				path =                 paths[0], 
 				setup =                '', 
@@ -148,7 +150,7 @@ def d_build_interface(d_file, i_files=[]):
 	plural = 'D interfaces'
 	singular = 'D interface'
 
-	f = self_deleting_named_temporary_file()
+	f = FS.self_deleting_named_temporary_file()
 	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + dc._opt_out_file + f.name
 	command = dc.to_native(command)
 
@@ -163,7 +165,7 @@ def d_build_interface(d_file, i_files=[]):
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
@@ -194,7 +196,7 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 # FIXME: Remove this, as there are no shared libraries in D
@@ -226,7 +228,7 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
@@ -254,7 +256,7 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def d_build_program(out_file, inc_files, link_files=[]):
@@ -279,7 +281,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def d_run_say(command):

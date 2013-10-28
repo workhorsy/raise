@@ -288,14 +288,6 @@ class TestBasics(TestCase):
 	def set_up(self, id):
 		self.init('Basics', id)
 
-	def test_raise(self):
-		command = '{0} raise -plain'.format(sys.executable)
-
-		expected = \
-"blah"
-
-		self.assert_process_output(command, expected)
-
 	def test_nothing(self):
 		command = '{0} raise -plain simple_nothing'.format(sys.executable)
 
@@ -363,18 +355,16 @@ Install the program 'no_such_program' and try again. Exiting ...'''
 		command = '{0} raise -plain simple_require_not_root'.format(sys.executable)
 
 		expected = \
-'''Running target 'simple_require_not_root'
-'''
+"Running target 'simple_require_not_root'"
 
-		self.assert_process_output(command, expected, is_success = False)
-
+		self.assert_process_output(command, expected)
 
 	def test_require_root_failure(self):
 		command = '{0} raise -plain simple_require_root_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_require_root_failure'
-'''
+Must be run as root. Exiting ...'''
 
 		self.assert_process_output(command, expected, is_success = False)
 

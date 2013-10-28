@@ -2,20 +2,24 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_csharp import *
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_csharp as CSharp
+import lib_raise_fs as FS
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('lib_math')
-	remove_binaries('main')
+	FS.remove_binaries('lib_math')
+	FS.remove_binaries('main')
 
 def _configure():
-	csc = csharp_get_default_compiler()
+	csc = CSharp.csharp_get_default_compiler()
 	csc.debug = True
 	csc.optimize = True
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
-	csharp_save_compiler(csc)
+	CSharp.csharp_save_compiler(csc)
 
 def setup_failure():
 	# Empty the path and reset the CSharp module so it finds no compilers
@@ -25,22 +29,22 @@ def setup_failure():
 	CSharp.cs_runtimes = {}
 	CSharp.csc = None
 	CSharp.runtime = None
-	CSharp.call_setup()
+	CSharp.setup()
 
 def build_program():
 	clean()
 	_configure()
 
-	csharp_build_program('main.exe', ['main.cs', 'lib_math.cs'])
+	CSharp.csharp_build_program('main.exe', ['main.cs', 'lib_math.cs'])
 
-	csharp_run_say('main.exe')
+	CSharp.csharp_run_say('main.exe')
 
 def build_shared_library():
 	clean()
 	_configure()
 
-	csharp_build_shared_library('lib_math.dll', ['lib_math.cs'])
-	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
+	CSharp.csharp_build_shared_library('lib_math.dll', ['lib_math.cs'])
+	CSharp.csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
 
-	csharp_run_say('main.exe')
+	CSharp.csharp_run_say('main.exe')
 
