@@ -25,21 +25,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import lib_raise_process as Process
 
-class Python(RaiseModule):
-	@classmethod
-	def setup(cls):
-		pass
 
 
 def require_python_modules(mod_names):
 	for mod_name in mod_names:
-		do_on_fail_exit(
+		Process.do_on_fail_exit(
 			"Checking for python module '{0}'".format(mod_name),
 			"Install the python module '{0}' and try again.".format(mod_name),
 			'{0} -c "import {1}"'.format(Config.python, mod_name)
 		)
 
-Python.call_setup()
 
 

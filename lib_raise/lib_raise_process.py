@@ -25,7 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os
+import os, sys
 import subprocess
 import time
 import lib_raise_config as Config

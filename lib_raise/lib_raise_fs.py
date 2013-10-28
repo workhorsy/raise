@@ -29,21 +29,22 @@ import os
 import tempfile, shutil, filecmp
 import atexit
 import lib_raise_config as Config
+import lib_raise_process as Process
 import lib_raise_terminal as Print
 
 
 def change_dir(name):
-	do_on_fail_exit("Changing to dir '{0}'".format(name),
+	Process.do_on_fail_exit("Changing to dir '{0}'".format(name),
 					"Failed to change to the dir '{0}'.".format(name),
 				lambda: os.chdir(name))
 
 def move_file(source, dest):
-	do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
 def copy_file(source, dest):
-	do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
@@ -54,16 +55,16 @@ def copy_new_file(source, dest):
 		copy_file(source, dest)
 
 def copy_dir(source, dest, symlinks = False):
-	do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the dir '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copytree(source, dest, symlinks = symlinks))
 
 def make_dir(source, ignore_failure = False):
 	if ignore_failure:
-		do_on_fail_pass("Making the dir '{0}'".format(source),
+		Process.do_on_fail_pass("Making the dir '{0}'".format(source),
 					lambda: os.mkdir(source))
 	else:
-		do_on_fail_exit("Making the dir '{0}'".format(source),
+		Process.do_on_fail_exit("Making the dir '{0}'".format(source),
 						"Failed to make the dir '{0}'.".format(source),
 					lambda: os.mkdir(source))
 
@@ -130,7 +131,7 @@ def remove_binaries(name):
 	Print.ok()
 
 def symlink(source, link_name):
-	do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
+	Process.do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))
 

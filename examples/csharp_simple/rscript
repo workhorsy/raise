@@ -1,45 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from lib_raise_csharp import *
+import os
+import lib_raise_csharp as CSharp
+import lib_raise_fs as FS
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_process as Process
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('lib_math_helper')
-	remove_binaries('main')
+	FS.remove_binaries('lib_math_helper')
+	FS.remove_binaries('main')
 
 def _configure():
-	csc = csharp_get_default_compiler()
+	csc = CSharp.get_default_compiler()
 	csc.debug = True
 	csc.optimize = True
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
-	csharp_save_compiler(csc)
+	CSharp.save_compiler(csc)
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
-	require_not_root()
+	OS.require_not_root()
 	clean()
 	_configure()
 
 	# Build the library
-	csharp_build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+	CSharp.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
 
 	# Build the program
-	csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
+	CSharp.build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 
 	# Run the program
-	csharp_run_say('./main.exe')
+	CSharp.run_say('./main.exe')
 
 def _remove():
-	csharp_uninstall_program('raise_example.exe', 'raise_example')
-	csharp_uninstall_library('lib_math_helper.dll', 'raise_example')
+	CSharp.uninstall_program('raise_example.exe', 'raise_example')
+	CSharp.uninstall_library('lib_math_helper.dll', 'raise_example')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
 	_configure()
 
@@ -49,22 +54,22 @@ def remove():
 def install():
 	"""Installs the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
-		csharp_build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
-		csharp_build_program('raise_example.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
-	do_as_normal_user(actual_build)
+		CSharp.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+		CSharp.build_program('raise_example.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
+	OS.do_as_normal_user(actual_build)
 
 	# Remove old install
 	_remove()
 
 	# Install
-	csharp_install_program('raise_example.exe', 'raise_example')
-	csharp_install_library('lib_math_helper.dll', 'raise_example')
+	CSharp.install_program('raise_example.exe', 'raise_example')
+	CSharp.install_library('lib_math_helper.dll', 'raise_example')
 
 
 

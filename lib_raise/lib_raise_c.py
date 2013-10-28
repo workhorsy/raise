@@ -335,7 +335,7 @@ def install_program(name, dir_name=None):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-	do_on_fail_exit("Installing the program '{0}'".format(name),
+	Process.do_on_fail_exit("Installing the program '{0}'".format(name),
 					"Failed to install the program '{0}'.".format(name),
 				lambda: fn())
 
@@ -366,7 +366,7 @@ def uninstall_program(name, dir_name=None):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-	do_on_fail_exit("Uninstalling the program '{0}'".format(name),
+	Process.do_on_fail_exit("Uninstalling the program '{0}'".format(name),
 					"Failed to uninstall the program '{0}'.".format(name),
 				lambda: fn())
 
@@ -397,7 +397,7 @@ def install_library(name, dir_name=None):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-	do_on_fail_exit("Installing the library '{0}'".format(name),
+	Process.do_on_fail_exit("Installing the library '{0}'".format(name),
 					"Failed to install the library '{0}'.".format(name),
 				lambda: fn())
 
@@ -428,7 +428,7 @@ def uninstall_library(name, dir_name=None):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-	do_on_fail_exit("Uninstalling the library '{0}'".format(name),
+	Process.do_on_fail_exit("Uninstalling the library '{0}'".format(name),
 					"Failed to uninstall the library '{0}'.".format(name),
 				lambda: fn())
 
@@ -459,7 +459,7 @@ def install_header(name, dir_name=None):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-	do_on_fail_exit("Installing the header '{0}'".format(name),
+	Process.do_on_fail_exit("Installing the header '{0}'".format(name),
 					"Failed to install the header '{0}'.".format(name),
 				lambda: fn())
 
@@ -490,7 +490,7 @@ def uninstall_header(name, dir_name=None):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-	do_on_fail_exit("Uninstalling the header '{0}'".format(name),
+	Process.do_on_fail_exit("Uninstalling the header '{0}'".format(name),
 					"Failed to uninstall the header '{0}'.".format(name),
 				lambda: fn())
 

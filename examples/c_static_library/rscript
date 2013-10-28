@@ -1,81 +1,86 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from lib_raise_c import *
-from lib_raise_linker import *
-from lib_raise_ar import *
+import os
+import lib_raise_c as C
+import lib_raise_linker as Linker
+import lib_raise_ar as AR
+import lib_raise_fs as FS
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_process as Process
 
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('raise_example')
-	remove_binaries('libexample')
+	FS.remove_binaries('raise_example')
+	FS.remove_binaries('libexample')
 
 def _configure():
-	cc = c_get_default_compiler()
+	cc = C.get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_compiler(cc)
+	C.save_compiler(cc)
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
-	require_not_root()
+	OS.require_not_root()
 	clean()
 	_configure()
 
 	# Build the library
-	c_build_object('libexample.o', ['libexample.c'])
-	ar_build_static_library('libexample.a', ['libexample.o'])
+	C.build_object('libexample.o', ['libexample.c'])
+	AR.build_static_library('libexample.a', ['libexample.o'])
 
 	# Build the program and link against the library
-	c_build_program('raise_example.exe', ['main.c'], ['libexample.a'])
+	C.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 
 	# Run the program
-	c_run_say('./raise_example.exe')
+	C.run_say('./raise_example.exe')
 
 def _remove():
-	c_uninstall_program('raise_example.exe')
-	c_uninstall_library('libexample.a')
-	c_uninstall_header('libexample.h')
+	C.uninstall_program('raise_example.exe')
+	C.uninstall_library('libexample.a')
+	C.uninstall_header('libexample.h')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
 	_configure()
 
 	# Remove the files
 	_remove()
 
-	ldconfig()
+	Linker.ldconfig()
 
 def install():
 	"""Installs the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
-		c_build_object('libexample.o', ['libexample.c'])
-		ar_build_static_library('libexample.a', ['libexample.o'])
-		c_build_program('raise_example.exe', ['main.c'], ['libexample.a'])
-	do_as_normal_user(actual_build)
+		C.build_object('libexample.o', ['libexample.c'])
+		AR.build_static_library('libexample.a', ['libexample.o'])
+		C.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
+	OS.do_as_normal_user(actual_build)
 
 	# Remove old install
 	_remove()
 
 	# Install
-	c_install_program('raise_example.exe')
-	c_install_library('libexample.a')
-	c_install_header('libexample.h')
+	C.install_program('raise_example.exe')
+	C.install_library('libexample.a')
+	C.install_header('libexample.h')
 
-	ldconfig()
+	Linker.ldconfig()
 
 
 

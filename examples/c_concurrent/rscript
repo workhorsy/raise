@@ -2,32 +2,36 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_c import *
+import lib_raise_c as C
+import lib_raise_fs as FS
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_process as Process
 
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('main')
-	remove_binaries('a')
-	remove_binaries('b')
-	remove_binaries('c')
+	FS.remove_binaries('main')
+	FS.remove_binaries('a')
+	FS.remove_binaries('b')
+	FS.remove_binaries('c')
 
 def _configure():
-	cc = c_get_default_compiler()
+	cc = C.get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_compiler(cc)
+	C.save_compiler(cc)
 
 def build():
 	"""Builds the program. Will only build files that have changed since the last build."""
-	require_not_root()
+	OS.require_not_root()
 	_build()
 
 def rebuild():
 	"""Rebuilds the program. Will build all the files. Even if they have not changed since last build."""
-	require_not_root()
+	OS.require_not_root()
 	clean()
 	_build()
 
@@ -39,19 +43,19 @@ def _build():
 
 	# Build each c++ file into an object
 	# All the events between concurrent_start() and concurrent_end() will be run concurrently
-	concurrent_start()
+	Process.concurrent_start()
 	for f in code_files:
 		object_name = '{0}.o'.format(f)
 		code_name = '{0}.c'.format(f)
-		c_build_object(object_name, [code_name])
-	concurrent_end()
+		C.build_object(object_name, [code_name])
+	Process.concurrent_end()
 
 	# Link all the objects into the program
 	object_files = [s + '.o' for s in code_files]
-	c_build_program('main.exe', object_files)
+	C.build_program('main.exe', object_files)
 
 	# Run the program
-	c_run_say('./main.exe')
+	C.run_say('./main.exe')
 
 
 
