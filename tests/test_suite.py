@@ -222,8 +222,8 @@ class TestProcessRunner(object):
 			shell = True
 		)
 
-		self._stdout = ''
-		self._stderr = ''
+		self._stdout = b''
+		self._stderr = b''
 
 		while True:
 			sout, serr = self._process.communicate()

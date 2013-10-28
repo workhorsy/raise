@@ -57,8 +57,8 @@ class ProcessRunner(object):
 		for key, value in os.environ.items():
 			env[key] = OS.expand_envs(value)
 
-		self._stdout = ''
-		self._stderr = ''
+		self._stdout = b''
+		self._stderr = b''
 
 		# Start the process and save the output
 		self._process = subprocess.Popen(
