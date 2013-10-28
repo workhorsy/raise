@@ -30,7 +30,7 @@ import lib_raise_process as Process
 import lib_raise_fs as FS
 
 
-def ar_build_static_library(ar_file, o_files):
+def build_static_library(ar_file, o_files):
 	# Make sure the extension is valid
 	if not ar_file.endswith('.a'):
 		Print.exit("Out file extension should be '.a' not '.{0}'.".format(ar_file.split('.')[-1]))

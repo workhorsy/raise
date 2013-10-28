@@ -112,7 +112,7 @@ def setup():
 		Print.exit("No C# compiler found. Install one and try again.")
 
 
-def csharp_get_default_compiler():
+def get_default_compiler():
 	global cs_compilers
 
 	comp = None
@@ -123,7 +123,7 @@ def csharp_get_default_compiler():
 
 	return comp
 
-def csharp_save_compiler(compiler):
+def save_compiler(compiler):
 	global cs_runtimes
 	global csc
 	global runtime
@@ -144,7 +144,7 @@ def csharp_save_compiler(compiler):
 
 	os.environ['CSFLAGS'] = str.join(' ', opts)
 
-def csharp_build_program(out_file, inc_files, link_files=[]):
+def build_program(out_file, inc_files, link_files=[]):
 	global csc
 
 	# Make sure the extension is valid
@@ -172,7 +172,7 @@ def csharp_build_program(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def csharp_build_shared_library(out_file, inc_files, link_files=[]):
+def build_shared_library(out_file, inc_files, link_files=[]):
 	global csc
 
 	# Make sure the extension is valid
@@ -200,7 +200,7 @@ def csharp_build_shared_library(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def csharp_run_say(command):
+def run_say(command):
 	global csc
 	global runtime
 	Print.status("Running C# program")
@@ -222,7 +222,7 @@ def csharp_run_say(command):
 		sys.stdout.write(runner.stdall)
 		Print.exit('Failed to run command.')
 
-def csharp_install_program(name, dir_name):
+def install_program(name, dir_name):
 	global csc
 
 	# Make sure the extension is valid
@@ -266,7 +266,7 @@ def csharp_install_program(name, dir_name):
 					"Failed to install the program '{0}'.".format(name),
 				lambda: fn())
 
-def csharp_uninstall_program(name, dir_name):
+def uninstall_program(name, dir_name):
 	global csc
 
 	# Make sure the extension is valid
@@ -302,7 +302,7 @@ def csharp_uninstall_program(name, dir_name):
 					"Failed to uninstall the program '{0}'.".format(name),
 				lambda: fn())
 
-def csharp_install_library(name, dir_name=None):
+def install_library(name, dir_name=None):
 	global csc
 
 	# Make sure the extension is valid
@@ -333,7 +333,7 @@ def csharp_install_library(name, dir_name=None):
 					"Failed to install the library '{0}'.".format(name),
 				lambda: fn())
 
-def csharp_uninstall_library(name, dir_name=None):
+def uninstall_library(name, dir_name=None):
 	global csc
 
 	# Make sure the extension is valid

@@ -114,7 +114,7 @@ def setup():
 		Print.exit("No C++ compiler found. Install one and try again.")
 
 
-def cxx_get_default_compiler():
+def get_default_compiler():
 	global cxx_compilers
 	comp = None
 
@@ -126,7 +126,7 @@ def cxx_get_default_compiler():
 
 	return comp
 
-def cxx_save_compiler(compiler):
+def save_compiler(compiler):
 	global cxx
 
 	# CXX
@@ -145,7 +145,7 @@ def cxx_save_compiler(compiler):
 
 	os.environ['CXXFLAGS'] = str.join(' ', opts)
 
-def cxx_build_program(o_file, cxx_files, i_files=[]):
+def build_program(o_file, cxx_files, i_files=[]):
 	global cxx
 
 	# Make sure the extension is valid
@@ -174,7 +174,7 @@ def cxx_build_program(o_file, cxx_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def cxx_link_program(out_file, obj_files, i_files=[]):
+def link_program(out_file, obj_files, i_files=[]):
 	global cxx
 
 	# Make sure the extension is valid
@@ -204,7 +204,7 @@ def cxx_link_program(out_file, obj_files, i_files=[]):
 	event = Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def cxx_build_object(o_file, cxx_files, i_files=[]):
+def build_object(o_file, cxx_files, i_files=[]):
 	global cxx
 
 	# Make sure the extension is valid
@@ -239,7 +239,7 @@ def cxx_build_object(o_file, cxx_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def cxx_run_say(command):
+def run_say(command):
 	global cxx
 
 	Print.status("Running C++ program")

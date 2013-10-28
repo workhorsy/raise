@@ -14,12 +14,12 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	csc = CSharp.csharp_get_default_compiler()
+	csc = CSharp.get_default_compiler()
 	csc.debug = True
 	csc.optimize = True
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
-	CSharp.csharp_save_compiler(csc)
+	CSharp.save_compiler(csc)
 
 def setup_failure():
 	# Empty the path and reset the CSharp module so it finds no compilers
@@ -35,16 +35,16 @@ def build_program():
 	clean()
 	_configure()
 
-	CSharp.csharp_build_program('main.exe', ['main.cs', 'lib_math.cs'])
+	CSharp.build_program('main.exe', ['main.cs', 'lib_math.cs'])
 
-	CSharp.csharp_run_say('main.exe')
+	CSharp.run_say('main.exe')
 
 def build_shared_library():
 	clean()
 	_configure()
 
-	CSharp.csharp_build_shared_library('lib_math.dll', ['lib_math.cs'])
-	CSharp.csharp_build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
+	CSharp.build_shared_library('lib_math.dll', ['lib_math.cs'])
+	CSharp.build_program('main.exe', ['main.cs'], ['-r:lib_math.dll'])
 
-	CSharp.csharp_run_say('main.exe')
+	CSharp.run_say('main.exe')
 

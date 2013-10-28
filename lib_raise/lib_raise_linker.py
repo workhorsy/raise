@@ -88,7 +88,7 @@ class Linker(object):
 
 		return command
 
-def linker_get_default_linker():
+def get_default_linker():
 	global linkers
 
 	if OS.os_type._name == 'Windows':
@@ -96,14 +96,14 @@ def linker_get_default_linker():
 	else:
 		return linkers['ld']
 
-def linker_save_linker(new_linker):
+def save_linker(new_linker):
 	global linker
 
 	# LINKER
 	linker = new_linker
 	os.environ['LINKER'] = linker._name
 
-def linker_link_program(out_file, obj_files, i_files=[]):
+def link_program(out_file, obj_files, i_files=[]):
 	global linker
 
 	# Setup the messages

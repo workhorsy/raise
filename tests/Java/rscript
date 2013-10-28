@@ -14,12 +14,12 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	javac = Java.java_get_default_compiler()
+	javac = Java.get_default_compiler()
 	javac.debug = True
 	javac.warnings = True
 	javac.verbose = False
 	javac.deprecation = False
-	Java.java_save_compiler(javac)
+	Java.save_compiler(javac)
 
 def setup_failure():
 	# Empty the path and reset the Java module so it finds no compilers
@@ -37,16 +37,16 @@ def build_program():
 	clean()
 	_configure()
 
-	Java.java_build_program('main.class', ['main.java', 'lib_math.java'])
+	Java.build_program('main.class', ['main.java', 'lib_math.java'])
 
-	Java.java_run_say('main')
+	Java.run_say('main')
 
 def build_jar():
 	clean()
 	_configure()
 
-	Java.java_build_jar('lib_math.jar', ['lib_math.java'])
-	Java.java_build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
+	Java.build_jar('lib_math.jar', ['lib_math.java'])
+	Java.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
 
-	Java.java_run_say('main')
+	Java.run_say('main')
 

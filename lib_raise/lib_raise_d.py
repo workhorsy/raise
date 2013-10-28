@@ -112,7 +112,7 @@ def setup():
 		Print.exit("No D compiler found. Install one and try again.")
 
 
-def d_get_default_compiler():
+def get_default_compiler():
 	global d_compilers
 
 	comp = None
@@ -123,7 +123,7 @@ def d_get_default_compiler():
 
 	return comp
 
-def d_save_compiler(compiler):
+def save_compiler(compiler):
 	global dc
 
 	# DC
@@ -141,7 +141,7 @@ def d_save_compiler(compiler):
 
 	os.environ['DFLAGS'] = str.join(' ', opts)
 
-def d_build_interface(d_file, i_files=[]):
+def build_interface(d_file, i_files=[]):
 	global dc
 
 	# Setup the messages
@@ -168,7 +168,7 @@ def d_build_interface(d_file, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
+def build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	global dc
 
 	# Make sure the extension is valid
@@ -200,7 +200,7 @@ def d_build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	Process.add_event(event)
 
 # FIXME: Remove this, as there are no shared libraries in D
-def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
+def build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	global dc
 
 	# Make sure the extension is valid
@@ -231,7 +231,7 @@ def d_build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
+def build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
 	global dc
 
 	# Make sure the extension is valid
@@ -259,7 +259,7 @@ def d_build_static_library(o_file, d_files, i_files=[], l_files=[], generate_hea
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def d_build_program(out_file, inc_files, link_files=[]):
+def build_program(out_file, inc_files, link_files=[]):
 	global dc
 
 	# Make sure the extension is valid
@@ -284,7 +284,7 @@ def d_build_program(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def d_run_say(command):
+def run_say(command):
 	global dc
 	Print.status("Running D program")
 
@@ -304,7 +304,7 @@ def d_run_say(command):
 		sys.stdout.write(runner.stdall)
 		Print.exit('Failed to run command.')
 
-def d_install_program(name, dir_name=None):
+def install_program(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid
@@ -335,7 +335,7 @@ def d_install_program(name, dir_name=None):
 					"Failed to install the program '{0}'.".format(name),
 				lambda: fn())
 
-def d_uninstall_program(name, dir_name=None):
+def uninstall_program(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid
@@ -366,7 +366,7 @@ def d_uninstall_program(name, dir_name=None):
 					"Failed to uninstall the program '{0}'.".format(name),
 				lambda: fn())
 
-def d_install_library(name, dir_name=None):
+def install_library(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid
@@ -397,7 +397,7 @@ def d_install_library(name, dir_name=None):
 					"Failed to install the library '{0}'.".format(name),
 				lambda: fn())
 
-def d_uninstall_library(name, dir_name=None):
+def uninstall_library(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid
@@ -428,7 +428,7 @@ def d_uninstall_library(name, dir_name=None):
 					"Failed to uninstall the library '{0}'.".format(name),
 				lambda: fn())
 
-def d_install_interface(name, dir_name=None):
+def install_interface(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid
@@ -459,7 +459,7 @@ def d_install_interface(name, dir_name=None):
 					"Failed to install the interface '{0}'.".format(name),
 				lambda: fn())
 
-def d_uninstall_interface(name, dir_name=None):
+def uninstall_interface(name, dir_name=None):
 	global dc
 
 	# Make sure the extension is valid

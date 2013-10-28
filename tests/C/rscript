@@ -17,15 +17,15 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	cc = C.c_get_default_compiler()
+	cc = C.get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	C.c_save_compiler(cc)
+	C.save_compiler(cc)
 
-	linker = Linker.linker_get_default_linker()
-	Linker.linker_save_linker(linker)
+	linker = Linker.get_default_linker()
+	Linker.save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -41,42 +41,42 @@ def build_object():
 	clean()
 	_configure()
 
-	C.c_build_object('lib_math.o', ['lib_math.c'])
-	C.c_build_object('main.o', ['main.c'])
+	C.build_object('lib_math.o', ['lib_math.c'])
+	C.build_object('main.o', ['main.c'])
 
-	C.c_build_program('main.exe', ['lib_math.o', 'main.o'])
+	C.build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	C.c_run_say('./main.exe')
+	C.run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	C.c_build_program('main.exe', ['lib_math.c', 'main.c'])
+	C.build_program('main.exe', ['lib_math.c', 'main.c'])
 
-	C.c_run_say('./main.exe')
+	C.run_say('./main.exe')
 
 def build_shared_library():
 	clean()
 	_configure()
 
 	# Build the library
-	C.c_build_object('lib_math.o', ['lib_math.c'])
-	C.c_build_shared_library('lib_math.so', ['lib_math.o'])
+	C.build_object('lib_math.o', ['lib_math.c'])
+	C.build_shared_library('lib_math.so', ['lib_math.o'])
 
-	C.c_build_program('main.exe', ['main.c', 'lib_math.so'])
+	C.build_program('main.exe', ['main.c', 'lib_math.so'])
 
-	C.c_run_say('./main.exe')
+	C.run_say('./main.exe')
 
 def build_static_library():
 	clean()
 	_configure()
 
 	# Build the library
-	C.c_build_object('lib_math.o', ['lib_math.c'])
-	AR.ar_build_static_library('lib_math.a', ['lib_math.o'])
+	C.build_object('lib_math.o', ['lib_math.c'])
+	AR.build_static_library('lib_math.a', ['lib_math.o'])
 
-	C.c_build_program('main.exe', ['main.c', 'lib_math.a'])
+	C.build_program('main.exe', ['main.c', 'lib_math.a'])
 
-	C.c_run_say('./main.exe')
+	C.run_say('./main.exe')
 

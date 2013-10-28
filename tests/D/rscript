@@ -17,12 +17,12 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	dc = D.d_get_default_compiler()
+	dc = D.get_default_compiler()
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
 	dc.warnings_as_errors = True
-	D.d_save_compiler(dc)
+	D.save_compiler(dc)
 
 def setup_failure():
 	# Empty the path and reset the D module so it finds no compilers
@@ -36,33 +36,33 @@ def build_object():
 	clean()
 	_configure()
 
-	D.d_build_object('lib_math.o', ['lib_math.d'])
-	D.d_build_object('main.o', ['main.d'])
-	D.d_build_program('main.exe', ['main.o', 'lib_math.o'])
+	D.build_object('lib_math.o', ['lib_math.d'])
+	D.build_object('main.o', ['main.d'])
+	D.build_program('main.exe', ['main.o', 'lib_math.o'])
 
-	D.d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	D.d_build_program('main.exe', ['main.d', 'lib_math.d'])
+	D.build_program('main.exe', ['main.d', 'lib_math.d'])
 
-	D.d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_static_library():
 	clean()
 	_configure()
 
-	D.d_build_object('lib_math.o', ['lib_math.d'])
-	D.d_build_static_library('lib_math.a', ['lib_math.o'])
-	D.d_build_program('main.exe', ['main.d', 'lib_math.a'])
+	D.build_object('lib_math.o', ['lib_math.d'])
+	D.build_static_library('lib_math.a', ['lib_math.o'])
+	D.build_program('main.exe', ['main.d', 'lib_math.a'])
 
-	D.d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_interface():
 	clean()
 	_configure()
 
-	D.d_build_interface('lib_math.d')
+	D.build_interface('lib_math.d')
 

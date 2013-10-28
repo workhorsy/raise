@@ -15,15 +15,15 @@ def clean():
 	pass
 
 def _configure():
-	cc = C.c_get_default_compiler()
+	cc = C.get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	C.c_save_compiler(cc)
+	C.save_compiler(cc)
 
-	linker = Linker.linker_get_default_linker()
-	Linker.linker_save_linker(linker)
+	linker = Linker.get_default_linker()
+	Linker.save_linker(linker)
 
 def find_installed_library():
 	clean()

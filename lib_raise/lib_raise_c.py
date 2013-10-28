@@ -132,7 +132,7 @@ def setup():
 		Print.exit("No C compiler found. Install one and try again.")
 
 
-def c_get_default_compiler():
+def get_default_compiler():
 	global c_compilers
 	comp = None
 
@@ -146,7 +146,7 @@ def c_get_default_compiler():
 
 	return comp
 
-def c_save_compiler(compiler):
+def save_compiler(compiler):
 	global cc
 
 	# CC
@@ -165,7 +165,7 @@ def c_save_compiler(compiler):
 
 	os.environ['CFLAGS'] = str.join(' ', opts)
 
-def c_link_program(out_file, obj_files, i_files=[]):
+def link_program(out_file, obj_files, i_files=[]):
 	global cc
 
 	# Make sure the extension is valid
@@ -195,7 +195,7 @@ def c_link_program(out_file, obj_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def c_build_object(o_file, c_files, i_files=[]):
+def build_object(o_file, c_files, i_files=[]):
 	global cc
 
 	# Make sure the extension is valid
@@ -230,7 +230,7 @@ def c_build_object(o_file, c_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def c_build_program(o_file, c_files, i_files=[]):
+def build_program(o_file, c_files, i_files=[]):
 	global cc
 
 	# Make sure the extension is valid
@@ -260,7 +260,7 @@ def c_build_program(o_file, c_files, i_files=[]):
 	Process.add_event(event)
 
 # FIXME: Change to use the linker through the compiler
-def c_build_shared_library(so_file, o_files):
+def build_shared_library(so_file, o_files):
 	# Make sure the extension is valid
 	Helpers.require_file_extension(so_file, '.so')
 
@@ -288,7 +288,7 @@ def c_build_shared_library(so_file, o_files):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def c_run_say(command):
+def run_say(command):
 	global cc
 	Print.status("Running C program")
 
@@ -308,7 +308,7 @@ def c_run_say(command):
 		sys.stdout.write(runner.stdall)
 		Print.exit('Failed to run command.')
 
-def c_install_program(name, dir_name=None):
+def install_program(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid
@@ -339,7 +339,7 @@ def c_install_program(name, dir_name=None):
 					"Failed to install the program '{0}'.".format(name),
 				lambda: fn())
 
-def c_uninstall_program(name, dir_name=None):
+def uninstall_program(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid
@@ -370,7 +370,7 @@ def c_uninstall_program(name, dir_name=None):
 					"Failed to uninstall the program '{0}'.".format(name),
 				lambda: fn())
 
-def c_install_library(name, dir_name=None):
+def install_library(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid
@@ -401,7 +401,7 @@ def c_install_library(name, dir_name=None):
 					"Failed to install the library '{0}'.".format(name),
 				lambda: fn())
 
-def c_uninstall_library(name, dir_name=None):
+def uninstall_library(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid
@@ -432,7 +432,7 @@ def c_uninstall_library(name, dir_name=None):
 					"Failed to uninstall the library '{0}'.".format(name),
 				lambda: fn())
 
-def c_install_header(name, dir_name=None):
+def install_header(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid
@@ -463,7 +463,7 @@ def c_install_header(name, dir_name=None):
 					"Failed to install the header '{0}'.".format(name),
 				lambda: fn())
 
-def c_uninstall_header(name, dir_name=None):
+def uninstall_header(name, dir_name=None):
 	global cc
 
 	# Make sure the extension is valid

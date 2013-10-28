@@ -109,7 +109,7 @@ class JavaCompiler(object):
 
 		return command
 
-def java_get_default_compiler():
+def get_default_compiler():
 	global java_compilers
 
 	comp = None
@@ -120,7 +120,7 @@ def java_get_default_compiler():
 
 	return comp
 
-def java_save_compiler(compiler):
+def save_compiler(compiler):
 	global java_runtimes
 	global java_jars
 	global javac
@@ -144,7 +144,7 @@ def java_save_compiler(compiler):
 
 	os.environ['JAVAFLAGS'] = str.join(' ', opts)
 
-def java_build_program(out_file, inc_files, link_files=[]):
+def build_program(out_file, inc_files, link_files=[]):
 	global javac
 
 	# Make sure the extension is valid
@@ -171,7 +171,7 @@ def java_build_program(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def java_build_jar(out_file, inc_files, link_files=[]):
+def build_jar(out_file, inc_files, link_files=[]):
 	global javac
 
 	# Make sure the extension is valid
@@ -199,7 +199,7 @@ def java_build_jar(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def java_run_say(command):
+def run_say(command):
 	global javac
 	global runtime
 	Print.status("Running Java program")
