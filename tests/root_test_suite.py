@@ -376,10 +376,183 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 		self.assert_process_output(command, expected)
 
 
+class TestCXX(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
+	def set_up(self, id):
+		self.init('CXX', id)
+
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
+Running C++ program ...                                                     :)
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)'''
+
+		self.assert_process_output(command, expected)
+
+	def test_install_and_uninstall_shared_library(self):
+		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_shared_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building C++ object 'lib_math.o' ...                                        :)
+Building shared library 'lib_math.so' ...                                   :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.so' ...                                    :)
+Running C++ program ...                                                     :)
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)'''
+
+		self.assert_process_output(command, expected)
+
+	def test_install_and_uninstall_static_library(self):
+		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_static_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building C++ object 'lib_math.o' ...                                        :)
+Building static library 'lib_math.a' ...                                    :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.a' ...                                     :)
+Running C++ program ...                                                     :)
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)'''
+
+		self.assert_process_output(command, expected)
+
+
+class TestD(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
+	def set_up(self, id):
+		self.init('D', id)
+
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_program'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building D program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
+Running D program ...                                                       :)
+raise_example.exe
+9 * 12 = 108
+Uninstalling the program 'raise_example.exe' ...                            :)'''
+
+		self.assert_process_output(command, expected)
+
+
+	def test_install_and_uninstall_static_library(self):
+		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_static_library'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building D object 'lib_math.o' ...                                          :)
+Building static library 'lib_math.a' ...                                    :)
+Building D program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.a' ...                                     :)
+Running D program ...                                                       :)
+raise_example.exe
+9 * 12 = 108
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)'''
+
+		self.assert_process_output(command, expected)
+
+
+class TestCSharp(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
+	def set_up(self, id):
+		self.init('CSharp', id)
+
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building C# program 'raise_example.exe' ...                                 :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
+Running C# program ...                                                      :)
+raise_example.exe
+10 - 4 = 6
+Uninstalling the program 'raise_example.exe' ...                            :)'''
+
+		self.assert_process_output(command, expected)
+
+
+	def test_install_and_uninstall_shared_library(self):
+		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_shared_library'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building C# shared library 'lib_math.dll' ...                               :)
+Building C# program 'raise_example.exe' ...                                 :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.dll' ...                                 :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.dll' ...                                   :)
+Running C# program ...                                                      :)
+raise_example.exe
+10 - 4 = 6
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.dll' ...                                 :)'''
+
+		self.assert_process_output(command, expected)
+
+
+# FIXME: Some tests are stomping on each other
+# because they are using the same install locations.
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	runner.add_test_case(TestBasics)
 	runner.add_test_case(TestC)
+	runner.add_test_case(TestCXX)
+	runner.add_test_case(TestCSharp)
 	runner.run()
 
 

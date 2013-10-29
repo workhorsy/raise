@@ -48,3 +48,50 @@ def build_shared_library():
 
 	CSharp.run_say('main.exe')
 
+# Tests that require root
+def install_and_uninstall_program():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CSharp.build_program('raise_example.exe', ['main.cs', 'lib_math.cs'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CSharp.uninstall_program('raise_example.exe', 'raise_example')
+	CSharp.install_program('raise_example.exe', 'raise_example')
+
+	# Run
+	CSharp.run_say('raise_example.exe')
+
+	# Remove
+	CSharp.uninstall_program('raise_example.exe', 'raise_example')
+
+def install_and_uninstall_shared_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CSharp.build_shared_library('lib_math.dll', ['lib_math.cs'])
+		CSharp.build_program('raise_example.exe', ['main.cs'], ['-r:lib_math.dll'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CSharp.uninstall_program('raise_example.exe', 'raise_example')
+	CSharp.uninstall_library('lib_math.dll', 'raise_example')
+	CSharp.install_program('raise_example.exe', 'raise_example')
+	CSharp.install_library('lib_math.dll', 'raise_example')
+
+	# Run
+	CSharp.run_say('raise_example.exe')
+
+	# Remove
+	CSharp.uninstall_program('raise_example.exe', 'raise_example')
+	CSharp.uninstall_library('lib_math.dll', 'raise_example')
+

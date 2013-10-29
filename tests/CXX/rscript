@@ -5,7 +5,7 @@ import os
 import lib_raise_terminal as Print
 import lib_raise_libraries as Libraries
 import lib_raise_os as OS
-import lib_raise_c as C
+import lib_raise_c as C # FIXME: Should not be a dependency
 import lib_raise_cxx as CXX
 import lib_raise_linker as Linker
 import lib_raise_ar as AR
@@ -80,4 +80,78 @@ def build_static_library():
 	CXX.build_program('main.exe', ['main.cc', 'lib_math.a'])
 
 	CXX.run_say('./main.exe')
+
+# Tests that require root
+def install_and_uninstall_program():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.cc'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.install_program('raise_example.exe')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+
+def install_and_uninstall_shared_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_object('lib_math.o', ['lib_math.cc'])
+		C.build_shared_library('lib_math.so', ['lib_math.o'])
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.so'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.so')
+	CXX.install_program('raise_example.exe')
+	CXX.install_library('lib_math.so')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.so')
+
+def install_and_uninstall_static_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_object('lib_math.o', ['lib_math.cc'])
+		AR.build_static_library('lib_math.a', ['lib_math.o'])
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.a'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.a')
+	CXX.install_program('raise_example.exe')
+	CXX.install_library('lib_math.a')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.a')
 

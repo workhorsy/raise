@@ -26,6 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import sys, os
+import shutil
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_os as OS
