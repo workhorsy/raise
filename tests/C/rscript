@@ -80,3 +80,78 @@ def build_static_library():
 
 	C.run_say('./main.exe')
 
+# Tests that require root
+def install_and_uninstall_program():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		C.build_program('raise_example.exe', ['main.c', 'lib_math.c'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	C.uninstall_program('raise_example.exe')
+	C.install_program('raise_example.exe')
+
+	# Run
+	C.run_say('raise_example.exe')
+
+	# Remove
+	C.uninstall_program('raise_example.exe')
+
+def install_and_uninstall_shared_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		C.build_object('lib_math.o', ['lib_math.c'])
+		C.build_shared_library('lib_math.so', ['lib_math.o'])
+		C.build_program('raise_example.exe', ['main.c', 'lib_math.so'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	C.uninstall_program('raise_example.exe')
+	C.uninstall_library('lib_math.so')
+	C.install_program('raise_example.exe')
+	C.install_library('lib_math.so')
+
+	# Run
+	C.run_say('raise_example.exe')
+
+	# Remove
+	C.uninstall_program('raise_example.exe')
+	C.uninstall_library('lib_math.so')
+
+def install_and_uninstall_static_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		C.build_object('lib_math.o', ['lib_math.c'])
+		AR.build_static_library('lib_math.a', ['lib_math.o'])
+		C.build_program('raise_example.exe', ['main.c', 'lib_math.a'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	C.uninstall_program('raise_example.exe')
+	C.uninstall_library('lib_math.a')
+	C.install_program('raise_example.exe')
+	C.install_library('lib_math.a')
+
+	# Run
+	C.run_say('raise_example.exe')
+
+	# Remove
+	C.uninstall_program('raise_example.exe')
+	C.uninstall_library('lib_math.a')
+
+

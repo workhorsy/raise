@@ -35,3 +35,10 @@ def simple_require_not_root():
 def simple_require_root_failure():
 	OS.require_root()
 
+# Tests that require root
+def simple_require_root():
+	OS.require_root()
+
+def simple_require_not_root_failure():
+	OS.require_not_root()
+
