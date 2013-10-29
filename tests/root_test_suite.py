@@ -545,6 +545,54 @@ Uninstalling the library 'lib_math.dll' ...                                 :)''
 		self.assert_process_output(command, expected)
 
 
+class TestJava(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
+	def set_up(self, id):
+		self.init('Java', id)
+
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_program'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building Java program 'main.class' ...                                      :)
+Uninstalling the program 'main.class' ...                                   :)
+Installing the program 'main.class' ...                                     :)
+Running Java program ...                                                    :)
+java main
+8 - 1 = 7
+Uninstalling the program 'main.class' ...                                   :)'''
+
+		self.assert_process_output(command, expected)
+
+
+	def test_install_and_uninstall_jar(self):
+		command = '{0} raise -plain install_and_uninstall_jar'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_jar'
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building Java jar 'lib_math.jar' ...                                        :)
+Building Java program 'main.class' ...                                      :)
+Uninstalling the program 'main.class' ...                                   :)
+Uninstalling the jar 'lib_math.jar' ...                                     :)
+Installing the program 'main.class' ...                                     :)
+Installing the jar 'lib_math.jar' ...                                       :)
+Running Java program ...                                                    :)
+java main
+8 - 1 = 7
+Uninstalling the program 'main.class' ...                                   :)
+Uninstalling the jar 'lib_math.jar' ...                                     :)'''
+
+		self.assert_process_output(command, expected)
+
+
 # FIXME: Some tests are stomping on each other
 # because they are using the same install locations.
 if __name__ == '__main__':
@@ -553,6 +601,7 @@ if __name__ == '__main__':
 	runner.add_test_case(TestC)
 	runner.add_test_case(TestCXX)
 	runner.add_test_case(TestCSharp)
+	runner.add_test_case(TestJava)
 	runner.run()
 
 

@@ -26,6 +26,8 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os, sys
+import shutil
+import stat
 import lib_raise_terminal as Print
 import lib_raise_config as Config
 import lib_raise_os as OS
@@ -220,6 +222,149 @@ def run_say(command):
 		sys.stdout.write(native_command + '\n')
 		sys.stdout.write(runner.stdall)
 		Print.exit('Failed to run command.')
+
+
+def install_program(name, dir_name):
+	global javac
+
+	# Make sure the extension is valid
+	Helpers.require_file_extension(name, '.class')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = javac.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Install
+	def fn():
+		# Make the dir if needed
+		if dir_name and not os.path.isdir(install_dir):
+			os.mkdir(install_dir)
+
+		# Copy the file
+		shutil.copy2(source, dest)
+
+		if OS.os_type._name != 'Windows':
+			script_name = Helpers.before(name, '.')
+			script_path = '/usr/bin/' + script_name
+			with open(script_path, 'wb') as f:
+				f.write("#!/usr/bin/env bash\n")
+				f.write("\n")
+				f.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/{0}\n".format(script_name))
+				f.write("THIS_EXE=\"/usr/lib/{0}/{0}.exe\"\n".format(script_name))
+				f.write("exec java $THIS_EXE \"$@\"\n")
+				f.write("\n")
+			st = os.stat(script_path)
+			os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+	Process.do_on_fail_exit("Installing the program '{0}'".format(name),
+					"Failed to install the program '{0}'.".format(name),
+				lambda: fn())
+
+def uninstall_program(name, dir_name):
+	global javac
+
+	# Make sure the extension is valid
+	Helpers.require_file_extension(name, '.class')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = javac.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Remove
+	def fn():
+		# Remove the file
+		if os.path.isfile(dest):
+			os.remove(dest)
+		# Remove the dir if empty
+		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
+			shutil.rmtree(install_dir)
+
+		if OS.os_type._name != 'Windows':
+			script_name = Helpers.before(name, '.')
+			if os.path.isfile('/usr/bin/' + script_name):
+				os.remove('/usr/bin/' + script_name)
+
+	Process.do_on_fail_exit("Uninstalling the program '{0}'".format(name),
+					"Failed to uninstall the program '{0}'.".format(name),
+				lambda: fn())
+
+def install_jar(name, dir_name=None):
+	global javac
+
+	# Make sure the extension is valid
+	Helpers.require_file_extension(name, '.jar')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = javac.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Install
+	def fn():
+		# Make the dir if needed
+		if dir_name and not os.path.isdir(install_dir):
+			os.mkdir(install_dir)
+
+		# Copy the file
+		shutil.copy2(source, dest)
+
+	Process.do_on_fail_exit("Installing the jar '{0}'".format(name),
+					"Failed to install the jar '{0}'.".format(name),
+				lambda: fn())
+
+def uninstall_jar(name, dir_name=None):
+	global javac
+
+	# Make sure the extension is valid
+	Helpers.require_file_extension(name, '.jar')
+
+	# Get the location programs are stored in
+	prog_root = None
+	if OS.os_type._name == 'Windows':
+		prog_root = os.environ.get('programfiles', 'C:\Program Files')
+	else:
+		prog_root = '/usr/lib/'
+
+	# Get the native install source and dest
+	source = javac.to_native(name)
+	install_dir = os.path.join(prog_root, dir_name or '')
+	dest = os.path.join(install_dir, source)
+
+	# Remove
+	def fn():
+		# Remove the file
+		if os.path.isfile(dest):
+			os.remove(dest)
+		# Remove the dir if empty
+		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
+			shutil.rmtree(install_dir)
+
+	Process.do_on_fail_exit("Uninstalling the jar '{0}'".format(name),
+					"Failed to uninstall the jar '{0}'.".format(name),
+				lambda: fn())
 
 
 setup()
