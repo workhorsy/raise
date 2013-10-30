@@ -148,7 +148,7 @@ class ConcurrentTestRunner(object):
 
 	def run(self):
 		# Get the number of CPU cores
-		cpus_total = multiprocessing.cpu_count()
+		cpus_total = 1
 		cpus_free = cpus_total
 		ready_members = []
 		total = 0
@@ -612,8 +612,6 @@ Uninstalling the jar 'lib_math.jar' ...                                     :)''
 		self.assert_process_output(command, expected)
 
 
-# FIXME: Some tests are stomping on each other
-# because they are using the same install locations.
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	runner.add_test_case(TestBasics)
