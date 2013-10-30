@@ -55,6 +55,19 @@ def chomp(s):
 
 	return s
 
+def chown_r(dir_name, uid, gid):
+	# Chown the root directory
+	os.chown(dir_name, uid, gid)
+
+	# Loop through all entries in the root directory
+	for root, dirs, files in os.walk(dir_name):
+		for entry in files:
+			# Get the whole name
+			absolute_entry = os.path.join(root, entry)
+
+			# Chown the entry
+			os.chown(absolute_entry, uid, gid)
+
 class TestCase(object):
 	@classmethod
 	def has_prerequisites(cls):
@@ -66,10 +79,16 @@ class TestCase(object):
 	def init(self, test_dir, id):
 		self.id = id
 
-		# Change to the test directory
+		# Copy the files to a build dir
 		self.pwd = os.getcwd()
 		self.build_dir = 'build_{0}'.format(self.id)
 		shutil.copytree(test_dir, self.build_dir)
+
+		# Make the normal user the owner of all the files in the build dir
+		status = os.stat(test_dir)
+		chown_r(self.build_dir, status.st_uid, status.st_gid)
+
+		# Change to the build dir
 		os.chdir(self.build_dir)
 
 	def tear_down(self):
