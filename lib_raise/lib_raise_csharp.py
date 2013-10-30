@@ -252,7 +252,7 @@ def install_program(name, dir_name):
 		if OS.os_type._name != 'Windows':
 			script_name = Helpers.before(name, '.')
 			script_path = '/usr/bin/' + script_name
-			with open(script_path, 'wb') as f:
+			with open(script_path, 'w') as f:
 				f.write("#!/usr/bin/env bash\n")
 				f.write("\n")
 				f.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/{0}\n".format(script_name))
