@@ -26,9 +26,43 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import lib_raise_config as Config
-import lib_raise_process as Process
+import lib_raise_os as OS
 import lib_raise_fs as FS
+import lib_raise_process as Process
 
+extension_map = {}
+
+def setup():
+	global extension_map
+	# Figure out the extensions for this OS
+	if OS.os_type._name == 'Cygwin':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
+	elif OS.os_type._name == 'Windows':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.obj',
+			'.so' : '.dll',
+			'.a' : '.lib'
+		}
+	else:
+		extension_map = {
+			'.exe' : '',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
+
+def to_native(command):
+	global extension_map
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
+
+	return command
 
 def build_static_library(ar_file, o_files):
 	# Make sure the extension is valid
@@ -44,15 +78,20 @@ def build_static_library(ar_file, o_files):
 			ar_file + " " + \
 			str.join(' ', o_files)
 
+	native_command = to_native(command)
+	native_ar_file = to_native(ar_file)
+	native_o_files = [to_native(o) for o in o_files]
+
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [ar_file], triggers = o_files):
+		if not FS.is_outdated(to_update = [native_ar_file], triggers = native_o_files):
 			return False
 		return True
 
 	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, native_command, setup)
 	Process.add_event(event)
 
 
+setup()
 

@@ -28,6 +28,7 @@
 import os
 import lib_raise_config as Config
 import lib_raise_os as OS
+import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_libraries as Libraries
 import lib_raise_terminal as Print
@@ -39,6 +40,28 @@ linker = None
 def setup():
 	global linkers
 	extension_map = {}
+	# Figure out the extensions for this OS
+	if OS.os_type._name == 'Cygwin':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
+	elif OS.os_type._name == 'Windows':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.obj',
+			'.so' : '.dll',
+			'.a' : '.lib'
+		}
+	else:
+		extension_map = {
+			'.exe' : '',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
 
 	# Get the names and paths for know linkers
 	names = ['ld', 'link.exe']
@@ -192,4 +215,5 @@ def link_static_or_shared_paths(lib_names):
 
 
 setup()
+
 

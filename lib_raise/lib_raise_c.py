@@ -276,16 +276,19 @@ def build_shared_library(so_file, o_files):
 				str.join(' ', o_files), 
 				Linker.linker._opt_out_file, 
 				so_file)
-	command = Linker.linker.to_native(command)
 
+	native_command = Linker.linker.to_native(command)
+	native_so_file = Linker.linker.to_native(so_file)
+	native_o_files = [Linker.linker.to_native(o) for o in o_files]
+	
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [so_file], triggers = o_files):
+		if not FS.is_outdated(to_update = [native_so_file], triggers = native_o_files):
 			return False
 		return True
 
 	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, native_command, setup)
 	Process.add_event(event)
 
 def run_say(command):
@@ -495,5 +498,6 @@ def uninstall_header(name, dir_name=None):
 				lambda: fn())
 
 setup()
+
 
 

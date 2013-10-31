@@ -56,6 +56,10 @@ def chomp(s):
 	return s
 
 def chown_r(dir_name, uid, gid):
+	# Just return if this OS does not support chown
+	if not hasattr(os, 'chown'):
+		return
+
 	# Chown the root directory
 	os.chown(dir_name, uid, gid)
 
