@@ -61,7 +61,7 @@ def chown_r(dir_name, uid, gid):
 
 	# Loop through all entries in the root directory
 	for root, dirs, files in os.walk(dir_name):
-		for entry in files:
+		for entry in dirs + files:
 			# Get the whole name
 			absolute_entry = os.path.join(root, entry)
 
