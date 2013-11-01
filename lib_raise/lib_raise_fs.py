@@ -25,29 +25,26 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import os
 import tempfile, shutil, filecmp
 import atexit
-from lib_raise_terminal import *
-
-
-class FS(RaiseModule):
-	@classmethod
-	def setup(cls):
-		pass
+import lib_raise_config as Config
+import lib_raise_process as Process
+import lib_raise_terminal as Print
 
 
 def change_dir(name):
-	_do_on_fail_exit("Changing to dir '{0}'".format(name),
+	Process.do_on_fail_exit("Changing to dir '{0}'".format(name),
 					"Failed to change to the dir '{0}'.".format(name),
 				lambda: os.chdir(name))
 
 def move_file(source, dest):
-	_do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Moving the file '{0}' to '{1}'".format(source, dest),
 					"Failed to move the file' {0}'.".format(source),
 				lambda: shutil.move(source, dest))
 
 def copy_file(source, dest):
-	_do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Copying the file '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the file '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copy2(source, dest))
 
@@ -58,27 +55,27 @@ def copy_new_file(source, dest):
 		copy_file(source, dest)
 
 def copy_dir(source, dest, symlinks = False):
-	_do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
+	Process.do_on_fail_exit("Copying the dir '{0}' to '{1}'".format(source, dest),
 					"Failed to copy the dir '{0}' to '{1}'.".format(source, dest),
 				lambda: shutil.copytree(source, dest, symlinks = symlinks))
 
 def make_dir(source, ignore_failure = False):
 	if ignore_failure:
-		_do_on_fail_pass("Making the dir '{0}'".format(source),
+		Process.do_on_fail_pass("Making the dir '{0}'".format(source),
 					lambda: os.mkdir(source))
 	else:
-		_do_on_fail_exit("Making the dir '{0}'".format(source),
+		Process.do_on_fail_exit("Making the dir '{0}'".format(source),
 						"Failed to make the dir '{0}'.".format(source),
 					lambda: os.mkdir(source))
 
 def remove_dir(name, and_children = False):
-	print_status("Removing the dir '{0}'".format(name))
+	Print.status("Removing the dir '{0}'".format(name))
 	success = False
 
 	# Make sure we are not removing the current directory
 	if name == os.getcwd():
-		print_fail()
-		print_exit("Can't remove the current directory '{0}'.".format(name))
+		Print.fail()
+		Print.exit("Can't remove the current directory '{0}'.".format(name))
 
 	try:
 		if os.path.islink(name):
@@ -94,13 +91,13 @@ def remove_dir(name, and_children = False):
 			success = True
 
 	if success:
-		print_ok()
+		Print.ok()
 	else:
-		print_fail()
-		print_exit("Failed to remove the dir '{0}'.".format(name))
+		Print.fail()
+		Print.exit("Failed to remove the dir '{0}'.".format(name))
 
 def remove_file(name, ignore_failure = False):
-	print_status("Removing the file '{0}'".format(name))
+	Print.status("Removing the file '{0}'".format(name))
 	success = False
 
 	try:
@@ -114,13 +111,13 @@ def remove_file(name, ignore_failure = False):
 			success = True
 
 	if success:
-		print_ok()
+		Print.ok()
 	else:
-		print_fail()
-		print_exit("Failed to remove the file '{0}'.".format(name))
+		Print.fail()
+		Print.exit("Failed to remove the file '{0}'.".format(name))
 
 def remove_binaries(name):
-	print_status("Removing binaries '{0}'".format(name))
+	Print.status("Removing binaries '{0}'".format(name))
 
 	extensions = ['.exe', '.o', '.obj', '.so', '.a', '.dll', '.lib', '.pyc',
 				'.exe.mdb', '.dll.mdb', '.jar', '.class']
@@ -131,10 +128,10 @@ def remove_binaries(name):
 			if extension in extensions or entry == name:
 				os.remove(entry)
 
-	print_ok()
+	Print.ok()
 
 def symlink(source, link_name):
-	_do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
+	Process.do_on_fail_exit("Symlinking '{0}' to '{1}'".format(source, link_name),
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))
 
@@ -142,8 +139,8 @@ def is_outdated(to_update, triggers):
 	# Exit if any triggers don't exist
 	for trigger in triggers:
 		if not os.path.isfile(os.path.abspath(trigger)):
-			print_fail()
-			print_exit("The file '{0}' does not exist.".format(trigger))
+			Print.fail()
+			Print.exit("The file '{0}' does not exist.".format(trigger))
 
 	# Return true if any of the files to check do not exist
 	for update in to_update:
@@ -180,5 +177,4 @@ def self_deleting_named_temporary_file():
 	return f
 
 
-FS.call_setup()
 

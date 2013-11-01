@@ -26,12 +26,19 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os, sys
+import lib_raise_terminal as Print
+
+
+target_name = None
+pwd = os.sys.path[0]
+python = sys.executable
+is_plain = False
 
 
 def early_exit(message):
 	sys.stdout.write('{0} Exiting ...\n'.format(message))
 	sys.stdout.flush()
-	exit(1)
+	sys.exit(1)
 
 def import_rscript(globals_var, locals_var):
 	# Make sure there is an rscript file
@@ -47,7 +54,7 @@ def import_rscript(globals_var, locals_var):
 			code = compile(f.read(), 'rscript', 'exec')
 			names = [name for name in code.co_names]
 		except Exception as e:
-			print_exit(e)
+			Print.exit(e)
 
 		exec(code, globals_var, locals_var)
 
@@ -59,30 +66,6 @@ def import_rscript(globals_var, locals_var):
 				targets[name] = globals_var[name]
 
 	return targets
-
-
-class Config(object):
-	target_name = None
-	pwd = os.sys.path[0]
-	python = sys.executable
-	is_plain = False
-
-
-class RaiseModule(object):
-	is_setup = False
-
-	@classmethod
-	def call_setup(cls):
-		if cls.is_setup:
-			return
-
-		cls.setup()
-
-		cls.is_setup = True
-
-	@classmethod
-	def setup(cls):
-		raise NotImplementedError("The class method 'setup' should be overridden in child classes.")
 
 
 # FIXME: This should be in the C module?

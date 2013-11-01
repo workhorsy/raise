@@ -28,31 +28,35 @@
 import platform
 import multiprocessing
 import re
-from lib_raise_config import *
+import lib_raise_config as Config
 
 
-class CPU(RaiseModule):
-	arch = None
-	bits = None
-	cpus_total = None
-	cpus_free = None
-
-	@classmethod
-	def setup(cls):
-		# Figure out the CPU architecture
-		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
-			cls.arch = 'x86_32'
-			cls.bits = '32'
-		elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
-			cls.arch = 'x86_64'
-			cls.bits = '64'
-		else:
-			early_exit('Unknown architecture {0}.'.format(platform.machine()))
-
-		# Figure out how many cpus there are
-		cls.cpus_total = multiprocessing.cpu_count()
-		cls.cpus_free = cls.cpus_total
+arch = None
+bits = None
+cpus_total = None
+cpus_free = None
 
 
-CPU.call_setup()
+def setup():
+	global arch
+	global bits
+	global cpus_total
+	global cpus_free
+
+	# Figure out the CPU architecture
+	if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', platform.machine()):
+		arch = 'x86_32'
+		bits = '32'
+	elif re.match('^x86$|^x86_64$|^amd64$', platform.machine()):
+		arch = 'x86_64'
+		bits = '64'
+	else:
+		Config.early_exit('Unknown architecture {0}.'.format(platform.machine()))
+
+	# Figure out how many cpus there are
+	cpus_total = multiprocessing.cpu_count()
+	cpus_free = cpus_total
+
+setup()
+
 

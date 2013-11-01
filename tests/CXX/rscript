@@ -2,27 +2,31 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_c import *
-from lib_raise_cxx import *
-from lib_raise_ar import *
-from lib_raise_linker import *
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_c as C # FIXME: Should not be a dependency
+import lib_raise_cxx as CXX
+import lib_raise_linker as Linker
+import lib_raise_ar as AR
+import lib_raise_fs as FS
 
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_binaries('lib_math')
-	remove_binaries('main')
+	FS.remove_binaries('lib_math')
+	FS.remove_binaries('main')
 
 def _configure():
-	cxx = cxx_get_default_compiler()
+	cxx = CXX.get_default_compiler()
 	cxx.debug = True
 	cxx.optimize = True
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True
-	cxx_save_compiler(cxx)
+	CXX.save_compiler(cxx)
 
-	linker = linker_get_default_linker()
-	linker_save_linker(linker)
+	linker = Linker.get_default_linker()
+	Linker.save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -32,48 +36,122 @@ def setup_failure():
 	CXX.is_setup = False
 	CXX.cxx_compilers = {}
 	CXX.cxx = None
-	CXX.call_setup()
+	CXX.setup()
 
 def build_object():
 	clean()
 	_configure()
 
-	cxx_build_object('lib_math.o', ['lib_math.cc'])
-	cxx_build_object('main.o', ['main.cc'])
+	CXX.build_object('lib_math.o', ['lib_math.cc'])
+	CXX.build_object('main.o', ['main.cc'])
 
-	cxx_build_program('main.exe', ['lib_math.o', 'main.o'])
+	CXX.build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	cxx_run_say('./main.exe')
+	CXX.run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	cxx_build_program('main.exe', ['lib_math.cc', 'main.cc'])
+	CXX.build_program('main.exe', ['lib_math.cc', 'main.cc'])
 
-	cxx_run_say('./main.exe')
+	CXX.run_say('./main.exe')
 
 def build_shared_library():
 	clean()
 	_configure()
 
 	# Build the library
-	cxx_build_object('lib_math.o', ['lib_math.cc'])
-	c_build_shared_library('lib_math.so', ['lib_math.o'])
+	CXX.build_object('lib_math.o', ['lib_math.cc'])
+	C.build_shared_library('lib_math.so', ['lib_math.o'])
 
-	cxx_build_program('main.exe', ['main.cc', 'lib_math.so'])
+	CXX.build_program('main.exe', ['main.cc', 'lib_math.so'])
 
-	cxx_run_say('./main.exe')
+	CXX.run_say('./main.exe')
 
 def build_static_library():
 	clean()
 	_configure()
 
 	# Build the library
-	cxx_build_object('lib_math.o', ['lib_math.cc'])
-	ar_build_static_library('lib_math.a', ['lib_math.o'])
+	CXX.build_object('lib_math.o', ['lib_math.cc'])
+	AR.build_static_library('lib_math.a', ['lib_math.o'])
 
-	cxx_build_program('main.exe', ['main.cc', 'lib_math.a'])
+	CXX.build_program('main.exe', ['main.cc', 'lib_math.a'])
 
-	cxx_run_say('./main.exe')
+	CXX.run_say('./main.exe')
+
+# Tests that require root
+def install_and_uninstall_program():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.cc'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.install_program('raise_example.exe')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+
+def install_and_uninstall_shared_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_object('lib_math.o', ['lib_math.cc'])
+		C.build_shared_library('lib_math.so', ['lib_math.o'])
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.so'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.so')
+	CXX.install_program('raise_example.exe')
+	CXX.install_library('lib_math.so')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.so')
+
+def install_and_uninstall_static_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		CXX.build_object('lib_math.o', ['lib_math.cc'])
+		AR.build_static_library('lib_math.a', ['lib_math.o'])
+		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.a'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.a')
+	CXX.install_program('raise_example.exe')
+	CXX.install_library('lib_math.a')
+
+	# Run
+	CXX.run_say('raise_example.exe')
+
+	# Remove
+	CXX.uninstall_program('raise_example.exe')
+	CXX.uninstall_library('lib_math.a')
 

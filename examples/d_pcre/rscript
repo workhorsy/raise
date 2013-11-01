@@ -1,93 +1,100 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from lib_raise_c import *
-from lib_raise_d import *
-from lib_raise_linker import *
+
+import os
+import lib_raise_c as C
+import lib_raise_d as D
+import lib_raise_linker as Linker
+import lib_raise_fs as FS
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_process as Process
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_file('a.out', ignore_failure = True)
-	remove_binaries('raise_example')
-	remove_binaries('lib_regex')
+	FS.remove_file('a.out', ignore_failure = True)
+	FS.remove_binaries('raise_example')
+	FS.remove_binaries('lib_regex')
 
 def _configure():
-	cc = c_get_default_compiler()
+	cc = C.get_default_compiler()
 	cc.debug = True
 	cc.optimize = True
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	c_save_compiler(cc)
+	C.save_compiler(cc)
 
-	dc = d_get_default_compiler()
+	dc = D.get_default_compiler()
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
 	dc.warnings_as_errors = True
-	d_save_compiler(dc)
+	D.save_compiler(dc)
 
-	linker = linker_get_default_linker()
-	linker_save_linker(linker)
+	linker = Linker.get_default_linker()
+	Linker.save_linker(linker)
 
 	# FIXME: Make this cache the file lists instead of getting it again
-	require_header_file('libpcre', lambda ver: ver.major == 8)
-	require_shared_library('libpcre', lambda ver: ver.major == 8)
-	require_static_library('libphobos2')
+	Libraries.require_header_file('libpcre', lambda ver: ver.major == 8)
+	Libraries.require_shared_library('libpcre', lambda ver: ver.major == 8)
+	Libraries.require_static_library('libphobos2')
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
-	require_not_root()
+	OS.require_not_root()
 	clean()
 	_configure()
 
 	# Build the C object file
-	c_build_object('lib_regex.o', ['lib_regex.c'])
+	C.build_object('lib_regex.o', ['lib_regex.c'])
 
 	# Build the D program using the C object file
 	# FIXME: It should automatically get the library path from the require above
-	link = '-L-l:' + get_shared_library('libpcre')
-	d_build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
+	link = '-L-l:' + Libraries.get_shared_library('libpcre')
+	D.build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
-	d_run_say('./raise_example.exe')
+	D.run_say('./raise_example.exe')
 
 def _remove():
-	remove_file('/usr/bin/raise_example', ignore_failure = True)
-	remove_file('/usr/lib/lib_regex.so', ignore_failure = True)
+	D.uninstall_program('raise_example.exe')
+	C.uninstall_library('lib_regex.so')
 
 def remove():
 	"""Uninstalls the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
+	_configure()
 
 	# Remove the files
 	_remove()
 
-	ldconfig()
+	Linker.ldconfig()
 
 def install():
 	"""Installs the program."""
 	# Setup
-	require_root()
+	OS.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
-		c_build_object('lib_regex.o', ['lib_regex.c'])
-		c_build_shared_library('lib_regex.so', ['lib_regex.o'])
-		d_build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
-	do_as_normal_user(actual_build)
+		C.build_object('lib_regex.o', ['lib_regex.c'])
+		C.build_shared_library('lib_regex.so', ['lib_regex.o'])
+		D.build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
+	OS.do_as_normal_user(actual_build)
 
 	# Remove old install
 	_remove()
 
 	# Install
-	copy_file('raise_example', '/usr/bin/raise_example')
-	copy_file('lib_regex.so', '/usr/lib/lib_regex.so')
+	D.install_program('raise_example.exe')
+	C.install_library('lib_regex.so')
 
-	ldconfig()
+	Linker.ldconfig()
 
 

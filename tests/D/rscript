@@ -2,23 +2,27 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from lib_raise_c import *
-from lib_raise_d import *
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_d as D
+import lib_raise_ar as AR
+import lib_raise_fs as FS
 
 
 def clean():
 	"""Removes any files and directories generated when building."""
-	remove_file('lib_math.di', ignore_failure = True)
-	remove_binaries('lib_math')
-	remove_binaries('main')
+	FS.remove_file('lib_math.di', ignore_failure = True)
+	FS.remove_binaries('lib_math')
+	FS.remove_binaries('main')
 
 def _configure():
-	dc = d_get_default_compiler()
+	dc = D.get_default_compiler()
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
 	dc.warnings_as_errors = True
-	d_save_compiler(dc)
+	D.save_compiler(dc)
 
 def setup_failure():
 	# Empty the path and reset the D module so it finds no compilers
@@ -26,39 +30,87 @@ def setup_failure():
 	D.is_setup = False
 	D.d_compilers = {}
 	D.dc = None
-	D.call_setup()
+	D.setup()
 
 def build_object():
 	clean()
 	_configure()
 
-	d_build_object('lib_math.o', ['lib_math.d'])
-	d_build_object('main.o', ['main.d'])
-	d_build_program('main.exe', ['main.o', 'lib_math.o'])
+	D.build_object('lib_math.o', ['lib_math.d'])
+	D.build_object('main.o', ['main.d'])
+	D.build_program('main.exe', ['main.o', 'lib_math.o'])
 
-	d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_program():
 	clean()
 	_configure()
 
-	d_build_program('main.exe', ['main.d', 'lib_math.d'])
+	D.build_program('main.exe', ['main.d', 'lib_math.d'])
 
-	d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_static_library():
 	clean()
 	_configure()
 
-	d_build_object('lib_math.o', ['lib_math.d'])
-	d_build_static_library('lib_math.a', ['lib_math.o'])
-	d_build_program('main.exe', ['main.d', 'lib_math.a'])
+	D.build_object('lib_math.o', ['lib_math.d'])
+	D.build_static_library('lib_math.a', ['lib_math.o'])
+	D.build_program('main.exe', ['main.d', 'lib_math.a'])
 
-	d_run_say('./main.exe')
+	D.run_say('./main.exe')
 
 def build_interface():
 	clean()
 	_configure()
 
-	d_build_interface('lib_math.d')
+	D.build_interface('lib_math.d')
+
+# Tests that require root
+def install_and_uninstall_program():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		D.build_program('raise_example.exe', ['main.d', 'lib_math.d'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	D.uninstall_program('raise_example.exe')
+	D.install_program('raise_example.exe')
+
+	# Run
+	D.run_say('raise_example.exe')
+
+	# Remove
+	D.uninstall_program('raise_example.exe')
+
+def install_and_uninstall_static_library():
+	# Configure
+	OS.require_root()
+	clean()
+	_configure()
+
+	# Build as a normal user
+	def actual_build():
+		D.build_object('lib_math.o', ['lib_math.d'])
+		AR.build_static_library('lib_math.a', ['lib_math.o'])
+		D.build_program('raise_example.exe', ['main.d', 'lib_math.a'])
+	OS.do_as_normal_user(actual_build)
+
+	# Install
+	D.uninstall_program('raise_example.exe')
+	D.uninstall_library('lib_math.a')
+	D.install_program('raise_example.exe')
+	D.install_library('lib_math.a')
+
+	# Run
+	D.run_say('raise_example.exe')
+
+	# Remove
+	D.uninstall_program('raise_example.exe')
+	D.uninstall_library('lib_math.a')
 

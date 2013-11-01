@@ -1,22 +1,44 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+import lib_raise_terminal as Print
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+
 def simple_nothing():
 	pass
 
 def simple_status():
-	print_status('Simple status')
+	Print.status('Simple status')
 
 def simple_ok():
-	print_status('Simple ok')
-	print_ok()
+	Print.status('Simple ok')
+	Print.ok()
 
 def simple_fail():
-	print_status('Simple fail')
-	print_fail()
+	Print.status('Simple fail')
+	Print.fail()
 
 def simple_warning():
-	print_status('Simple warning')
-	print_warning()
+	Print.status('Simple warning')
+	Print.warning()
 
+def simple_require_program():
+	Libraries.require_programs(['gcc'])
+
+def simple_require_program_failure():
+	Libraries.require_programs(['no_such_program'])
+
+def simple_require_not_root():
+	OS.require_not_root()
+
+def simple_require_root_failure():
+	OS.require_root()
+
+# Tests that require root
+def simple_require_root():
+	OS.require_root()
+
+def simple_require_not_root_failure():
+	OS.require_not_root()
 

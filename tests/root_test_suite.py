@@ -55,6 +55,23 @@ def chomp(s):
 
 	return s
 
+def chown_r(dir_name, uid, gid):
+	# Just return if this OS does not support chown
+	if not hasattr(os, 'chown'):
+		return
+
+	# Chown the root directory
+	os.chown(dir_name, uid, gid)
+
+	# Loop through all entries in the root directory
+	for root, dirs, files in os.walk(dir_name):
+		for entry in dirs + files:
+			# Get the whole name
+			absolute_entry = os.path.join(root, entry)
+
+			# Chown the entry
+			os.chown(absolute_entry, uid, gid)
+
 class TestCase(object):
 	@classmethod
 	def has_prerequisites(cls):
@@ -66,10 +83,16 @@ class TestCase(object):
 	def init(self, test_dir, id):
 		self.id = id
 
-		# Change to the test directory
+		# Copy the files to a build dir
 		self.pwd = os.getcwd()
 		self.build_dir = 'build_{0}'.format(self.id)
 		shutil.copytree(test_dir, self.build_dir)
+
+		# Make the normal user the owner of all the files in the build dir
+		status = os.stat(test_dir)
+		chown_r(self.build_dir, status.st_uid, status.st_gid)
+
+		# Change to the build dir
 		os.chdir(self.build_dir)
 
 	def tear_down(self):
@@ -129,7 +152,7 @@ class ConcurrentTestRunner(object):
 
 	def run(self):
 		# Get the number of CPU cores
-		cpus_total = multiprocessing.cpu_count()
+		cpus_total = 1
 		cpus_free = cpus_total
 		ready_members = []
 		total = 0
@@ -288,83 +311,20 @@ class TestBasics(TestCase):
 	def set_up(self, id):
 		self.init('Basics', id)
 
-	def test_nothing(self):
-		command = '{0} raise -plain simple_nothing'.format(sys.executable)
+	def test_require_root(self):
+		command = '{0} raise -plain simple_require_root'.format(sys.executable)
 
 		expected = \
-"Running target 'simple_nothing'"
+"Running target 'simple_require_root'"
 
 		self.assert_process_output(command, expected)
 
-	def test_status(self):
-		command = '{0} raise -plain simple_status'.format(sys.executable)
+	def test_require_not_root_failure(self):
+		command = '{0} raise -plain simple_require_not_root_failure'.format(sys.executable)
 
 		expected = \
-'''Running target 'simple_status'
-Simple status ...'''
-
-		self.assert_process_output(command, expected)
-
-	def test_ok(self):
-		command = '{0} raise -plain simple_ok'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_ok'
-Simple ok ...                                                               :)'''
-
-		self.assert_process_output(command, expected)
-
-	def test_fail(self):
-		command = '{0} raise -plain simple_fail'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_fail'
-Simple fail ................................................................:('''
-
-		self.assert_process_output(command, expected)
-
-	def test_warning(self):
-		command = '{0} raise -plain simple_warning'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_warning'
-Simple warning .............................................................:\\'''
-
-		self.assert_process_output(command, expected)
-
-	def test_require_program(self):
-		command = '{0} raise -plain simple_require_program'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_require_program'
-Checking for program 'gcc' ...                                              :)'''
-
-		self.assert_process_output(command, expected)
-
-	def test_require_program_failure(self):
-		command = '{0} raise -plain simple_require_program_failure'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_require_program_failure'
-Checking for program 'no_such_program' .....................................:(
-Install the program 'no_such_program' and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_require_not_root(self):
-		command = '{0} raise -plain simple_require_not_root'.format(sys.executable)
-
-		expected = \
-"Running target 'simple_require_not_root'"
-
-		self.assert_process_output(command, expected)
-
-	def test_require_root_failure(self):
-		command = '{0} raise -plain simple_require_root_failure'.format(sys.executable)
-
-		expected = \
-'''Running target 'simple_require_root_failure'
-Must be run as root. Exiting ...'''
+'''Running target 'simple_require_not_root_failure'
+Must not be run as root. Exiting ...'''
 
 		self.assert_process_output(command, expected, is_success = False)
 
@@ -372,168 +332,69 @@ Must be run as root. Exiting ...'''
 class TestC(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['gcc', 'clang', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+		return True
 
 	def set_up(self, id):
 		self.init('C', id)
 
-	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
-'''Running target 'setup_failure'
-Setting up C module ........................................................:(
-No C compiler found. Install one and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_object'
+'''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
-Building C object 'lib_math.o' ...                                          :)
-Building C object 'main.o' ...                                              :)
-Building C program 'main.exe' ...                                           :)
+Building C program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
 Running C program ...                                                       :)
-./main.exe
-7 * 12 = 84'''
+raise_example.exe
+7 * 12 = 84
+Uninstalling the program 'raise_example.exe' ...                            :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+	def test_install_and_uninstall_shared_library(self):
+		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_program'
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building C program 'main.exe' ...                                           :)
-Running C program ...                                                       :)
-./main.exe
-7 * 12 = 84'''
-
-		self.assert_process_output(command, expected)
-
-	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_shared_library'
+'''Running target 'install_and_uninstall_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building shared library 'lib_math.so' ...                                   :)
-Building C program 'main.exe' ...                                           :)
+Building C program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.so' ...                                    :)
 Running C program ...                                                       :)
-./main.exe
-7 * 12 = 84'''
+raise_example.exe
+7 * 12 = 84
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
+	def test_install_and_uninstall_static_library(self):
+		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_static_library'
+'''Running target 'install_and_uninstall_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building C object 'lib_math.o' ...                                          :)
 Building static library 'lib_math.a' ...                                    :)
-Building C program 'main.exe' ...                                           :)
+Building C program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.a' ...                                     :)
 Running C program ...                                                       :)
-./main.exe
-7 * 12 = 84'''
-
-		self.assert_process_output(command, expected)
-
-
-class TestD(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['dmd', 'dmd2', 'ldc2']:
-			if program_paths(prog):
-				return True
-
-		return False
-
-	def set_up(self, id):
-		self.init('D', id)
-
-	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
-
-		expected = \
-'''Running target 'setup_failure'
-Setting up D module ........................................................:(
-No D compiler found. Install one and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_program'
-Removing the file 'lib_math.di' ...                                         :)
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building D program 'main.exe' ...                                           :)
-Running D program ...                                                       :)
-./main.exe
-9 * 12 = 108'''
-
-		self.assert_process_output(command, expected)
-
-	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_object'
-Removing the file 'lib_math.di' ...                                         :)
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building D object 'lib_math.o' ...                                          :)
-Building D object 'main.o' ...                                              :)
-Building D program 'main.exe' ...                                           :)
-Running D program ...                                                       :)
-./main.exe
-9 * 12 = 108'''
-
-		self.assert_process_output(command, expected)
-
-	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_static_library'
-Removing the file 'lib_math.di' ...                                         :)
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building D object 'lib_math.o' ...                                          :)
-Building D static library 'lib_math.a' ...                                  :)
-Building D program 'main.exe' ...                                           :)
-Running D program ...                                                       :)
-./main.exe
-9 * 12 = 108'''
-
-		self.assert_process_output(command, expected)
-
-	def test_build_interface(self):
-		command = '{0} raise -plain build_interface'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_interface'
-Removing the file 'lib_math.di' ...                                         :)
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building D interface 'lib_math.di' ...                                      :)'''
+raise_example.exe
+7 * 12 = 84
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)'''
 
 		self.assert_process_output(command, expected)
 
@@ -541,84 +402,120 @@ Building D interface 'lib_math.di' ...                                      :)''
 class TestCXX(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['g++', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+		return True
 
 	def set_up(self, id):
 		self.init('CXX', id)
 
-	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
-'''Running target 'setup_failure'
-Setting up C++ module ......................................................:(
-No C++ compiler found. Install one and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_program'
+'''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
-Building C++ program 'main.exe' ...                                         :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
 Running C++ program ...                                                     :)
-./main.exe
-7 + 9 = 16'''
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
+	def test_install_and_uninstall_shared_library(self):
+		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_object'
-Removing binaries 'lib_math' ...                                            :)
-Removing binaries 'main' ...                                                :)
-Building C++ object 'lib_math.o' ...                                        :)
-Building C++ object 'main.o' ...                                            :)
-Building C++ program 'main.exe' ...                                         :)
-Running C++ program ...                                                     :)
-./main.exe
-7 + 9 = 16'''
-
-		self.assert_process_output(command, expected)
-
-	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_shared_library'
+'''Running target 'install_and_uninstall_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building shared library 'lib_math.so' ...                                   :)
-Building C++ program 'main.exe' ...                                         :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.so' ...                                    :)
 Running C++ program ...                                                     :)
-./main.exe
-7 + 9 = 16'''
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.so' ...                                  :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
+	def test_install_and_uninstall_static_library(self):
+		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_static_library'
+'''Running target 'install_and_uninstall_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building C++ object 'lib_math.o' ...                                        :)
 Building static library 'lib_math.a' ...                                    :)
-Building C++ program 'main.exe' ...                                         :)
+Building C++ program 'raise_example.exe' ...                                :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.a' ...                                     :)
 Running C++ program ...                                                     :)
-./main.exe
-7 + 9 = 16'''
+raise_example.exe
+7 + 9 = 16
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)'''
+
+		self.assert_process_output(command, expected)
+
+
+class TestD(TestCase):
+	@classmethod
+	def has_prerequisites(cls):
+		return True
+
+	def set_up(self, id):
+		self.init('D', id)
+
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_program'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building D program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
+Running D program ...                                                       :)
+raise_example.exe
+9 * 12 = 108
+Uninstalling the program 'raise_example.exe' ...                            :)'''
+
+		self.assert_process_output(command, expected)
+
+
+	def test_install_and_uninstall_static_library(self):
+		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'install_and_uninstall_static_library'
+Removing the file 'lib_math.di' ...                                         :)
+Removing binaries 'lib_math' ...                                            :)
+Removing binaries 'main' ...                                                :)
+Building D object 'lib_math.o' ...                                          :)
+Building static library 'lib_math.a' ...                                    :)
+Building D program 'raise_example.exe' ...                                  :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.a' ...                                     :)
+Running D program ...                                                       :)
+raise_example.exe
+9 * 12 = 108
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.a' ...                                   :)'''
 
 		self.assert_process_output(command, expected)
 
@@ -626,51 +523,47 @@ Running C++ program ...                                                     :)
 class TestCSharp(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['dmcs', 'csc']:
-			if program_paths(prog):
-				return True
-
-		return False
+		return True
 
 	def set_up(self, id):
 		self.init('CSharp', id)
 
-	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
-'''Running target 'setup_failure'
-Setting up C# module .......................................................:(
-No C# compiler found. Install one and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_program'
+'''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
-Building C# program 'main.exe' ...                                          :)
+Building C# program 'raise_example.exe' ...                                 :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Installing the program 'raise_example.exe' ...                              :)
 Running C# program ...                                                      :)
-main.exe
-10 - 4 = 6'''
+raise_example.exe
+10 - 4 = 6
+Uninstalling the program 'raise_example.exe' ...                            :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
+
+	def test_install_and_uninstall_shared_library(self):
+		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_shared_library'
+'''Running target 'install_and_uninstall_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building C# shared library 'lib_math.dll' ...                               :)
-Building C# program 'main.exe' ...                                          :)
+Building C# program 'raise_example.exe' ...                                 :)
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.dll' ...                                 :)
+Installing the program 'raise_example.exe' ...                              :)
+Installing the library 'lib_math.dll' ...                                   :)
 Running C# program ...                                                      :)
-main.exe
-10 - 4 = 6'''
+raise_example.exe
+10 - 4 = 6
+Uninstalling the program 'raise_example.exe' ...                            :)
+Uninstalling the library 'lib_math.dll' ...                                 :)'''
 
 		self.assert_process_output(command, expected)
 
@@ -678,100 +571,56 @@ main.exe
 class TestJava(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['javac']:
-			if program_paths(prog):
-				return True
-
-		return False
+		return True
 
 	def set_up(self, id):
 		self.init('Java', id)
 
-	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+	def test_install_and_uninstall_program(self):
+		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
-'''Running target 'setup_failure'
-Setting up Java module .....................................................:(
-No Java compiler found. Install one and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, is_success = False)
-
-	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
-
-		expected = \
-'''Running target 'build_program'
+'''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building Java program 'main.class' ...                                      :)
+Uninstalling the program 'main.class' ...                                   :)
+Installing the program 'main.class' ...                                     :)
 Running Java program ...                                                    :)
 java main
-8 - 1 = 7'''
+8 - 1 = 7
+Uninstalling the program 'main.class' ...                                   :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_build_shared_library(self):
-		command = '{0} raise -plain build_jar'.format(sys.executable)
+
+	def test_install_and_uninstall_jar(self):
+		command = '{0} raise -plain install_and_uninstall_jar'.format(sys.executable)
 
 		expected = \
-'''Running target 'build_jar'
+'''Running target 'install_and_uninstall_jar'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building Java jar 'lib_math.jar' ...                                        :)
 Building Java program 'main.class' ...                                      :)
+Uninstalling the program 'main.class' ...                                   :)
+Uninstalling the jar 'lib_math.jar' ...                                     :)
+Installing the program 'main.class' ...                                     :)
+Installing the jar 'lib_math.jar' ...                                       :)
 Running Java program ...                                                    :)
 java main
-8 - 1 = 7'''
+8 - 1 = 7
+Uninstalling the program 'main.class' ...                                   :)
+Uninstalling the jar 'lib_math.jar' ...                                     :)'''
 
 		self.assert_process_output(command, expected)
-
-
-class TestLibraries(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		return True
-
-	def set_up(self, id):
-		self.init('Libraries', id)
-
-	def test_find_installed_library(self):
-		command = '{0} raise -plain find_installed_library'.format(sys.executable)
-
-		expected = \
-'''Running target 'find_installed_library'
-Checking for shared library 'libSDL' ...                                    :)'''
-
-		self.assert_process_output(command, expected)
-
-	def test_find_missing_library(self):
-		command = '{0} raise -plain find_missing_library'.format(sys.executable)
-
-		expected = \
-'''Running target 'find_missing_library'
-Checking for shared library 'libDoesNotExist' ..............................:(
-Shared library 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, False)
-
-	def test_find_installed_library_bad_version(self):
-		command = '{0} raise -plain find_installed_library_bad_version'.format(sys.executable)
-
-		expected = \
-'''Running target 'find_installed_library_bad_version'
-Checking for shared library 'libSDL' .......................................:(
-Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
-
-		self.assert_process_output(command, expected, False)
 
 
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	runner.add_test_case(TestBasics)
-	runner.add_test_case(TestLibraries)
 	runner.add_test_case(TestC)
 	runner.add_test_case(TestCXX)
-	runner.add_test_case(TestD)
 	runner.add_test_case(TestCSharp)
 	runner.add_test_case(TestJava)
 	runner.run()

@@ -7,6 +7,7 @@
 	* Fixed Bug #1216446: 'Text coloring should only show in terminals that can support it'.
 	* Fixed Bug #1239799: 'File system functions have inconsistent naming conventions'.
 	* Fixed Bug #1241949: 'Update slogan to say 'build automation tool'not 'build tool''.
+	* Fixed Bug #1242352: 'Add generic install paths for each OS and language'.
 
 2013-09-22 Release 0.2.0
 	* Fixed Bug #1223030: 'Make it complain if running in normal Windows terminal'.
