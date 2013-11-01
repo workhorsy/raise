@@ -32,7 +32,6 @@ import lib_raise_terminal as Print
 import lib_raise_os as OS
 import lib_raise_libraries as Libraries
 import lib_raise_fs as FS
-import lib_raise_linker as Linker
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
 
@@ -86,7 +85,7 @@ def setup():
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
 				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed', 
+				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			cxx_compilers[comp._name] = comp
@@ -103,7 +102,7 @@ def setup():
 				warnings_as_errors =   '', 
 				optimize =             '/O2', 
 				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed', 
+				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			cxx_compilers[comp._name] = comp
@@ -158,6 +157,36 @@ def build_program(o_file, cxx_files, i_files=[]):
 	plural = 'C++ programs'
 	singular = 'C++ program'
 	command = '${CXX} ${CXXFLAGS} ' + \
+				str.join(' ', cxx_files) + ' ' + \
+				str.join(' ', i_files) + ' ' + \
+				cxx._opt_out_file + o_file
+	command = cxx.to_native(command)
+
+	def setup():
+		# Make sure the environmental variable is set
+		if not 'CXX' in os.environ:
+			Print.fail()
+			Print.exit("Set the env variable 'CXX' to the C++ compiler, and try again.")
+
+		return True
+
+	# Create the event
+	event = Process.Event(task, result, plural, singular, command, setup)
+	Process.add_event(event)
+
+def build_shared_library(o_file, cxx_files, i_files=[]):
+	global cxx
+
+	# Make sure the extension is valid
+	Helpers.require_file_extension(o_file, '.so')
+
+	# Setup the messages
+	task = 'Building'
+	result = o_file
+	plural = 'C++ shared libraries'
+	singular = 'C++ shared library'
+	command = '${CXX} ${CXXFLAGS} ' + \
+				cxx._opt_link + ' ' + \
 				str.join(' ', cxx_files) + ' ' + \
 				str.join(' ', i_files) + ' ' + \
 				cxx._opt_out_file + o_file

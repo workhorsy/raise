@@ -33,7 +33,6 @@ import lib_raise_os as OS
 import lib_raise_libraries as Libraries
 import lib_raise_process as Process
 import lib_raise_fs as FS
-import lib_raise_linker as Linker
 import lib_raise_helpers as Helpers
 
 
@@ -87,7 +86,7 @@ def setup():
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
 				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed', 
+				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			c_compilers[comp._name] = comp
@@ -103,7 +102,7 @@ def setup():
 				warnings_as_errors =   '-Werror', 
 				optimize =             '-O2', 
 				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed', 
+				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			c_compilers[comp._name] = comp
@@ -120,7 +119,7 @@ def setup():
 				warnings_as_errors =   '', 
 				optimize =             '/O2', 
 				compile_time_flags =   '-D', 
-				link =                 '-Wl,-as-needed', 
+				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			c_compilers[comp._name] = comp
@@ -259,27 +258,28 @@ def build_program(o_file, c_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-# FIXME: Change to use the linker through the compiler
 def build_shared_library(so_file, o_files):
+	global cc
+
 	# Make sure the extension is valid
 	Helpers.require_file_extension(so_file, '.so')
 
 	# Setup the messages
 	task = 'Building'
 	result = so_file
-	plural = 'shared libraries'
-	singular = 'shared library'
+	plural = 'C shared libraries'
+	singular = 'C shared library'
 	command = "{0} {1} {2} {3} {4}{5}".format(
-				Linker.linker._name, 
-				Linker.linker._opt_setup, 
-				Linker.linker._opt_shared, 
+				cc._name, 
+				cc._opt_setup, 
+				cc._opt_link, 
 				str.join(' ', o_files), 
-				Linker.linker._opt_out_file, 
+				cc._opt_out_file, 
 				so_file)
 
-	native_command = Linker.linker.to_native(command)
-	native_so_file = Linker.linker.to_native(so_file)
-	native_o_files = [Linker.linker.to_native(o) for o in o_files]
+	native_command = cc.to_native(command)
+	native_so_file = cc.to_native(so_file)
+	native_o_files = [cc.to_native(o) for o in o_files]
 	
 	def setup():
 		# Skip if the files have not changed since last build

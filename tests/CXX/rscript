@@ -5,9 +5,7 @@ import os
 import lib_raise_terminal as Print
 import lib_raise_libraries as Libraries
 import lib_raise_os as OS
-import lib_raise_c as C # FIXME: Should not be a dependency
 import lib_raise_cxx as CXX
-import lib_raise_linker as Linker
 import lib_raise_ar as AR
 import lib_raise_fs as FS
 
@@ -24,9 +22,6 @@ def _configure():
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True
 	CXX.save_compiler(cxx)
-
-	linker = Linker.get_default_linker()
-	Linker.save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -63,7 +58,7 @@ def build_shared_library():
 
 	# Build the library
 	CXX.build_object('lib_math.o', ['lib_math.cc'])
-	C.build_shared_library('lib_math.so', ['lib_math.o'])
+	CXX.build_shared_library('lib_math.so', ['lib_math.o'])
 
 	CXX.build_program('main.exe', ['main.cc', 'lib_math.so'])
 
@@ -112,7 +107,7 @@ def install_and_uninstall_shared_library():
 	# Build as a normal user
 	def actual_build():
 		CXX.build_object('lib_math.o', ['lib_math.cc'])
-		C.build_shared_library('lib_math.so', ['lib_math.o'])
+		CXX.build_shared_library('lib_math.so', ['lib_math.o'])
 		CXX.build_program('raise_example.exe', ['main.cc', 'lib_math.so'])
 	OS.do_as_normal_user(actual_build)
 

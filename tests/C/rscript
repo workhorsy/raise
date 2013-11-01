@@ -6,7 +6,6 @@ import lib_raise_terminal as Print
 import lib_raise_libraries as Libraries
 import lib_raise_os as OS
 import lib_raise_c as C
-import lib_raise_linker as Linker
 import lib_raise_ar as AR
 import lib_raise_fs as FS
 
@@ -23,9 +22,6 @@ def _configure():
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
 	C.save_compiler(cc)
-
-	linker = Linker.get_default_linker()
-	Linker.save_linker(linker)
 
 	os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
