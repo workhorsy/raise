@@ -24,7 +24,7 @@ def simple_warning():
 	Print.warning()
 
 def simple_require_program():
-	Libraries.require_programs(['gcc'])
+	Libraries.require_programs(['python'])
 
 def simple_require_program_failure():
 	Libraries.require_programs(['no_such_program'])

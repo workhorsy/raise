@@ -337,7 +337,7 @@ Simple warning .............................................................:\\'
 
 		expected = \
 '''Running target 'simple_require_program'
-Checking for program 'gcc' ...                                              :)'''
+Checking for program 'python' ...                                           :)'''
 
 		self.assert_process_output(command, expected)
 
