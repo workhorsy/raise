@@ -332,7 +332,11 @@ Must not be run as root. Exiting ...'''
 class TestC(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		return True
+		for prog in ['gcc', 'clang', 'cl.exe']:
+			if program_paths(prog):
+				return True
+
+		return False
 
 	def set_up(self, id):
 		self.init('C', id)
@@ -402,7 +406,11 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 class TestCXX(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		return True
+		for prog in ['g++', 'cl.exe']:
+			if program_paths(prog):
+				return True
+
+		return False
 
 	def set_up(self, id):
 		self.init('CXX', id)
@@ -472,7 +480,11 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 class TestD(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		return True
+		for prog in ['dmd', 'dmd2', 'ldc2']:
+			if program_paths(prog):
+				return True
+
+		return False
 
 	def set_up(self, id):
 		self.init('D', id)
@@ -523,7 +535,11 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 class TestCSharp(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		return True
+		for prog in ['dmcs', 'csc']:
+			if program_paths(prog):
+				return True
+
+		return False
 
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -571,7 +587,11 @@ Uninstalling the library 'lib_math.dll' ...                                 :)''
 class TestJava(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		return True
+		for prog in ['javac']:
+			if program_paths(prog):
+				return True
+
+		return False
 
 	def set_up(self, id):
 		self.init('Java', id)
