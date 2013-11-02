@@ -56,7 +56,7 @@ def test():
 	D.build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
-	D.run_say('./raise_example.exe')
+	D.run_print('./raise_example.exe')
 
 def _remove():
 	D.uninstall_program('raise_example.exe')

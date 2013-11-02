@@ -40,7 +40,7 @@ def build_object():
 	D.build_object('main.o', ['main.d'])
 	D.build_program('main.exe', ['main.o', 'lib_math.o'])
 
-	D.run_say('./main.exe')
+	D.run_print('./main.exe')
 
 def build_program():
 	clean()
@@ -48,7 +48,7 @@ def build_program():
 
 	D.build_program('main.exe', ['main.d', 'lib_math.d'])
 
-	D.run_say('./main.exe')
+	D.run_print('./main.exe')
 
 def build_static_library():
 	clean()
@@ -58,7 +58,7 @@ def build_static_library():
 	D.build_static_library('lib_math.a', ['lib_math.o'])
 	D.build_program('main.exe', ['main.d', 'lib_math.a'])
 
-	D.run_say('./main.exe')
+	D.run_print('./main.exe')
 
 def build_interface():
 	clean()
@@ -83,7 +83,7 @@ def install_and_uninstall_program():
 	D.install_program('raise_example.exe')
 
 	# Run
-	D.run_say('raise_example.exe')
+	D.run_print('raise_example.exe')
 
 	# Remove
 	D.uninstall_program('raise_example.exe')
@@ -108,7 +108,7 @@ def install_and_uninstall_static_library():
 	D.install_library('lib_math.a')
 
 	# Run
-	D.run_say('raise_example.exe')
+	D.run_print('raise_example.exe')
 
 	# Remove
 	D.uninstall_program('raise_example.exe')

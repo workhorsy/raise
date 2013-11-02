@@ -42,7 +42,7 @@ def build_object():
 
 	C.build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	C.run_say('./main.exe')
+	C.run_print('./main.exe')
 
 def build_program():
 	clean()
@@ -50,7 +50,7 @@ def build_program():
 
 	C.build_program('main.exe', ['lib_math.c', 'main.c'])
 
-	C.run_say('./main.exe')
+	C.run_print('./main.exe')
 
 def build_shared_library():
 	clean()
@@ -62,7 +62,7 @@ def build_shared_library():
 
 	C.build_program('main.exe', ['main.c', 'lib_math.so'])
 
-	C.run_say('./main.exe')
+	C.run_print('./main.exe')
 
 def build_static_library():
 	clean()
@@ -74,7 +74,7 @@ def build_static_library():
 
 	C.build_program('main.exe', ['main.c', 'lib_math.a'])
 
-	C.run_say('./main.exe')
+	C.run_print('./main.exe')
 
 # Tests that require root
 def install_and_uninstall_program():
@@ -93,7 +93,7 @@ def install_and_uninstall_program():
 	C.install_program('raise_example.exe')
 
 	# Run
-	C.run_say('raise_example.exe')
+	C.run_print('raise_example.exe')
 
 	# Remove
 	C.uninstall_program('raise_example.exe')
@@ -118,7 +118,7 @@ def install_and_uninstall_shared_library():
 	C.install_library('lib_math.so')
 
 	# Run
-	C.run_say('raise_example.exe')
+	C.run_print('raise_example.exe')
 
 	# Remove
 	C.uninstall_program('raise_example.exe')
@@ -144,7 +144,7 @@ def install_and_uninstall_static_library():
 	C.install_library('lib_math.a')
 
 	# Run
-	C.run_say('raise_example.exe')
+	C.run_print('raise_example.exe')
 
 	# Remove
 	C.uninstall_program('raise_example.exe')

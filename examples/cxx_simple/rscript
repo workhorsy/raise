@@ -35,7 +35,7 @@ def test():
 	CXX.build_program('raise_example.exe', ['main.cc'])
 
 	# Run the program
-	CXX.run_say('./raise_example.exe')
+	CXX.run_print('./raise_example.exe')
 
 
 

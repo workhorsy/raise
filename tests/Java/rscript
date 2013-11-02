@@ -39,7 +39,7 @@ def build_program():
 
 	Java.build_program('main.class', ['main.java', 'lib_math.java'])
 
-	Java.run_say('main')
+	Java.run_print('main')
 
 def build_jar():
 	clean()
@@ -48,7 +48,7 @@ def build_jar():
 	Java.build_jar('lib_math.jar', ['lib_math.java'])
 	Java.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
 
-	Java.run_say('main')
+	Java.run_print('main')
 
 # Tests that require root
 def install_and_uninstall_program():
@@ -67,7 +67,7 @@ def install_and_uninstall_program():
 	Java.install_program('main.class', 'raise_example')
 
 	# Run
-	Java.run_say('main')
+	Java.run_print('main')
 
 	# Remove
 	Java.uninstall_program('main.class', 'raise_example')
@@ -91,7 +91,7 @@ def install_and_uninstall_jar():
 	Java.install_jar('lib_math.jar', 'raise_example')
 
 	# Run
-	Java.run_say('main')
+	Java.run_print('main')
 
 	# Remove
 	Java.uninstall_program('main.class', 'raise_example')

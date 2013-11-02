@@ -291,7 +291,7 @@ def build_shared_library(so_file, o_files):
 	event = Process.Event(task, result, plural, singular, native_command, setup)
 	Process.add_event(event)
 
-def run_say(command):
+def run_print(command):
 	global cc
 	Print.status("Running C program")
 

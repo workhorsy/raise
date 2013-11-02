@@ -42,7 +42,7 @@ def build_object():
 
 	CXX.build_program('main.exe', ['lib_math.o', 'main.o'])
 
-	CXX.run_say('./main.exe')
+	CXX.run_print('./main.exe')
 
 def build_program():
 	clean()
@@ -50,7 +50,7 @@ def build_program():
 
 	CXX.build_program('main.exe', ['lib_math.cc', 'main.cc'])
 
-	CXX.run_say('./main.exe')
+	CXX.run_print('./main.exe')
 
 def build_shared_library():
 	clean()
@@ -62,7 +62,7 @@ def build_shared_library():
 
 	CXX.build_program('main.exe', ['main.cc', 'lib_math.so'])
 
-	CXX.run_say('./main.exe')
+	CXX.run_print('./main.exe')
 
 def build_static_library():
 	clean()
@@ -74,7 +74,7 @@ def build_static_library():
 
 	CXX.build_program('main.exe', ['main.cc', 'lib_math.a'])
 
-	CXX.run_say('./main.exe')
+	CXX.run_print('./main.exe')
 
 # Tests that require root
 def install_and_uninstall_program():
@@ -93,7 +93,7 @@ def install_and_uninstall_program():
 	CXX.install_program('raise_example.exe')
 
 	# Run
-	CXX.run_say('raise_example.exe')
+	CXX.run_print('raise_example.exe')
 
 	# Remove
 	CXX.uninstall_program('raise_example.exe')
@@ -118,7 +118,7 @@ def install_and_uninstall_shared_library():
 	CXX.install_library('lib_math.so')
 
 	# Run
-	CXX.run_say('raise_example.exe')
+	CXX.run_print('raise_example.exe')
 
 	# Remove
 	CXX.uninstall_program('raise_example.exe')
@@ -144,7 +144,7 @@ def install_and_uninstall_static_library():
 	CXX.install_library('lib_math.a')
 
 	# Run
-	CXX.run_say('raise_example.exe')
+	CXX.run_print('raise_example.exe')
 
 	# Remove
 	CXX.uninstall_program('raise_example.exe')

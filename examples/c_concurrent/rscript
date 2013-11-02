@@ -55,7 +55,7 @@ def _build():
 	C.build_program('main.exe', object_files)
 
 	# Run the program
-	C.run_say('./main.exe')
+	C.run_print('./main.exe')
 
 
 

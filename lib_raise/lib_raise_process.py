@@ -264,8 +264,7 @@ def concurrent_end():
 	Event.is_concurrent = False
 	Event.is_first_concurrent = False
 
-# FIXME: Rename to run_print
-def run_say(command):
+def run_print(command):
 	Print.status("Running command")
 
 	runner = ProcessRunner(command)

@@ -39,7 +39,7 @@ def test():
 	C.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 
 	# Run the program
-	C.run_say('./raise_example.exe')
+	C.run_print('./raise_example.exe')
 
 def _remove():
 	C.uninstall_program('raise_example.exe')

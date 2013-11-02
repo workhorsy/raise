@@ -201,7 +201,7 @@ def build_jar(out_file, inc_files, link_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def run_say(command):
+def run_print(command):
 	global javac
 	global runtime
 	Print.status("Running Java program")

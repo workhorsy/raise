@@ -269,7 +269,7 @@ def build_object(o_file, cxx_files, i_files=[]):
 	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
-def run_say(command):
+def run_print(command):
 	global cxx
 
 	Print.status("Running C++ program")

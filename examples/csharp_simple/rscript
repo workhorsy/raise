@@ -35,7 +35,7 @@ def test():
 	CSharp.build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 
 	# Run the program
-	CSharp.run_say('./main.exe')
+	CSharp.run_print('./main.exe')
 
 def _remove():
 	CSharp.uninstall_program('raise_example.exe', 'raise_example')
