@@ -67,13 +67,13 @@ def setup():
 		}
 
 	# Get the names and paths for know D compilers
-	names = ['dmd', 'dmd2', 'ldc2']
+	names = ['dmd2', 'dmd', 'ldc2', 'ldc']
 	for name in names:
 		paths = Libraries.program_paths(name)
 		if len(paths) == 0:
 			continue
 
-		if name in ['dmd', 'dmd2']:
+		if name in ['dmd2', 'dmd']:
 			comp = Config.Compiler(
 				name =                 name, 
 				path =                 paths[0], 
@@ -89,9 +89,9 @@ def setup():
 				extension_map = extension_map
 			)
 			d_compilers[comp._name] = comp
-		elif name == 'ldc2':
+		elif name in ['ldc2', 'ldc']:
 			comp = Config.Compiler(
-				name =                 'ldc2', 
+				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
 				out_file =             '-of', 
@@ -117,7 +117,7 @@ def get_default_compiler():
 	global d_compilers
 
 	comp = None
-	for name in ['dmd', 'dmd2', 'ldc2']:
+	for name in ['dmd2', 'dmd', 'ldc2', 'ldc']:
 		if name in d_compilers:
 			comp = d_compilers[name]
 			break
