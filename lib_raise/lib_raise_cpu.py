@@ -39,8 +39,7 @@ bits = None
 mhz = None
 name = None
 vendor_name = None
-# FIXME: Change flags to a list, so we do 'blah' in flags instead of 'in' and bool test
-flags = {}
+flags = []
 cpus_total = None
 cpus_free = None
 
@@ -56,6 +55,8 @@ def setup():
 	global cpus_free
 
 	def set_arch(dirty_arch):
+		global arch
+		global bits
 		if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$', dirty_arch):
 			arch = 'x86_32'
 			bits = '32'
@@ -100,6 +101,8 @@ def setup():
 			retval = mask & feature_bits > 0
 			return retval
 
+		# http://en.wikipedia.org/wiki/CPUID
+		# http://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean
 		# http://www.lohninger.com/helpcsuite/public_constants_cpuid.htm
 		flags = {
 			'fpu' : is_set(0), # Floating Point Unit
@@ -122,19 +125,23 @@ def setup():
 			'pse36' : is_set(17), # 36 bit Page Size Extensions
 			'serial' : is_set(18), # Processor Serial Number
 			'clflush' : is_set(19), # Cache Flush
-			'reserved1' : is_set(20), # reserved
+			#'reserved1' : is_set(20), # reserved
 			'dts' : is_set(21), # Debug Trace Store
 			'acpi' : is_set(22), # ACPI support
 			'mmx' : is_set(23), # MultiMedia Extensions
-			'xsr' : is_set(24), # FXSAVE and FXRSTOR instructions
+			'fxsr' : is_set(24), # FXSAVE and FXRSTOR instructions
 			'sse' : is_set(25), # SSE instructions
 			'sse2' : is_set(26), # SSE2 (WNI) instructions
 			'ss' : is_set(27), # self snoop
-			'reserved2' : is_set(28), # reserved
+			#'reserved2' : is_set(28), # reserved
 			'tm' : is_set(29), # Automatic clock control
 			'ia64' : is_set(30), # IA64 instructions
 			'3dnow' : is_set(31) # 3DNow! instructions available
 		}
+
+		# Get a list of only the flags that are true
+		flags = [k for k, v in flags.items() if v]
+		flags.sort()
 	# For everything else, use /proc/cpuinfo
 	else:
 		# Get the CPU arch and bits
@@ -151,61 +158,12 @@ def setup():
 		vendor_name = Helpers.between(cpuinfo, 'vendor_id	: ', '\n')
 
 		# Get the CPU features
-		features = Helpers.between(cpuinfo, 'flags		: ', '\n').split()
-
-		def is_set(name):
-			return name in features
-
-		# FIXME: Is there a definitive list of flags? I am getting more on Linux, and
-		# some are different. Like sse2 on Linux is simd2 on windows xp.
-		flags = {
-			'fpu' : is_set('fpu'), # Floating Point Unit
-			'vme' : is_set('vme'), # V86 Mode Extensions
-			'de' : is_set('de'), # Debug Extensions - I/O breakpoints supported
-			'pse' : is_set('pse'), # Page Size Extensions (4 MB pages supported)
-			'tsc' : is_set('tsc'), # Time Stamp Counter and RDTSC instruction are available
-			'msr' : is_set('msr'), # Model Specific Registers
-			'pae' : is_set('pae'), # Physical Address Extensions (36 bit address, 2MB pages)
-			'mce' : is_set('mce'), # Machine Check Exception supported
-			'cx8' : is_set('cx8'), # Compare Exchange Eight Byte instruction available
-			'apic' : is_set('apic'), # Local APIC present (multiprocessor operation support)
-			'sepamd' : is_set('sepamd'), # Fast system calls (AMD only)
-			'sep' : is_set('sep'), # Fast system calls
-			'mtrr' : is_set('mtrr'), # Memory Type Range Registers
-			'pge' : is_set('pge'), # Page Global Enable
-			'mca' : is_set('mca'), # Machine Check Architecture
-			'cmov' : is_set('cmov'), # Conditional MOVe instructions
-			'pat' : is_set('pat'), # Page Attribute Table
-			'pse36' : is_set('pse36'), # 36 bit Page Size Extensions
-			'serial' : is_set('serial'), # Processor Serial Number
-			'clflush' : is_set('clflush'), # Cache Flush
-			'reserved1' : is_set('reserved1'), # reserved
-			'dts' : is_set('dts'), # Debug Trace Store
-			'acpi' : is_set('acpi'), # ACPI support
-			'mmx' : is_set('mmx'), # MultiMedia Extensions
-			'xsr' : is_set('xsr'), # FXSAVE and FXRSTOR instructions
-			'sse' : is_set('sse'), # SSE instructions
-			'sse2' : is_set('sse2'), # SSE2 (WNI) instructions
-			'ss' : is_set('ss'), # self snoop
-			'reserved2' : is_set('reserved2'), # reserved
-			'tm' : is_set('tm'), # Automatic clock control
-			'ia64' : is_set('ia64'), # IA64 instructions
-			'3dnow' : is_set('3dnow') # 3DNow! instructions available
-		}
-		for feature in features.split():
-			flags[feature] = True
-
-
-		#print('mhz', mhz)
-		#print('name', name)
-		#print('vendor_name', vendor_name)
-		#print('flags', flags)
-
+		flags = Helpers.between(cpuinfo, 'flags		: ', '\n').split()
+		flags.sort()
 
 	# Figure out how many cpus there are
 	cpus_total = multiprocessing.cpu_count()
 	cpus_free = cpus_total
-
 
 setup()
 
