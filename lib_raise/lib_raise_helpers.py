@@ -60,6 +60,9 @@ def after(s, n):
 		return s[i+len(n) : ]
 
 def between(s, l, r):
+	return before(after(s, l), r)
+
+def between_last(s, l, r):
 	return before_last(after(s, l), r)
 
 def version_string_to_tuple(version_string):

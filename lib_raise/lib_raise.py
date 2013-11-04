@@ -37,8 +37,8 @@ if sys.version_info < (2, 6):
 # Load the default modules
 import lib_raise_config as Config
 import lib_raise_helpers as Helpers
-import lib_raise_cpu as CPU
 import lib_raise_os as OS
+import lib_raise_cpu as CPU
 import lib_raise_terminal as Print
 import lib_raise_fs as FS
 import lib_raise_process as Process

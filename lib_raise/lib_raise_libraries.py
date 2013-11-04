@@ -182,7 +182,7 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 	for package in result.split("\n"):
 		# Get the name and version
 		name = Helpers.before(package.split()[1], ':')
-		version = Helpers.between(package.split()[2], ':', '-')
+		version = Helpers.between_last(package.split()[2], ':', '-')
 		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
@@ -217,8 +217,8 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 		result = Process.run_and_get_stdout("rpm -qi {0}".format(package))
 		if not result:
 			continue
-		name = Helpers.between(result, 'Name        : ', '\n')
-		version = Helpers.between(result, 'Version     : ', '\n')
+		name = Helpers.between_last(result, 'Name        : ', '\n')
+		version = Helpers.between_last(result, 'Version     : ', '\n')
 		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the version does not match
@@ -293,7 +293,7 @@ def require_header_file(header_name, version_cb = None):
 	if not get_header_file(header_name, version_cb):
 		ver = "(Any version)"
 		if version_cb:
-			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Header file '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -309,7 +309,7 @@ def require_static_library(lib_name, version_cb = None):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Static library '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -325,7 +325,7 @@ def require_shared_library(lib_name, version_cb = None):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Shared library '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -344,7 +344,7 @@ def require_static_or_shared_library(lib_name, version_cb = None):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
 		if version_cb:
-			ver = Helpers.between(inspect.getsource(version_cb), ': ', ')')
+			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
 
 		message = "Shared/Static library '{0} {1}' not installed. Install and try again."
 		Print.fail()
