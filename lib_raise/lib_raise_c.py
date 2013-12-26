@@ -118,8 +118,8 @@ def setup():
 				warnings_all =         '/Wall', 
 				warnings_as_errors =   '', 
 				optimize =             '/O2', 
-				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed', 
+				compile_time_flags =   '/D', 
+				link =                 '/LDd', 
 				extension_map = extension_map
 			)
 			c_compilers[comp._name] = comp
