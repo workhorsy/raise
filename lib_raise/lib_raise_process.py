@@ -178,7 +178,7 @@ class Event(object):
 		if Event.is_concurrent:
 			if Event.is_first_concurrent:
 				Event.is_first_concurrent = False
-				sys.stdout.write("{0} {1} in concurrently ...\n".format(self._task, self._plural))
+				sys.stdout.write("{0} {1} concurrently ...\n".format(self._task, self._plural))
 				sys.stdout.flush()
 				Print.message_length = 0
 
