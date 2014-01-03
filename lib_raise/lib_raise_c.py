@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -188,6 +188,9 @@ def link_program(out_file, obj_files, i_files=[]):
 			Print.fail()
 			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
 
+		# Create the output directory if it does not exist
+		FS.create_path_dirs(out_file)
+
 		return True
 
 	# Create the event
@@ -223,6 +226,9 @@ def build_object(o_file, c_files, i_files=[]):
 			Print.fail()
 			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
 
+		# Create the output directory if it does not exist
+		FS.create_path_dirs(o_file)
+
 		return True
 
 	# Create the event
@@ -251,6 +257,9 @@ def build_program(o_file, c_files, i_files=[]):
 		if not 'CC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
+
+		# Create the output directory if it does not exist
+		FS.create_path_dirs(o_file)
 
 		return True
 
@@ -285,6 +294,10 @@ def build_shared_library(so_file, o_files):
 		# Skip if the files have not changed since last build
 		if not FS.is_outdated(to_update = [native_so_file], triggers = native_o_files):
 			return False
+
+		# Create the output directory if it does not exist
+		FS.create_path_dirs(so_file)
+
 		return True
 
 	# Create the event

@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -151,6 +151,9 @@ def link_program(out_file, obj_files, i_files=[]):
 		if not 'LINK' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'LINK' to the linker, and try again.")
+
+		# Create the output directory if it does not exist
+		FS.create_path_dirs(out_file)
 
 		return True
 
