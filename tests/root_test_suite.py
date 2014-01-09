@@ -40,11 +40,13 @@ def program_paths(program_name):
 	path = os.environ['PATH']
 	for p in os.environ['PATH'].split(os.pathsep):
 		p = os.path.join(p, program_name)
-		if os.access(p, os.X_OK):
+		# Save the path if it is executable
+		if os.access(p, os.X_OK) and not os.path.isdir(p):
 			paths.append(p)
+		# Save the path if we found one with a common extension like .exe
 		for e in exts:
 			pext = p + e
-			if os.access(pext, os.X_OK):
+			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
 				paths.append(pext)
 	return paths
 
