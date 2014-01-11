@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -427,11 +427,13 @@ def program_paths(program_name):
 	path = os.environ['PATH']
 	for p in os.environ['PATH'].split(os.pathsep):
 		p = os.path.join(p, program_name)
-		if os.access(p, os.X_OK):
+		# Save the path if it is executable
+		if os.access(p, os.X_OK) and not os.path.isdir(p):
 			paths.append(p)
+		# Save the path if we found one with a common extension like .exe
 		for e in exts:
 			pext = p + e
-			if os.access(pext, os.X_OK):
+			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
 				paths.append(pext)
 	return paths
 
