@@ -47,18 +47,18 @@ Last updated on January 12th 2014
 	<ol>
 		<li><a href="#c_and_c++_support">C/C++</a></li>
 		<li><a href="#d_support">D</a></li>
-		<li><a href="#csharp_support">C#</a></li>
+		<li><a href="#c_sharp_support">C#</a></li>
 		<li><a href="#java_support">Java</a></li>
 	</ol>
 	<li><a href="#operating_system_support">Operating System Support</a></li>
 	<ol>
-		<li><a href="#linux">Linux</a></li>
-		<li><a href="#freebsd">FreeBSD</a></li>
-		<li><a href="#windows">Windows</a></li>
-		<li><a href="#cygwin">Cygwin</a></li>
-		<li><a href="#os_x">OS X</a></li>
-		<li><a href="#open_indiana">Open Indiana</a></li>
-		<li><a href="#haiku">Haiku</a></li>
+		<li><a href="#linux_support">Linux</a></li>
+		<li><a href="#freebsd_support">FreeBSD</a></li>
+		<li><a href="#windows_support">Windows</a></li>
+		<li><a href="#cygwin_support">Cygwin</a></li>
+		<li><a href="#os_x_support">OS X</a></li>
+		<li><a href="#open_indiana_support">Open Indiana</a></li>
+		<li><a href="#haiku_support">Haiku</a></li>
 	</ol>
 	<li><a href="#fundamentals">Fundamentals</a></li>
 	<ol>
@@ -66,22 +66,22 @@ Last updated on January 12th 2014
 	</ol>
 	<li><a href="#basics">Basics</a></li>
 	<ol>
-		<li><a href="#">Functions that must succeed</a></li>
-		<li><a href="#">Functions that may fail</a></li>
-		<li><a href="#">Commands that must succeed</a></li>
-		<li><a href="#">Commands that may fail</a></li>
-		<li><a href="#">Commands and printing the result</a></li>
-		<li><a href="#">Commands and getting the result</a></li>
+		<li><a href="#functions_that_must_succeed">Functions that must succeed</a></li>
+		<li><a href="#functions_that_may_fail">Functions that may fail</a></li>
+		<li><a href="#commands_that_must_succeed">Commands that must succeed</a></li>
+		<li><a href="#commands_that_may_fail">Commands that may fail</a></li>
+		<li><a href="#commands_and_printing_the_result">Commands and printing the result</a></li>
+		<li><a href="#commands_and_getting_the_result">Commands and getting the result</a></li>
 	</ol>
 	<li><a href="#file_systems">File System</a></li>
-	<li><a href="#">Terminal</a></li>
-	<li><a href="#">Concurrency</a></li>
-	<li><a href="#">Libraries and Programs</a></li>
-	<li><a href="#">C</a></li>
-	<li><a href="#">C++</a></li>
-	<li><a href="#">D</a></li>
-	<li><a href="#">C#</a></li>
-	<li><a href="#">Java</a></li>
+	<li><a href="#terminal">Terminal</a></li>
+	<li><a href="#concurrency">Concurrency</a></li>
+	<li><a href="#libraries_and_programs">Libraries and Programs</a></li>
+	<li><a href="#c">C</a></li>
+	<li><a href="#c++">C++</a></li>
+	<li><a href="#d">D</a></li>
+	<li><a href="#c_sharp">C#</a></li>
+	<li><a href="#java">Java</a></li>
 </ol>
 
 
@@ -123,39 +123,44 @@ contact one of the authors.
 <hr />
 
 
+<a id="installation"></a>
 <h1>2. Installation</h1>
 
 
 <hr />
 
-
+<a id="command_line_arguments"></a>
 <h1>3. Command Line Arguments</h1>
 
 
 <hr />
 
 
+<a id="supported_languages"></a>
 <h1>4. Supported Languages</h1>
 
-<a id="c_and_c++"></a>
+<a id="c_and_c++_support"></a>
 <h2>4.1. C/C++</h2>
 
 <p>
 C and C++ are fully supported with GCC, and CLang. MS cl.exe support is not yet complete.
 </p>
 
+<a id="d_support"></a>
 <h2>4.2. D</h2>
 
 <p>
 D is fully supported with DMD and LDC.
 </p>
 
+<a id="c_sharp_support"></a>
 <h2>4.3. C#</h2>
 
 <p>
 C# works with Mono and MS .NET. Some advanced features such as installing into the GAC have not been implemented.
 </p>
 
+<a id="java_support"></a>
 <h2>4.4. Java</h2>
 
 <p>
@@ -166,32 +171,38 @@ Java works with OpenJDK 7.
 <hr />
 
 
+<a id="operating_system_support"></a>
 <h1>5. Operating System Support</h1>
 
+<a id="linux_support"></a>
 <h2>5.1. Linux</h2>
 
 <p>
 Fully supported and developed primarily on Linux. Tested primarily on Ubuntu, Debian, Linux Mint, Fedora, and Centos.
 </p>
 
+<a id="freebsd_support"></a>
 <h2>5.2. FreeBSD</h2>
 
 <p>
 Fully supported.
 </p>
 
+<a id="windows_support"></a>
 <h2>5.3. Windows</h2>
 
 <p>
 Partially supported. Tested on Windows XP, and 7. There are still issues with building and finding C/C++ libraries on Windows. It is recommended that Windows users use Cygwin.
 </p>
 
+<a id="cygwin_support"></a>
 <h2>5.4. Cygwin</h2>
 
 <p>
 Fully Supported.
 </p>
 
+<a id="os_x_support"></a>
 <h2>5.5. OS X</h2>
 
 <p>
@@ -206,6 +217,7 @@ As of November 2nd 2013 there is no way to purchase OS X 10.9 without using the 
 If other contributors want to donate a machine, or add this feature themselves, they are welcome to do it.
 </p>
 
+<a id="open_indiana_support"></a>
 <h2>5.6. Open Indiana</h2>
 
 <p>
@@ -219,6 +231,7 @@ they are still
 to GCC/Clang. A basic C/C++ "Hello World" program does not compile. 
 </p>
 
+<a id="haiku_support"></a>
 <h2>5.7. Haiku</h2>
 
 <p>
@@ -234,6 +247,7 @@ Python version uses all memory, and crashes.
 <hr />
 
 
+<a id="fundamentals"></a>
 <h1>6. Fundamentals</h1>
 
 <p>
@@ -274,9 +288,11 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 <hr />
 
 
+<a id="basics"></a>
 <h1>7. Basics</h1>
 
-<h2>7.2. Functions that must succeed</h2>
+<a id="functions_that_must_succeed"></a>
+<h2>7.1. Functions that must succeed</h2>
 
 <p>
 Using the Process.do_on_fail_exit function, it will print the message, run the 
@@ -313,7 +329,8 @@ Running that code will produce this result:
     It failed Exiting ...
 </pre>
 
-<h2>7.3. Functions that may fail</h2>
+<a id="functions_that_may_fail"></a>
+<h2>7.2. Functions that may fail</h2>
 
 <p>
 If you do not want the script to exit when the function is_broken throws an 
@@ -343,9 +360,14 @@ Running that code will produce this result:
     Running is_broken ...                                                       :)
 </pre>
 
-<h2>7.4. Commands that must succeed</h2>
-<h2>7.5. Commands that may fail</h2>
-<h2>7.6. Commands and printing the result</h2>
+<a id="commands_that_must_succeed"></a>
+<h2>7.3. Commands that must succeed</h2>
+
+<a id="commands_that_may_fail"></a>
+<h2>7.4. Commands that may fail</h2>
+
+<a id="commands_and_printing_the_result"></a>
+<h2>7.5. Commands and printing the result</h2>
 
 <p>
 If you want to run a command and have its result printed, you can use the 
@@ -367,6 +389,83 @@ Produces the result:
 </pre>
 
 <h2>7.7. Commands and getting the result</h2>
+
+
+<hr />
+
+
+<a id="file_system"></a>
+<h1>File System</h1>
+
+
+<hr />
+
+
+<a id="terminal"></a>
+<h1>Terminal</h1>
+
+
+<hr />
+
+
+<a id="concurrency"></a>
+<h1>Concurrency</h1>
+
+
+<hr />
+
+
+<a id="libraries_and_programs"></a>
+<h1>Libraries and Programs</h1>
+
+
+<hr />
+
+
+<a id="C"></a>
+<h1>C</h1>
+
+
+<hr />
+
+
+<a id="c++"></a>
+<h1>C++</h1>
+
+
+<hr />
+
+
+<a id="d"></a>
+<h1>D</h1>
+
+
+<hr />
+
+
+<a id="c_sharp"></a>
+<h1>C#</h1>
+
+
+<hr />
+
+
+<a id="java"></a>
+<h1>Java</h1>
+
+
+<hr />
+
+
+		<div id="footer">
+			Copyright &copy; 2014 <a href="http://workhorsy.org"rel="external">Matthew Brennan Jones</a>
+			<br />
+			Raise is licensed under 
+			<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank"rel="external">The MIT License</a>
+			<br />
+			This website and all documentation are licensed under 
+			<a href="http://creativecommons.org/licenses/by/3.0"rel="external">The Creative Commons Attribution License v3.0</a>
+		</div>
 
 		</script>
 		<script src="js/rainbow.js"></script>
