@@ -51,6 +51,7 @@ if __name__ == '__main__':
 	for arg in sys.argv[1:]:
 		if arg.startswith('-'):
 			if arg == '-plain': Config.is_plain = True
+			elif arg == '-inspect': Config.is_inspect = True
 		else:
 			args.append(arg)
 
@@ -85,9 +86,10 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.3.0 Dev - January 3 2014) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.3.0 Dev - January 13 2014) http://launchpad.net/raise")
 		print("OPTIONS:")
-		print("    -plain - Don't clear, don't use color, and fix the width to 79")
+		print("    -plain   - Don't clear, don't use color, and fix the width to 79")
+		print("    -inspect - Print the source code to the target")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
@@ -109,6 +111,15 @@ if __name__ == '__main__':
 	# Exit if there is no target with that name
 	if not Config.target_name in targets:
 		Print.exit("No target named '{0}'. Found targets are {1}.".format(Config.target_name, target_list))
+
+	# Inspect the source code if specified
+	if Config.is_inspect:
+		import inspect
+		target = targets[Config.target_name]
+		code = inspect.getsourcelines(target)[0]
+		code = str.join(' ', code)
+		print(code)
+		exit(0)
 
 	# Try running the target in the rscript
 	target = targets[Config.target_name]

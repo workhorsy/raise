@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import shutil
+import lib_raise_c as C
+import lib_raise_linker as Linker
+import lib_raise_fs as FS
+import lib_raise_libraries as Libraries
+import lib_raise_os as OS
+import lib_raise_process as Process
+
+
+def setup():
+	if os.path.isdir('example'):
+		shutil.rmtree('example')
+	os.mkdir('example')
+
+	if os.path.isfile('one'):
+		os.remove('one')
+
+	if os.path.isfile('two'):
+		os.remove('two')
+
+	open('one', 'a').close()
+
+def fs_change_dir():
+	FS.change_dir('example')
+
+def fs_move_file():
+	FS.move_file('one', 'two')
+
+def fs_copy_file():
+	pass
+
+def fs_copy_new_file():
+	pass
+
+def fs_copy_dir():
+	pass
+
+def fs_make_dir():
+	pass
+
+def fs_remove_dir():
+	pass
+
+def fs_remove_file():
+	pass
+
+def fs_remove_binaries():
+	pass
+
+def fs_symlink():
+	pass
+

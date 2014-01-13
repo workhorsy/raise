@@ -468,7 +468,7 @@ Produces the result:
 	</p>
 
 	<pre><code data-language="python">
-FS.change_dir('example')
+${template_info['fs_change_dir']['example']}
 	</code></pre>
 
 	<p>
@@ -476,7 +476,7 @@ FS.change_dir('example')
 	</p>
 
 	<pre class="raise_output">
-Changing to dir 'example' ...                                                <span class="smile">:)</span>
+${template_info['fs_change_dir']['output']}
 	</pre>
 
 <a id="fs_move_file"></a>
