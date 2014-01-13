@@ -456,13 +456,53 @@ Produces the result:
 
 <a id="fs_change_dir"></a>
 <h2>8.1. Change Dir</h2>
-	change_dir(name):
-	<span class="fixme">FIXME</span>
+
+	<p>
+	<span class="fun">change_dir(<span class="arg">name</span>)</span><br />
+		Uses the standard Python <span class="fun">os.chdir</span> 
+	function to change to the <span class="arg">name</span> directory.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+FS.change_dir('example')
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Changing to dir 'example' ...                                                <span class="smile">:)</span>
+	</pre>
 
 <a id="fs_move_file"></a>
 <h2>8.2. Move File</h2>
-	move_file(source, dest):
-	<span class="fixme">FIXME</span>
+
+	<p>
+	<span class="fun">move_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
+	Uses the standard Python <span class="fun">shutil.move</span> function to move the file
+	<span class="arg">source</span> to <span class="arg">dest</span>.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+FS.move_file('one', 'two'):
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Moving the file 'one' to 'two' ...                                           <span class="smile">:)</span>
+	</pre>
 
 <a id="fs_copy_file"></a>
 <h2>8.3. Copy File</h2>
@@ -573,7 +613,6 @@ Produces the result:
 			<a href="http://creativecommons.org/licenses/by/3.0"rel="external">The Creative Commons Attribution License v3.0</a>
 		</div>
 
-		</script>
 		<script src="js/rainbow.js"></script>
 		<script src="js/language/generic.js"></script>
 		<script src="js/language/shell.js"></script>
