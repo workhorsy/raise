@@ -54,6 +54,10 @@ info = {
 	'fs_remove_file' : {}, 
 	'fs_remove_binaries' : {}, 
 	'fs_symlink' : {}, 
+
+	'c_compilers' : {},
+	'c_compiler_setup' : {},
+	'c_building_object' : {},
 }
 
 if __name__ == '__main__':

@@ -30,6 +30,10 @@ def setup():
 
 	open('one', 'a').close()
 
+'''
+File Systems
+'''
+
 def fs_change_dir():
 	FS.change_dir('example')
 
@@ -59,4 +63,48 @@ def fs_remove_binaries():
 
 def fs_symlink():
 	FS.symlink('example', 'example_link')
+
+'''
+ C
+'''
+
+def c_compilers():
+	cc = C.get_default_compiler()
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(cc._name))
+	print("path: {0} ".format(cc._path))
+
+	cc = C.c_compilers['clang']
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(cc._name))
+	print("path: {0} ".format(cc._path))
+
+
+def c_compiler_setup():
+	# Get a C compiler
+	cc = C.get_default_compiler()
+
+	# Compiler setup
+	cc.debug = True
+	cc.optimize = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	cc.compile_time_flags = ['SDL=true']
+
+	# Save the compiler config in environmental variables
+	C.save_compiler(cc)
+
+	# Print environmental variables to see what happens under the hood
+	print("$CC: {0}".format(os.environ['CC']))
+	print("$CFLAGS: {0}".format(os.environ['CFLAGS']))
+
+def c_building_object():
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	C.build_object('main.o', ['main.c'])
+
 
