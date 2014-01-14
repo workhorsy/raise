@@ -493,7 +493,7 @@ ${template_info['fs_change_dir']['output']}
 	</p>
 
 	<pre><code data-language="python">
-FS.move_file('one', 'two'):
+${template_info['fs_move_file']['example']}
 	</code></pre>
 
 	<p>
@@ -501,48 +501,207 @@ FS.move_file('one', 'two'):
 	</p>
 
 	<pre class="raise_output">
-Moving the file 'one' to 'two' ...                                           <span class="smile">:)</span>
+${template_info['fs_move_file']['output']}
 	</pre>
 
 <a id="fs_copy_file"></a>
 <h2>8.3. Copy File</h2>
-	def copy_file(source, dest):
-	<span class="fixme">FIXME</span>
+	<p>
+	<span class="fun">copy_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
+	Uses the standard Python <span class="fun">shutil.copy2</span> function to copy the file
+	<span class="arg">source</span> to <span class="arg">dest</span>.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_copy_file']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_copy_file']['output']}
+	</pre>
 
 <a id="fs_copy_new_file"></a>
 <h2>8.4. Copy New File</h2>
-	def copy_new_file(source, dest):
-	<span class="fixme">FIXME</span>
+	<p>
+	<span class="fun">copy_new_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
+	Copies the file only if <span class="arg">dest</span> does not exist, or <span class="arg">source</span> is
+	different from <span class="arg">dest</span>.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_copy_new_file']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_copy_new_file']['output']}
+	</pre>
 
 <a id="fs_copy_dir"></a>
 <h2>8.5. Copy Dir</h2>
-	def copy_dir(source, dest, symlinks = False):
-	<span class="fixme">FIXME</span>
+	<p>
+	<span class="fun">copy_dir(<span class="arg">source</span>, <span class="arg">dest</span>, <span class="arg">symlinks</span> = False)</span><br />
+	Uses the standard Python <span class="fun">shutil.copytree</span> function to recursively copy 
+	the directory from <span class="arg">source</span> to <span class="arg">dest</span>. If
+	<span class="arg">symlinks</span> is True, symlinks remail links. If symlinks is False the links 
+	are replaced with copies of the actual data.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_copy_dir']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_copy_dir']['output']}
+	</pre>
 
 <a id="fs_make_dir"></a>
 <h2>8.6. Make Dir</h2>
-	def make_dir(source, ignore_failure = False):
-	<span class="fixme">FIXME</span>
+	<p>
+	<span class="fun">make_dir(<span class="arg">source</span>, <span class="arg">ignore_failure</span> = False)</span><br />
+	Uses the standard Python <span class="fun">os.mkdir</span> function to make the 
+	directory <span class="arg">source</span>. If <span class="arg">ignore_failure</span> 
+	is False, any errors will be ignored.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_make_dir']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_make_dir']['output']}
+	</pre>
 
 <a id="fs_remove_dir"></a>
 <h2>8.7. Remove Dir</h2>
-	def remove_dir(name, and_children = False):
-	<span class="fixme">FIXME</span>
+	<p>
+	<span class="fun">remove_dir(<span class="arg">name</span>, <span class="arg">and_children</span> = False)</span><br />
+	Uses the standard Python <span class="fun">shutil.rmtree</span> function to remove the 
+	directory <span class="arg">name</span>. If <span class="arg">name</span> is the current 
+	directory, it will display an error. If <span class="arg">and_children</span> 
+	is True it will remove any child directories.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_remove_dir']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_remove_dir']['output']}
+	</pre>
 
 <a id="fs_remove_file"></a>
-<h2>8.9. Remove File</h2>
-	def remove_file(name, ignore_failure = False):
-	<span class="fixme">FIXME</span>
+<h2>8.8. Remove File</h2>
+	<p>
+	<span class="fun">remove_file(<span class="arg">name</span>, <span class="arg">ignore_failure</span> = False)</span><br />
+	Uses the standard Python <span class="fun">os.rmdir</span> function to remove the 
+	file <span class="arg">name</span>. If <span class="arg">ignore_failure</span> 
+	is True it will ignore any errors.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_remove_file']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_remove_file']['output']}
+	</pre>
 
 <a id="fs_remove_binaries"></a>
-<h2>8.10. Remove Binaries</h2>
-	def remove_binaries(name):
-	<span class="fixme">FIXME</span>
+<h2>8.9. Remove Binaries</h2>
+	<p>
+	<span class="fun">remove_binaries(<span class="arg">name</span>)</span><br />
+	Will remove any files that start with <span class="arg">name</span>, and have the 
+	extensions .exe, .o, .obj, .so, .a, .dll, .lib, .pyc, .exe.mdb, .dll.mdb, 
+	.jar, .class.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_remove_binaries']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_remove_binaries']['output']}
+	</pre>
 
 <a id="fs_symlink"></a>
-<h2>8.11. Symlink</h2>
-	def symlink(source, link_name):
-	<span class="fixme">FIXME</span>
+<h2>8.10. Symlink</h2>
+	<p>
+	<span class="fun">symlink(<span class="arg">source</span>, <span class="arg">link_name</span>)</span><br />
+	Uses the standard Python <span class="fun">os.symlink</span> function to create a 
+	symlink from <span class="arg">source</span> to <span class="arg">link_name</span>.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['fs_symlink']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['fs_symlink']['output']}
+	</pre>
 
 <hr />
 

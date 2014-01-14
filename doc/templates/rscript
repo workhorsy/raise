@@ -16,6 +16,12 @@ def setup():
 		shutil.rmtree('example')
 	os.mkdir('example')
 
+	if os.path.isdir('new_example'):
+		shutil.rmtree('new_example')
+
+	if os.path.islink('example_link'):
+		os.unlink('example_link')
+
 	if os.path.isfile('one'):
 		os.remove('one')
 
@@ -31,26 +37,26 @@ def fs_move_file():
 	FS.move_file('one', 'two')
 
 def fs_copy_file():
-	pass
+	FS.copy_file('one', 'two')
 
 def fs_copy_new_file():
-	pass
+	FS.copy_new_file('one', 'two')
 
 def fs_copy_dir():
-	pass
+	FS.copy_dir('example', 'new_example', symlinks = False)
 
 def fs_make_dir():
-	pass
+	FS.make_dir('example', ignore_failure = True)
 
 def fs_remove_dir():
-	pass
+	FS.remove_dir('example', and_children = True)
 
 def fs_remove_file():
-	pass
+	FS.remove_file('does_not_exist', ignore_failure = True)
 
 def fs_remove_binaries():
-	pass
+	FS.remove_binaries('main')
 
 def fs_symlink():
-	pass
+	FS.symlink('example', 'example_link')
 
