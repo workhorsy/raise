@@ -25,7 +25,7 @@ Last updated on January 13th 2014
 </p>
 
 <p>
-<a href=https://launchpad.net/raise">https://launchpad.net/raise</a>
+<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a>
 </p>
 
 
@@ -276,7 +276,18 @@ Java works with OpenJDK 7.
 <h2>5.1. Linux</h2>
 
 <p>
-Fully supported and developed primarily on Linux. Tested primarily on Ubuntu, Debian, Linux Mint, Fedora, and Centos.
+Fully supported.
+</p>
+
+<p>
+Primarily developed on Linux with kernel 2.6 and greater. 
+Tested primarily on 
+<a href="http://ubuntu.com" target="_blank" rel="external">Ubuntu</a>, 
+<a href="http://debian.org" target="_blank" rel="external">Debian</a>, 
+<a href="http://linuxmint.com" target="_blank" rel="external">Linux Mint</a>, 
+<a href="http://fedoraproject.org" target="_blank" rel="external">Fedora</a>, and 
+<a href="http://centos.org" target="_blank" rel="external">Centos</a>. It should 
+"just work" on other Linux distros.
 </p>
 
 <a id="freebsd_support"></a>
@@ -286,11 +297,31 @@ Fully supported and developed primarily on Linux. Tested primarily on Ubuntu, De
 Fully supported.
 </p>
 
+<p>
+Has not yet been tested on other BSDs such as OpenBSD, NetBSD, or DragonflyBSD.
+</p>
+
+<p>
+<a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
+</p>
+
 <a id="windows_support"></a>
 <h2>5.3. Windows</h2>
 
 <p>
-Partially supported. Tested on Windows XP, and 7. There are still issues with building and finding C/C++ libraries on Windows. It is recommended that Windows users use Cygwin.
+Partially supported.
+</p>
+
+<p>Tested on 
+<a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>, and 
+<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>. 
+There are still issues with 
+building and finding C/C++ libraries on Windows. It is recommended 
+that Windows users use Cygwin.
+</p>
+
+<p>
+Has not been tested on Windows 8 or Windows RT.
 </p>
 
 <a id="cygwin_support"></a>
@@ -298,6 +329,10 @@ Partially supported. Tested on Windows XP, and 7. There are still issues with bu
 
 <p>
 Fully Supported.
+</p>
+
+<p>
+<a href="http://cygwin.com" target="_blank" rel="external">Cygwin</a>
 </p>
 
 <a id="os_x_support"></a>
@@ -308,11 +343,19 @@ Not supported or tested.
 </p>
 
 <p>
-As of November 2nd 2013 there is no way to purchase OS X 10.9 without using the Mac App Store (running on OS X only), or buying dedicated hardware. I will not be fixing this until Apple allows me to buy a full install disk of the current release, and install it in a virtual machine without hacks.
+As of November 2nd 2013 there is no way to purchase OS X 10.9 without using 
+the Mac App Store (running on OS X only), or buying dedicated hardware. 
+I will not be fixing this until Apple allows me to buy a full install disk 
+of the current release, and install it in a virtual machine without hacks.
 </p>
 
 <p>
-If other contributors want to donate a machine, or add this feature themselves, they are welcome to do it.
+If other contributors want to donate a machine, or add this feature 
+themselves, they are welcome to do it.
+</p>
+
+<p>
+<a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
 </p>
 
 <a id="open_indiana_support"></a>
@@ -325,9 +368,13 @@ Not supported.
 <p>
 Was not able to get it to work. As of October 17th 2013 (oi_151a_prestable8) 
 they are still 
-<a href="http://wiki.openindiana.org/oi/Compiler+Migration">migrating from SunStudio</a> 
+<a href="http://wiki.openindiana.org/oi/Compiler+Migration" target="_blank" rel="external">migrating from SunStudio</a> 
 to GCC/Clang. A basic C/C++ "Hello World" program does not compile. 
 </p>
+
+<p>
+<a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
+<p>
 
 <a id="haiku_support"></a>
 <h2>5.7. Haiku</h2>
@@ -340,6 +387,10 @@ Not supported.
 Was not able to get it to work. As of October 17th 2013 (R1 Alpha 4.1) The 
 Python version uses all memory, and crashes. 
 </p>
+
+<p>
+<a href="https://haiku-os.org" target="_blank" rel="external">Haiku</a>
+<p>
 
 
 <hr />
