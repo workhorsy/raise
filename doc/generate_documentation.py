@@ -69,6 +69,12 @@ info = {
 	'c_header_installation' : {},
 	'c_header_uinstallation' : {},
 	'c_running_and_printing' : {},
+
+	'users_running_as_root' : {},
+	'users_running_as_a_normal_user' : {},
+	'users_privilege_escalation' : {},
+	'users_user_name' : {},
+	'users_user_id' : {},
 }
 
 if __name__ == '__main__':

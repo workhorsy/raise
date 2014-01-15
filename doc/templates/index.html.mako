@@ -83,6 +83,14 @@ Last updated on January 14th 2014
 		<li><a href="#commands_and_printing_the_result">Commands and printing the result</a></li>
 		<li><a href="#commands_and_getting_the_result">Commands and getting the result</a></li>
 	</ol>
+	<li><a href="#users">Users</a></li>
+	<ol>
+		<li><a href="#users_running_as_root">Running as Root</a></li>
+		<li><a href="#users_running_as_a_normal_user">Running as a Normal User</a></li>
+		<li><a href="#users_privilege_escalation">Privilege Escalation</a></li>
+		<li><a href="#users_user_name">User Name</a></li>
+		<li><a href="#users_user_id">User ID</a></li>
+	</ol>
 	<li><a href="#file_system">File System</a></li>
 	<ol>
 		<li><a href="#fs_change_dir">change_dir</a></li>
@@ -95,8 +103,6 @@ Last updated on January 14th 2014
 		<li><a href="#fs_remove_file">remove_file</a></li>
 		<li><a href="#fs_remove_binaries">remove_binaries</a></li>
 		<li><a href="#fs_symlink">symlink</a></li>
-
-
 	</ol>
 	<li><a href="#terminal">Terminal</a></li>
 	<ol>
@@ -594,11 +600,138 @@ Produces the result:
 <hr />
 
 
+
+<a id="users"></a>
+<h1>8. Users</h1>
+
+<a id="users_running_as_root"></a>
+<h2>8.1. Running as Root</h2>
+
+	<p>
+	fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_running_as_root']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['users_running_as_root']['output']}
+	</pre>
+
+
+<a id="users_running_as_a_normal_user"></a>
+<h2>8.2. Running as a Normal User</h2>
+
+	<p>
+	fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_running_as_a_normal_user']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['users_running_as_a_normal_user']['output']}
+	</pre>
+
+
+<a id="users_privilege_escalation"></a>
+<h2>8.3. Privilege Escalation</h2>
+
+	<p>
+	fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_privilege_escalation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['users_privilege_escalation']['output']}
+	</pre>
+
+
+<a id="users_user_name"></a>
+<h2>8.4. User Name</h2>
+
+	<p>
+	fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_user_name']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['users_user_name']['output']}
+	</pre>
+
+
+<a id="users_user_id"></a>
+<h2>8.5. User ID</h2>
+
+	<p>
+	fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_user_id']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['users_user_id']['output']}
+	</pre>
+
+
+<hr />
+
+
 <a id="file_system"></a>
-<h1>8. File System</h1>
+<h1>9. File System</h1>
 
 <a id="fs_change_dir"></a>
-<h2>8.1. Change Dir</h2>
+<h2>9.1. Change Dir</h2>
 
 	<p>
 	<span class="fun">change_dir(<span class="arg">name</span>)</span><br />
@@ -623,7 +756,7 @@ ${template_info['fs_change_dir']['output']}
 	</pre>
 
 <a id="fs_move_file"></a>
-<h2>8.2. Move File</h2>
+<h2>9.2. Move File</h2>
 
 	<p>
 	<span class="fun">move_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
@@ -648,7 +781,7 @@ ${template_info['fs_move_file']['output']}
 	</pre>
 
 <a id="fs_copy_file"></a>
-<h2>8.3. Copy File</h2>
+<h2>9.3. Copy File</h2>
 	<p>
 	<span class="fun">copy_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
 	Uses the standard Python <span class="fun">shutil.copy2</span> function to copy the file
@@ -672,7 +805,7 @@ ${template_info['fs_copy_file']['output']}
 	</pre>
 
 <a id="fs_copy_new_file"></a>
-<h2>8.4. Copy New File</h2>
+<h2>9.4. Copy New File</h2>
 	<p>
 	<span class="fun">copy_new_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
 	Copies the file only if <span class="arg">dest</span> does not exist, or <span class="arg">source</span> is
@@ -696,7 +829,7 @@ ${template_info['fs_copy_new_file']['output']}
 	</pre>
 
 <a id="fs_copy_dir"></a>
-<h2>8.5. Copy Dir</h2>
+<h2>9.5. Copy Dir</h2>
 	<p>
 	<span class="fun">copy_dir(<span class="arg">source</span>, <span class="arg">dest</span>, <span class="arg">symlinks</span> = False)</span><br />
 	Uses the standard Python <span class="fun">shutil.copytree</span> function to recursively copy 
@@ -722,7 +855,7 @@ ${template_info['fs_copy_dir']['output']}
 	</pre>
 
 <a id="fs_make_dir"></a>
-<h2>8.6. Make Dir</h2>
+<h2>9.6. Make Dir</h2>
 	<p>
 	<span class="fun">make_dir(<span class="arg">source</span>, <span class="arg">ignore_failure</span> = False)</span><br />
 	Uses the standard Python <span class="fun">os.mkdir</span> function to make the 
@@ -747,7 +880,7 @@ ${template_info['fs_make_dir']['output']}
 	</pre>
 
 <a id="fs_remove_dir"></a>
-<h2>8.7. Remove Dir</h2>
+<h2>9.7. Remove Dir</h2>
 	<p>
 	<span class="fun">remove_dir(<span class="arg">name</span>, <span class="arg">and_children</span> = False)</span><br />
 	Uses the standard Python <span class="fun">shutil.rmtree</span> function to remove the 
@@ -773,7 +906,7 @@ ${template_info['fs_remove_dir']['output']}
 	</pre>
 
 <a id="fs_remove_file"></a>
-<h2>8.8. Remove File</h2>
+<h2>9.8. Remove File</h2>
 	<p>
 	<span class="fun">remove_file(<span class="arg">name</span>, <span class="arg">ignore_failure</span> = False)</span><br />
 	Uses the standard Python <span class="fun">os.rmdir</span> function to remove the 
@@ -798,7 +931,7 @@ ${template_info['fs_remove_file']['output']}
 	</pre>
 
 <a id="fs_remove_binaries"></a>
-<h2>8.9. Remove Binaries</h2>
+<h2>9.9. Remove Binaries</h2>
 	<p>
 	<span class="fun">remove_binaries(<span class="arg">name</span>)</span><br />
 	Will remove any files that start with <span class="arg">name</span>, and have the 
@@ -823,7 +956,7 @@ ${template_info['fs_remove_binaries']['output']}
 	</pre>
 
 <a id="fs_symlink"></a>
-<h2>8.10. Symlink</h2>
+<h2>9.10. Symlink</h2>
 	<p>
 	<span class="fun">symlink(<span class="arg">source</span>, <span class="arg">link_name</span>)</span><br />
 	Uses the standard Python <span class="fun">os.symlink</span> function to create a 
@@ -850,25 +983,25 @@ ${template_info['fs_symlink']['output']}
 
 
 <a id="terminal"></a>
-<h1>9. Terminal</h1>
+<h1>10. Terminal</h1>
 
 
 <hr />
 
 
 <a id="libraries_and_programs"></a>
-<h1>10. Libraries and Programs</h1>
+<h1>11. Libraries and Programs</h1>
 
 
 <hr />
 
 
 <a id="c"></a>
-<h1>11. C</h1>
+<h1>12. C</h1>
 
 
 <a id="c_file_extensions"></a>
-<h2>11.1. File Extensions</h2>
+<h2>12.1. File Extensions</h2>
 
 	<table>
 		<tr>
@@ -909,7 +1042,7 @@ ${template_info['fs_symlink']['output']}
 	<table>
 
 <a id="c_compilers"></a>
-<h2>11.2. Compilers</h2>
+<h2>12.2. Compilers</h2>
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C compilers. The compiler
@@ -945,7 +1078,7 @@ ${template_info['c_compilers']['output']}
 	</pre>
 
 <a id="c_compiler_setup"></a>
-<h2>11.3. Compiler Setup</h2>
+<h2>12.3. Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -982,7 +1115,7 @@ ${template_info['c_compiler_setup']['output']}
 	</pre>
 
 <a id="c_building_object"></a>
-<h2>11.4. Building Object</h2>
+<h2>12.4. Building Object</h2>
 
 	<p>
 		C object files can be built using the <span class="fun">C.build_object</span> function.
@@ -1005,7 +1138,7 @@ ${template_info['c_building_object']['output']}
 	</pre>
 
 <a id="c_building_program"></a>
-<h2>11.5. Building Program</h2>
+<h2>12.5. Building Program</h2>
 
 	<p>
 		C programs can be built using the <span class="fun">C.build_program</span> function.
@@ -1028,7 +1161,7 @@ ${template_info['c_building_program']['output']}
 	</pre>
 
 <a id="c_building_shared_library"></a>
-<h2>11.6. Building Shared Library</h2>
+<h2>12.6. Building Shared Library</h2>
 
 	<p>
 		C shared library can be built using the <span class="fun">C.build_shared_library</span> function.
@@ -1051,7 +1184,7 @@ ${template_info['c_building_shared_library']['output']}
 	</pre>
 
 <a id="c_program_installation"></a>
-<h2>11.7. Program Installation</h2>
+<h2>12.7. Program Installation</h2>
 
 	<p>
 		C programs can be installed with the <span class="fun">C.install_program</span> function.
@@ -1074,7 +1207,7 @@ ${template_info['c_program_installation']['output']}
 	</pre>
 
 <a id="c_uninstall_program"></a>
-<h2>11.8. Program Uninstallation</h2>
+<h2>12.8. Program Uninstallation</h2>
 
 	<p>
 		fixme
@@ -1098,7 +1231,7 @@ ${template_info['c_uninstall_program']['output']}
 
 
 <a id="c_library_installation"></a>
-<h2>11.9. Library Installation</h2>
+<h2>12.9. Library Installation</h2>
 
 	<p>
 		fixme
@@ -1122,7 +1255,7 @@ ${template_info['c_library_installation']['output']}
 
 
 <a id="c_library_uinstallation"></a>
-<h2>11.10. Library Uninstallation</h2>
+<h2>12.10. Library Uninstallation</h2>
 
 	<p>
 		fixme
@@ -1146,7 +1279,7 @@ ${template_info['c_library_uinstallation']['output']}
 
 
 <a id="c_header_installation"></a>
-<h2>11.11. Header Installation</h2>
+<h2>12.11. Header Installation</h2>
 
 	<p>
 		fixme
@@ -1170,7 +1303,7 @@ ${template_info['c_header_installation']['output']}
 
 
 <a id="c_header_uinstallation"></a>
-<h2>11.12. Header Uninstall</h2>
+<h2>12.12. Header Uninstall</h2>
 
 	<p>
 		fixme
@@ -1194,7 +1327,7 @@ ${template_info['c_header_uinstallation']['output']}
 
 
 <a id="c_running_and_printing"></a>
-<h2>11.13. Running and Printing</h2>
+<h2>12.13. Running and Printing</h2>
 
 	<p>
 		C programs can be ran with the <span class="fun">C.run_print</span> function.
@@ -1220,18 +1353,18 @@ ${template_info['c_running_and_printing']['output']}
 
 
 <a id="c++"></a>
-<h1>12. C++</h1>
+<h1>13. C++</h1>
 
 
 <hr />
 
 
 <a id="d"></a>
-<h1>13. D</h1>
+<h1>14. D</h1>
 
 
 <a id="d_file_extensions"></a>
-<h2>13.1. File Extensions</h2>
+<h2>14.1. File Extensions</h2>
 
 	<table>
 		<tr>
@@ -1276,21 +1409,21 @@ ${template_info['c_running_and_printing']['output']}
 
 
 <a id="c_sharp"></a>
-<h1>14. C#</h1>
+<h1>15. C#</h1>
 
 
 <hr />
 
 
 <a id="java"></a>
-<h1>15. Java</h1>
+<h1>16. Java</h1>
 
 
 <hr />
 
 
 <a id="concurrency"></a>
-<h1>16. Concurrency</h1>
+<h1>17. Concurrency</h1>
 
 
 <hr />

@@ -162,4 +162,26 @@ def c_running_and_printing():
 	# Run the C program
 	C.run_print('./main.exe')
 
+'''
+OS
+'''
+
+def users_running_as_root():
+	print('fixme')
+
+def users_running_as_a_normal_user():
+	print('fixme')
+
+def users_privilege_escalation():
+	print('fixme')
+
+def users_user_name():
+	print('fixme')
+
+def users_user_id():
+	print('fixme')
+
+
+
+
 
