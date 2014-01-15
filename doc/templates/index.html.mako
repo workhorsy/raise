@@ -3,21 +3,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Raise 0.3 Documentation</title>
+		<title>Raise Documentation 0.3</title>
 		<link type="text/css" rel="Stylesheet" href="styles.css" />
 		<link href="themes/obsidian.css" rel="stylesheet" type="text/css" media="screen" />
 	</head>
 
 	<body>
 
-<h1>Raise 0.3 Documentation</h1>
+<h1 class="header">Raise Documentation 0.3</h1>
 
 <p>
 A small build automation tool that ships with your software.
 <p>
 
 <p>
-&copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
+Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
@@ -41,6 +41,8 @@ Last updated on January 14th 2014
 		<li><a href="#authors_and_copyright">Authors and Copyright</a></li>
 		<li><a href="#contact_and_bugs">Contact and Bugs</a></li>
 		<li><a href="#documentation">Documentation</a></li>
+		<li><a href="#philosophy">Philosophy</a></li>
+		<li><a href="#goals">Goals</a></li>
 	</ol>
 	<li><a href="#installation">Installation</a></li>
 	<ol>
@@ -159,7 +161,7 @@ Last updated on January 14th 2014
 <h1>1. Introduction</h1>
 
 <a id="license"></a>
-<h2>1.1 License</h2>
+<h2>1.1. License</h2>
 
 <p>
 Raise is licensed as freely as posible, in the hopes that it will be 
@@ -227,6 +229,37 @@ python generate_documentation.py
 	whipe out any changes in index.html when generate_documentation.py 
 	is run.
 </p>
+
+
+<a id="philosophy"></a>
+<h2>1.5. Philosophy</h2>
+
+<p>
+The philosophy of Raise is that it says what it is doing. Not how
+ it is doing it. It only shows the details when something goes wrong. 
+That way the build output does not fill with information you 
+don't need. It shows the output for each step of the build 
+process, as its own line.
+</p>
+
+<a id="goals"></a>
+<h2>1.6. Goals</h2>
+
+<p>
+	<ol>
+		<li>Should be fast for incremental and clean builds, even with 10,000 of files.</li>
+		<li>Should be able to automatically find libraries and programs.</li>
+		<li>Should work with Python instead of creating its own language or using a graph.</li>
+		<li>Should run without needing to be installed.</li>
+		<li>Should be small enough to include in your VCS and ship with your software.</li>
+		<li>Should not require any external dependencies, libraries, or tools.</li>
+		<li>Should do everything implicitly instead of explicitly.</li>
+		<li>Should work consistently across platforms.</li>
+		<li>Should be easy to do things sequentially or concurrently.</li>
+		<li>Should present output in a uniform and intuitive way.</li>
+	</ol>
+</p>
+
 
 <hr />
 

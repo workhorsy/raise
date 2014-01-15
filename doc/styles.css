@@ -2,8 +2,8 @@ body {
 	background-color: #FFFFFF;
 	color: #2c2c2c;
 	font-family: Verdana, Geneva, Helvetica, sans-serif;
-	margin-left: 10%;
-	margin-right: 10%;
+	margin-left: 5%;
+	margin-right: 5%;
 }
 
 table, th, td {
@@ -88,6 +88,13 @@ a[rel="external"] {
 
 .raise_output .success {
 	background-color: #4e9a06;
+}
+
+.header {
+	display: block;
+	/*text-indent: 128px;*/
+	min-height: 128px;
+	background: url(raise_icon_no_logo_128.png) no-repeat;
 }
 
 #footer {
