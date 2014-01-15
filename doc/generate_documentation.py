@@ -58,6 +58,17 @@ info = {
 	'c_compilers' : {},
 	'c_compiler_setup' : {},
 	'c_building_object' : {},
+	'c_building_program' : {},
+	'c_building_object' : {},
+	'c_building_program' : {},
+	'c_building_shared_library' : {},
+	'c_program_installation' : {},
+	'c_uninstall_program' : {},
+	'c_library_installation' : {},
+	'c_library_uinstallation' : {},
+	'c_header_installation' : {},
+	'c_header_uinstallation' : {},
+	'c_running_and_printing' : {},
 }
 
 if __name__ == '__main__':
@@ -71,9 +82,13 @@ if __name__ == '__main__':
 
 		# Get the source code
 		example = run_and_get_stdall('./raise -plain -inspect {0}'.format(anchor))
+		if len(example.strip()) == 0:
+			raise Exception('Example for "{0}" was blank.'.format(anchor))
 
 		# Get the output and apply CSS styles
 		output = run_and_get_stdall('./raise -plain {0}'.format(anchor))
+		if len(output.strip()) == 0:
+			raise Exception('Output for "{0}" was blank.'.format(anchor))
 		output = str.join("\n", output.split("\n")[1 : ])
 		output = add_styles(output)
 

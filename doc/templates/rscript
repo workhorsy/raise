@@ -28,6 +28,9 @@ def setup():
 	if os.path.isfile('two'):
 		os.remove('two')
 
+	#if os.path.isfile('main'):
+	#	os.remove('main')
+
 	open('one', 'a').close()
 
 '''
@@ -101,10 +104,62 @@ def c_compiler_setup():
 	print("$CFLAGS: {0}".format(os.environ['CFLAGS']))
 
 def c_building_object():
+	# Get and setup the C compiler
 	cc = C.get_default_compiler()
 	cc.debug = True
 	C.save_compiler(cc)
 
+	# Build the object
 	C.build_object('main.o', ['main.c'])
+
+def c_building_program():
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Build the program
+	C.build_program('main.exe', ['main.c'])
+
+def c_building_shared_library():
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Build the library
+	C.build_object('libexample.o', ['libexample.c'])
+	C.build_shared_library('libexample.so', ['libexample.o'])
+
+
+def c_program_installation():
+	print('fixme')
+
+def c_uninstall_program():
+	print('fixme')
+
+def c_library_installation():
+	print('fixme')
+
+def c_library_uinstallation():
+	print('fixme')
+
+def c_header_installation():
+	print('fixme')
+
+def c_header_uinstallation():
+	print('fixme')
+
+def c_running_and_printing():
+		# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Build the program
+	C.build_program('main.exe', ['main.c'])
+
+	# Run the C program
+	C.run_print('./main.exe')
 
 

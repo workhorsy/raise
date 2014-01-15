@@ -1007,30 +1007,214 @@ ${template_info['c_building_object']['output']}
 <a id="c_building_program"></a>
 <h2>11.5. Building Program</h2>
 
+	<p>
+		C programs can be built using the <span class="fun">C.build_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_building_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_building_program']['output']}
+	</pre>
+
 <a id="c_building_shared_library"></a>
 <h2>11.6. Building Shared Library</h2>
+
+	<p>
+		C shared library can be built using the <span class="fun">C.build_shared_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_building_shared_library']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_building_shared_library']['output']}
+	</pre>
 
 <a id="c_program_installation"></a>
 <h2>11.7. Program Installation</h2>
 
+	<p>
+		C programs can be installed with the <span class="fun">C.install_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_program_installation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_program_installation']['output']}
+	</pre>
+
 <a id="c_uninstall_program"></a>
 <h2>11.8. Program Uninstallation</h2>
+
+	<p>
+		fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_uninstall_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_uninstall_program']['output']}
+	</pre>
+
 
 <a id="c_library_installation"></a>
 <h2>11.9. Library Installation</h2>
 
+	<p>
+		fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_library_installation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_library_installation']['output']}
+	</pre>
+
+
 <a id="c_library_uinstallation"></a>
 <h2>11.10. Library Uninstallation</h2>
+
+	<p>
+		fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_library_uinstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_library_uinstallation']['output']}
+	</pre>
+
 
 <a id="c_header_installation"></a>
 <h2>11.11. Header Installation</h2>
 
+	<p>
+		fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_header_installation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_header_installation']['output']}
+	</pre>
+
+
 <a id="c_header_uinstallation"></a>
 <h2>11.12. Header Uninstall</h2>
+
+	<p>
+		fixme
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_header_uinstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_header_uinstallation']['output']}
+	</pre>
+
 
 <a id="c_running_and_printing"></a>
 <h2>11.13. Running and Printing</h2>
 
+	<p>
+		C programs can be ran with the <span class="fun">C.run_print</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['c_running_and_printing']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['c_running_and_printing']['output']}
+	</pre>
 
 <hr />
 
