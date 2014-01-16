@@ -682,6 +682,14 @@ Effective user id: 1000
 	</p>
 
 	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_running_as_a_normal_user']['example']}
+	</code></pre>
+
+	<p>
 	Example output when run as root:
 	</p>
 
@@ -780,6 +788,14 @@ Normal user name: matt
 	<span class="fun">os.geteuid</span> will return 0, because it is
 	actually being run as root.
 	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['users_user_id']['example']}
+	</code></pre>
 
 	<p>
 	Example output when NOT run as root:
