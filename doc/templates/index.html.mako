@@ -219,7 +219,7 @@ The Raise documentation is license under
 <h2>1.2. Authors and Copyright</h2>
 
 <p>
-&copy; 2013 - 2014 Matthew Brennan Jones <a href="mailto:mattjones@workhorsy.org">&lt;mattjones@workhorsy.org&gt;</a>
+Copyright &copy; 2013 - 2014 Matthew Brennan Jones <a href="mailto:mattjones@workhorsy.org">&lt;mattjones@workhorsy.org&gt;</a>
 </p>
 
 <p>
@@ -231,7 +231,7 @@ Other authors please add your copyright and contact info here.
 
 <p>
 If you find any errors, bugs, or misinformation, please report a bug at 
-<a href="https://launchpad.net/raise">https://launchpad.net/raise</a> or 
+<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a> or 
 contact one of the authors.
 </p>
 
@@ -1695,7 +1695,7 @@ ${template_info['c_running_and_printing']['output']}
 
 
 		<div id="footer">
-			&copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
+			Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 			<br />
 			Raise is licensed under 
 			<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
