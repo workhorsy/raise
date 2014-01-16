@@ -8,7 +8,7 @@
  * @version 1.0
  */
 pre {
-    background: #22282A;
+    background: #000000;
     word-wrap: break-word;
     margin: 0px;
     padding: 0px;
@@ -19,11 +19,11 @@ pre {
 }
 
 pre, code {
-    font-family: 'Monaco', courier, monospace;
+    font-family: monospace;
 }
 
 pre .comment {
-	color: #66747B;
+	color: #0088FF;
 }
 
 pre .constant {
