@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 15th 2014
+Last updated on January 16th 2014
 </p>
 
 <p>
@@ -37,7 +37,7 @@ Last updated on January 15th 2014
 <ol>
 	<li><a href="#introduction">Introduction</a></li>
 	<ol>
-		<li><a href="#license">License
+		<li><a href="#license">License</a></li>
 		<li><a href="#authors_and_copyright">Authors and Copyright</a></li>
 		<li><a href="#contact_and_bugs">Contact and Bugs</a></li>
 		<li><a href="#documentation">Documentation</a></li>
@@ -46,14 +46,8 @@ Last updated on January 15th 2014
 	</ol>
 	<li><a href="#installation">Installation</a></li>
 	<ol>
-		<li><a href="#installation_linux">Linux</a></li>
-		<li><a href="#installation_freebsd">FreeBSD</a></li>
+		<li><a href="#installation_normal">Normal</a></li>
 		<li><a href="#installation_windows">Windows</a></li>
-		<li><a href="#installation_cygwin">Cygwin</a></li>
-		<li><a href="#installation_os_x">OS X</a></li>
-		<li><a href="#installation_open_indiana">Open Indiana</a></li>
-		<li><a href="#installation_haiku">Haiku</a></li>
-		<li><a href="#installation_mobile">Android, iOS, Chrome OS</a></li>
 		<li><a href="#installation_from_trunk">From Trunk</a></li>
 	</ol>
 	<li><a href="#command_line_arguments">Command Line Arguments</a></li>
@@ -214,7 +208,7 @@ contact one of the authors.
 
 <p>
 	Documentation is provided in the doc/index.html file. It is generated 
-	from the <a href="http://makotemplates.org" target="_blank"rel="external">Python Mako Template</a> 
+	from the <a href="http://makotemplates.org" target="_blank" rel="external">Python Mako Template</a> 
 	file doc/templates/index.html.mako.
 </p>
 
@@ -275,16 +269,26 @@ process, as its own line.
 <a id="installation"></a>
 <h1>2. Installation</h1>
 
+
+
 <p>
-Raise does not get installed into your Operating System.
+Raise should not be installed into your Operating System. It is designed to run
+from inside your project's directory.
 </p>
 
 <p>
-Instead it consists of a small shim script called "raise" and a directory of 
-modules called ".lib_raise". The "raise" script is safe to save into your VCS 
+Raise consists of a small shim script called "raise" and a directory of 
+modules called ".lib_raise". The "raise" shim is safe to save into your VCS 
 along with your source code. It is small (7kB) and should not change very often. 
-All the ".lib_raise" files are automatically downloaded from by the "raise" 
+All the ".lib_raise" modules are automatically downloaded by the "raise" 
 shim. You should not check the ".lib_raise" directory into your VCS.
+</p>
+
+<p>
+If you want to check the raise modules into your VCS (So your project will 
+build without needing an Internet connection). You should rename the
+".lib_raise" directory to "lib_raise". This is also a good idea to do before 
+you release your source code as a compressed file.
 </p>
 
 <p>
@@ -292,7 +296,7 @@ The file hierarchy of Raise looks like this:
 </p>
 
 <pre>
-# Your script the builds your software
+# Your script that builds your software
 rscript
 
 # The shim that gets everything ready
@@ -319,17 +323,8 @@ raise
            └─lib_raise_terminal.py
 </pre>
 
-<a id="installation_linux"></a>
-<h2>2.1. Linux Installation</h2>
-
-	<pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
-chmod +x raise
-./raise
-	</code></pre>
-
-<a id="installation_freebsd"></a>
-<h2>2.2. FreeBSD Installation</h2>
+<a id="installation_normal"></a>
+<h2>2.1. Normal Installation</h2>
 
 	<pre><code data-language="shell">
 wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
@@ -338,7 +333,7 @@ chmod +x raise
 	</code></pre>
 
 <a id="installation_windows"></a>
-<h2>2.3. Windows Installation</h2>
+<h2>2.2. Windows Installation</h2>
 
 <p>
 Download from <a href="http://launchpad.net/raise/trunk/0.3.0/+download/raise"> http://launchpad.net/raise/trunk/0.3.0/+download/raise</a>
@@ -348,48 +343,12 @@ Download from <a href="http://launchpad.net/raise/trunk/0.3.0/+download/raise"> 
 python raise
 	</code></pre>
 
-<a id="installation_cygwin"></a>
-<h2>2.4. Cygwin Installation</h2>
-
-	<pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
-chmod +x raise
-./raise
-	</code></pre>
-
-<a id="installation_os_x"></a>
-<h2>2.5. OS X Installation</h2>
-
-<p>
-<a href="#os_x_support">See support for more details.</a>
-</p>
-
-<a id="installation_open_indiana"></a>
-<h2>2.6. Open Indiana Installation</h2>
-
-<p>
-<a href="#os_open_indiana">See support for more details.</a>
-</p>
-
-<a id="installation_haiku"></a>
-<h2>2.7. Haiku Installation</h2>
-
-<p>
-<a href="#os_haiku">See support for more details.</a>
-</p>
-
-<a id="installation_mobile"></a>
-<h2>2.8. Android, iOS, Chrome OS Installation</h2>
-
-<p>
-<a href="#os_mobile">See support for more details.</a>
-</p>
-
 <a id="installation_from_trunk"></a>
-<h2>2.9. From Trunk Installation</h2>
+<h2>2.3. From Trunk Installation</h2>
 
 	<p>
-		Source code can be checked out using the Bazaar VCS.
+		Source code can be checked out using the 
+		<a href="http://bazaar.canonical.com/en/" target="_blank" rel="external">Bazaar VCS</a>.
 	<p>
 
 	<pre><code data-language="shell">
