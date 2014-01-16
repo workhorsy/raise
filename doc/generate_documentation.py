@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 '''
 	Running this script will generate the documentation index.html 
@@ -110,7 +112,11 @@ if __name__ == '__main__':
 	os.chdir('..')
 
 	# Apply the generated code info to the template
-	mytemplate = Template(filename='templates/index.html.mako')
+	mytemplate = Template(
+		filename='templates/index.html.mako', 
+		input_encoding='utf-8',
+		output_encoding='utf-8')
+
 	with open('index.html', 'wb') as f:
 		f.write(mytemplate.render(template_info=info))
 

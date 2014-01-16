@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 14th 2014
+Last updated on January 15th 2014
 </p>
 
 <p>
@@ -46,7 +46,15 @@ Last updated on January 14th 2014
 	</ol>
 	<li><a href="#installation">Installation</a></li>
 	<ol>
-		<li><span class="fixme">FIXME</span></li>
+		<li><a href="#installation_linux">Linux</a></li>
+		<li><a href="#installation_freebsd">FreeBSD</a></li>
+		<li><a href="#installation_windows">Windows</a></li>
+		<li><a href="#installation_cygwin">Cygwin</a></li>
+		<li><a href="#installation_os_x">OS X</a></li>
+		<li><a href="#installation_open_indiana">Open Indiana</a></li>
+		<li><a href="#installation_haiku">Haiku</a></li>
+		<li><a href="#installation_mobile">Android, iOS, Chrome OS</a></li>
+		<li><a href="#installation_from_trunk">From Trunk</a></li>
 	</ol>
 	<li><a href="#command_line_arguments">Command Line Arguments</a></li>
 	<ol>
@@ -267,8 +275,132 @@ process, as its own line.
 <a id="installation"></a>
 <h1>2. Installation</h1>
 
+<p>
+Raise does not get installed into your Operating System.
+</p>
+
+<p>
+Instead it consists of a small shim script called "raise" and a directory of 
+modules called ".lib_raise". The "raise" script is safe to save into your VCS 
+along with your source code. It is small (7kB) and should not change very often. 
+All the ".lib_raise" files are automatically downloaded from by the "raise" 
+shim. You should not check the ".lib_raise" directory into your VCS.
+</p>
+
+<p>
+The file hierarchy of Raise looks like this:
+</p>
+
+<pre>
+# Your script the builds your software
+rscript
+
+# The shim that gets everything ready
+raise
+
+# The modules that are automatically downloaded
+.lib_raise─┬
+           ├─lib_raise_ar.py
+           ├─lib_raise_config.py
+           ├─lib_raise_cpu.py
+           ├─lib_raise_c.py
+           ├─lib_raise_csharp.py
+           ├─lib_raise_cxx.py
+           ├─lib_raise_d.py
+           ├─lib_raise_fs.py
+           ├─lib_raise_helpers.py
+           ├─lib_raise_java.py
+           ├─lib_raise_libraries.py
+           ├─lib_raise_linker.py
+           ├─lib_raise_os.py
+           ├─lib_raise_process.py
+           ├─lib_raise.py
+           ├─lib_raise_python.py
+           └─lib_raise_terminal.py
+</pre>
+
+<a id="installation_linux"></a>
+<h2>2.1. Linux Installation</h2>
+
+	<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
+chmod +x raise
+./raise
+	</code></pre>
+
+<a id="installation_freebsd"></a>
+<h2>2.2. FreeBSD Installation</h2>
+
+	<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
+chmod +x raise
+./raise
+	</code></pre>
+
+<a id="installation_windows"></a>
+<h2>2.3. Windows Installation</h2>
+
+<p>
+Download from <a href="http://launchpad.net/raise/trunk/0.3.0/+download/raise"> http://launchpad.net/raise/trunk/0.3.0/+download/raise</a>
+</p>
+
+	<pre><code data-language="shell">
+python raise
+	</code></pre>
+
+<a id="installation_cygwin"></a>
+<h2>2.4. Cygwin Installation</h2>
+
+	<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
+chmod +x raise
+./raise
+	</code></pre>
+
+<a id="installation_os_x"></a>
+<h2>2.5. OS X Installation</h2>
+
+<p>
+<a href="#os_x_support">See support for more details.</a>
+</p>
+
+<a id="installation_open_indiana"></a>
+<h2>2.6. Open Indiana Installation</h2>
+
+<p>
+<a href="#os_open_indiana">See support for more details.</a>
+</p>
+
+<a id="installation_haiku"></a>
+<h2>2.7. Haiku Installation</h2>
+
+<p>
+<a href="#os_haiku">See support for more details.</a>
+</p>
+
+<a id="installation_mobile"></a>
+<h2>2.8. Android, iOS, Chrome OS Installation</h2>
+
+<p>
+<a href="#os_mobile">See support for more details.</a>
+</p>
+
+<a id="installation_from_trunk"></a>
+<h2>2.9. From Trunk Installation</h2>
+
+	<p>
+		Source code can be checked out using the Bazaar VCS.
+	<p>
+
+	<pre><code data-language="shell">
+bzr branch lp:raise
+cd raise/examples/c_simple
+./raise test
+	</code></pre>
+
 
 <hr />
+
 
 <a id="command_line_arguments"></a>
 <h1>3. Command Line Arguments</h1>
