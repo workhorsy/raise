@@ -202,7 +202,7 @@ Last updated on January 16th 2014
 <h2>1.1. License</h2>
 
 <p>
-Raise is licensed as freely as posible, in the hopes that it will be 
+Raise is licensed as freely as possible, in the hopes that it will be 
 compatible with most other software licenses.
 </p>
 
@@ -264,7 +264,7 @@ python generate_documentation.py
 
 <p>
 	Any changes should be added to the index.html.mako file, as it will 
-	whipe out any changes in index.html when generate_documentation.py 
+	wipe out any changes in index.html when generate_documentation.py 
 	is run.
 </p>
 
@@ -637,7 +637,7 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 <h2>6.2. File Extensions</h2>
 
 <p>
-One of the huge issue in dealing with differnt platforms, is how they handle file 
+One of the huge issue in dealing with different platforms, is how they handle file 
 extensions. Many have different extensions for the same type of file. For example
 Windows typically uses .exe for executable, and .obj for object. While Linux 
 typically uses no extension for executable, and .o for object.
@@ -1280,7 +1280,7 @@ ${template_info['fs_symlink']['output']}
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C compilers. The compiler
-		 is abstracted away in a gereralized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't 
 		have to worry about compiler specific functionality.
 	</p>
 
