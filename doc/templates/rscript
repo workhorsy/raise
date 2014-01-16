@@ -151,7 +151,7 @@ def c_header_uinstallation():
 	print('fixme')
 
 def c_running_and_printing():
-		# Get and setup the C compiler
+	# Get and setup the C compiler
 	cc = C.get_default_compiler()
 	cc.debug = True
 	C.save_compiler(cc)
@@ -167,19 +167,41 @@ OS
 '''
 
 def users_running_as_root():
-	print('fixme')
+	# Print the user id
+	print('Effective user id: {0}'.format(os.getuid()))
+
+	# Will print an error and exit if the user is NOT root
+	OS.require_root()
 
 def users_running_as_a_normal_user():
-	print('fixme')
+	# Print the user id
+	print('Effective user id: {0}'.format(os.getuid()))
+
+	# Will print an error and exit if the user is root
+	OS.require_not_root()
 
 def users_privilege_escalation():
-	print('fixme')
+	# User id by default
+	print('Effective user id: {0}'.format(os.geteuid()))
+
+	# User id when running as a normal user
+	def cb():
+		print('Effective user id: {0}'.format(os.geteuid()))
+	OS.do_as_normal_user(cb)
+
+	# User id by default
+	print('Effective user id: {0}'.format(os.geteuid()))
 
 def users_user_name():
-	print('fixme')
+	import getpass
+	print('Current user name: {0}'.format(getpass.getuser()))
+
+	print('Normal user name: {0}'.format(OS.get_normal_user_name()))
 
 def users_user_id():
-	print('fixme')
+	print('Current user id: {0}'.format(os.getuid()))
+
+	print('Normal user id: {0}'.format(OS.get_normal_user_id()))
 
 
 

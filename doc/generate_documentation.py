@@ -70,11 +70,11 @@ info = {
 	'c_header_uinstallation' : {},
 	'c_running_and_printing' : {},
 
-	'users_running_as_root' : {},
-	'users_running_as_a_normal_user' : {},
+	'users_running_as_root' : 'skip_run',
+	'users_running_as_a_normal_user' : 'skip_run',
 	'users_privilege_escalation' : {},
-	'users_user_name' : {},
-	'users_user_id' : {},
+	'users_user_name' : 'skip_run',
+	'users_user_id' : 'skip_run',
 }
 
 if __name__ == '__main__':
@@ -92,11 +92,13 @@ if __name__ == '__main__':
 			raise Exception('Example for "{0}" was blank.'.format(anchor))
 
 		# Get the output and apply CSS styles
-		output = run_and_get_stdall('./raise -plain {0}'.format(anchor))
-		if len(output.strip()) == 0:
-			raise Exception('Output for "{0}" was blank.'.format(anchor))
-		output = str.join("\n", output.split("\n")[1 : ])
-		output = add_styles(output)
+		output = 'skip'
+		if value != 'skip_run':
+			output = run_and_get_stdall('./raise -plain {0}'.format(anchor))
+			if len(output.strip()) == 0:
+				raise Exception('Output for "{0}" was blank.'.format(anchor))
+			output = str.join("\n", output.split("\n")[1 : ])
+			output = add_styles(output)
 
 		# Save the code and output
 		info[anchor] = {

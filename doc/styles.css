@@ -78,15 +78,15 @@ a[rel="external"] {
 	background-color: #c4a000;
 }
 
-.raise_output .target {
+.target {
 	background-color: #3465a4;
 }
 
-.raise_output .failure {
+.failure {
 	background-color: #FF0000;
 }
 
-.raise_output .success {
+.success {
 	background-color: #4e9a06;
 }
 

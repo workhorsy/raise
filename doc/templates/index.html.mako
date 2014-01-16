@@ -641,7 +641,9 @@ Produces the result:
 <h2>8.1. Running as Root</h2>
 
 	<p>
-	fixme
+	If you want to ensure that a script is run as root. You can use the
+	<span class="fun">OS.require_root</span> function. If the script is not
+	run as root, it will print an error and exit.
 	</p>
 
 	<p>
@@ -653,11 +655,20 @@ ${template_info['users_running_as_root']['example']}
 	</code></pre>
 
 	<p>
-	Example output:
+	Example output when run as root:
 	</p>
 
 	<pre class="raise_output">
-${template_info['users_running_as_root']['output']}
+Effective user id: 0
+	</pre>
+
+	<p>
+	Example output when NOT run as root:
+	</p>
+
+	<pre class="raise_output">
+Effective user id: 1000
+<span class="failure">Must be run as root. Exiting ...</span>
 	</pre>
 
 
@@ -665,23 +676,26 @@ ${template_info['users_running_as_root']['output']}
 <h2>8.2. Running as a Normal User</h2>
 
 	<p>
-	fixme
+	If you want to ensure that a script is run as a normal user, you can 
+	use the <span class="fun">OS.require_not_root</span> function. If the
+	script is run as root, it will print an error and exit.
 	</p>
 
 	<p>
-	Example:
-	</p>
-
-	<pre><code data-language="python">
-${template_info['users_running_as_a_normal_user']['example']}
-	</code></pre>
-
-	<p>
-	Example output:
+	Example output when run as root:
 	</p>
 
 	<pre class="raise_output">
-${template_info['users_running_as_a_normal_user']['output']}
+Effective user id: 0
+<span class="failure">Must not be run as root. Exiting ...</span>
+	</pre>
+
+	<p>
+	Example output when NOT run as root:
+	</p>
+
+	<pre class="raise_output">
+Effective user id: 1000
 	</pre>
 
 
@@ -689,7 +703,12 @@ ${template_info['users_running_as_a_normal_user']['output']}
 <h2>8.3. Privilege Escalation</h2>
 
 	<p>
-	fixme
+	Often you will need do some actions as root, and others as a normal user, 
+	all in the same script. A common example is to compile a program as a 
+	normal user, then install it as root. You can do this by running the 
+	script as root, then using the function 
+	<span class="fun">OS.do_as_normal_user</span>
+	to temporarily step down as a normal user.
 	</p>
 
 	<p>
@@ -705,7 +724,9 @@ ${template_info['users_privilege_escalation']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['users_privilege_escalation']['output']}
+Effective user id: 0
+Effective user id: 1000
+Effective user id: 0
 	</pre>
 
 
@@ -713,7 +734,13 @@ ${template_info['users_privilege_escalation']['output']}
 <h2>8.4. User Name</h2>
 
 	<p>
-	fixme
+	When running a script with a privilege escalation tool such as 
+	<span class="fun">sudo</span>, you often need to get the actual user
+	name. Most python functions such as 
+	<span class="fun">getpass.getuser</span> 
+	will return 'root', because it is actually being run as root. To get
+	the actual user name, you can use the 
+	<span class="fun">OS.get_normal_user_name</span> function.
 	</p>
 
 	<p>
@@ -725,35 +752,51 @@ ${template_info['users_user_name']['example']}
 	</code></pre>
 
 	<p>
-	Example output:
+	Example output when NOT run as root:
 	</p>
 
 	<pre class="raise_output">
-${template_info['users_user_name']['output']}
+Current user name: matt
+Normal user name: matt
 	</pre>
 
+	<p>
+	Example output when run as root:
+	</p>
+
+	<pre class="raise_output">
+Current user name: root
+Normal user name: matt
+	</pre>
 
 <a id="users_user_id"></a>
 <h2>8.5. User ID</h2>
 
 	<p>
-	fixme
+	When running a script with a privilege escalation tool such as 
+	<span class="fun">sudo</span>, you often need to get the actual user
+	name. Most python functions such as 
+	<span class="fun">os.getuid</span> and 
+	<span class="fun">os.geteuid</span> will return 0, because it is
+	actually being run as root.
 	</p>
 
 	<p>
-	Example:
-	</p>
-
-	<pre><code data-language="python">
-${template_info['users_user_id']['example']}
-	</code></pre>
-
-	<p>
-	Example output:
+	Example output when NOT run as root:
 	</p>
 
 	<pre class="raise_output">
-${template_info['users_user_id']['output']}
+Current user id: 1000
+Normal user id: 1000
+	</pre>
+
+	<p>
+	Example output when run as root:
+	</p>
+
+	<pre class="raise_output">
+Current user id: 0
+Normal user id: 1000
 	</pre>
 
 
