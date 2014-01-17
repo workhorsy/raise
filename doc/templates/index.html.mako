@@ -113,16 +113,16 @@ Last updated on January 16th 2014
 	<li>
 		<a href="#file_system">File System</a>
 		<ol>
-			<li><a href="#fs_change_dir">change_dir</a></li>
-			<li><a href="#fs_move_file">move_file</a></li>
-			<li><a href="#fs_copy_file">copy_file</a></li>
-			<li><a href="#fs_copy_new_file">copy_new_file</a></li>
-			<li><a href="#fs_copy_dir">copy_dir</a></li>
-			<li><a href="#fs_make_dir">make_dir</a></li>
-			<li><a href="#fs_remove_dir">remove_dir</a></li>
-			<li><a href="#fs_remove_file">remove_file</a></li>
-			<li><a href="#fs_remove_binaries">remove_binaries</a></li>
-			<li><a href="#fs_symlink">symlink</a></li>
+			<li><a href="#fs_change_dir">Change Dir</a></li>
+			<li><a href="#fs_move_file">Move File</a></li>
+			<li><a href="#fs_copy_file">Copy File</a></li>
+			<li><a href="#fs_copy_new_file">Copy New File</a></li>
+			<li><a href="#fs_copy_dir">Copy Dir</a></li>
+			<li><a href="#fs_make_dir">Make Dir</a></li>
+			<li><a href="#fs_remove_dir">Remove Dir</a></li>
+			<li><a href="#fs_remove_file">Remove File</a></li>
+			<li><a href="#fs_remove_binaries">Remove Binaries</a></li>
+			<li><a href="#fs_symlink">Symlink</a></li>
 		</ol>
 	</li>
 	<li>
