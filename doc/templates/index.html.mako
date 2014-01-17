@@ -238,6 +238,13 @@ If you find any errors, bugs, or misinformation, please report a bug at
 contact one of the authors.
 </p>
 
+<p>
+Please have a look at the list of upcomming bug fixes for the upcomming 
+<a href="https://launchpad.net/raise/+milestone/0.4.0" target="_blank" rel="external">
+0.4.0 release</a>.
+
+</p>
+
 
 <a id="documentation"></a>
 <h2>1.4. Documentation</h2>
@@ -1461,6 +1468,13 @@ import lib_raise_c as C
 <a id="c_file_extensions"></a>
 <h2>12.1. File Extensions</h2>
 
+	<p>
+	Many C compilers/OSes use different extensions for different types of 
+	files. To get around this limitation, you can use the file extension for
+	the Raise rows below, and it will automatically be mapped to the OS
+	type below.
+	</p>
+
 	<table>
 		<tr>
 			<th></th>
@@ -1763,6 +1777,13 @@ ${template_info['c_running_and_printing']['output']}
 
 <a id="d_file_extensions"></a>
 <h2>14.1. File Extensions</h2>
+
+	<p>
+	Many D compilers/OSes use different extensions for different types of 
+	files. To get around this limitation, you can use the file extension for
+	the Raise rows below, and it will automatically be mapped to the OS
+	type below.
+	</p>
 
 	<table>
 		<tr>
