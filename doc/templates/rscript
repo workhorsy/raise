@@ -4,6 +4,7 @@
 import os
 import shutil
 import lib_raise_c as C
+import lib_raise_cxx as CXX
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
@@ -11,27 +12,26 @@ import lib_raise_os as OS
 import lib_raise_process as Process
 
 
-def setup():
-	if os.path.isdir('example'):
-		shutil.rmtree('example')
-	os.mkdir('example')
-
-	if os.path.isdir('new_example'):
-		shutil.rmtree('new_example')
+def cleanup():
+	for entry in ['example', 'new_example']:
+		if os.path.isdir(entry):
+			shutil.rmtree(entry)
 
 	if os.path.islink('example_link'):
 		os.unlink('example_link')
 
-	if os.path.isfile('one'):
-		os.remove('one')
+	for entry in ['one', 'two', 'main']:
+		if os.path.isfile(entry):
+			os.remove(entry)
 
-	if os.path.isfile('two'):
-		os.remove('two')
+	for entry in ['libexample', 'libadd', 'main']:
+		FS.remove_binaries(entry)
 
-	#if os.path.isfile('main'):
-	#	os.remove('main')
+def setup():
+	cleanup()
 
 	open('one', 'a').close()
+	os.mkdir('example')
 
 '''
 installation
@@ -209,6 +209,124 @@ def c_running_and_printing():
 
 	# Run the C program
 	C.run_print('./main.exe')
+
+'''
+ C++
+'''
+
+def cxx_compilers():
+	cc = CXX.get_default_compiler()
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(cc._name))
+	print("path: {0} ".format(cc._path))
+
+def cxx_compiler_setup():
+	# Get a C++ compiler
+	cc = CXX.get_default_compiler()
+
+	# Compiler setup
+	cc.debug = True
+	cc.optimize = True
+	cc.warnings_all = True
+	cc.warnings_as_errors = True
+	cc.compile_time_flags = ['SDL=true']
+
+	# Save the compiler config in environmental variables
+	CXX.save_compiler(cc)
+
+	# Print environmental variables to see what happens under the hood
+	print("$CXX: {0}".format(os.environ['CXX']))
+	print("$CXXFLAGS: {0}".format(os.environ['CXXFLAGS']))
+
+def cxx_building_object():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the object
+	CXX.build_object('main.o', ['main.cc'])
+
+def cxx_building_program():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the program
+	CXX.build_program('main.exe', ['main.cc'])
+
+def cxx_building_shared_library():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the library
+	CXX.build_object('libadd.o', ['libadd.cc'])
+	CXX.build_shared_library('libadd.so', ['libadd.o'])
+
+
+def cxx_program_installation_and_uninstallation():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the program
+	CXX.build_program('main.exe', ['main.cc'])
+
+	# Install the program
+	CXX.install_program('main.exe')
+
+	FS.remove_binaries('main')
+
+	# Run the C++ program from the system
+	CXX.run_print('main.exe')
+
+	# Uninstall the program
+	CXX.uninstall_program('main.exe')
+
+def cxx_library_installation_and_uninstallation():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the library
+	CXX.build_object('libadd.o', ['libadd.cc'])
+	CXX.build_shared_library('libadd.so', ['libadd.o'])
+
+	# Install the library
+	CXX.install_library('libadd.so')
+
+	# Uninstall the library
+	CXX.uninstall_library('libadd.so')
+
+def cxx_header_installation_and_uninstallation():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Install the header
+	CXX.install_header('libadd.h')
+
+	# Uninstall the header
+	CXX.uninstall_header('libadd.h')
+
+def cxx_running_and_printing():
+	# Get and setup the C++ compiler
+	cc = CXX.get_default_compiler()
+	cc.debug = True
+	CXX.save_compiler(cc)
+
+	# Build the program
+	CXX.build_program('main.exe', ['main.cc'])
+
+	# Run the C++ program
+	CXX.run_print('./main.exe')
 
 '''
 OS

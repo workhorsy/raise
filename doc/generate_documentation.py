@@ -71,6 +71,18 @@ info = {
 	'c_header_installation_and_uninstallation' : 'skip_run',
 	'c_running_and_printing' : {},
 
+	'cxx_compilers' : {},
+	'cxx_compiler_setup' : {},
+	'cxx_building_object' : {},
+	'cxx_building_program' : {},
+	'cxx_building_object' : {},
+	'cxx_building_program' : {},
+	'cxx_building_shared_library' : {},
+	'cxx_program_installation_and_uninstallation' : 'skip_run',
+	'cxx_library_installation_and_uninstallation' : 'skip_run',
+	'cxx_header_installation_and_uninstallation' : 'skip_run',
+	'cxx_running_and_printing' : {},
+
 	'users_running_as_root' : 'skip_run',
 	'users_running_as_a_normal_user' : 'skip_run',
 	'users_privilege_escalation' : {},
@@ -91,7 +103,7 @@ if __name__ == '__main__':
 
 	# Generate the source code and output for each doc item
 	for anchor, value in info.items():
-		# Cleanup
+		# Setup
 		run_and_get_stdall('./raise setup')
 
 		# Get the source code
@@ -113,6 +125,9 @@ if __name__ == '__main__':
 			'example' : example, 
 			'output' : output, 
 		}
+
+	# Cleanup
+	run_and_get_stdall('./raise cleanup')
 
 	# Move back up one directory
 	os.chdir('..')

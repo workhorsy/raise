@@ -159,9 +159,18 @@ Last updated on January 17th 2014
 		</ol>
 	</li>
 	<li>
-		<a href="#c++">C++</a>
+		<a href="#cxx">C++</a>
 		<ol>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#cxx_file_extensions">File Extensions</a></li>
+			<li><a href="#cxx_compilers">Compilers</a></li>
+			<li><a href="#cxx_compiler_setup">Compiler Setup</a></li>
+			<li><a href="#cxx_building_object">Building Object</a></li>
+			<li><a href="#cxx_building_program">Building Program</a></li>
+			<li><a href="#cxx_building_shared_library">Building Shared Library</a></li>
+			<li><a href="#cxx_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
+			<li><a href="#cxx_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
+			<li><a href="#cxx_header_installation_and_uninstallation">Header Installation and Uninstallation</a></li>
+			<li><a href="#cxx_running_and_printing">Running and Printing</a></li>
 		</ol>
 	</li>
 	<li>
@@ -1744,11 +1753,315 @@ ${template_info['c_running_and_printing']['example']}
 ${template_info['c_running_and_printing']['output']}
 	</pre>
 
+
 <hr />
 
 
-<a id="c++"></a>
+<a id="cxx"></a>
 <h1>13. C++</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_cxx as CXX
+	</code></pre>
+
+<a id="cxx_file_extensions"></a>
+<h2>13.1. File Extensions</h2>
+
+	<p>
+	Many C++ compilers/OSes use different extensions for different types of 
+	files. To get around this limitation, you can use the file extension for
+	the Raise rows below, and it will automatically be mapped to the OS
+	type below.
+	</p>
+
+	<table>
+		<tr>
+			<th></th>
+			<th>Raise</th>
+			<th>Cygwin</th>
+			<th>Windows</th>
+			<th>Standard</th>
+		</tr>
+		<tr>
+			<td>Executable</td>
+			<td>.exe</td>
+			<td>.exe</td>
+			<td>.exe</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Object</td>
+			<td>.o</td>
+			<td>.o</td>
+			<td>.obj</td>
+			<td>.o</td>
+		</tr>
+		<tr>
+			<td>Shared Library</td>
+			<td>.so</td>
+			<td>.so</td>
+			<td>.dll</td>
+			<td>.so</td>
+		</tr>
+		<tr>
+			<td>Static Library</td>
+			<td>.a</td>
+			<td>.a</td>
+			<td>.lib</td>
+			<td>.a</td>
+		</tr>
+	</table>
+
+<a id="cxx_compilers"></a>
+<h2>13.2. Compilers</h2>
+
+	<p>
+		Raise supports the GCC, and MS cl.exe C++ compilers. The compiler
+		 is abstracted away in a generalized way, as to make it so you don't 
+		have to worry about compiler specific functionality.
+	</p>
+
+	<p>
+		You can select the best C++ compiler for your platform by
+		using the <span class="fun">CXX.get_default_compiler</span> function.
+	</p>
+
+	<p>
+		You can also select the compiler specifically by using the 
+		<span class="fun">CXX.c_compilers</span> dictionary. Be careful
+		as only compilers that were found by Raise will be in the dictionary.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_compilers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_compilers']['output']}
+	</pre>
+
+<a id="cxx_compiler_setup"></a>
+<h2>13.3. Compiler Setup</h2>
+	<p>
+		After the compiler is selected, it can be configured 
+		using the properties.
+	</p>
+
+	<ul>
+		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
+		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+	</ul>
+
+	<p>
+		After the compiler is setup the way you want, the setting MUST be saved in an 
+		environmental variable. This is done with the 
+		<span class="fun">CXX.save_compiler</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_compiler_setup']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_compiler_setup']['output']}
+	</pre>
+
+<a id="cxx_building_object"></a>
+<h2>13.4. Building Object</h2>
+
+	<p>
+		C++ object files can be built using the <span class="fun">CXX.build_object</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_building_object']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_building_object']['output']}
+	</pre>
+
+<a id="cxx_building_program"></a>
+<h2>13.5. Building Program</h2>
+
+	<p>
+		C++ programs can be built using the <span class="fun">CXX.build_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_building_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_building_program']['output']}
+	</pre>
+
+<a id="cxx_building_shared_library"></a>
+<h2>13.6. Building Shared Library</h2>
+
+	<p>
+		C++ shared library can be built using the <span class="fun">CXX.build_shared_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_building_shared_library']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_building_shared_library']['output']}
+	</pre>
+
+<a id="cxx_program_installation_and_uninstallation"></a>
+<h2>13.7. Program Installation and Uninstallation</h2>
+
+	<p>
+		C++ programs can be installed with the <span class="fun">CXX.install_program</span> function, and
+		uninstalled with the <span class="fun">CXX.uninstall_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_program_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building C++ program 'main.exe' ...                                         <span class="smile">:)</span>
+Installing the program 'main.exe' ...                                       <span class="smile">:)</span>
+Removing binaries 'main' ...                                                <span class="smile">:)</span>
+Running C++ program ...                                                     <span class="smile">:)</span>
+main.exe
+Hello World!
+Uninstalling the program 'main.exe' ...                                     <span class="smile">:)</span>
+	</pre>
+
+
+<a id="cxx_library_installation_and_uninstallation"></a>
+<h2>13.8. Library Installation and Uninstallation</h2>
+
+	<p>
+		C++ libraries can be installed with the <span class="fun">CXX.install_library</span> function, and
+		uninstalled with the <span class="fun">CXX.uninstall_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_library_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building C++ shared library 'libadd.so' ...                                 <span class="smile">:)</span>
+Installing the library 'libadd.so' ...                                      <span class="smile">:)</span>
+Uninstalling the library 'libadd.so' ...                                    <span class="smile">:)</span>
+
+	</pre>
+
+
+<a id="cxx_header_installation_and_uninstallation"></a>
+<h2>13.9. Header Installation and Installation</h2>
+
+	<p>
+		C++ headers can be installed with the <span class="fun">CXX.install_header</span> function, and
+		uninstalled with the <span class="fun">CXX.uninstall_header</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_header_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Installing the header 'libadd.h' ...                                        <span class="smile">:)</span>
+Uninstalling the header 'libadd.h' ...                                      <span class="smile">:)</span>
+	</pre>
+
+
+<a id="cxx_running_and_printing"></a>
+<h2>13.10. Running and Printing</h2>
+
+	<p>
+		C++ programs can be ran with the <span class="fun">CXX.run_print</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cxx_running_and_printing']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cxx_running_and_printing']['output']}
+	</pre>
 
 
 <hr />
