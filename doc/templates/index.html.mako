@@ -152,12 +152,9 @@ Last updated on January 16th 2014
 			<li><a href="#c_building_object">Building Object</a></li>
 			<li><a href="#c_building_program">Building Program</a></li>
 			<li><a href="#c_building_shared_library">Building Shared Library</a></li>
-			<li><a href="#c_program_installation">Program Installation</a></li>
-			<li><a href="#c_uninstall_program">Program Uninstallation</a></li>
-			<li><a href="#c_library_installation">Library Installation</a></li>
-			<li><a href="#c_library_uinstallation">Library Uninstallation</a></li>
-			<li><a href="#c_header_installation">Header Installation</a></li>
-			<li><a href="#c_header_uinstallation">Header Uninstall</a></li>
+			<li><a href="#c_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
+			<li><a href="#c_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
+			<li><a href="#c_header_installation_and_uninstallation">Header Installation and Uninstallation</a></li>
 			<li><a href="#c_running_and_printing">Running and Printing</a></li>
 		</ol>
 	</li>
@@ -1620,11 +1617,12 @@ ${template_info['c_building_shared_library']['example']}
 ${template_info['c_building_shared_library']['output']}
 	</pre>
 
-<a id="c_program_installation"></a>
-<h2>12.7. Program Installation</h2>
+<a id="c_program_installation_and_uninstallation"></a>
+<h2>12.7. Program Installation and Uninstallation</h2>
 
 	<p>
-		C programs can be installed with the <span class="fun">C.install_program</span> function.
+		C programs can be installed with the <span class="fun">C.install_program</span> function, and
+		uninstalled with the <span class="fun">C.uninstall_program</span> function.
 	</p>
 
 	<p>
@@ -1632,7 +1630,7 @@ ${template_info['c_building_shared_library']['output']}
 	</p>
 
 	<pre><code data-language="python">
-${template_info['c_program_installation']['example']}
+${template_info['c_program_installation_and_uninstallation']['example']}
 	</code></pre>
 
 	<p>
@@ -1640,38 +1638,22 @@ ${template_info['c_program_installation']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['c_program_installation']['output']}
-	</pre>
-
-<a id="c_uninstall_program"></a>
-<h2>12.8. Program Uninstallation</h2>
-
-	<p>
-		fixme
-	</p>
-
-	<p>
-	Example:
-	</p>
-
-	<pre><code data-language="python">
-${template_info['c_uninstall_program']['example']}
-	</code></pre>
-
-	<p>
-	Example output:
-	</p>
-
-	<pre class="raise_output">
-${template_info['c_uninstall_program']['output']}
+Building C program 'main.exe' ...                                            <span class="smile">:)</span>
+Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
+Removing binaries 'main' ...                                                 <span class="smile">:)</span>
+Running C program ...                                                        <span class="smile">:)</span>
+main.exe
+Hello World!
+Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
 	</pre>
 
 
-<a id="c_library_installation"></a>
-<h2>12.9. Library Installation</h2>
+<a id="c_library_installation_and_uninstallation"></a>
+<h2>12.8. Library Installation and Uninstallation</h2>
 
 	<p>
-		fixme
+		C libraries can be installed with the <span class="fun">C.install_library</span> function, and
+		uninstalled with the <span class="fun">C.uninstall_library</span> function.
 	</p>
 
 	<p>
@@ -1679,7 +1661,7 @@ ${template_info['c_uninstall_program']['output']}
 	</p>
 
 	<pre><code data-language="python">
-${template_info['c_library_installation']['example']}
+${template_info['c_library_installation_and_uninstallation']['example']}
 	</code></pre>
 
 	<p>
@@ -1687,15 +1669,17 @@ ${template_info['c_library_installation']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['c_library_installation']['output']}
+Installing the library 'libexample.so' ...                                   <span class="smile">:)</span>
+Uninstalling the library 'libexample.so' ...                                 <span class="smile">:)</span>
 	</pre>
 
 
-<a id="c_library_uinstallation"></a>
-<h2>12.10. Library Uninstallation</h2>
+<a id="c_header_installation_and_uninstallation"></a>
+<h2>12.9. Header Installation and Installation</h2>
 
 	<p>
-		fixme
+		C headers can be installed with the <span class="fun">C.install_header</span> function, and
+		uninstalled with the <span class="fun">C.uninstall_header</span> function.
 	</p>
 
 	<p>
@@ -1703,7 +1687,7 @@ ${template_info['c_library_installation']['output']}
 	</p>
 
 	<pre><code data-language="python">
-${template_info['c_library_uinstallation']['example']}
+${template_info['c_header_installation_and_uninstallation']['example']}
 	</code></pre>
 
 	<p>
@@ -1711,60 +1695,13 @@ ${template_info['c_library_uinstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['c_library_uinstallation']['output']}
-	</pre>
-
-
-<a id="c_header_installation"></a>
-<h2>12.11. Header Installation</h2>
-
-	<p>
-		fixme
-	</p>
-
-	<p>
-	Example:
-	</p>
-
-	<pre><code data-language="python">
-${template_info['c_header_installation']['example']}
-	</code></pre>
-
-	<p>
-	Example output:
-	</p>
-
-	<pre class="raise_output">
-${template_info['c_header_installation']['output']}
-	</pre>
-
-
-<a id="c_header_uinstallation"></a>
-<h2>12.12. Header Uninstall</h2>
-
-	<p>
-		fixme
-	</p>
-
-	<p>
-	Example:
-	</p>
-
-	<pre><code data-language="python">
-${template_info['c_header_uinstallation']['example']}
-	</code></pre>
-
-	<p>
-	Example output:
-	</p>
-
-	<pre class="raise_output">
-${template_info['c_header_uinstallation']['output']}
+Installing the header 'libexample.h' ...                                     <span class="smile">:)</span>
+Uninstalling the header 'libexample.h' ...                                   <span class="smile">:)</span>
 	</pre>
 
 
 <a id="c_running_and_printing"></a>
-<h2>12.13. Running and Printing</h2>
+<h2>12.10. Running and Printing</h2>
 
 	<p>
 		C programs can be ran with the <span class="fun">C.run_print</span> function.

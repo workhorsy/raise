@@ -132,23 +132,53 @@ def c_building_shared_library():
 	C.build_shared_library('libexample.so', ['libexample.o'])
 
 
-def c_program_installation():
-	print('fixme')
+def c_program_installation_and_uninstallation():
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
 
-def c_uninstall_program():
-	print('fixme')
+	# Build the program
+	C.build_program('main.exe', ['main.c'])
 
-def c_library_installation():
-	print('fixme')
+	# Install the program
+	C.install_program('main.exe')
 
-def c_library_uinstallation():
-	print('fixme')
+	FS.remove_binaries('main')
 
-def c_header_installation():
-	print('fixme')
+	# Run the C program from the system
+	C.run_print('main.exe')
 
-def c_header_uinstallation():
-	print('fixme')
+	# Uninstall the program
+	C.uninstall_program('main.exe')
+
+def c_library_installation_and_uninstallation():
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Build the library
+	C.build_object('libexample.o', ['libexample.c'])
+	C.build_shared_library('libexample.so', ['libexample.o'])
+
+	# Install the library
+	C.install_library('libexample.so')
+
+	# Uninstall the library
+	C.uninstall_library('libexample.so')
+
+def c_header_installation_and_uninstallation():
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Install the header
+	C.install_header('libexample.h')
+
+	# Uninstall the header
+	C.uninstall_header('libexample.h')
 
 def c_running_and_printing():
 	# Get and setup the C compiler
