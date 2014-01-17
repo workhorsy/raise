@@ -671,6 +671,11 @@ To see the mappings, look at the section for each language.
 <a id="basics"></a>
 <h1>7. Basics</h1>
 
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_process as Process
+	</code></pre>
+
 <a id="functions_that_must_succeed"></a>
 <h2>7.1. Functions that must succeed</h2>
 
@@ -812,6 +817,11 @@ Produces the result:
 
 <a id="users"></a>
 <h1>8. Users</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_os as OS
+	</code></pre>
 
 <a id="users_running_as_root"></a>
 <h2>8.1. Running as Root</h2>
@@ -997,6 +1007,11 @@ Normal user id: 1000
 
 <a id="file_system"></a>
 <h1>9. File System</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_fs as FS
+	</code></pre>
 
 <a id="fs_change_dir"></a>
 <h2>9.1. Change Dir</h2>
@@ -1260,6 +1275,11 @@ ${template_info['fs_symlink']['output']}
 <a id="find"></a>
 <h1>11. Finding Programs, Libraries, and Headers Files</h1>
 
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_libraries as Libraries
+	</code></pre>
+
 <p>
 Raise has built in functionality for finding programs, libraries, 
 and header files. It tries to use the OSes native way of searching
@@ -1433,6 +1453,10 @@ ${template_info['find_requiring_headers']['output']}
 <a id="c"></a>
 <h1>12. C</h1>
 
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_c as C
+	</code></pre>
 
 <a id="c_file_extensions"></a>
 <h2>12.1. File Extensions</h2>
