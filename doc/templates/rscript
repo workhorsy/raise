@@ -215,18 +215,46 @@ def find_requiring_programs():
 	Libraries.require_programs(['gcc'])
 
 def find_finding_libraries():
-	print(Libraries.get_static_library('SDL'))
-	print(Libraries.get_shared_library('SDL'))
+	# SDL Library any version
+	print(Libraries.get_static_library('libSDL'))
+	print(Libraries.get_shared_library('libSDL'))
+
+	# SDL Library at least version 1.2
+	print(Libraries.get_shared_library('libSDL', lambda ver: ver >= (1, 2)))
+
+	# SDL Library of version 1.X
+	print(Libraries.get_shared_library('libSDL', lambda ver: ver.major == 1))
 
 def find_requiring_libraries():
-	Libraries.require_static_library('SDL')
-	Libraries.require_shared_library('SDL')
+	# SDL Library any version
+	Libraries.require_static_library('libSDL')
+	Libraries.require_shared_library('libSDL')
+
+	# SDL Library at least version 1.2
+	Libraries.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
+
+	# SDL Library of version 1.X
+	Libraries.require_shared_library('libSDL', lambda ver: ver.major == 1)
 
 def find_finding_headers():
-	print(Libraries.get_header_file('SDL'))
+	# SDL Library any version
+	print(Libraries.get_header_file('libSDL'))
+
+	# SDL Library at least version 1.2
+	print(Libraries.get_header_file('libSDL', lambda ver: ver >= (1, 2)))
+
+	# SDL Library of version 1.X
+	print(Libraries.get_header_file('libSDL', lambda ver: ver.major == 1))
 
 def find_requiring_headers():
-	Libraries.require_header_file('SDL')
+	# SDL Library any version
+	Libraries.require_header_file('libSDL')
+
+	# SDL Library at least version 1.2
+	Libraries.require_header_file('libSDL', lambda ver: ver >= (1, 2))
+
+	# SDL Library of version 1.X
+	Libraries.require_header_file('libSDL', lambda ver: ver.major == 1)
 
 
 

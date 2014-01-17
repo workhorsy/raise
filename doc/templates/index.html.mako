@@ -1283,7 +1283,8 @@ Below are a few ways Raise will search on common OSes:
 <h2>11.1. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
-	<span class="fun">Libraries.program_paths</span> function.
+	<span class="fun">Libraries.program_paths</span> function. There is currently
+	no way to specify what version of the program you want to find.
 	</p>
 
 	<p>
@@ -1307,7 +1308,8 @@ ${template_info['find_finding_programs']['output']}
 	<p>
 	You can make sure a program is installed, by using the 
 	<span class="fun">Libraries.require_programs</span> function. If the 
-	program is not installed, it will print an error and exit.
+	program is not installed, it will print an error and exit. There is 
+	currently no way to specify what version of the program you want to require.
 	</p>
 
 	<p>
@@ -1331,7 +1333,8 @@ ${template_info['find_requiring_programs']['output']}
 	<p>
 	You can find a library, by searching for it with the
 	<span class="fun">Libraries.get_static_library</span> and
-	<span class="fun">Libraries.get_shared_library</span> functions.
+	<span class="fun">Libraries.get_shared_library</span> functions. Optionally
+	you can use the version lambda to specify what version you want.
 	</p>
 
 	<p>
@@ -1356,7 +1359,8 @@ ${template_info['find_finding_libraries']['output']}
 	You can make sure a library is installed, by using the 
 	<span class="fun">Libraries.require_static_library</span> and
 	<span class="fun">Libraries.require_shared_library</span> functions. 
-	If the library is not installed, it will print an error and exit. 
+	If the library is not installed, it will print an error and exit. Optionally
+	you can use the version lambda to specify what version you want.
 	</p>
 
 	<p>
@@ -1379,7 +1383,8 @@ ${template_info['find_requiring_libraries']['output']}
 <h2>11.5. Finding Headers Files</h2>
 	<p>
 	You can find a header file, by searching for it with the
-	<span class="fun">Libraries.get_header_file</span> function.
+	<span class="fun">Libraries.get_header_file</span> function. Optionally
+	you can use the version lambda to specify what version you want.
 	</p>
 
 	<p>
@@ -1403,7 +1408,8 @@ ${template_info['find_finding_headers']['output']}
 	<p>
 	You can make sure a header file is installed, by using the 
 	<span class="fun">Libraries.require_header_file</span> function. 
-	If the header is not installed, it will print an error and exit. 
+	If the header is not installed, it will print an error and exit. Optionally
+	you can use the version lambda to specify what version you want.
 	</p>
 
 	<p>
