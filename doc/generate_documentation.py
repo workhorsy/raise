@@ -46,6 +46,8 @@ def run_and_get_stdall(command):
 
 # A list of the the documentation items to generate examples for
 info = {
+	'installation' : {},
+
 	'fs_change_dir' : {}, 
 	'fs_move_file' : {}, 
 	'fs_copy_file' : {}, 

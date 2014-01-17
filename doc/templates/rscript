@@ -34,6 +34,24 @@ def setup():
 	open('one', 'a').close()
 
 '''
+installation
+'''
+
+def installation():
+	modules = []
+	for root, dirs, files in os.walk('../../lib_raise'):
+		for entry in files:
+			if entry.endswith('.py'):
+				modules.append(entry)
+
+	modules.sort()
+
+	print('.lib_raise-+')
+	for module in modules[:-1]:
+		print('           |-{0}'.format(module))
+	print('           `-{0}'.format(modules[-1]))
+
+'''
 File Systems
 '''
 

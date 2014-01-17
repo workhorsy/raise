@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 16th 2014
+Last updated on January 17th 2014
 </p>
 
 <p>
@@ -338,7 +338,7 @@ you release your source code as a compressed file.
 The file hierarchy of Raise looks like this:
 </p>
 
-<pre>
+<pre class="raise_output">
 # Your script that builds your software
 rscript
 
@@ -346,24 +346,7 @@ rscript
 raise
 
 # The modules that are automatically downloaded
-.lib_raise─┬
-           ├─lib_raise_ar.py
-           ├─lib_raise_config.py
-           ├─lib_raise_cpu.py
-           ├─lib_raise_c.py
-           ├─lib_raise_csharp.py
-           ├─lib_raise_cxx.py
-           ├─lib_raise_d.py
-           ├─lib_raise_fs.py
-           ├─lib_raise_helpers.py
-           ├─lib_raise_java.py
-           ├─lib_raise_libraries.py
-           ├─lib_raise_linker.py
-           ├─lib_raise_os.py
-           ├─lib_raise_process.py
-           ├─lib_raise.py
-           ├─lib_raise_python.py
-           └─lib_raise_terminal.py
+${template_info['installation']['output']}
 </pre>
 
 <a id="installation_normal"></a>
