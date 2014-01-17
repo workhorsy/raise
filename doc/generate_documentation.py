@@ -77,6 +77,13 @@ info = {
 	'users_privilege_escalation' : {},
 	'users_user_name' : 'skip_run',
 	'users_user_id' : 'skip_run',
+
+	'find_finding_programs' : {},
+	'find_requiring_programs' : {},
+	'find_finding_libraries' : {},
+	'find_requiring_libraries' : {},
+	'find_finding_headers' : {},
+	'find_requiring_headers' : {},
 }
 
 if __name__ == '__main__':

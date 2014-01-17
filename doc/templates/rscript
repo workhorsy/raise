@@ -203,7 +203,30 @@ def users_user_id():
 
 	print('Normal user id: {0}'.format(OS.get_normal_user_id()))
 
+'''
+Finding Programs, Libraries, and Headers Files
+'''
 
+def find_finding_programs():
+	paths = Libraries.program_paths('gcc')
+	print(paths)
+
+def find_requiring_programs():
+	Libraries.require_programs(['gcc'])
+
+def find_finding_libraries():
+	print(Libraries.get_static_library('SDL'))
+	print(Libraries.get_shared_library('SDL'))
+
+def find_requiring_libraries():
+	Libraries.require_static_library('SDL')
+	Libraries.require_shared_library('SDL')
+
+def find_finding_headers():
+	print(Libraries.get_header_file('SDL'))
+
+def find_requiring_headers():
+	Libraries.require_header_file('SDL')
 
 
 

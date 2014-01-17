@@ -132,9 +132,15 @@ Last updated on January 16th 2014
 		</ol>
 	</li>
 	<li>
-		<a href="#libraries_and_programs">Libraries and Programs</a>
+		<a href="#find">Finding Programs, Libraries, and Headers Files</a>
 		<ol>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#find_finding_programs">Finding Programs</a></li>
+			<li><a href="#find_requiring_programs">Requiring Programs</a></li>
+			<li><a href="#find_finding_libraries">Finding Libraries</a></li>
+			<li><a href="#find_requiring_libraries">Requiring Libraries</a></li>
+			<li><a href="#find_finding_headers">Finding Headers Files</a></li>
+			<li><a href="#find_requiring_headers">Requiring Headers Files</a></li>
+
 		</ol>
 	</li>
 	<li>
@@ -1254,8 +1260,167 @@ ${template_info['fs_symlink']['output']}
 <hr />
 
 
-<a id="libraries_and_programs"></a>
-<h1>11. Libraries and Programs</h1>
+<a id="find"></a>
+<h1>11. Finding Programs, Libraries, and Headers Files</h1>
+
+<p>
+Raise has built in functionality for finding programs, libraries, 
+and header files. It tries to use the OSes native way of searching
+for files. If that is not available, or does not find anything, 
+it will simply search the file system.
+</p>
+
+Below are a few ways Raise will search on common OSes:
+<ol>
+	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
+	<li>Dpkg: Debian, Ubuntu, Linux Mint</li>
+	<li>RPM: Red Hat, Fedora, openSUSE, Mandriva</li>
+	<li>pkg_info: FreeBSD</li>
+	<li>File System: The PATH as well as common places for your OS.</li>
+</ol>
+
+<a id="find_finding_programs"></a>
+<h2>11.1. Finding Programs</h2>
+	<p>
+	You can find a program, by searching for it with the 
+	<span class="fun">Libraries.program_paths</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_finding_programs']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_finding_programs']['output']}
+	</pre>
+
+<a id="find_requiring_programs"></a>
+<h2>11.2. Requiring Programs</h2>
+	<p>
+	You can make sure a program is installed, by using the 
+	<span class="fun">Libraries.require_programs</span> function. If the 
+	program is not installed, it will print an error and exit.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_requiring_programs']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_requiring_programs']['output']}
+	</pre>
+
+<a id="find_finding_libraries"></a>
+<h2>11.3. Finding Libraries</h2>
+	<p>
+	You can find a library, by searching for it with the
+	<span class="fun">Libraries.get_static_library</span> and
+	<span class="fun">Libraries.get_shared_library</span> functions.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_finding_libraries']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_finding_libraries']['output']}
+	</pre>
+
+<a id="find_requiring_libraries"></a>
+<h2>11.4. Requiring Libraries</h2>
+	<p>
+	You can make sure a library is installed, by using the 
+	<span class="fun">Libraries.require_static_library</span> and
+	<span class="fun">Libraries.require_shared_library</span> functions. 
+	If the library is not installed, it will print an error and exit. 
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_requiring_libraries']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_requiring_libraries']['output']}
+	</pre>
+
+<a id="find_finding_headers"></a>
+<h2>11.5. Finding Headers Files</h2>
+	<p>
+	You can find a header file, by searching for it with the
+	<span class="fun">Libraries.get_header_file</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_finding_headers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_finding_headers']['output']}
+	</pre>
+
+<a id="find_requiring_headers"></a>
+<h2>11.6. Requiring Headers Files</h2>
+	<p>
+	You can make sure a header file is installed, by using the 
+	<span class="fun">Libraries.require_header_file</span> function. 
+	If the header is not installed, it will print an error and exit. 
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_requiring_headers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_requiring_headers']['output']}
+	</pre>
 
 
 <hr />
