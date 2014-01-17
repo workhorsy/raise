@@ -1267,7 +1267,8 @@ ${template_info['fs_symlink']['output']}
 Raise has built in functionality for finding programs, libraries, 
 and header files. It tries to use the OSes native way of searching
 for files. If that is not available, or does not find anything, 
-it will simply search the file system.
+it will fall-back to searching the file system. Raise can also include the
+version number when searching for libraries and header files.
 </p>
 
 Below are a few ways Raise will search on common OSes:
