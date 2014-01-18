@@ -564,5 +564,22 @@ def find_requiring_headers():
 	# SDL Library of version 1.X
 	Libraries.require_header_file('libSDL', lambda ver: ver.major == 1)
 
+'''
+Concurrency
+'''
+
+def concurrency():
+	# After this function, events will start queueing
+	Process.concurrent_start()
+
+	for f in code_files:
+		object_name = '{0}.o'.format(f)
+		code_name = 'src/{0}.cc'.format(f)
+		CXX.build_object(object_name, [code_name], ['-DSDL=true'])
+
+	# After this it will start running events
+	Process.concurrent_end()
+
+
 
 

@@ -203,9 +203,6 @@ Last updated on January 17th 2014
 	</li>
 	<li>
 		<a href="#concurrency">Concurrency</a>
-		<ol>
-			<li><span class="fixme">FIXME</span></li>
-		</ol>
 	</li>
 </ol>
 
@@ -2428,6 +2425,29 @@ ${template_info['d_running_and_printing']['output']}
 
 <a id="concurrency"></a>
 <h1>17. Concurrency</h1>
+
+	<p>
+	Raise normally runs events in serial. If you want to run events concurrently
+	 and leverage multiple CPU cores, you can use 
+	<span class="fun">Process.concurrent_start</span> and 
+	<span class="fun">Process.concurrent_end</span>.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['concurrency']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['concurrency']['output']}
+	</pre>
 
 
 <hr />

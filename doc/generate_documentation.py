@@ -102,6 +102,8 @@ info = {
 	'find_requiring_libraries' : {},
 	'find_finding_headers' : {},
 	'find_requiring_headers' : {},
+
+	'concurrency' : {},
 }
 
 if __name__ == '__main__':
