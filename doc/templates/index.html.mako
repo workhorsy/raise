@@ -177,7 +177,16 @@ Last updated on January 17th 2014
 		<a href="#d">D</a>
 		<ol>
 			<li><a href="#d_file_extensions">File Extensions</a></li>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#d_compilers">Compilers</a></li>
+			<li><a href="#d_compiler_setup">Compiler Setup</a></li>
+			<li><a href="#d_building_object">Building Object</a></li>
+			<li><a href="#d_building_program">Building Program</a></li>
+			<li><a href="#d_building_library">Building Library</a></li>
+			<li><a href="#d_building_interface">Building Interface</a></li>
+			<li><a href="#d_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
+			<li><a href="#d_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
+			<li><a href="#d_interface_installation_and_uninstallation">Interface Installation and Uninstallation</a></li>
+			<li><a href="#d_running_and_printing">Running and Printing</a></li>
 		</ol>
 	</li>
 	<li>
@@ -1705,7 +1714,7 @@ Uninstalling the library 'libexample.so' ...                                 <sp
 
 
 <a id="c_header_installation_and_uninstallation"></a>
-<h2>12.9. Header Installation and Installation</h2>
+<h2>12.9. Header Installation and Uninstallation</h2>
 
 	<p>
 		C headers can be installed with the <span class="fun">C.install_header</span> function, and
@@ -1829,7 +1838,7 @@ import lib_raise_cxx as CXX
 
 	<p>
 		You can also select the compiler specifically by using the 
-		<span class="fun">CXX.c_compilers</span> dictionary. Be careful
+		<span class="fun">CXX.cxx_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
 
@@ -2015,7 +2024,7 @@ Uninstalling the library 'libadd.so' ...                                    <spa
 
 
 <a id="cxx_header_installation_and_uninstallation"></a>
-<h2>13.9. Header Installation and Installation</h2>
+<h2>13.9. Header Installation and Uninstallation</h2>
 
 	<p>
 		C++ headers can be installed with the <span class="fun">CXX.install_header</span> function, and
@@ -2070,6 +2079,10 @@ ${template_info['cxx_running_and_printing']['output']}
 <a id="d"></a>
 <h1>14. D</h1>
 
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_d as D
+	</code></pre>
 
 <a id="d_file_extensions"></a>
 <h2>14.1. File Extensions</h2>
@@ -2118,6 +2131,282 @@ ${template_info['cxx_running_and_printing']['output']}
 			<td>.a</td>
 		</tr>
 	</table>
+
+<a id="d_compilers"></a>
+<h2>14.2. Compilers</h2>
+
+	<p>
+		Raise supports the DMD, and LDC D compilers. The compiler
+		 is abstracted away in a generalized way, as to make it so you don't 
+		have to worry about compiler specific functionality.
+	</p>
+
+	<p>
+		You can select the best D compiler for your platform by
+		using the <span class="fun">D.get_default_compiler</span> function.
+	</p>
+
+	<p>
+		You can also select the compiler specifically by using the 
+		<span class="fun">D.d_compilers</span> dictionary. Be careful
+		as only compilers that were found by Raise will be in the dictionary.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_compilers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_compilers']['output']}
+	</pre>
+
+<a id="d_compiler_setup"></a>
+<h2>14.3. Compiler Setup</h2>
+	<p>
+		After the compiler is selected, it can be configured 
+		using the properties.
+	</p>
+
+	<ul>
+		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
+		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+	</ul>
+
+	<p>
+		After the compiler is setup the way you want, the setting MUST be saved in an 
+		environmental variable. This is done with the 
+		<span class="fun">D.save_compiler</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_compiler_setup']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_compiler_setup']['output']}
+	</pre>
+
+<a id="d_building_object"></a>
+<h2>14.4. Building Object</h2>
+
+	<p>
+		D object files can be built using the <span class="fun">D.build_object</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_building_object']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_building_object']['output']}
+	</pre>
+
+<a id="d_building_program"></a>
+<h2>14.5. Building Program</h2>
+
+	<p>
+		C++ programs can be built using the <span class="fun">D.build_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_building_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_building_program']['output']}
+	</pre>
+
+<a id="d_building_library"></a>
+<h2>14.6. Building Library</h2>
+
+	<p>
+		D static library can be built using the <span class="fun">D.build_static_library</span> function.
+		The main DMD compiler and spec does not yet support building shared libraries.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_building_library']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_building_library']['output']}
+	</pre>
+
+<a id="d_building_interface"></a>
+<h2>14.7. Building Interface</h2>
+
+	<p>
+		D interface can be built using the <span class="fun">D.build_interface</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_building_interface']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_building_interface']['output']}
+	</pre>
+
+<a id="d_program_installation_and_uninstallation"></a>
+<h2>14.8. Program Installation and Uninstallation</h2>
+
+	<p>
+		D programs can be installed with the <span class="fun">D.install_program</span> function, and
+		uninstalled with the <span class="fun">D.uninstall_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_program_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building D program 'main.exe' ...                                           <span class="smile">:)</span>
+Installing the program 'main.exe' ...                                       <span class="smile">:)</span>
+Removing binaries 'main' ...                                                <span class="smile">:)</span>
+Running D program ...                                                       <span class="smile">:)</span>
+main.exe
+Hello World!
+Uninstalling the program 'main.exe' ...                                     <span class="smile">:)</span>
+	</pre>
+
+
+<a id="d_library_installation_and_uninstallation"></a>
+<h2>14.9. Library Installation and Uninstallation</h2>
+
+	<p>
+		D libraries can be installed with the <span class="fun">D.install_library</span> function, and
+		uninstalled with the <span class="fun">D.uninstall_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_library_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building D object 'libsubtract.o' ...                                       <span class="smile">:)</span>
+Building D static library 'libsubtract.a' ...                               <span class="smile">:)</span>
+Installing the library 'libsubtract.a' ...                                  <span class="smile">:)</span>
+Uninstalling the library 'libsubtract.a' ...                                <span class="smile">:)</span>
+
+	</pre>
+
+
+<a id="d_interface_installation_and_uninstallation"></a>
+<h2>14.10. Interface Installation and Uninstallation</h2>
+
+	<p>
+		D interfaces can be installed with the <span class="fun">D.install_interface</span> function, and
+		uninstalled with the <span class="fun">D.uninstall_interface</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_interface_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building D interface 'libsubtract.di' ...                                   <span class="smile">:)</span>
+Installing the interface 'libsubtract.di' ...                               <span class="smile">:)</span>
+Uninstalling the interface 'libsubtract.di' ...                             <span class="smile">:)</span>
+	</pre>
+
+
+<a id="d_running_and_printing"></a>
+<h2>14.11. Running and Printing</h2>
+
+	<p>
+		D programs can be ran with the <span class="fun">D.run_print</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['d_running_and_printing']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['d_running_and_printing']['output']}
+	</pre>
 
 
 <hr />
