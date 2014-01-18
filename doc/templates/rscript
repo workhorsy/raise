@@ -5,6 +5,7 @@ import os
 import shutil
 import lib_raise_c as C
 import lib_raise_cxx as CXX
+import lib_raise_ar as AR
 import lib_raise_d as D
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
@@ -140,15 +141,18 @@ def c_building_program():
 	# Build the program
 	C.build_program('main.exe', ['main.c'])
 
-def c_building_shared_library():
+def c_building_library():
 	# Get and setup the C compiler
 	cc = C.get_default_compiler()
 	cc.debug = True
 	C.save_compiler(cc)
 
-	# Build the library
+	# Build the library into an object
 	C.build_object('libexample.o', ['libexample.c'])
+
+	# Build the library as a shared and static library
 	C.build_shared_library('libexample.so', ['libexample.o'])
+	AR.build_static_library('libexample.a', ['libexample.o'])
 
 
 def c_program_installation_and_uninstallation():
@@ -264,15 +268,18 @@ def cxx_building_program():
 	# Build the program
 	CXX.build_program('main.exe', ['main.cc'])
 
-def cxx_building_shared_library():
+def cxx_building_library():
 	# Get and setup the C++ compiler
 	cc = CXX.get_default_compiler()
 	cc.debug = True
 	CXX.save_compiler(cc)
 
-	# Build the library
+	# Build the library into an object
 	CXX.build_object('libadd.o', ['libadd.cc'])
+
+	# Build the library as a shared and static library
 	CXX.build_shared_library('libadd.so', ['libadd.o'])
+	AR.build_static_library('libadd.a', ['libadd.o'])
 
 
 def cxx_program_installation_and_uninstallation():

@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 17th 2014
+Last updated on January 18th 2014
 </p>
 
 <p>
@@ -151,7 +151,7 @@ Last updated on January 17th 2014
 			<li><a href="#c_compiler_setup">Compiler Setup</a></li>
 			<li><a href="#c_building_object">Building Object</a></li>
 			<li><a href="#c_building_program">Building Program</a></li>
-			<li><a href="#c_building_shared_library">Building Shared Library</a></li>
+			<li><a href="#c_building_library">Building Library</a></li>
 			<li><a href="#c_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
 			<li><a href="#c_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
 			<li><a href="#c_header_installation_and_uninstallation">Header Installation and Uninstallation</a></li>
@@ -166,7 +166,7 @@ Last updated on January 17th 2014
 			<li><a href="#cxx_compiler_setup">Compiler Setup</a></li>
 			<li><a href="#cxx_building_object">Building Object</a></li>
 			<li><a href="#cxx_building_program">Building Program</a></li>
-			<li><a href="#cxx_building_shared_library">Building Shared Library</a></li>
+			<li><a href="#cxx_building_library">Building Library</a></li>
 			<li><a href="#cxx_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
 			<li><a href="#cxx_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
 			<li><a href="#cxx_header_installation_and_uninstallation">Header Installation and Uninstallation</a></li>
@@ -1461,6 +1461,7 @@ ${template_info['find_requiring_headers']['output']}
 	<pre><code data-language="python">
 # Most of this section requires the modules:
 import lib_raise_c as C
+import lib_raise_ar as AR
 	</code></pre>
 
 <a id="c_file_extensions"></a>
@@ -1630,11 +1631,14 @@ ${template_info['c_building_program']['example']}
 ${template_info['c_building_program']['output']}
 	</pre>
 
-<a id="c_building_shared_library"></a>
-<h2>12.6. Building Shared Library</h2>
+<a id="c_building_library"></a>
+<h2>12.6. Building Library</h2>
 
 	<p>
-		C shared library can be built using the <span class="fun">C.build_shared_library</span> function.
+		C shared library can be built using the 
+		<span class="fun">C.build_shared_library</span> function. C static
+		libraries can be built using the 
+		<span class="fun">AR.build_static_library</span> function.
 	</p>
 
 	<p>
@@ -1642,7 +1646,7 @@ ${template_info['c_building_program']['output']}
 	</p>
 
 	<pre><code data-language="python">
-${template_info['c_building_shared_library']['example']}
+${template_info['c_building_library']['example']}
 	</code></pre>
 
 	<p>
@@ -1650,7 +1654,7 @@ ${template_info['c_building_shared_library']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['c_building_shared_library']['output']}
+${template_info['c_building_library']['output']}
 	</pre>
 
 <a id="c_program_installation_and_uninstallation"></a>
@@ -1769,6 +1773,7 @@ ${template_info['c_running_and_printing']['output']}
 	<pre><code data-language="python">
 # Most of this section requires the modules:
 import lib_raise_cxx as CXX
+import lib_raise_ar as AR
 	</code></pre>
 
 <a id="cxx_file_extensions"></a>
@@ -1938,11 +1943,14 @@ ${template_info['cxx_building_program']['example']}
 ${template_info['cxx_building_program']['output']}
 	</pre>
 
-<a id="cxx_building_shared_library"></a>
-<h2>13.6. Building Shared Library</h2>
+<a id="cxx_building_library"></a>
+<h2>13.6. Building Library</h2>
 
 	<p>
-		C++ shared library can be built using the <span class="fun">CXX.build_shared_library</span> function.
+		C++ shared library can be built using the 
+		<span class="fun">CXX.build_shared_library</span> function. C++ static
+		libraries can be built using the 
+		<span class="fun">AR.build_static_library</span> function.
 	</p>
 
 	<p>
@@ -1950,7 +1958,7 @@ ${template_info['cxx_building_program']['output']}
 	</p>
 
 	<pre><code data-language="python">
-${template_info['cxx_building_shared_library']['example']}
+${template_info['cxx_building_library']['example']}
 	</code></pre>
 
 	<p>
@@ -1958,7 +1966,7 @@ ${template_info['cxx_building_shared_library']['example']}
 	</p>
 
 	<pre class="raise_output">
-${template_info['cxx_building_shared_library']['output']}
+${template_info['cxx_building_library']['output']}
 	</pre>
 
 <a id="cxx_program_installation_and_uninstallation"></a>
