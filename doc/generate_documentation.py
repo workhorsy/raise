@@ -104,6 +104,8 @@ info = {
 	'find_requiring_headers' : {},
 
 	'concurrency' : {},
+
+	'cpu' : {},
 }
 
 if __name__ == '__main__':

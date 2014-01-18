@@ -12,6 +12,7 @@ import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
 import lib_raise_os as OS
 import lib_raise_process as Process
+import lib_raise_cpu as CPU
 
 
 def cleanup():
@@ -590,6 +591,17 @@ def concurrency():
 	# Tell Raise to start running all the queued events concurrently
 	Process.concurrent_end()
 
+'''
+CPU
+'''
+
+def cpu():
+	print("Architechture: {0}".format(CPU.arch))
+	print("Bits: {0}".format(CPU.bits))
+	print("MHz: {0}".format(CPU.mhz))
+	print("Name: {0}".format(CPU.name))
+	print("Vendor Name: {0}".format(CPU.vendor_name))
+	print("Flags: {0}".format(str.join(', ', CPU.flags)))
 
 
 

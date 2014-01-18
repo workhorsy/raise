@@ -204,6 +204,9 @@ Last updated on January 18th 2014
 	<li>
 		<a href="#concurrency">Concurrency</a>
 	</li>
+	<li>
+		<a href="#cpu">CPU</a>
+	</li>
 </ol>
 
 
@@ -2434,6 +2437,11 @@ ${template_info['d_running_and_printing']['output']}
 <a id="concurrency"></a>
 <h1>17. Concurrency</h1>
 
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_process as Process
+	</code></pre>
+
 	<p>
 	Raise normally runs events in serial. If you want to run events concurrently
 	 and leverage multiple CPU cores, you can use 
@@ -2457,6 +2465,44 @@ ${template_info['concurrency']['example']}
 
 	<pre class="raise_output">
 ${template_info['concurrency']['output']}
+	</pre>
+
+
+<hr />
+
+
+<a id="cpu"></a>
+<h1>18. CPU</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_cpu as CPU
+	</code></pre>
+
+	Information about the CPU can be gotten from properties:
+	<ul>
+		<li>arch: The architecture. EG: x86_32, x86_64</li>
+		<li>bits: The bits. EG: 32, 64</li>
+		<li>mhz: The MHz</li>
+		<li>name: The Name</li>
+		<li>vendor_name: The Vendor Name. EG: "GenuineIntel", "AuthenticAMD"</li>
+		<li>flags: Flags that tell what functions the CPU supports. EG: acpi, sse, sse2, et cetera</li>
+	</ul>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['cpu']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['cpu']['output']}
 	</pre>
 
 
