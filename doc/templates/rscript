@@ -569,15 +569,18 @@ Concurrency
 '''
 
 def concurrency():
-	# After this function, events will start queueing
+	# Get and setup the C compiler
+	cc = C.get_default_compiler()
+	cc.debug = True
+	C.save_compiler(cc)
+
+	# Tell Raise to start queueing the events after this function
 	Process.concurrent_start()
 
-	for f in code_files:
-		object_name = '{0}.o'.format(f)
-		code_name = 'src/{0}.cc'.format(f)
-		CXX.build_object(object_name, [code_name], ['-DSDL=true'])
+	C.build_object('main.o', ['main.c'])
+	C.build_object('libexample.o', ['libexample.c'])
 
-	# After this it will start running events
+	# Tell Raise to start running all the queued events concurrently
 	Process.concurrent_end()
 
 

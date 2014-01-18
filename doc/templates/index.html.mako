@@ -2430,7 +2430,9 @@ ${template_info['d_running_and_printing']['output']}
 	Raise normally runs events in serial. If you want to run events concurrently
 	 and leverage multiple CPU cores, you can use 
 	<span class="fun">Process.concurrent_start</span> and 
-	<span class="fun">Process.concurrent_end</span>.
+	<span class="fun">Process.concurrent_end</span>. Make sure to only group 
+	the same type of events, between start and end. Otherwise it may give you 
+	unexpected results.
 	</p>
 
 	<p>
