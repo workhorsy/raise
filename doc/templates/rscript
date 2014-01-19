@@ -14,6 +14,7 @@ import lib_raise_python as Python
 import lib_raise_os as OS
 import lib_raise_process as Process
 import lib_raise_cpu as CPU
+import lib_raise_terminal as Terminal
 
 
 def cleanup():
@@ -608,5 +609,20 @@ def cpu():
 	print("Vendor Name: {0}".format(CPU.vendor_name))
 	print("Flags: {0}".format(str.join(', ', CPU.flags)))
 
+'''
+Terminal
+'''
+
+def terminal_ok():
+	Terminal.status("Looks like things will be okay")
+	Terminal.ok()
+
+def terminal_warning():
+	Terminal.status("Looks like this may give a warning")
+	Terminal.warning("Yep. Here is the warning")
+
+def terminal_fail():
+	Terminal.status("This may fail")
+	Terminal.fail("Yep. Here is the fail message")
 
 

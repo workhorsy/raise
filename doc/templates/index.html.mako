@@ -128,7 +128,9 @@ Last updated on January 18th 2014
 	<li>
 		<a href="#terminal">Terminal</a>
 		<ol>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#terminal_ok">Terminal OK</a></li>
+			<li><a href="#terminal_warning">Terminal Warning</a></li>
+			<li><a href="#terminal_fail">Terminal Fail</a></li>
 		</ol>
 	</li>
 	<li>
@@ -1275,6 +1277,83 @@ ${template_info['fs_symlink']['output']}
 
 <a id="terminal"></a>
 <h1>10. Terminal</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_terminal as Terminal
+	</code></pre>
+
+<a id="terminal_ok"></a>
+<h2>10.1. Terminal OK</h2>
+	<p>
+	If you want to print your own OK message, you can use the 
+	<span class="fun">Terminal.status</span> and 
+	<span class="fun">Terminal.ok</span> functions.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['terminal_ok']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['terminal_ok']['output']}
+	</pre>
+
+<a id="terminal_warning"></a>
+<h2>10.2. Terminal Warning</h2>
+	<p>
+	If you want to print your own warning message, you can use the 
+	<span class="fun">Terminal.status</span> and 
+	<span class="fun">Terminal.warning</span> functions.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['terminal_warning']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['terminal_warning']['output']}
+	</pre>
+
+<a id="terminal_fail"></a>
+<h2>10.3. Terminal Fail</h2>
+	<p>
+	If you want to print your own fail message, you can use the 
+	<span class="fun">Terminal.status</span> and 
+	<span class="fun">Terminal.fail</span> functions.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['terminal_fail']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['terminal_fail']['output']}
+	</pre>
 
 
 <hr />

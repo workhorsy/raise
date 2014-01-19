@@ -107,6 +107,10 @@ info = {
 	'concurrency' : {},
 
 	'cpu' : {},
+
+	'terminal_ok' : {},
+	'terminal_warning' : {},
+	'terminal_fail' : {},
 }
 
 if __name__ == '__main__':
