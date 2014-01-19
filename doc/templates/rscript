@@ -709,6 +709,7 @@ def cpu():
 	print("Name: {0}".format(CPU.name))
 	print("Vendor Name: {0}".format(CPU.vendor_name))
 	print("Flags: {0}".format(str.join(', ', CPU.flags)))
+	print("Cores: {0}".format(CPU.cpus_total))
 
 '''
 Terminal

@@ -2789,6 +2789,7 @@ import lib_raise_cpu as CPU
 		<li>name: The Name</li>
 		<li>vendor_name: The Vendor Name. EG: "GenuineIntel", "AuthenticAMD"</li>
 		<li>flags: Flags that tell what functions the CPU supports. EG: acpi, sse, sse2, et cetera</li>
+		<li>cpus_total: The total number of active cores.</li>
 	</ul>
 
 	<p>
