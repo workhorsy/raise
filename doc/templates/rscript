@@ -10,6 +10,7 @@ import lib_raise_d as D
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
+import lib_raise_python as Python
 import lib_raise_os as OS
 import lib_raise_process as Process
 import lib_raise_cpu as CPU
@@ -571,6 +572,10 @@ def find_requiring_headers():
 
 	# SDL Library of version 1.X
 	Libraries.require_header_file('libSDL', lambda ver: ver.major == 1)
+
+def find_requiring_python_modules():
+	# Require that os, sys, and platform are installed
+	Python.require_python_modules(['os', 'sys', 'platform'])
 
 '''
 Concurrency

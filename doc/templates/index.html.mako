@@ -140,7 +140,7 @@ Last updated on January 18th 2014
 			<li><a href="#find_requiring_libraries">Requiring Libraries</a></li>
 			<li><a href="#find_finding_headers">Finding Headers Files</a></li>
 			<li><a href="#find_requiring_headers">Requiring Headers Files</a></li>
-
+			<li><a href="#find_requiring_python_modules">Requiring Python Modules</a></li>
 		</ol>
 	</li>
 	<li>
@@ -1286,6 +1286,7 @@ ${template_info['fs_symlink']['output']}
 	<pre><code data-language="python">
 # Most of this section requires the modules:
 import lib_raise_libraries as Libraries
+import lib_raise_python as Python
 	</code></pre>
 
 <p>
@@ -1452,6 +1453,29 @@ ${template_info['find_requiring_headers']['example']}
 
 	<pre class="raise_output">
 ${template_info['find_requiring_headers']['output']}
+	</pre>
+
+<a id="find_requiring_python_modules"></a>
+<h2>11.7. Requiring Python Modules</h2>
+	<p>
+	You can make sure Python modules are installed by using the 
+	<span class="fun">Python.require_python_modules</span> function. 
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_requiring_python_modules']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_requiring_python_modules']['output']}
 	</pre>
 
 
