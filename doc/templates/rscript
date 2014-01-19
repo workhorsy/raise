@@ -7,6 +7,7 @@ import lib_raise_c as C
 import lib_raise_cxx as CXX
 import lib_raise_ar as AR
 import lib_raise_d as D
+import lib_raise_csharp as CS
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
@@ -29,7 +30,7 @@ def cleanup():
 		if os.path.isfile(entry):
 			os.remove(entry)
 
-	for entry in ['libexample', 'libadd', 'libsubtract', 'main']:
+	for entry in ['libexample', 'libadd', 'libsubtract', 'main', 'math_helper']:
 		FS.remove_binaries(entry)
 
 def setup():
@@ -479,6 +480,106 @@ def d_running_and_printing():
 
 	# Run the D program
 	D.run_print('./main.exe')
+
+'''
+C#
+'''
+def csharp_compilers():
+	csc = CS.get_default_compiler()
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(csc._name))
+	print("path: {0} ".format(csc._path))
+
+	csc = CS.cs_compilers['dmcs']
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(csc._name))
+	print("path: {0} ".format(csc._path))
+
+def csharp_compiler_setup():
+	# Get a C# compiler
+	csc = CS.get_default_compiler()
+
+	# Compiler setup
+	csc.debug = True
+	csc.optimize = True
+	csc.warnings_all = True
+	csc.warnings_as_errors = True
+	csc.compile_time_flags = ['SDL=true']
+
+	# Save the compiler config in environmental variables
+	CS.save_compiler(csc)
+
+	# Print environmental variables to see what happens under the hood
+	print("$CSC: {0}".format(os.environ['CSC']))
+	print("$CSFLAGS: {0}".format(os.environ['CSFLAGS']))
+
+def csharp_building_program():
+	# Get and setup the C# compiler
+	csc = CS.get_default_compiler()
+	csc.debug = True
+	CS.save_compiler(csc)
+
+	# Build the program
+	CS.build_program('main.exe', ['main.cs'])
+
+def csharp_building_library():
+	# Get and setup the C# compiler
+	csc = CS.get_default_compiler()
+	csc.debug = True
+	CS.save_compiler(csc)
+
+	# Build the library
+	CS.build_shared_library('math_helper.dll', ['math_helper.cs'])
+
+def csharp_program_installation_and_uninstallation():
+	# Get and setup the C# compiler
+	csc = CS.get_default_compiler()
+	csc.debug = True
+	CS.save_compiler(csc)
+
+	# Build the program
+	CS.build_program('main.exe', ['main.cs'])
+
+	# Install the program
+	CS.install_program('main.exe', 'csharp_example')
+
+	FS.remove_binaries('main')
+
+	# Run the C# program from the system
+	CS.run_print('main.exe')
+
+	# Uninstall the program
+	CS.uninstall_program('main.exe', 'csharp_example')
+
+def csharp_library_installation_and_uninstallation():
+	# Get and setup the C# compiler
+	csc = CS.get_default_compiler()
+	csc.debug = True
+	CS.save_compiler(csc)
+
+	# Build the library
+	CS.build_shared_library('math_helper.dll', ['math_helper.cs'])
+
+	# Install the library
+	CS.install_library('math_helper.dll')
+
+	# Uninstall the library
+	CS.uninstall_library('math_helper.dll')
+
+def csharp_running_and_printing():
+	# Get and setup the C# compiler
+	csc = CS.get_default_compiler()
+	csc.debug = True
+	CS.save_compiler(csc)
+
+	# Build the program
+	CS.build_program('main.exe', ['main.cs'])
+
+	# Run the C# program
+	CS.run_print('main.exe')
+
 
 '''
 OS

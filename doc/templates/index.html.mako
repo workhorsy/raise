@@ -192,9 +192,15 @@ Last updated on January 18th 2014
 		</ol>
 	</li>
 	<li>
-		<a href="#c_sharp">C#</a>
+		<a href="#csharp">C#</a>
 		<ol>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#csharp_compilers">Compilers</a></li>
+			<li><a href="#csharp_compiler_setup">Compiler Setup</a></li>
+			<li><a href="#csharp_building_program">Building Program</a></li>
+			<li><a href="#csharp_building_library">Building Library</a></li>
+			<li><a href="#csharp_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
+			<li><a href="#csharp_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
+			<li><a href="#csharp_running_and_printing">Running and Printing</a></li>
 		</ol>
 	</li>
 	<li>
@@ -2343,7 +2349,7 @@ ${template_info['d_building_object']['output']}
 <h2>14.5. Building Program</h2>
 
 	<p>
-		C++ programs can be built using the <span class="fun">D.build_program</span> function.
+		D programs can be built using the <span class="fun">D.build_program</span> function.
 	</p>
 
 	<p>
@@ -2523,8 +2529,201 @@ ${template_info['d_running_and_printing']['output']}
 <hr />
 
 
-<a id="c_sharp"></a>
+<a id="csharp"></a>
 <h1>15. C#</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_csharp as CS
+	</code></pre>
+
+<a id="csharp_compilers"></a>
+<h2>15.1. Compilers</h2>
+
+	<p>
+		Raise supports the Mono, and MS.NET C# compilers. The compiler
+		 is abstracted away in a generalized way, as to make it so you don't 
+		have to worry about compiler specific functionality.
+	</p>
+
+	<p>
+		You can select the best C# compiler for your platform by
+		using the <span class="fun">CS.get_default_compiler</span> function.
+	</p>
+
+	<p>
+		You can also select the compiler specifically by using the 
+		<span class="fun">CS.cs_compilers</span> dictionary. Be careful
+		as only compilers that were found by Raise will be in the dictionary.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_compilers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['csharp_compilers']['output']}
+	</pre>
+
+<a id="csharp_compiler_setup"></a>
+<h2>15.2. Compiler Setup</h2>
+	<p>
+		After the compiler is selected, it can be configured 
+		using the properties.
+	</p>
+
+	<ul>
+		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
+		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+	</ul>
+
+	<p>
+		After the compiler is setup the way you want, the setting MUST be saved in an 
+		environmental variable. This is done with the 
+		<span class="fun">CS.save_compiler</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_compiler_setup']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['csharp_compiler_setup']['output']}
+	</pre>
+
+<a id="csharp_building_program"></a>
+<h2>15.3. Building Program</h2>
+	<p>
+		C# programs can be built using the <span class="fun">CS.build_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_building_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['csharp_building_program']['output']}
+	</pre>
+
+<a id="csharp_building_library"></a>
+<h2>15.4. Building Library</h2>
+	<p>
+		C# static library can be built using the <span class="fun">CS.build_shared_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_building_library']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['csharp_building_library']['output']}
+	</pre>
+
+<a id="csharp_program_installation_and_uninstallation"></a>
+<h2>15.5. Program Installation and Uninstallation</h2>
+
+	<p>
+		C# programs can be installed with the <span class="fun">CS.install_program</span> function, and
+		uninstalled with the <span class="fun">CS.uninstall_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_program_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+fixme
+	</pre>
+
+<a id="csharp_library_installation_and_uninstallation"></a>
+<h2>15.6. Library Installation and Uninstallation</h2>
+	<p>
+		C# libraries can be installed with the <span class="fun">CS.install_library</span> function, and
+		uninstalled with the <span class="fun">CS.uninstall_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_library_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building C# shared library 'math_helper.dll' ...                             <span class="smile">:)</span>
+Installing the library 'math_helper.dll' ...                                 <span class="smile">:)</span>
+Uninstalling the library 'math_helper.dll' ...                               <span class="smile">:)</span>
+	</pre>
+
+<a id="csharp_running_and_printing"></a>
+<h2>15.7. Running and Printing</h2>
+	<p>
+		C# programs can be ran with the <span class="fun">CS.run_print</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['csharp_running_and_printing']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['csharp_running_and_printing']['output']}
+	</pre>
 
 
 <hr />

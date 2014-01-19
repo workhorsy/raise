@@ -90,6 +90,14 @@ info = {
 	'd_interface_installation_and_uninstallation' : 'skip_run',
 	'd_running_and_printing' : {},
 
+	'csharp_compilers' : {},
+	'csharp_compiler_setup' : {},
+	'csharp_building_program' : {},
+	'csharp_building_library' : {},
+	'csharp_program_installation_and_uninstallation' : 'skip_run',
+	'csharp_library_installation_and_uninstallation' : 'skip_run',
+	'csharp_running_and_printing' : {},
+
 	'users_running_as_root' : 'skip_run',
 	'users_running_as_a_normal_user' : 'skip_run',
 	'users_privilege_escalation' : {},
