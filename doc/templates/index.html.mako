@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 18th 2014
+Last updated on January 19th 2014
 </p>
 
 <p>
@@ -2675,7 +2675,13 @@ ${template_info['csharp_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-fixme
+Building C# program 'main.exe' ...                                           <span class="smile">:)</span>
+Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
+Removing binaries 'main' ...                                                 <span class="smile">:)</span>
+Running command ...                                                          <span class="smile">:)</span>
+main
+Hello World!
+Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
 	</pre>
 
 <a id="csharp_library_installation_and_uninstallation"></a>

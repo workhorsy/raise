@@ -548,7 +548,10 @@ def csharp_program_installation_and_uninstallation():
 	FS.remove_binaries('main')
 
 	# Run the C# program from the system
-	CS.run_print('main.exe')
+	#FIXME: CS.run_print does not work on Linux, because when installed it runs 
+	# the app from a shell script that does "mono blah.exe".
+	#CS.run_print('main.exe')
+	Process.run_print("main")
 
 	# Uninstall the program
 	CS.uninstall_program('main.exe', 'csharp_example')
@@ -563,10 +566,10 @@ def csharp_library_installation_and_uninstallation():
 	CS.build_shared_library('math_helper.dll', ['math_helper.cs'])
 
 	# Install the library
-	CS.install_library('math_helper.dll')
+	CS.install_library('math_helper.dll', 'libmath_helper')
 
 	# Uninstall the library
-	CS.uninstall_library('math_helper.dll')
+	CS.uninstall_library('math_helper.dll', 'libmath_helper')
 
 def csharp_running_and_printing():
 	# Get and setup the C# compiler

@@ -23,3 +23,9 @@ sudo python root_test_suite.py
 // Examples can be run from the example directory
 cd examples/c_simple/
 ./raise test
+
+
+// Documentation can be regenerated in the doc directory
+python generate_documentation.py
+
+
