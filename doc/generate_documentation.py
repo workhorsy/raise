@@ -140,17 +140,17 @@ if __name__ == '__main__':
 		print("running template {0} of {1} ...".format(n, len(info)))
 
 		# Setup
-		run_and_get_stdall('./raise setup')
+		run_and_get_stdall('{0} raise setup'.format(sys.executable))
 
 		# Get the source code
-		example = run_and_get_stdall('./raise -plain -inspect {0}'.format(anchor))
+		example = run_and_get_stdall('{0} raise -plain -inspect {1}'.format(sys.executable, anchor))
 		if len(example.strip()) == 0:
 			raise Exception('Example for "{0}" was blank.'.format(anchor))
 
 		# Get the output and apply CSS styles
 		output = 'skip'
 		if value != 'skip_run':
-			output = run_and_get_stdall('./raise -plain {0}'.format(anchor))
+			output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
 			if len(output.strip()) == 0:
 				raise Exception('Output for "{0}" was blank.'.format(anchor))
 			output = str.join("\n", output.split("\n")[1 : ])
@@ -163,7 +163,7 @@ if __name__ == '__main__':
 		}
 
 	# Cleanup
-	run_and_get_stdall('./raise cleanup')
+	run_and_get_stdall('{0} raise cleanup'.format(sys.executable))
 
 	# Move back up one directory
 	os.chdir('..')
