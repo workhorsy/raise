@@ -260,13 +260,14 @@ def install_program(name, dir_name):
 
 		if OS.os_type._name != 'Windows':
 			script_name = Helpers.before(name, '.')
-			script_path = '/usr/bin/' + script_name
+			script_path = os.path.join('/usr/bin/', script_name)
 			with open(script_path, 'w') as f:
 				f.write("#!/usr/bin/env bash\n")
 				f.write("\n")
-				f.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/{0}\n".format(script_name))
-				f.write("THIS_EXE=\"/usr/lib/{0}/{0}.exe\"\n".format(script_name))
-				f.write("exec java $THIS_EXE \"$@\"\n")
+				f.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/{0}\n".format(dir_name))
+				f.write("THIS_PATH=\"/usr/lib/{0}\"\n".format(dir_name))
+				f.write("THIS_EXE=\"{0}\"\n".format(script_name))
+				f.write("exec java -classpath $THIS_PATH $THIS_EXE \"$@\"\n")
 				f.write("\n")
 			st = os.stat(script_path)
 			os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)

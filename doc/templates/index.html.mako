@@ -2887,13 +2887,13 @@ ${template_info['java_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building Java program 'main.exe' ...                                           <span class="smile">:)</span>
-Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
+Building Java program 'main.class' ...                                       <span class="smile">:)</span>
+Installing the program 'main.class' ...                                      <span class="smile">:)</span>
 Removing binaries 'main' ...                                                 <span class="smile">:)</span>
 Running command ...                                                          <span class="smile">:)</span>
 main
 Hello World!
-Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
+Uninstalling the program 'main.class' ...                                    <span class="smile">:)</span>
 	</pre>
 
 <a id="java_library_installation_and_uninstallation"></a>
@@ -2916,9 +2916,9 @@ ${template_info['java_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building Java shared library 'math_helper.dll' ...                             <span class="smile">:)</span>
-Installing the library 'math_helper.dll' ...                                 <span class="smile">:)</span>
-Uninstalling the library 'math_helper.dll' ...                               <span class="smile">:)</span>
+Building Java jar 'lib_math.jar' ...                                         <span class="smile">:)</span>
+Installing the jar 'lib_math.jar' ...                                        <span class="smile">:)</span>
+Uninstalling the jar 'lib_math.jar' ...                                      <span class="smile">:)</span>
 	</pre>
 
 <a id="java_running_and_printing"></a>

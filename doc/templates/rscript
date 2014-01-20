@@ -31,7 +31,7 @@ def cleanup():
 		if os.path.isfile(entry):
 			os.remove(entry)
 
-	for entry in ['libexample', 'libadd', 'libsubtract', 'main', 'math_helper']:
+	for entry in ['libexample', 'libadd', 'libsubtract', 'main', 'math_helper', 'lib_math']:
 		FS.remove_binaries(entry)
 
 def setup():
@@ -594,7 +594,7 @@ def java_compilers():
 	print("name: {0}".format(javac._name))
 	print("path: {0} ".format(javac._path))
 
-	javac = Java.cs_compilers['javac']
+	javac = Java.java_compilers['javac']
 
 	# Print the compiler name and path for fun
 	print("name: {0}".format(javac._name))
@@ -636,7 +636,7 @@ def java_building_library():
 	Java.save_compiler(javac)
 
 	# Build the library
-	Java.build_shared_library('math_helper.jar', ['math_helper.java'])
+	Java.build_jar('math_helper.jar', ['lib_math.java'])
 
 def java_program_installation_and_uninstallation():
 	# Get and setup the Java compiler
@@ -648,12 +648,15 @@ def java_program_installation_and_uninstallation():
 	Java.build_program('main.class', ['main.java'])
 
 	# Install the program
-	java.install_program('main.class', 'java_example')
+	Java.install_program('main.class', 'java_example')
 
 	FS.remove_binaries('main')
 
 	# Run the Java program from the system
-	Java.run_print('main.class')
+	#FIXME: Java.run_print does not work on Linux, because when installed it runs 
+	# the app from a shell script that does "java blah".
+	#Java.run_print('main')
+	Process.run_print("main")
 
 	# Uninstall the program
 	Java.uninstall_program('main.class', 'java_example')
@@ -664,14 +667,14 @@ def java_library_installation_and_uninstallation():
 	javac.debug = True
 	Java.save_compiler(javac)
 
-	# Build the library
-	Java.build_shared_library('math_helper.jar', ['math_helper.java'])
+	# Build the jar
+	Java.build_jar('lib_math.jar', ['lib_math.java'])
 
-	# Install the library
-	Java.install_library('math_helper.jar', 'libmath_helper')
+	# Install the jar
+	Java.install_jar('lib_math.jar', 'lib_math')
 
-	# Uninstall the library
-	Java.uninstall_library('math_helper.jar', 'libmath_helper')
+	# Uninstall the jar
+	Java.uninstall_jar('lib_math.jar', 'lib_math')
 
 def java_running_and_printing():
 	# Get and setup the Java compiler
@@ -683,7 +686,7 @@ def java_running_and_printing():
 	Java.build_program('main.class', ['main.java'])
 
 	# Run the Java program
-	Java.run_print('main.class')
+	Java.run_print('main')
 
 '''
 OS
