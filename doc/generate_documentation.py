@@ -7,6 +7,7 @@
 '''
 
 import sys, os
+import pickle
 import subprocess
 from mako.template import Template
 
@@ -129,7 +130,14 @@ info = {
 	'terminal_fail' : {},
 }
 
+cache = {}
+
 if __name__ == '__main__':
+	# Load the cache
+	if os.path.isfile('cache.pickle'):
+		with open('cache.pickle', 'rb') as f:
+			cache = pickle.loads(f.read())
+
 	# Move the templates directory
 	os.chdir('templates')
 
@@ -147,14 +155,21 @@ if __name__ == '__main__':
 		if len(example.strip()) == 0:
 			raise Exception('Example for "{0}" was blank.'.format(anchor))
 
-		# Get the output and apply CSS styles
 		output = 'skip'
-		if value != 'skip_run':
-			output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
-			if len(output.strip()) == 0:
-				raise Exception('Output for "{0}" was blank.'.format(anchor))
-			output = str.join("\n", output.split("\n")[1 : ])
-			output = add_styles(output)
+		# Used the cached value if the code is the same
+		if example in cache:
+			output = cache[example]
+			print('cached ...')
+		# Or re-run the code if it has changed
+		else:
+			# Get the output and apply CSS styles
+			if value != 'skip_run':
+				output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
+				if len(output.strip()) == 0:
+					raise Exception('Output for "{0}" was blank.'.format(anchor))
+				output = str.join("\n", output.split("\n")[1 : ])
+				output = add_styles(output)
+			cache[example] = output
 
 		# Save the code and output
 		info[anchor] = {
@@ -167,6 +182,11 @@ if __name__ == '__main__':
 
 	# Move back up one directory
 	os.chdir('..')
+
+	# Save the cahce
+	with open('cache.pickle', 'wb') as f:
+		data = pickle.dumps(cache)
+		f.write(data)
 
 	# Apply the generated code info to the template
 	mytemplate = Template(
