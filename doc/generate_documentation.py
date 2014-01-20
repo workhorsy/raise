@@ -134,7 +134,11 @@ if __name__ == '__main__':
 	os.chdir('templates')
 
 	# Generate the source code and output for each doc item
+	n = 0
 	for anchor, value in info.items():
+		n += 1
+		print("running template {0} of {1} ...".format(n, len(info)))
+
 		# Setup
 		run_and_get_stdall('./raise setup')
 
