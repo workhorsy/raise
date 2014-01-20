@@ -98,6 +98,14 @@ info = {
 	'csharp_library_installation_and_uninstallation' : 'skip_run',
 	'csharp_running_and_printing' : {},
 
+	'java_compilers' : {},
+	'java_compiler_setup' : {},
+	'java_building_program' : {},
+	'java_building_library' : {},
+	'java_program_installation_and_uninstallation' : 'skip_run',
+	'java_library_installation_and_uninstallation' : 'skip_run',
+	'java_running_and_printing' : {},
+
 	'users_running_as_root' : 'skip_run',
 	'users_running_as_a_normal_user' : 'skip_run',
 	'users_privilege_escalation' : {},

@@ -8,6 +8,7 @@ import lib_raise_cxx as CXX
 import lib_raise_ar as AR
 import lib_raise_d as D
 import lib_raise_csharp as CS
+import lib_raise_java as Java
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_libraries as Libraries
@@ -583,6 +584,106 @@ def csharp_running_and_printing():
 	# Run the C# program
 	CS.run_print('main.exe')
 
+'''
+Java
+'''
+def java_compilers():
+	javac = Java.get_default_compiler()
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(javac._name))
+	print("path: {0} ".format(javac._path))
+
+	javac = Java.cs_compilers['javac']
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(javac._name))
+	print("path: {0} ".format(javac._path))
+
+def java_compiler_setup():
+	# Get a Java compiler
+	javac = Java.get_default_compiler()
+
+	# Compiler setup
+	javac.debug = True
+	javac.optimize = True
+	javac.warnings_all = True
+	javac.warnings_as_errors = True
+	javac.compile_time_flags = ['SDL=true']
+
+	# Save the compiler config in environmental variables
+	Java.save_compiler(javac)
+
+	# Print environmental variables to see what happens under the hood
+	print("$JAVAC: {0}".format(os.environ['JAVAC']))
+	print("$JAR: {0}".format(os.environ['JAR']))
+	print("$JAVA: {0}".format(os.environ['JAVA']))
+	print("$JAVAFLAGS: {0}".format(os.environ['JAVAFLAGS']))
+
+def java_building_program():
+	# Get and setup the Java compiler
+	javac = Java.get_default_compiler()
+	javac.debug = True
+	Java.save_compiler(javac)
+
+	# Build the program
+	Java.build_program('main.class', ['main.java'])
+
+def java_building_library():
+	# Get and setup the java compiler
+	javac = Java.get_default_compiler()
+	javac.debug = True
+	Java.save_compiler(javac)
+
+	# Build the library
+	Java.build_shared_library('math_helper.jar', ['math_helper.java'])
+
+def java_program_installation_and_uninstallation():
+	# Get and setup the Java compiler
+	javac = Java.get_default_compiler()
+	javac.debug = True
+	Java.save_compiler(javac)
+
+	# Build the program
+	Java.build_program('main.class', ['main.java'])
+
+	# Install the program
+	java.install_program('main.class', 'java_example')
+
+	FS.remove_binaries('main')
+
+	# Run the Java program from the system
+	Java.run_print('main.class')
+
+	# Uninstall the program
+	Java.uninstall_program('main.class', 'java_example')
+
+def java_library_installation_and_uninstallation():
+	# Get and setup the Java compiler
+	javac = Java.get_default_compiler()
+	javac.debug = True
+	Java.save_compiler(javac)
+
+	# Build the library
+	Java.build_shared_library('math_helper.jar', ['math_helper.java'])
+
+	# Install the library
+	Java.install_library('math_helper.jar', 'libmath_helper')
+
+	# Uninstall the library
+	Java.uninstall_library('math_helper.jar', 'libmath_helper')
+
+def java_running_and_printing():
+	# Get and setup the Java compiler
+	javac = Java.get_default_compiler()
+	javac.debug = True
+	Java.save_compiler(javac)
+
+	# Build the program
+	Java.build_program('main.class', ['main.java'])
+
+	# Run the Java program
+	Java.run_print('main.class')
 
 '''
 OS

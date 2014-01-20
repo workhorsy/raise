@@ -206,7 +206,13 @@ Last updated on January 19th 2014
 	<li>
 		<a href="#java">Java</a>
 		<ol>
-			<li><span class="fixme">FIXME</span></li>
+			<li><a href="#java_compilers">Compilers</a></li>
+			<li><a href="#java_compiler_setup">Compiler Setup</a></li>
+			<li><a href="#java_building_program">Building Program</a></li>
+			<li><a href="#java_building_library">Building Library</a></li>
+			<li><a href="#java_program_installation_and_uninstallation">Program Installation and Uninstallation</a></li>
+			<li><a href="#java_library_installation_and_uninstallation">Library Installation and Uninstallation</a></li>
+			<li><a href="#java_running_and_printing">Running and Printing</a></li>
 		</ol>
 	</li>
 	<li>
@@ -2737,6 +2743,205 @@ ${template_info['csharp_running_and_printing']['output']}
 
 <a id="java"></a>
 <h1>16. Java</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_java as Java
+	</code></pre>
+
+<a id="java_compilers"></a>
+<h2>16.1. Compilers</h2>
+
+	<p>
+		Raise supports the OpenJDK 7 Java compiler. The compiler
+		 is abstracted away in a generalized way, as to make it so you don't 
+		have to worry about compiler specific functionality.
+	</p>
+
+	<p>
+		You can select the best Java compiler for your platform by
+		using the <span class="fun">Java.get_default_compiler</span> function.
+	</p>
+
+	<p>
+		You can also select the compiler specifically by using the 
+		<span class="fun">Java.cs_compilers</span> dictionary. Be careful
+		as only compilers that were found by Raise will be in the dictionary.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_compilers']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['java_compilers']['output']}
+	</pre>
+
+<a id="java_compiler_setup"></a>
+<h2>16.2. Compiler Setup</h2>
+	<p>
+		After the compiler is selected, it can be configured 
+		using the properties.
+	</p>
+
+	<ul>
+		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
+		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+	</ul>
+
+	<p>
+		After the compiler is setup the way you want, the setting MUST be saved in an 
+		environmental variable. This is done with the 
+		<span class="fun">Java.save_compiler</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_compiler_setup']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['java_compiler_setup']['output']}
+	</pre>
+
+<a id="java_building_program"></a>
+<h2>16.3. Building Program</h2>
+	<p>
+		Java programs can be built using the <span class="fun">Java.build_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_building_program']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['java_building_program']['output']}
+	</pre>
+
+<a id="java_building_library"></a>
+<h2>16.4. Building Library</h2>
+	<p>
+		Java static library can be built using the <span class="fun">Java.build_shared_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_building_library']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['java_building_library']['output']}
+	</pre>
+
+<a id="java_program_installation_and_uninstallation"></a>
+<h2>16.5. Program Installation and Uninstallation</h2>
+
+	<p>
+		Java programs can be installed with the <span class="fun">Java.install_program</span> function, and
+		uninstalled with the <span class="fun">Java.uninstall_program</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_program_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building Java program 'main.exe' ...                                           <span class="smile">:)</span>
+Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
+Removing binaries 'main' ...                                                 <span class="smile">:)</span>
+Running command ...                                                          <span class="smile">:)</span>
+main
+Hello World!
+Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
+	</pre>
+
+<a id="java_library_installation_and_uninstallation"></a>
+<h2>16.6. Library Installation and Uninstallation</h2>
+	<p>
+		Java libraries can be installed with the <span class="fun">Java.install_library</span> function, and
+		uninstalled with the <span class="fun">Java.uninstall_library</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_library_installation_and_uninstallation']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Building Java shared library 'math_helper.dll' ...                             <span class="smile">:)</span>
+Installing the library 'math_helper.dll' ...                                 <span class="smile">:)</span>
+Uninstalling the library 'math_helper.dll' ...                               <span class="smile">:)</span>
+	</pre>
+
+<a id="java_running_and_printing"></a>
+<h2>16.7. Running and Printing</h2>
+	<p>
+		Java programs can be ran with the <span class="fun">Java.run_print</span> function.
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['java_running_and_printing']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['java_running_and_printing']['output']}
+	</pre>
 
 
 <hr />
