@@ -41,6 +41,13 @@ def setup():
 	os.mkdir('example')
 
 '''
+OS
+'''
+
+def operating_system_support():
+	print("OS: {0}".format(OS.os_type._name))
+
+'''
 installation
 '''
 

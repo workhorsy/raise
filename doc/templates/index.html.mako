@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 19th 2014
+Last updated on January 21st 2014
 </p>
 
 <p>
@@ -476,6 +476,36 @@ Java works with OpenJDK 7.
 
 <a id="operating_system_support"></a>
 <h1>5. Operating System Support</h1>
+
+	<pre><code data-language="python">
+# Most of this section requires the modules:
+import lib_raise_os as OS
+	</code></pre>
+
+<p>
+	Raise uses a string for the OS Type. Any time you need to check what
+	OS your script is running under, you can use <span class="fun">OS.os_type._name</span>.
+</p>
+
+There are three basic OS types:
+
+<ul>
+	<li>Cygwin: Cygwin running on Windows</li>
+	<li>Unix: All Unix and Linux based OSes</li>
+	<li>Windows: All Windows OSes</li>
+</ul>
+
+<pre><code data-language="python">
+${template_info['operating_system_support']['example']}
+</code></pre>
+
+<p>
+Example output:
+</p>
+
+<pre class="raise_output">
+${template_info['operating_system_support']['output']}
+</pre>
 
 <a id="linux_support"></a>
 <h2>5.1. Linux</h2>
