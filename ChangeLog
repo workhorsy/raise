@@ -1,4 +1,4 @@
-* Release 0.3.0
+2014-01-22 Release 0.3.0
 	* Fixed Bug #1271347: 'The get_header_file function returns wrong header file for SDL'.
 	* Fixed Bug #1228910: 'Add documentation'.
 	* Fixed Bug #1225296: 'Break raise_actual into modules'.
