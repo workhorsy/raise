@@ -3045,7 +3045,7 @@ ${template_info['cpu']['example']}
 	Example output:
 	</p>
 
-	<pre class="raise_output">
+	<pre class="raise_output" style="white-space: pre-wrap;">
 ${template_info['cpu']['output']}
 	</pre>
 
