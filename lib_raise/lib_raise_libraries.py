@@ -75,9 +75,41 @@ def _get_static_library_from_library_files(library_name, extension, library_file
 	return None
 
 def _get_header_from_library_files(library_name, library_files):
+	'''
+	Will match header files with this priority:
+	1. Exact match after last path separator
+	2. Exact match different capitalization after last path separator
+	3. Matches ending
+	4. Matches ending with different capitalization
+	'''
 	library_name = library_name.lstrip('lib')
+
+	# 1. Exact match after last path separator
+	desired_name = '{0}.h'.format(library_name)
 	for entry in library_files:
-		if library_name in entry and entry.endswith('.h'):
+		file_name = os.path.basename(entry)
+		if file_name == desired_name:
+			return entry
+
+	# 2. Exact match different capitalization after last path separator
+	desired_name = '{0}.h'.format(library_name).lower()
+	for entry in library_files:
+		file_name = os.path.basename(entry).lower()
+		if file_name == desired_name:
+			return entry
+
+	# 3. Matches ending
+	desired_name = '{0}.h'.format(library_name)
+	for entry in library_files:
+		file_name = os.path.basename(entry)
+		if file_name.endswith(desired_name):
+			return entry
+
+	# 4. Matches ending with different capitalization
+	desired_name = '{0}.h'.format(library_name).lower()
+	for entry in library_files:
+		file_name = os.path.basename(entry).lower()
+		if file_name.endswith(desired_name):
 			return entry
 
 	return None
