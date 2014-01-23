@@ -158,7 +158,7 @@ def link_program(out_file, obj_files, i_files=[]):
 		return True
 
 	# Create the event
-	event = Event(task, result, plural, singular, command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def ldconfig():
