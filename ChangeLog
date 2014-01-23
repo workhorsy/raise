@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1271797: 'Documentation cannot be generated with Python3'.
 
 2014-01-22 Release 0.3.0
 	* Fixed Bug #1271347: 'The get_header_file function returns wrong header file for SDL'.

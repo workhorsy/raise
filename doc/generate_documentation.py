@@ -13,9 +13,9 @@ from mako.template import Template
 
 # Adds to add CSS styles to output
 def add_styles(code):
-	code = code.replace(':)', '<span class="smile">:)</span>')
-	code = code.replace(':(', '<span class="frown">:(</span>')
-	code = code.replace(':\\', '<span class="normal">:\</span>')
+	code = code.replace(b':)', b'<span class="smile">:)</span>')
+	code = code.replace(b':(', b'<span class="frown">:(</span>')
+	code = code.replace(b':\\', b'<span class="normal">:\</span>')
 	return code
 
 # Runs a command and gets all the standard output as a string
@@ -156,7 +156,7 @@ if __name__ == '__main__':
 		if len(example.strip()) == 0:
 			raise Exception('Example for "{0}" was blank.'.format(anchor))
 
-		output = 'skip'
+		output = b'skip'
 		# Used the cached value if the code is the same
 		if example in cache:
 			output = cache[example]
@@ -168,14 +168,14 @@ if __name__ == '__main__':
 				output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
 				if len(output.strip()) == 0:
 					raise Exception('Output for "{0}" was blank.'.format(anchor))
-				output = str.join("\n", output.split("\n")[1 : ])
+				output = bytes.join(b"\n", output.split(b"\n")[1 : ])
 				output = add_styles(output)
 			cache[example] = output
 
 		# Save the code and output
 		info[anchor] = {
-			'example' : example, 
-			'output' : output, 
+			'example' : example.decode('utf-8'), 
+			'output' : output.decode('utf-8'), 
 		}
 
 	# Cleanup
