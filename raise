@@ -175,6 +175,11 @@ if __name__ == '__main__':
 			if has_files:
 				needs_update = False
 
+	# Print the version if that is the target
+	if args == 'version':
+		print(LIB_RAISE_VERSION)
+		exit(0)
+
 	# Run update if that is the target
 	if args == 'update':
 		update(dir_name)

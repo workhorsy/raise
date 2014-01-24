@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1230070: 'Add option to print version'.
 	* Fixed Bug #1270697: 'Have updater do more checks to redownload'.
 	* Fixed Bug #1272146: 'Add clang as a C++ compiler'.
 	* Fixed Bug #1270698: 'Give each language its own compiler class'.
