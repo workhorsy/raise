@@ -450,7 +450,7 @@ cd raise/examples/c_simple
 <h2>4.1. C/C++</h2>
 
 <p>
-C and C++ are fully supported with GCC, and CLang. MS cl.exe support is not yet complete.
+C and C++ are fully supported with GCC, and Clang. MS cl.exe support is not yet complete.
 </p>
 
 <a id="d_support"></a>
@@ -1988,7 +1988,7 @@ import lib_raise_ar as AR
 <h2>13.2. C++ Compilers</h2>
 
 	<p>
-		Raise supports the GCC, and MS cl.exe C++ compilers. The compiler
+		Raise supports the GCC, Clang, and MS cl.exe C++ compilers. The compiler
 		 is abstracted away in a generalized way, as to make it so you don't 
 		have to worry about compiler specific functionality.
 	</p>
