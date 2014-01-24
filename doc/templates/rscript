@@ -366,7 +366,7 @@ def d_compilers():
 	print("name: {0}".format(dc._name))
 	print("path: {0} ".format(dc._path))
 
-	dc = D.d_compilers['dmd']
+	dc = D.d_compilers['ldc2']
 
 	# Print the compiler name and path for fun
 	print("name: {0}".format(dc._name))
