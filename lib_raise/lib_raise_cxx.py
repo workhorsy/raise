@@ -68,7 +68,7 @@ def setup():
 		}
 
 	# Get the names and paths for know C++ compilers
-	names = ['g++', 'cl.exe']
+	names = ['g++', 'clang++', 'cl.exe']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
@@ -77,6 +77,26 @@ def setup():
 		if name == 'g++':
 			comp = C.CCompiler(
 				name =                 'g++', 
+				path =                 paths[0], 
+				setup =                '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Wall', 
+				warnings_as_errors =   '-Werror', 
+				optimize_zero =        '-O0',
+				optimize_one =         '-O1',
+				optimize_two =         '-O2',
+				optimize_three =       '-O3',
+				optimize_size =        '-Os',
+				compile_time_flags =   '-D', 
+				link =                 '-shared -Wl,-as-needed', 
+				extension_map = extension_map
+			)
+			cxx_compilers[comp._name] = comp
+		elif name == 'clang++':
+			comp = C.CCompiler(
+				name =                 'clang++', 
 				path =                 paths[0], 
 				setup =                '', 
 				out_file =             '-o ', 
@@ -132,6 +152,8 @@ def get_default_compiler():
 	else:
 		if 'g++' in cxx_compilers:
 			comp = cxx_compilers['g++']
+		elif 'clang++' in cxx_compilers:
+			comp = cxx_compilers['clang++']
 
 	return comp
 

@@ -239,7 +239,7 @@ def cxx_compilers():
 	print("name: {0}".format(cc._name))
 	print("path: {0} ".format(cc._path))
 
-	cc = CXX.cxx_compilers['g++']
+	cc = CXX.cxx_compilers['clang++']
 
 	# Print the compiler name and path for fun
 	print("name: {0}".format(cc._name))

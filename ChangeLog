@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1272146: 'Add clang as a C++ compiler'.
 	* Fixed Bug #1270698: 'Give each language its own compiler class'.
 	* Fixed Bug #1270696: 'Rename to OS module to User'.
 	* Fixed Bug #1270694: 'Rename the Library module to Find'.
