@@ -31,7 +31,7 @@ import stat
 import lib_raise_terminal as Print
 import lib_raise_config as Config
 import lib_raise_os as OS
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
@@ -59,7 +59,7 @@ def setup():
 	# Get the names and paths for know Java compilers
 	names = ['javac']
 	for name in names:
-		paths = Libraries.program_paths(name)
+		paths = Find.program_paths(name)
 		if len(paths) == 0:
 			continue
 

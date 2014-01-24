@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 21st 2014
+Last updated on January 23rd 2014
 </p>
 
 <p>
@@ -1406,7 +1406,7 @@ ${template_info['terminal_fail']['output']}
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_python as Python
 	</code></pre>
 
@@ -1431,7 +1431,7 @@ Below are a few ways Raise will search on common OSes:
 <h2>11.1. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
-	<span class="fun">Libraries.program_paths</span> function. There is currently
+	<span class="fun">Find.program_paths</span> function. There is currently
 	no way to specify what version of the program you want to find.
 	</p>
 
@@ -1455,7 +1455,7 @@ ${template_info['find_finding_programs']['output']}
 <h2>11.2. Requiring Programs</h2>
 	<p>
 	You can make sure a program is installed, by using the 
-	<span class="fun">Libraries.require_programs</span> function. If the 
+	<span class="fun">Find.require_programs</span> function. If the 
 	program is not installed, it will print an error and exit. There is 
 	currently no way to specify what version of the program you want to require.
 	</p>
@@ -1480,8 +1480,8 @@ ${template_info['find_requiring_programs']['output']}
 <h2>11.3. Finding Libraries</h2>
 	<p>
 	You can find a library, by searching for it with the
-	<span class="fun">Libraries.get_static_library</span> and
-	<span class="fun">Libraries.get_shared_library</span> functions. Optionally
+	<span class="fun">Find.get_static_library</span> and
+	<span class="fun">Find.get_shared_library</span> functions. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
 
@@ -1505,8 +1505,8 @@ ${template_info['find_finding_libraries']['output']}
 <h2>11.4. Requiring Libraries</h2>
 	<p>
 	You can make sure a library is installed, by using the 
-	<span class="fun">Libraries.require_static_library</span> and
-	<span class="fun">Libraries.require_shared_library</span> functions. 
+	<span class="fun">Find.require_static_library</span> and
+	<span class="fun">Find.require_shared_library</span> functions. 
 	If the library is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
@@ -1531,7 +1531,7 @@ ${template_info['find_requiring_libraries']['output']}
 <h2>11.5. Finding Headers Files</h2>
 	<p>
 	You can find a header file, by searching for it with the
-	<span class="fun">Libraries.get_header_file</span> function. Optionally
+	<span class="fun">Find.get_header_file</span> function. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
 
@@ -1555,7 +1555,7 @@ ${template_info['find_finding_headers']['output']}
 <h2>11.6. Requiring Headers Files</h2>
 	<p>
 	You can make sure a header file is installed, by using the 
-	<span class="fun">Libraries.require_header_file</span> function. 
+	<span class="fun">Find.require_header_file</span> function. 
 	If the header is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>

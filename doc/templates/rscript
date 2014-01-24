@@ -11,7 +11,7 @@ import lib_raise_csharp as CS
 import lib_raise_java as Java
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_python as Python
 import lib_raise_os as OS
 import lib_raise_process as Process
@@ -741,53 +741,53 @@ Finding Programs, Libraries, and Headers Files
 '''
 
 def find_finding_programs():
-	paths = Libraries.program_paths('gcc')
+	paths = Find.program_paths('gcc')
 	print(paths)
 
 def find_requiring_programs():
-	Libraries.require_programs(['gcc'])
+	Find.require_programs(['gcc'])
 
 def find_finding_libraries():
 	# SDL Library any version
-	print(Libraries.get_static_library('libSDL'))
-	print(Libraries.get_shared_library('libSDL'))
+	print(Find.get_static_library('libSDL'))
+	print(Find.get_shared_library('libSDL'))
 
 	# SDL Library at least version 1.2
-	print(Libraries.get_shared_library('libSDL', lambda ver: ver >= (1, 2)))
+	print(Find.get_shared_library('libSDL', lambda ver: ver >= (1, 2)))
 
 	# SDL Library of version 1.X
-	print(Libraries.get_shared_library('libSDL', lambda ver: ver.major == 1))
+	print(Find.get_shared_library('libSDL', lambda ver: ver.major == 1))
 
 def find_requiring_libraries():
 	# SDL Library any version
-	Libraries.require_static_library('libSDL')
-	Libraries.require_shared_library('libSDL')
+	Find.require_static_library('libSDL')
+	Find.require_shared_library('libSDL')
 
 	# SDL Library at least version 1.2
-	Libraries.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
+	Find.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
 
 	# SDL Library of version 1.X
-	Libraries.require_shared_library('libSDL', lambda ver: ver.major == 1)
+	Find.require_shared_library('libSDL', lambda ver: ver.major == 1)
 
 def find_finding_headers():
 	# SDL Library any version
-	print(Libraries.get_header_file('libSDL'))
+	print(Find.get_header_file('libSDL'))
 
 	# SDL Library at least version 1.2
-	print(Libraries.get_header_file('libSDL', lambda ver: ver >= (1, 2)))
+	print(Find.get_header_file('libSDL', lambda ver: ver >= (1, 2)))
 
 	# SDL Library of version 1.X
-	print(Libraries.get_header_file('libSDL', lambda ver: ver.major == 1))
+	print(Find.get_header_file('libSDL', lambda ver: ver.major == 1))
 
 def find_requiring_headers():
 	# SDL Library any version
-	Libraries.require_header_file('libSDL')
+	Find.require_header_file('libSDL')
 
 	# SDL Library at least version 1.2
-	Libraries.require_header_file('libSDL', lambda ver: ver >= (1, 2))
+	Find.require_header_file('libSDL', lambda ver: ver >= (1, 2))
 
 	# SDL Library of version 1.X
-	Libraries.require_header_file('libSDL', lambda ver: ver.major == 1)
+	Find.require_header_file('libSDL', lambda ver: ver.major == 1)
 
 def find_requiring_python_modules():
 	# Require that os, sys, and platform are installed

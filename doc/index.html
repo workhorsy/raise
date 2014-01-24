@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 21st 2014
+Last updated on January 23rd 2014
 </p>
 
 <p>
@@ -387,10 +387,10 @@ raise
            |-lib_raise_csharp.py
            |-lib_raise_cxx.py
            |-lib_raise_d.py
+           |-lib_raise_find.py
            |-lib_raise_fs.py
            |-lib_raise_helpers.py
            |-lib_raise_java.py
-           |-lib_raise_libraries.py
            |-lib_raise_linker.py
            |-lib_raise_os.py
            |-lib_raise_process.py
@@ -1522,7 +1522,7 @@ Yep. Here is the fail message
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_python as Python
 	</code></pre>
 
@@ -1547,7 +1547,7 @@ Below are a few ways Raise will search on common OSes:
 <h2>11.1. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
-	<span class="fun">Libraries.program_paths</span> function. There is currently
+	<span class="fun">Find.program_paths</span> function. There is currently
 	no way to specify what version of the program you want to find.
 	</p>
 
@@ -1557,7 +1557,7 @@ Below are a few ways Raise will search on common OSes:
 
 	<pre><code data-language="python">
 def find_finding_programs():
- 	paths = Libraries.program_paths('gcc')
+ 	paths = Find.program_paths('gcc')
  	print(paths)
 
 
@@ -1576,7 +1576,7 @@ def find_finding_programs():
 <h2>11.2. Requiring Programs</h2>
 	<p>
 	You can make sure a program is installed, by using the 
-	<span class="fun">Libraries.require_programs</span> function. If the 
+	<span class="fun">Find.require_programs</span> function. If the 
 	program is not installed, it will print an error and exit. There is 
 	currently no way to specify what version of the program you want to require.
 	</p>
@@ -1587,7 +1587,7 @@ def find_finding_programs():
 
 	<pre><code data-language="python">
 def find_requiring_programs():
- 	Libraries.require_programs(['gcc'])
+ 	Find.require_programs(['gcc'])
 
 
 	</code></pre>
@@ -1605,8 +1605,8 @@ Checking for program 'gcc' ...                                              <spa
 <h2>11.3. Finding Libraries</h2>
 	<p>
 	You can find a library, by searching for it with the
-	<span class="fun">Libraries.get_static_library</span> and
-	<span class="fun">Libraries.get_shared_library</span> functions. Optionally
+	<span class="fun">Find.get_static_library</span> and
+	<span class="fun">Find.get_shared_library</span> functions. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
 
@@ -1617,14 +1617,14 @@ Checking for program 'gcc' ...                                              <spa
 	<pre><code data-language="python">
 def find_finding_libraries():
  	# SDL Library any version
- 	print(Libraries.get_static_library('libSDL'))
- 	print(Libraries.get_shared_library('libSDL'))
+ 	print(Find.get_static_library('libSDL'))
+ 	print(Find.get_shared_library('libSDL'))
  
  	# SDL Library at least version 1.2
- 	print(Libraries.get_shared_library('libSDL', lambda ver: ver >= (1, 2)))
+ 	print(Find.get_shared_library('libSDL', lambda ver: ver >= (1, 2)))
  
  	# SDL Library of version 1.X
- 	print(Libraries.get_shared_library('libSDL', lambda ver: ver.major == 1))
+ 	print(Find.get_shared_library('libSDL', lambda ver: ver.major == 1))
 
 
 	</code></pre>
@@ -1645,8 +1645,8 @@ def find_finding_libraries():
 <h2>11.4. Requiring Libraries</h2>
 	<p>
 	You can make sure a library is installed, by using the 
-	<span class="fun">Libraries.require_static_library</span> and
-	<span class="fun">Libraries.require_shared_library</span> functions. 
+	<span class="fun">Find.require_static_library</span> and
+	<span class="fun">Find.require_shared_library</span> functions. 
 	If the library is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
@@ -1658,14 +1658,14 @@ def find_finding_libraries():
 	<pre><code data-language="python">
 def find_requiring_libraries():
  	# SDL Library any version
- 	Libraries.require_static_library('libSDL')
- 	Libraries.require_shared_library('libSDL')
+ 	Find.require_static_library('libSDL')
+ 	Find.require_shared_library('libSDL')
  
  	# SDL Library at least version 1.2
- 	Libraries.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
+ 	Find.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
  
  	# SDL Library of version 1.X
- 	Libraries.require_shared_library('libSDL', lambda ver: ver.major == 1)
+ 	Find.require_shared_library('libSDL', lambda ver: ver.major == 1)
 
 
 	</code></pre>
@@ -1686,7 +1686,7 @@ Checking for shared library 'libSDL' ...                                    <spa
 <h2>11.5. Finding Headers Files</h2>
 	<p>
 	You can find a header file, by searching for it with the
-	<span class="fun">Libraries.get_header_file</span> function. Optionally
+	<span class="fun">Find.get_header_file</span> function. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
 
@@ -1697,13 +1697,13 @@ Checking for shared library 'libSDL' ...                                    <spa
 	<pre><code data-language="python">
 def find_finding_headers():
  	# SDL Library any version
- 	print(Libraries.get_header_file('libSDL'))
+ 	print(Find.get_header_file('libSDL'))
  
  	# SDL Library at least version 1.2
- 	print(Libraries.get_header_file('libSDL', lambda ver: ver >= (1, 2)))
+ 	print(Find.get_header_file('libSDL', lambda ver: ver >= (1, 2)))
  
  	# SDL Library of version 1.X
- 	print(Libraries.get_header_file('libSDL', lambda ver: ver.major == 1))
+ 	print(Find.get_header_file('libSDL', lambda ver: ver.major == 1))
 
 
 	</code></pre>
@@ -1723,7 +1723,7 @@ def find_finding_headers():
 <h2>11.6. Requiring Headers Files</h2>
 	<p>
 	You can make sure a header file is installed, by using the 
-	<span class="fun">Libraries.require_header_file</span> function. 
+	<span class="fun">Find.require_header_file</span> function. 
 	If the header is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
@@ -1735,13 +1735,13 @@ def find_finding_headers():
 	<pre><code data-language="python">
 def find_requiring_headers():
  	# SDL Library any version
- 	Libraries.require_header_file('libSDL')
+ 	Find.require_header_file('libSDL')
  
  	# SDL Library at least version 1.2
- 	Libraries.require_header_file('libSDL', lambda ver: ver >= (1, 2))
+ 	Find.require_header_file('libSDL', lambda ver: ver >= (1, 2))
  
  	# SDL Library of version 1.X
- 	Libraries.require_header_file('libSDL', lambda ver: ver.major == 1)
+ 	Find.require_header_file('libSDL', lambda ver: ver.major == 1)
 
 
 	</code></pre>

@@ -7,7 +7,7 @@ import lib_raise_c as C
 import lib_raise_d as D
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_os as OS
 import lib_raise_process as Process
 
@@ -36,9 +36,9 @@ def _configure():
 	Linker.save_linker(linker)
 
 	# FIXME: Make this cache the file lists instead of getting it again
-	Libraries.require_header_file('libpcre', lambda ver: ver.major == 8)
-	Libraries.require_shared_library('libpcre', lambda ver: ver.major == 8)
-	Libraries.require_static_library('libphobos2')
+	Find.require_header_file('libpcre', lambda ver: ver.major == 8)
+	Find.require_shared_library('libpcre', lambda ver: ver.major == 8)
+	Find.require_static_library('libphobos2')
 
 def test():
 	"""Builds the program, and runs it."""
@@ -52,7 +52,7 @@ def test():
 
 	# Build the D program using the C object file
 	# FIXME: It should automatically get the library path from the require above
-	link = '-L-l:' + Libraries.get_shared_library('libpcre')
+	link = '-L-l:' + Find.get_shared_library('libpcre')
 	D.build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program

@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import lib_raise_terminal as Print
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_os as OS
 
 def simple_nothing():
@@ -24,10 +24,10 @@ def simple_warning():
 	Print.warning()
 
 def simple_require_program():
-	Libraries.require_programs(['python'])
+	Find.require_programs(['python'])
 
 def simple_require_program_failure():
-	Libraries.require_programs(['no_such_program'])
+	Find.require_programs(['no_such_program'])
 
 def simple_require_not_root():
 	OS.require_not_root()

@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import lib_raise_terminal as Print
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 import lib_raise_os as OS
 import lib_raise_linker as Linker
 import lib_raise_ar as AR
@@ -29,17 +29,17 @@ def find_installed_library():
 	clean()
 	_configure()
 
-	Libraries.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
+	Find.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
 
 def find_missing_library():
 	clean()
 	_configure()
 
-	Libraries.require_shared_library('libDoesNotExist')
+	Find.require_shared_library('libDoesNotExist')
 
 def find_installed_library_bad_version():
 	clean()
 	_configure()
 
-	Libraries.require_shared_library('libSDL', lambda ver: ver >= (99, 0))
+	Find.require_shared_library('libSDL', lambda ver: ver >= (99, 0))
 

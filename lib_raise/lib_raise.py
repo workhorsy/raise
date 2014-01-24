@@ -42,7 +42,7 @@ import lib_raise_cpu as CPU
 import lib_raise_terminal as Print
 import lib_raise_fs as FS
 import lib_raise_process as Process
-import lib_raise_libraries as Libraries
+import lib_raise_find as Find
 
 
 if __name__ == '__main__':
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.4.0 Dev - January 22 2014) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.4.0 Dev - January 23 2014) http://launchpad.net/raise")
 		print("OPTIONS:")
 		print("    -plain   - Don't clear, don't use color, and fix the width to 79")
 		print("    -inspect - Print the source code to the target")

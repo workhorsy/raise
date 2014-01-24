@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -729,13 +729,13 @@ java main
 		self.assert_process_output(command, expected)
 
 
-class TestLibraries(TestCase):
+class TestFind(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
 		return True
 
 	def set_up(self, id):
-		self.init('Libraries', id)
+		self.init('Find', id)
 
 	def test_find_installed_library(self):
 		command = '{0} raise -plain find_installed_library'.format(sys.executable)
@@ -770,7 +770,7 @@ Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	runner.add_test_case(TestBasics)
-	runner.add_test_case(TestLibraries)
+	runner.add_test_case(TestFind)
 	runner.add_test_case(TestC)
 	runner.add_test_case(TestCXX)
 	runner.add_test_case(TestD)
