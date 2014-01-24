@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Raise Documentation 0.4</title>
+		<title>Raise Documentation 0.4 Dev</title>
 		<link type="text/css" rel="Stylesheet" href="styles.css" />
 		<link href="themes/obsidian.css" rel="stylesheet" type="text/css" media="screen" />
 	</head>
 
 	<body>
 
-<h1 class="header">Raise Documentation 0.4</h1>
+<h1 class="header">Raise Documentation 0.4 Dev</h1>
 
 <p>
 A small build automation tool that ships with your software.
