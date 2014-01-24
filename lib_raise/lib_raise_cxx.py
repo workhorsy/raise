@@ -34,6 +34,7 @@ import lib_raise_find as Find
 import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
+import lib_raise_c as C
 
 
 cxx_compilers = {}
@@ -74,7 +75,7 @@ def setup():
 			continue
 
 		if name == 'g++':
-			comp = Config.Compiler(
+			comp = C.CCompiler(
 				name =                 'g++', 
 				path =                 paths[0], 
 				setup =                '', 
@@ -83,7 +84,11 @@ def setup():
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
-				optimize =             '-O2', 
+				optimize_zero =        '-O0',
+				optimize_one =         '-O1',
+				optimize_two =         '-O2',
+				optimize_three =       '-O3',
+				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
 				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
@@ -91,7 +96,7 @@ def setup():
 			cxx_compilers[comp._name] = comp
 		elif name == 'cl.exe':
 			# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
-			comp = Config.Compiler(
+			comp = C.CCompiler(
 				name =                 'cl.exe', 
 				path =                 paths[0], 
 				setup =                '/nologo /EHsc', 
@@ -100,7 +105,11 @@ def setup():
 				debug =                '', 
 				warnings_all =         '/Wall', 
 				warnings_as_errors =   '', 
-				optimize =             '/O2', 
+				optimize_zero =        '/Od',
+				optimize_one =         '/O1',
+				optimize_two =         '/O2',
+				optimize_three =       '/Ox',
+				optimize_size =        '/Os',
 				compile_time_flags =   '-D', 
 				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
@@ -139,7 +148,11 @@ def save_compiler(compiler):
 	if cxx.debug: opts.append(cxx._opt_debug)
 	if cxx.warnings_all: opts.append(cxx._opt_warnings_all)
 	if cxx.warnings_as_errors: opts.append(cxx._opt_warnings_as_errors)
-	if cxx.optimize: opts.append(cxx._opt_optimize)
+	if cxx.optimize_level == 0: opts.append(cxx._opt_optimize_zero)
+	if cxx.optimize_level == 1: opts.append(cxx._opt_optimize_one)
+	if cxx.optimize_level == 2: opts.append(cxx._opt_optimize_two)
+	if cxx.optimize_level == 3: opts.append(cxx._opt_optimize_three)
+	if cxx.optimize_level == 'small': opts.append(cxx._opt_optimize_size)
 	for compile_time_flag in cxx.compile_time_flags:
 		opts.append(cxx._opt_compile_time_flags + compile_time_flag)
 

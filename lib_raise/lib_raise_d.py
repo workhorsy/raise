@@ -74,7 +74,7 @@ def setup():
 			continue
 
 		if name in ['dmd2', 'dmd']:
-			comp = Config.Compiler(
+			comp = DCompiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
@@ -82,7 +82,6 @@ def setup():
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
-				warnings_as_errors =   '', 
 				optimize =             '-O', 
 				compile_time_flags =   '-version=', 
 				link =                 '-Wl,-as-needed', 
@@ -90,7 +89,7 @@ def setup():
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['ldc2', 'ldc']:
-			comp = Config.Compiler(
+			comp = DCompiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
@@ -98,7 +97,6 @@ def setup():
 				no_link =              '-c', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
-				warnings_as_errors =   '', 
 				optimize =             '-O2',
 				compile_time_flags =   '-version=', 
 				link =                 '-Wl,-as-needed', 
@@ -111,6 +109,40 @@ def setup():
 		Print.status("Setting up D module")
 		Print.fail()
 		Print.exit("No D compiler found. Install one and try again.")
+
+
+class DCompiler(object):
+	def __init__(self, name, path, setup, out_file, no_link, 
+				debug, warnings_all, optimize, 
+				compile_time_flags, link, extension_map):
+
+		self._name = name
+		self._path = path
+
+		# Save text for all the options
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_no_link = no_link
+		self._opt_debug = debug
+		self._opt_warnings_all = warnings_all
+		self._opt_optimize = optimize
+
+		self._opt_compile_time_flags = compile_time_flags
+		self._opt_link = link
+
+		# Set the default values of the flags
+		self.debug = False
+		self.warnings_all = False
+		self.optimize = True
+		self.compile_time_flags = []
+
+		self.extension_map = extension_map
+
+	def to_native(self, command):
+		for before, after in self.extension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 
 def get_default_compiler():
@@ -135,7 +167,6 @@ def save_compiler(compiler):
 	opts = []
 	if dc.debug: opts.append(dc._opt_debug)
 	if dc.warnings_all: opts.append(dc._opt_warnings_all)
-	if dc.warnings_as_errors: opts.append(dc._opt_warnings_as_errors)
 	if dc.optimize: opts.append(dc._opt_optimize)
 	for compile_time_flag in dc.compile_time_flags:
 		opts.append(dc._opt_compile_time_flags + compile_time_flag)

@@ -16,7 +16,7 @@ def clean():
 def _configure():
 	csc = CSharp.get_default_compiler()
 	csc.debug = True
-	csc.optimize = True
+	csc.optimize_level = 2
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
 	CSharp.save_compiler(csc)

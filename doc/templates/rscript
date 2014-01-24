@@ -124,7 +124,7 @@ def c_compiler_setup():
 
 	# Compiler setup
 	cc.debug = True
-	cc.optimize = True
+	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
 	cc.compile_time_flags = ['SDL=true']
@@ -251,7 +251,7 @@ def cxx_compiler_setup():
 
 	# Compiler setup
 	cc.debug = True
-	cc.optimize = True
+	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
 	cc.compile_time_flags = ['SDL=true']
@@ -380,7 +380,6 @@ def d_compiler_setup():
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
-	dc.warnings_as_errors = True
 	dc.compile_time_flags = ['SDL=true']
 
 	# Save the compiler config in environmental variables
@@ -515,7 +514,6 @@ def csharp_compiler_setup():
 	csc.optimize = True
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
-	csc.compile_time_flags = ['SDL=true']
 
 	# Save the compiler config in environmental variables
 	CS.save_compiler(csc)
@@ -614,10 +612,9 @@ def java_compiler_setup():
 
 	# Compiler setup
 	javac.debug = True
-	javac.optimize = True
-	javac.warnings_all = True
-	javac.warnings_as_errors = True
-	javac.compile_time_flags = ['SDL=true']
+	javac.warnings = True
+	javac.verbose = False
+	javac.deprecation = True
 
 	# Save the compiler config in environmental variables
 	Java.save_compiler(javac)

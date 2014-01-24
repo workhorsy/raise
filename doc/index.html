@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Raise Documentation 0.3</title>
+		<title>Raise Documentation 0.4</title>
 		<link type="text/css" rel="Stylesheet" href="styles.css" />
 		<link href="themes/obsidian.css" rel="stylesheet" type="text/css" media="screen" />
 	</head>
 
 	<body>
 
-<h1 class="header">Raise Documentation 0.3</h1>
+<h1 class="header">Raise Documentation 0.4</h1>
 
 <p>
 A small build automation tool that ships with your software.
@@ -1910,7 +1910,15 @@ path: /usr/bin/clang
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>optimize_level:
+			<ul>
+				<li>0 for no optimizations</li>
+				<li>1 for basic optimizations</li>
+				<li>2 for good optimizations</li>
+				<li>3 for best optimizations</li>
+				<li>'small' for small code</li>
+			</ul>
+		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
@@ -1933,7 +1941,7 @@ def c_compiler_setup():
  
  	# Compiler setup
  	cc.debug = True
- 	cc.optimize = True
+ 	cc.optimize_level = 2
  	cc.warnings_all = True
  	cc.warnings_as_errors = True
  	cc.compile_time_flags = ['SDL=true']
@@ -2359,7 +2367,15 @@ path: /usr/bin/g++
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>optimize_level:
+			<ul>
+				<li>0 for no optimizations</li>
+				<li>1 for basic optimizations</li>
+				<li>2 for good optimizations</li>
+				<li>3 for best optimizations</li>
+				<li>'small' for small code</li>
+			</ul>
+		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
@@ -2382,7 +2398,7 @@ def cxx_compiler_setup():
  
  	# Compiler setup
  	cc.debug = True
- 	cc.optimize = True
+ 	cc.optimize_level = 2
  	cc.warnings_all = True
  	cc.warnings_as_errors = True
  	cc.compile_time_flags = ['SDL=true']
@@ -2811,7 +2827,6 @@ path: /usr/bin/dmd
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
-		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
 
@@ -2834,7 +2849,6 @@ def d_compiler_setup():
  	dc.debug = True
  	dc.optimize = True
  	dc.warnings_all = True
- 	dc.warnings_as_errors = True
  	dc.compile_time_flags = ['SDL=true']
  
  	# Save the compiler config in environmental variables
@@ -2853,7 +2867,7 @@ def d_compiler_setup():
 
 	<pre class="raise_output">
 $DC: dmd
-$DFLAGS: -g -w  -O -version=SDL=true
+$DFLAGS: -g -w -O -version=SDL=true
 
 	</pre>
 
@@ -3246,7 +3260,6 @@ path: /usr/bin/dmcs
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
-		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
 
 	<p>
@@ -3269,7 +3282,6 @@ def csharp_compiler_setup():
  	csc.optimize = True
  	csc.warnings_all = True
  	csc.warnings_as_errors = True
- 	csc.compile_time_flags = ['SDL=true']
  
  	# Save the compiler config in environmental variables
  	CS.save_compiler(csc)
@@ -3287,7 +3299,7 @@ def csharp_compiler_setup():
 
 	<pre class="raise_output">
 $CSC: dmcs
-$CSFLAGS: -debug -warn:4 -warnaserror -optimize SDL=true
+$CSFLAGS: -debug -warn:4 -warnaserror -optimize
 
 	</pre>
 
@@ -3560,10 +3572,9 @@ path: /usr/bin/javac
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
-		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
-		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
-		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+		<li>warnings: A bool that tells if it should show extra warning information.</li>
+		<li>verbose: A bool that tells if it should print extra output the stdout.</li>
+		<li>deprecation: A bool that tells if it should print warnings where deprecated APIs are used.</li>
 	</ul>
 
 	<p>
@@ -3583,10 +3594,9 @@ def java_compiler_setup():
  
  	# Compiler setup
  	javac.debug = True
- 	javac.optimize = True
- 	javac.warnings_all = True
- 	javac.warnings_as_errors = True
- 	javac.compile_time_flags = ['SDL=true']
+ 	javac.warnings = True
+ 	javac.verbose = False
+ 	javac.deprecation = True
  
  	# Save the compiler config in environmental variables
  	Java.save_compiler(javac)
@@ -3608,7 +3618,7 @@ def java_compiler_setup():
 $JAVAC: javac
 $JAR: jar
 $JAVA: java
-$JAVAFLAGS: -g
+$JAVAFLAGS: -g -deprecation
 
 	</pre>
 

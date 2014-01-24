@@ -18,7 +18,7 @@ def clean():
 def _configure():
 	cxx = CXX.get_default_compiler()
 	cxx.debug = True
-	cxx.optimize = True
+	cxx.optimize_level = 2
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True
 	cxx.compile_time_flags = ['ADD', 'MULTIPLY']

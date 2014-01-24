@@ -72,35 +72,27 @@ def setup():
 			continue
 
 		if name in ['dmcs']:
-			comp = Config.Compiler(
+			comp = CSCompiler(
 				name =                 name, 
 				path =                 paths[0], 
-				setup =                '', 
 				out_file =             '-out:', 
-				no_link =              '', 
 				debug =                '-debug', 
 				warnings_all =         '-warn:4', 
 				warnings_as_errors =   '-warnaserror', 
 				optimize =             '-optimize', 
-				compile_time_flags =   '', 
-				link =                 '', 
 				extension_map = extension_map
 			)
 			cs_compilers[comp._name] = comp
 			cs_runtimes[comp._name] = 'mono'
 		elif name in ['csc']:
-			comp = Config.Compiler(
+			comp = CSCompiler(
 				name =                 name, 
 				path =                 paths[0], 
-				setup =                '', 
 				out_file =             '-out:', 
-				no_link =              '', 
 				debug =                '-debug', 
 				warnings_all =         '-warn:4', 
 				warnings_as_errors =   '-warnaserror', 
 				optimize =             '-optimize', 
-				compile_time_flags =   '', 
-				link =                 '', 
 				extension_map = extension_map
 			)
 			cs_compilers[comp._name] = comp
@@ -111,6 +103,37 @@ def setup():
 		Print.status("Setting up C# module")
 		Print.fail()
 		Print.exit("No C# compiler found. Install one and try again.")
+
+
+class CSCompiler(object):
+	def __init__(self, name, path, out_file, 
+				debug, warnings_all, warnings_as_errors, 
+				optimize, extension_map):
+
+		self._name = name
+		self._path = path
+
+		# Save text for all the options
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_debug = debug
+		self._opt_warnings_all = warnings_all
+		self._opt_warnings_as_errors = warnings_as_errors
+		self._opt_optimize = optimize
+
+		# Set the default values of the flags
+		self.debug = False
+		self.warnings_all = False
+		self.warnings_as_errors = False
+		self.optimize = True
+
+		self.extension_map = extension_map
+
+	def to_native(self, command):
+		for before, after in self.extension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 
 def get_default_compiler():
@@ -140,8 +163,6 @@ def save_compiler(compiler):
 	if csc.warnings_all: opts.append(csc._opt_warnings_all)
 	if csc.warnings_as_errors: opts.append(csc._opt_warnings_as_errors)
 	if csc.optimize: opts.append(csc._opt_optimize)
-	for compile_time_flag in csc.compile_time_flags:
-		opts.append(csc._opt_compile_time_flags + compile_time_flag)
 
 	os.environ['CSFLAGS'] = str.join(' ', opts)
 

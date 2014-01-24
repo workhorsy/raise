@@ -75,7 +75,7 @@ def setup():
 			continue
 
 		if name == 'gcc':
-			comp = Config.Compiler(
+			comp = CCompiler(
 				name =                 'gcc', 
 				path =                 paths[0], 
 				setup =                '', 
@@ -84,14 +84,18 @@ def setup():
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
-				optimize =             '-O2', 
+				optimize_zero =        '-O0',
+				optimize_one =         '-O1',
+				optimize_two =         '-O2',
+				optimize_three =       '-O3',
+				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
 				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'clang':
-			comp = Config.Compiler(
+			comp = CCompiler(
 				name =                 'clang', 
 				path =                 paths[0], 
 				setup =                '', 
@@ -100,7 +104,11 @@ def setup():
 				debug =                '-g', 
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
-				optimize =             '-O2', 
+				optimize_zero =        '-O0',
+				optimize_one =         '-O1',
+				optimize_two =         '-O2',
+				optimize_three =       '-O3',
+				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
 				link =                 '-shared -Wl,-as-needed', 
 				extension_map = extension_map
@@ -108,7 +116,7 @@ def setup():
 			c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
 			# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
-			comp = Config.Compiler(
+			comp = CCompiler(
 				name =                 'cl.exe', 
 				path =                 paths[0], 
 				setup =                '/nologo', 
@@ -117,7 +125,11 @@ def setup():
 				debug =                '', 
 				warnings_all =         '/Wall', 
 				warnings_as_errors =   '', 
-				optimize =             '/O2', 
+				optimize_zero =        '/Od',
+				optimize_one =         '/O1',
+				optimize_two =         '/O2',
+				optimize_three =       '/Ox',
+				optimize_size =        '/Os',
 				compile_time_flags =   '/D', 
 				link =                 '/LDd', 
 				extension_map = extension_map
@@ -129,6 +141,50 @@ def setup():
 		Print.status("Setting up C module")
 		Print.fail()
 		Print.exit("No C compiler found. Install one and try again.")
+
+
+# Other C compilers: Clang, DMC, Dingus, Elsa, PCC
+# http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
+class CCompiler(object):
+	def __init__(self, name, path, setup, out_file, no_link, 
+				debug, warnings_all, warnings_as_errors, 
+				optimize_zero, optimize_one, optimize_two,
+				optimize_three, optimize_size, 
+				compile_time_flags, link, extension_map):
+
+		self._name = name
+		self._path = path
+
+		# Save text for all the options
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_no_link = no_link
+		self._opt_debug = debug
+		self._opt_warnings_all = warnings_all
+		self._opt_warnings_as_errors = warnings_as_errors
+		self._opt_optimize_zero = optimize_zero
+		self._opt_optimize_one = optimize_one
+		self._opt_optimize_two = optimize_two
+		self._opt_optimize_three = optimize_three
+		self._opt_optimize_size = optimize_size
+
+		self._opt_compile_time_flags = compile_time_flags
+		self._opt_link = link
+
+		# Set the default values of the flags
+		self.debug = False
+		self.warnings_all = False
+		self.warnings_as_errors = False
+		self.optimize_level = 1
+		self.compile_time_flags = []
+
+		self.extension_map = extension_map
+
+	def to_native(self, command):
+		for before, after in self.extension_map.items():
+			command = command.replace(before, after)
+
+		return command
 
 
 def get_default_compiler():
@@ -158,7 +214,11 @@ def save_compiler(compiler):
 	if cc.debug: opts.append(cc._opt_debug)
 	if cc.warnings_all: opts.append(cc._opt_warnings_all)
 	if cc.warnings_as_errors: opts.append(cc._opt_warnings_as_errors)
-	if cc.optimize: opts.append(cc._opt_optimize)
+	if cc.optimize_level == 0: opts.append(cc._opt_optimize_zero)
+	if cc.optimize_level == 1: opts.append(cc._opt_optimize_one)
+	if cc.optimize_level == 2: opts.append(cc._opt_optimize_two)
+	if cc.optimize_level == 3: opts.append(cc._opt_optimize_three)
+	if cc.optimize_level == 'small': opts.append(cc._opt_optimize_size)
 	for compile_time_flag in cc.compile_time_flags:
 		opts.append(cc._opt_compile_time_flags + compile_time_flag)
 

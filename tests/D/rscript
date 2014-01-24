@@ -21,7 +21,6 @@ def _configure():
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
-	dc.warnings_as_errors = True
 	D.save_compiler(dc)
 
 def setup_failure():

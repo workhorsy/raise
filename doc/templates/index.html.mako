@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Raise Documentation 0.3</title>
+		<title>Raise Documentation 0.4</title>
 		<link type="text/css" rel="Stylesheet" href="styles.css" />
 		<link href="themes/obsidian.css" rel="stylesheet" type="text/css" media="screen" />
 	</head>
 
 	<body>
 
-<h1 class="header">Raise Documentation 0.3</h1>
+<h1 class="header">Raise Documentation 0.4</h1>
 
 <p>
 A small build automation tool that ships with your software.
@@ -1705,7 +1705,15 @@ ${template_info['c_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>optimize_level:
+			<ul>
+				<li>0 for no optimizations</li>
+				<li>1 for basic optimizations</li>
+				<li>2 for good optimizations</li>
+				<li>3 for best optimizations</li>
+				<li>'small' for small code</li>
+			</ul>
+		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
@@ -2017,7 +2025,15 @@ ${template_info['cxx_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
+		<li>optimize_level:
+			<ul>
+				<li>0 for no optimizations</li>
+				<li>1 for basic optimizations</li>
+				<li>2 for good optimizations</li>
+				<li>3 for best optimizations</li>
+				<li>'small' for small code</li>
+			</ul>
+		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
@@ -2332,7 +2348,6 @@ ${template_info['d_compilers']['output']}
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
-		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
 
@@ -2621,7 +2636,6 @@ ${template_info['csharp_compilers']['output']}
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
-		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
 
 	<p>
@@ -2824,10 +2838,9 @@ ${template_info['java_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
-		<li>optimize: A bool that tell if it should optimize or not.</li>
-		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
-		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
-		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+		<li>warnings: A bool that tells if it should show extra warning information.</li>
+		<li>verbose: A bool that tells if it should print extra output the stdout.</li>
+		<li>deprecation: A bool that tells if it should print warnings where deprecated APIs are used.</li>
 	</ul>
 
 	<p>
