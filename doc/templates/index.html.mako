@@ -1613,7 +1613,7 @@ import lib_raise_ar as AR
 	</code></pre>
 
 <a id="c_file_extensions"></a>
-<h2>12.1. File Extensions</h2>
+<h2>12.1. C File Extensions</h2>
 
 	<p>
 	Many C compilers/OSes use different extensions for different types of 
@@ -1661,7 +1661,7 @@ import lib_raise_ar as AR
 	</table>
 
 <a id="c_compilers"></a>
-<h2>12.2. Compilers</h2>
+<h2>12.2. C Compilers</h2>
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C compilers. The compiler
@@ -1697,7 +1697,7 @@ ${template_info['c_compilers']['output']}
 	</pre>
 
 <a id="c_compiler_setup"></a>
-<h2>12.3. Compiler Setup</h2>
+<h2>12.3. C Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -1742,7 +1742,7 @@ ${template_info['c_compiler_setup']['output']}
 	</pre>
 
 <a id="c_building_object"></a>
-<h2>12.4. Building Object</h2>
+<h2>12.4. C Building Object</h2>
 
 	<p>
 		C object files can be built using the <span class="fun">C.build_object</span> function.
@@ -1765,7 +1765,7 @@ ${template_info['c_building_object']['output']}
 	</pre>
 
 <a id="c_building_program"></a>
-<h2>12.5. Building Program</h2>
+<h2>12.5. C Building Program</h2>
 
 	<p>
 		C programs can be built using the <span class="fun">C.build_program</span> function.
@@ -1788,7 +1788,7 @@ ${template_info['c_building_program']['output']}
 	</pre>
 
 <a id="c_building_library"></a>
-<h2>12.6. Building Library</h2>
+<h2>12.6. C Building Library</h2>
 
 	<p>
 		C shared library can be built using the 
@@ -1814,7 +1814,7 @@ ${template_info['c_building_library']['output']}
 	</pre>
 
 <a id="c_program_installation_and_uninstallation"></a>
-<h2>12.7. Program Installation and Uninstallation</h2>
+<h2>12.7. C Program Installation and Uninstallation</h2>
 
 	<p>
 		C programs can be installed with the <span class="fun">C.install_program</span> function, and
@@ -1845,7 +1845,7 @@ Uninstalling the program 'main.exe' ...                                      <sp
 
 
 <a id="c_library_installation_and_uninstallation"></a>
-<h2>12.8. Library Installation and Uninstallation</h2>
+<h2>12.8. C Library Installation and Uninstallation</h2>
 
 	<p>
 		C libraries can be installed with the <span class="fun">C.install_library</span> function, and
@@ -1871,7 +1871,7 @@ Uninstalling the library 'libexample.so' ...                                 <sp
 
 
 <a id="c_header_installation_and_uninstallation"></a>
-<h2>12.9. Header Installation and Uninstallation</h2>
+<h2>12.9. C Header Installation and Uninstallation</h2>
 
 	<p>
 		C headers can be installed with the <span class="fun">C.install_header</span> function, and
@@ -1897,7 +1897,7 @@ Uninstalling the header 'libexample.h' ...                                   <sp
 
 
 <a id="c_running_and_printing"></a>
-<h2>12.10. Running and Printing</h2>
+<h2>12.10. C Running and Printing</h2>
 
 	<p>
 		C programs can be ran with the <span class="fun">C.run_print</span> function.
@@ -1933,7 +1933,7 @@ import lib_raise_ar as AR
 	</code></pre>
 
 <a id="cxx_file_extensions"></a>
-<h2>13.1. File Extensions</h2>
+<h2>13.1. C++ File Extensions</h2>
 
 	<p>
 	Many C++ compilers/OSes use different extensions for different types of 
@@ -1981,7 +1981,7 @@ import lib_raise_ar as AR
 	</table>
 
 <a id="cxx_compilers"></a>
-<h2>13.2. Compilers</h2>
+<h2>13.2. C++ Compilers</h2>
 
 	<p>
 		Raise supports the GCC, and MS cl.exe C++ compilers. The compiler
@@ -2017,7 +2017,7 @@ ${template_info['cxx_compilers']['output']}
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
-<h2>13.3. Compiler Setup</h2>
+<h2>13.3. C++ Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2062,7 +2062,7 @@ ${template_info['cxx_compiler_setup']['output']}
 	</pre>
 
 <a id="cxx_building_object"></a>
-<h2>13.4. Building Object</h2>
+<h2>13.4. C++ Building Object</h2>
 
 	<p>
 		C++ object files can be built using the <span class="fun">CXX.build_object</span> function.
@@ -2085,7 +2085,7 @@ ${template_info['cxx_building_object']['output']}
 	</pre>
 
 <a id="cxx_building_program"></a>
-<h2>13.5. Building Program</h2>
+<h2>13.5. C++ Building Program</h2>
 
 	<p>
 		C++ programs can be built using the <span class="fun">CXX.build_program</span> function.
@@ -2108,7 +2108,7 @@ ${template_info['cxx_building_program']['output']}
 	</pre>
 
 <a id="cxx_building_library"></a>
-<h2>13.6. Building Library</h2>
+<h2>13.6. C++ Building Library</h2>
 
 	<p>
 		C++ shared library can be built using the 
@@ -2134,7 +2134,7 @@ ${template_info['cxx_building_library']['output']}
 	</pre>
 
 <a id="cxx_program_installation_and_uninstallation"></a>
-<h2>13.7. Program Installation and Uninstallation</h2>
+<h2>13.7.C++ Program Installation and Uninstallation</h2>
 
 	<p>
 		C++ programs can be installed with the <span class="fun">CXX.install_program</span> function, and
@@ -2165,7 +2165,7 @@ Uninstalling the program 'main.exe' ...                                     <spa
 
 
 <a id="cxx_library_installation_and_uninstallation"></a>
-<h2>13.8. Library Installation and Uninstallation</h2>
+<h2>13.8. C++ Library Installation and Uninstallation</h2>
 
 	<p>
 		C++ libraries can be installed with the <span class="fun">CXX.install_library</span> function, and
@@ -2193,7 +2193,7 @@ Uninstalling the library 'libadd.so' ...                                    <spa
 
 
 <a id="cxx_header_installation_and_uninstallation"></a>
-<h2>13.9. Header Installation and Uninstallation</h2>
+<h2>13.9. C++ Header Installation and Uninstallation</h2>
 
 	<p>
 		C++ headers can be installed with the <span class="fun">CXX.install_header</span> function, and
@@ -2219,7 +2219,7 @@ Uninstalling the header 'libadd.h' ...                                      <spa
 
 
 <a id="cxx_running_and_printing"></a>
-<h2>13.10. Running and Printing</h2>
+<h2>13.10. C++ Running and Printing</h2>
 
 	<p>
 		C++ programs can be ran with the <span class="fun">CXX.run_print</span> function.
@@ -2254,7 +2254,7 @@ import lib_raise_d as D
 	</code></pre>
 
 <a id="d_file_extensions"></a>
-<h2>14.1. File Extensions</h2>
+<h2>14.1. D File Extensions</h2>
 
 	<p>
 	Many D compilers/OSes use different extensions for different types of 
@@ -2302,7 +2302,7 @@ import lib_raise_d as D
 	</table>
 
 <a id="d_compilers"></a>
-<h2>14.2. Compilers</h2>
+<h2>14.2. D Compilers</h2>
 
 	<p>
 		Raise supports the DMD, and LDC D compilers. The compiler
@@ -2338,7 +2338,7 @@ ${template_info['d_compilers']['output']}
 	</pre>
 
 <a id="d_compiler_setup"></a>
-<h2>14.3. Compiler Setup</h2>
+<h2>14.3. D Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2374,7 +2374,7 @@ ${template_info['d_compiler_setup']['output']}
 	</pre>
 
 <a id="d_building_object"></a>
-<h2>14.4. Building Object</h2>
+<h2>14.4. D Building Object</h2>
 
 	<p>
 		D object files can be built using the <span class="fun">D.build_object</span> function.
@@ -2397,7 +2397,7 @@ ${template_info['d_building_object']['output']}
 	</pre>
 
 <a id="d_building_program"></a>
-<h2>14.5. Building Program</h2>
+<h2>14.5. D Building Program</h2>
 
 	<p>
 		D programs can be built using the <span class="fun">D.build_program</span> function.
@@ -2420,7 +2420,7 @@ ${template_info['d_building_program']['output']}
 	</pre>
 
 <a id="d_building_library"></a>
-<h2>14.6. Building Library</h2>
+<h2>14.6. D Building Library</h2>
 
 	<p>
 		D static library can be built using the <span class="fun">D.build_static_library</span> function.
@@ -2444,7 +2444,7 @@ ${template_info['d_building_library']['output']}
 	</pre>
 
 <a id="d_building_interface"></a>
-<h2>14.7. Building Interface</h2>
+<h2>14.7. D Building Interface</h2>
 
 	<p>
 		D interface can be built using the <span class="fun">D.build_interface</span> function.
@@ -2467,7 +2467,7 @@ ${template_info['d_building_interface']['output']}
 	</pre>
 
 <a id="d_program_installation_and_uninstallation"></a>
-<h2>14.8. Program Installation and Uninstallation</h2>
+<h2>14.8. D Program Installation and Uninstallation</h2>
 
 	<p>
 		D programs can be installed with the <span class="fun">D.install_program</span> function, and
@@ -2498,7 +2498,7 @@ Uninstalling the program 'main.exe' ...                                     <spa
 
 
 <a id="d_library_installation_and_uninstallation"></a>
-<h2>14.9. Library Installation and Uninstallation</h2>
+<h2>14.9. D Library Installation and Uninstallation</h2>
 
 	<p>
 		D libraries can be installed with the <span class="fun">D.install_library</span> function, and
@@ -2527,7 +2527,7 @@ Uninstalling the library 'libsubtract.a' ...                                <spa
 
 
 <a id="d_interface_installation_and_uninstallation"></a>
-<h2>14.10. Interface Installation and Uninstallation</h2>
+<h2>14.10. D Interface Installation and Uninstallation</h2>
 
 	<p>
 		D interfaces can be installed with the <span class="fun">D.install_interface</span> function, and
@@ -2554,7 +2554,7 @@ Uninstalling the interface 'libsubtract.di' ...                             <spa
 
 
 <a id="d_running_and_printing"></a>
-<h2>14.11. Running and Printing</h2>
+<h2>14.11. D Running and Printing</h2>
 
 	<p>
 		D programs can be ran with the <span class="fun">D.run_print</span> function.
@@ -2589,7 +2589,7 @@ import lib_raise_csharp as CS
 	</code></pre>
 
 <a id="csharp_compilers"></a>
-<h2>15.1. Compilers</h2>
+<h2>15.1. C# Compilers</h2>
 
 	<p>
 		Raise supports the Mono, and MS.NET C# compilers. The compiler
@@ -2625,7 +2625,7 @@ ${template_info['csharp_compilers']['output']}
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
-<h2>15.2. Compiler Setup</h2>
+<h2>15.2. C# Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2661,7 +2661,7 @@ ${template_info['csharp_compiler_setup']['output']}
 	</pre>
 
 <a id="csharp_building_program"></a>
-<h2>15.3. Building Program</h2>
+<h2>15.3. C# Building Program</h2>
 	<p>
 		C# programs can be built using the <span class="fun">CS.build_program</span> function.
 	</p>
@@ -2683,7 +2683,7 @@ ${template_info['csharp_building_program']['output']}
 	</pre>
 
 <a id="csharp_building_library"></a>
-<h2>15.4. Building Library</h2>
+<h2>15.4. C# Building Library</h2>
 	<p>
 		C# static library can be built using the <span class="fun">CS.build_shared_library</span> function.
 	</p>
@@ -2705,7 +2705,7 @@ ${template_info['csharp_building_library']['output']}
 	</pre>
 
 <a id="csharp_program_installation_and_uninstallation"></a>
-<h2>15.5. Program Installation and Uninstallation</h2>
+<h2>15.5. C# Program Installation and Uninstallation</h2>
 
 	<p>
 		C# programs can be installed with the <span class="fun">CS.install_program</span> function, and
@@ -2735,7 +2735,7 @@ Uninstalling the program 'main.exe' ...                                      <sp
 	</pre>
 
 <a id="csharp_library_installation_and_uninstallation"></a>
-<h2>15.6. Library Installation and Uninstallation</h2>
+<h2>15.6. C# Library Installation and Uninstallation</h2>
 	<p>
 		C# libraries can be installed with the <span class="fun">CS.install_library</span> function, and
 		uninstalled with the <span class="fun">CS.uninstall_library</span> function.
@@ -2760,7 +2760,7 @@ Uninstalling the library 'math_helper.dll' ...                               <sp
 	</pre>
 
 <a id="csharp_running_and_printing"></a>
-<h2>15.7. Running and Printing</h2>
+<h2>15.7. C# Running and Printing</h2>
 	<p>
 		C# programs can be ran with the <span class="fun">CS.run_print</span> function.
 	</p>
@@ -2794,7 +2794,7 @@ import lib_raise_java as Java
 	</code></pre>
 
 <a id="java_compilers"></a>
-<h2>16.1. Compilers</h2>
+<h2>16.1. Java Compilers</h2>
 
 	<p>
 		Raise supports the OpenJDK 7 Java compiler. The compiler
@@ -2830,7 +2830,7 @@ ${template_info['java_compilers']['output']}
 	</pre>
 
 <a id="java_compiler_setup"></a>
-<h2>16.2. Compiler Setup</h2>
+<h2>16.2. Java Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2866,7 +2866,7 @@ ${template_info['java_compiler_setup']['output']}
 	</pre>
 
 <a id="java_building_program"></a>
-<h2>16.3. Building Program</h2>
+<h2>16.3. Java Building Program</h2>
 	<p>
 		Java programs can be built using the <span class="fun">Java.build_program</span> function.
 	</p>
@@ -2888,7 +2888,7 @@ ${template_info['java_building_program']['output']}
 	</pre>
 
 <a id="java_building_library"></a>
-<h2>16.4. Building Library</h2>
+<h2>16.4. Java Building Library</h2>
 	<p>
 		Java static library can be built using the <span class="fun">Java.build_shared_library</span> function.
 	</p>
@@ -2910,7 +2910,7 @@ ${template_info['java_building_library']['output']}
 	</pre>
 
 <a id="java_program_installation_and_uninstallation"></a>
-<h2>16.5. Program Installation and Uninstallation</h2>
+<h2>16.5. Java Program Installation and Uninstallation</h2>
 
 	<p>
 		Java programs can be installed with the <span class="fun">Java.install_program</span> function, and
@@ -2940,7 +2940,7 @@ Uninstalling the program 'main.class' ...                                    <sp
 	</pre>
 
 <a id="java_library_installation_and_uninstallation"></a>
-<h2>16.6. Library Installation and Uninstallation</h2>
+<h2>16.6. Java Library Installation and Uninstallation</h2>
 	<p>
 		Java libraries can be installed with the <span class="fun">Java.install_library</span> function, and
 		uninstalled with the <span class="fun">Java.uninstall_library</span> function.
@@ -2965,7 +2965,7 @@ Uninstalling the jar 'lib_math.jar' ...                                      <sp
 	</pre>
 
 <a id="java_running_and_printing"></a>
-<h2>16.7. Running and Printing</h2>
+<h2>16.7. Java Running and Printing</h2>
 	<p>
 		Java programs can be ran with the <span class="fun">Java.run_print</span> function.
 	</p>
