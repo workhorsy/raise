@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -31,7 +31,7 @@ import multiprocessing
 import re
 import lib_raise_helpers as Helpers
 import lib_raise_config as Config
-import lib_raise_os as OS
+import lib_raise_users as Users
 
 
 arch = None
@@ -67,7 +67,7 @@ def setup():
 			Config.early_exit('Unknown architecture {0}.'.format(dirty_arch))
 
 	# For Windows get the CPU info from the register
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		import _winreg
 
 		# Get the CPU arch and bits

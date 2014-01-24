@@ -479,12 +479,12 @@ Java works with OpenJDK 7.
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_os as OS
+import lib_raise_helpers as Helpers
 	</code></pre>
 
 <p>
 	Raise uses a string for the OS Type. Any time you need to check what
-	OS your script is running under, you can use <span class="fun">OS.os_type._name</span>.
+	OS your script is running under, you can use <span class="fun">Helpers.os_type._name</span>.
 </p>
 
 There are three basic OS types:
@@ -872,7 +872,7 @@ Produces the result:
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_os as OS
+import lib_raise_users as Users
 	</code></pre>
 
 <a id="users_running_as_root"></a>
@@ -880,7 +880,7 @@ import lib_raise_os as OS
 
 	<p>
 	If you want to ensure that a script is run as root. You can use the
-	<span class="fun">OS.require_root</span> function. If the script is not
+	<span class="fun">Users.require_root</span> function. If the script is not
 	run as root, it will print an error and exit.
 	</p>
 
@@ -915,7 +915,7 @@ Effective user id: 1000
 
 	<p>
 	If you want to ensure that a script is run as a normal user, you can 
-	use the <span class="fun">OS.require_not_root</span> function. If the
+	use the <span class="fun">Users.require_not_root</span> function. If the
 	script is run as root, it will print an error and exit.
 	</p>
 
@@ -953,7 +953,7 @@ Effective user id: 1000
 	all in the same script. A common example is to compile a program as a 
 	normal user, then install it as root. You can do this by running the 
 	script as root, then using the function 
-	<span class="fun">OS.do_as_normal_user</span>
+	<span class="fun">Users.do_as_normal_user</span>
 	to temporarily step down as a normal user.
 	</p>
 
@@ -986,7 +986,7 @@ Effective user id: 0
 	<span class="fun">getpass.getuser</span> 
 	will return 'root', because it is actually being run as root. To get
 	the actual user name, you can use the 
-	<span class="fun">OS.get_normal_user_name</span> function.
+	<span class="fun">Users.get_normal_user_name</span> function.
 	</p>
 
 	<p>

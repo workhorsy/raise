@@ -27,11 +27,12 @@
 
 import os
 import lib_raise_config as Config
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_find as Find
 import lib_raise_terminal as Print
+import lib_raise_helpers as Helpers
 
 
 linkers = {}
@@ -41,14 +42,14 @@ def setup():
 	global linkers
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if OS.os_type._name == 'Cygwin':
+	if Helpers.os_type._name == 'Cygwin':
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif OS.os_type._name == 'Windows':
+	elif Helpers.os_type._name == 'Windows':
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
@@ -115,7 +116,7 @@ class Linker(object):
 def get_default_linker():
 	global linkers
 
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		return linkers['link.exe']
 	else:
 		return linkers['ld']
@@ -166,7 +167,7 @@ def ldconfig():
 	Print.status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if OS.os_type._name == 'Cygwin':
+	if Helpers.os_type._name == 'Cygwin':
 		Print.ok()
 		return
 

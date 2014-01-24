@@ -4,7 +4,7 @@
 import os
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_d as D
 import lib_raise_ar as AR
 import lib_raise_fs as FS
@@ -69,14 +69,14 @@ def build_interface():
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
 		D.build_program('raise_example.exe', ['main.d', 'lib_math.d'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	D.uninstall_program('raise_example.exe')
@@ -90,7 +90,7 @@ def install_and_uninstall_program():
 
 def install_and_uninstall_static_library():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -99,7 +99,7 @@ def install_and_uninstall_static_library():
 		D.build_object('lib_math.o', ['lib_math.d'])
 		AR.build_static_library('lib_math.a', ['lib_math.o'])
 		D.build_program('raise_example.exe', ['main.d', 'lib_math.a'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	D.uninstall_program('raise_example.exe')

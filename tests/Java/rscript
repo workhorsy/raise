@@ -4,7 +4,7 @@
 import os
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_java as Java
 import lib_raise_fs as FS
 
@@ -53,14 +53,14 @@ def build_jar():
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
 		Java.build_program('main.class', ['main.java', 'lib_math.java'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	Java.uninstall_program('main.class', 'raise_example')
@@ -74,7 +74,7 @@ def install_and_uninstall_program():
 
 def install_and_uninstall_jar():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -82,7 +82,7 @@ def install_and_uninstall_jar():
 	def actual_build():
 		Java.build_jar('lib_math.jar', ['lib_math.java'])
 		Java.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	Java.uninstall_program('main.class', 'raise_example')

@@ -26,23 +26,24 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import lib_raise_config as Config
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_fs as FS
 import lib_raise_process as Process
+import lib_raise_helpers as Helpers
 
 extension_map = {}
 
 def setup():
 	global extension_map
 	# Figure out the extensions for this OS
-	if OS.os_type._name == 'Cygwin':
+	if Helpers.os_type._name == 'Cygwin':
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif OS.os_type._name == 'Windows':
+	elif Helpers.os_type._name == 'Windows':
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',

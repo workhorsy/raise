@@ -13,10 +13,11 @@ import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_find as Find
 import lib_raise_python as Python
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_process as Process
 import lib_raise_cpu as CPU
 import lib_raise_terminal as Terminal
+import lib_raise_helpers as Helpers
 
 
 def cleanup():
@@ -41,11 +42,11 @@ def setup():
 	os.mkdir('example')
 
 '''
-OS
+Users
 '''
 
 def operating_system_support():
-	print("OS: {0}".format(OS.os_type._name))
+	print("OS: {0}".format(Helpers.os_type._name))
 
 '''
 installation
@@ -696,7 +697,7 @@ def java_running_and_printing():
 	Java.run_print('main')
 
 '''
-OS
+Users
 '''
 
 def users_running_as_root():
@@ -704,14 +705,14 @@ def users_running_as_root():
 	print('Effective user id: {0}'.format(os.getuid()))
 
 	# Will print an error and exit if the user is NOT root
-	OS.require_root()
+	Users.require_root()
 
 def users_running_as_a_normal_user():
 	# Print the user id
 	print('Effective user id: {0}'.format(os.getuid()))
 
 	# Will print an error and exit if the user is root
-	OS.require_not_root()
+	Users.require_not_root()
 
 def users_privilege_escalation():
 	# User id by default
@@ -720,7 +721,7 @@ def users_privilege_escalation():
 	# User id when running as a normal user
 	def cb():
 		print('Effective user id: {0}'.format(os.geteuid()))
-	OS.do_as_normal_user(cb)
+	Users.do_as_normal_user(cb)
 
 	# User id by default
 	print('Effective user id: {0}'.format(os.geteuid()))
@@ -729,12 +730,12 @@ def users_user_name():
 	import getpass
 	print('Current user name: {0}'.format(getpass.getuser()))
 
-	print('Normal user name: {0}'.format(OS.get_normal_user_name()))
+	print('Normal user name: {0}'.format(Users.get_normal_user_name()))
 
 def users_user_id():
 	print('Current user id: {0}'.format(os.getuid()))
 
-	print('Normal user id: {0}'.format(OS.get_normal_user_id()))
+	print('Normal user id: {0}'.format(Users.get_normal_user_id()))
 
 '''
 Finding Programs, Libraries, and Headers Files

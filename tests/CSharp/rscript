@@ -4,7 +4,7 @@
 import os
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_csharp as CSharp
 import lib_raise_fs as FS
 
@@ -51,14 +51,14 @@ def build_shared_library():
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
 		CSharp.build_program('raise_example.exe', ['main.cs', 'lib_math.cs'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	CSharp.uninstall_program('raise_example.exe', 'raise_example')
@@ -72,7 +72,7 @@ def install_and_uninstall_program():
 
 def install_and_uninstall_shared_library():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -80,7 +80,7 @@ def install_and_uninstall_shared_library():
 	def actual_build():
 		CSharp.build_shared_library('lib_math.dll', ['lib_math.cs'])
 		CSharp.build_program('raise_example.exe', ['main.cs'], ['-r:lib_math.dll'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	CSharp.uninstall_program('raise_example.exe', 'raise_example')

@@ -3,7 +3,7 @@
 
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_linker as Linker
 import lib_raise_ar as AR
 import lib_raise_c as C

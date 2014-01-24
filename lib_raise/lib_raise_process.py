@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -31,13 +31,13 @@ import time
 import lib_raise_config as Config
 import lib_raise_helpers as Helpers
 import lib_raise_cpu as CPU
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_terminal as Print
 
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if OS.os_type._name == 'Windows':
+		if Helpers.os_type._name == 'Windows':
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
@@ -55,7 +55,7 @@ class ProcessRunner(object):
 		# Recursively expand all environmental variables
 		env = {}
 		for key, value in os.environ.items():
-			env[key] = OS.expand_envs(value)
+			env[key] = Helpers.expand_envs(value)
 
 		self._stdout = b''
 		self._stderr = b''

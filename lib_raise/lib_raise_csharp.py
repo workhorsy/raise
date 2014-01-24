@@ -30,7 +30,7 @@ import shutil
 import stat
 import lib_raise_config as Config
 import lib_raise_terminal as Print
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_find as Find
 import lib_raise_fs as FS
 import lib_raise_process as Process
@@ -48,12 +48,12 @@ def setup():
 
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if OS.os_type._name == 'Cygwin':
+	if Helpers.os_type._name == 'Cygwin':
 		extension_map = {
 			'.exe' : '.exe',
 			'.dll' : '.dll'
 		}
-	elif OS.os_type._name == 'Windows':
+	elif Helpers.os_type._name == 'Windows':
 		extension_map = {
 			'.exe' : '.exe',
 			'.dll' : '.dll'
@@ -237,7 +237,7 @@ def install_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -256,7 +256,7 @@ def install_program(name, dir_name):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-		if OS.os_type._name != 'Windows':
+		if Helpers.os_type._name != 'Windows':
 			script_name = Helpers.before(name, '.')
 			script_path = os.path.join('/usr/bin/', script_name)
 			with open(script_path, 'w') as f:
@@ -281,7 +281,7 @@ def uninstall_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -300,7 +300,7 @@ def uninstall_program(name, dir_name):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-		if OS.os_type._name != 'Windows':
+		if Helpers.os_type._name != 'Windows':
 			script_name = Helpers.before(name, '.')
 			if os.path.isfile('/usr/bin/' + script_name):
 				os.remove('/usr/bin/' + script_name)
@@ -317,7 +317,7 @@ def install_library(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -348,7 +348,7 @@ def uninstall_library(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'

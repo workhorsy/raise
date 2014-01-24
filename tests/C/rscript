@@ -4,7 +4,7 @@
 import os
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_c as C
 import lib_raise_ar as AR
 import lib_raise_fs as FS
@@ -79,14 +79,14 @@ def build_static_library():
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
 	# Build as a normal user
 	def actual_build():
 		C.build_program('raise_example.exe', ['main.c', 'lib_math.c'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	C.uninstall_program('raise_example.exe')
@@ -100,7 +100,7 @@ def install_and_uninstall_program():
 
 def install_and_uninstall_shared_library():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -109,7 +109,7 @@ def install_and_uninstall_shared_library():
 		C.build_object('lib_math.o', ['lib_math.c'])
 		C.build_shared_library('lib_math.so', ['lib_math.o'])
 		C.build_program('raise_example.exe', ['main.c', 'lib_math.so'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	C.uninstall_program('raise_example.exe')
@@ -126,7 +126,7 @@ def install_and_uninstall_shared_library():
 
 def install_and_uninstall_static_library():
 	# Configure
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -135,7 +135,7 @@ def install_and_uninstall_static_library():
 		C.build_object('lib_math.o', ['lib_math.c'])
 		AR.build_static_library('lib_math.a', ['lib_math.o'])
 		C.build_program('raise_example.exe', ['main.c', 'lib_math.a'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Install
 	C.uninstall_program('raise_example.exe')

@@ -8,7 +8,7 @@ import lib_raise_d as D
 import lib_raise_linker as Linker
 import lib_raise_fs as FS
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_process as Process
 
 def clean():
@@ -43,7 +43,7 @@ def _configure():
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
-	OS.require_not_root()
+	Users.require_not_root()
 	clean()
 	_configure()
 
@@ -65,7 +65,7 @@ def _remove():
 def remove():
 	"""Uninstalls the program."""
 	# Setup
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -77,7 +77,7 @@ def remove():
 def install():
 	"""Installs the program."""
 	# Setup
-	OS.require_root()
+	Users.require_root()
 	clean()
 	_configure()
 
@@ -86,7 +86,7 @@ def install():
 		C.build_object('lib_regex.o', ['lib_regex.c'])
 		C.build_shared_library('lib_regex.so', ['lib_regex.o'])
 		D.build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
-	OS.do_as_normal_user(actual_build)
+	Users.do_as_normal_user(actual_build)
 
 	# Remove old install
 	_remove()

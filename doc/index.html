@@ -392,10 +392,10 @@ raise
            |-lib_raise_helpers.py
            |-lib_raise_java.py
            |-lib_raise_linker.py
-           |-lib_raise_os.py
            |-lib_raise_process.py
            |-lib_raise_python.py
-           `-lib_raise_terminal.py
+           |-lib_raise_terminal.py
+           `-lib_raise_users.py
 
 </pre>
 
@@ -497,12 +497,12 @@ Java works with OpenJDK 7.
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_os as OS
+import lib_raise_helpers as Helpers
 	</code></pre>
 
 <p>
 	Raise uses a string for the OS Type. Any time you need to check what
-	OS your script is running under, you can use <span class="fun">OS.os_type._name</span>.
+	OS your script is running under, you can use <span class="fun">Helpers.os_type._name</span>.
 </p>
 
 There are three basic OS types:
@@ -515,7 +515,7 @@ There are three basic OS types:
 
 <pre><code data-language="python">
 def operating_system_support():
- 	print("OS: {0}".format(OS.os_type._name))
+ 	print("OS: {0}".format(Helpers.os_type._name))
 
 
 </code></pre>
@@ -894,7 +894,7 @@ Produces the result:
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_os as OS
+import lib_raise_users as Users
 	</code></pre>
 
 <a id="users_running_as_root"></a>
@@ -902,7 +902,7 @@ import lib_raise_os as OS
 
 	<p>
 	If you want to ensure that a script is run as root. You can use the
-	<span class="fun">OS.require_root</span> function. If the script is not
+	<span class="fun">Users.require_root</span> function. If the script is not
 	run as root, it will print an error and exit.
 	</p>
 
@@ -916,7 +916,7 @@ def users_running_as_root():
  	print('Effective user id: {0}'.format(os.getuid()))
  
  	# Will print an error and exit if the user is NOT root
- 	OS.require_root()
+ 	Users.require_root()
 
 
 	</code></pre>
@@ -944,7 +944,7 @@ Effective user id: 1000
 
 	<p>
 	If you want to ensure that a script is run as a normal user, you can 
-	use the <span class="fun">OS.require_not_root</span> function. If the
+	use the <span class="fun">Users.require_not_root</span> function. If the
 	script is run as root, it will print an error and exit.
 	</p>
 
@@ -958,7 +958,7 @@ def users_running_as_a_normal_user():
  	print('Effective user id: {0}'.format(os.getuid()))
  
  	# Will print an error and exit if the user is root
- 	OS.require_not_root()
+ 	Users.require_not_root()
 
 
 	</code></pre>
@@ -989,7 +989,7 @@ Effective user id: 1000
 	all in the same script. A common example is to compile a program as a 
 	normal user, then install it as root. You can do this by running the 
 	script as root, then using the function 
-	<span class="fun">OS.do_as_normal_user</span>
+	<span class="fun">Users.do_as_normal_user</span>
 	to temporarily step down as a normal user.
 	</p>
 
@@ -1005,7 +1005,7 @@ def users_privilege_escalation():
  	# User id when running as a normal user
  	def cb():
  		print('Effective user id: {0}'.format(os.geteuid()))
- 	OS.do_as_normal_user(cb)
+ 	Users.do_as_normal_user(cb)
  
  	# User id by default
  	print('Effective user id: {0}'.format(os.geteuid()))
@@ -1034,7 +1034,7 @@ Effective user id: 0
 	<span class="fun">getpass.getuser</span> 
 	will return 'root', because it is actually being run as root. To get
 	the actual user name, you can use the 
-	<span class="fun">OS.get_normal_user_name</span> function.
+	<span class="fun">Users.get_normal_user_name</span> function.
 	</p>
 
 	<p>
@@ -1046,7 +1046,7 @@ def users_user_name():
  	import getpass
  	print('Current user name: {0}'.format(getpass.getuser()))
  
- 	print('Normal user name: {0}'.format(OS.get_normal_user_name()))
+ 	print('Normal user name: {0}'.format(Users.get_normal_user_name()))
 
 
 	</code></pre>
@@ -1089,7 +1089,7 @@ Normal user name: matt
 def users_user_id():
  	print('Current user id: {0}'.format(os.getuid()))
  
- 	print('Normal user id: {0}'.format(OS.get_normal_user_id()))
+ 	print('Normal user id: {0}'.format(Users.get_normal_user_id()))
 
 
 	</code></pre>

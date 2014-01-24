@@ -3,7 +3,7 @@
 
 import lib_raise_terminal as Print
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 
 def simple_nothing():
 	pass
@@ -30,15 +30,15 @@ def simple_require_program_failure():
 	Find.require_programs(['no_such_program'])
 
 def simple_require_not_root():
-	OS.require_not_root()
+	Users.require_not_root()
 
 def simple_require_root_failure():
-	OS.require_root()
+	Users.require_root()
 
 # Tests that require root
 def simple_require_root():
-	OS.require_root()
+	Users.require_root()
 
 def simple_require_not_root_failure():
-	OS.require_not_root()
+	Users.require_not_root()
 

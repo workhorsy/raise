@@ -5,7 +5,7 @@ import os
 import lib_raise_c as C
 import lib_raise_fs as FS
 import lib_raise_find as Find
-import lib_raise_os as OS
+import lib_raise_users as Users
 import lib_raise_process as Process
 
 
@@ -26,12 +26,12 @@ def _configure():
 
 def build():
 	"""Builds the program. Will only build files that have changed since the last build."""
-	OS.require_not_root()
+	Users.require_not_root()
 	_build()
 
 def rebuild():
 	"""Rebuilds the program. Will build all the files. Even if they have not changed since last build."""
-	OS.require_not_root()
+	Users.require_not_root()
 	clean()
 	_build()
 

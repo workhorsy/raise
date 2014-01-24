@@ -52,15 +52,15 @@ RAISE_URLS = {
 	'raise_csharp'        : '{0}lib_raise_csharp.py-20130925020021-x4i3z530h3t3v1yq-1/lib_raise_csharp.py'.format(RAISE_BASE),
 	'raise_cxx'           : '{0}lib_raise_cxx.py-20130925020016-9fjw17cv08u2lemd-1/lib_raise_cxx.py'.format(RAISE_BASE),
 	'raise_d'             : '{0}lib_raise_d.py-20130925020028-1dn7htdqkc5czmz6-1/lib_raise_d.py'.format(RAISE_BASE),
+	'raise_find'          : '{0}lib_raise_find.-20130926135917-cld8cx2qb6r0gg2p-1/lib_raise_find.py'.format(RAISE_BASE),
 	'raise_fs'            : '{0}lib_raise_fs.py-20130926135859-5fx3lg4fqvldafr6-1/lib_raise_fs.py'.format(RAISE_BASE),
 	'raise_helpers'       : '{0}lib_raise_helpers.py-20130926135905-4pr2hnirgvbysmts-1/lib_raise_helpers.py'.format(RAISE_BASE),
 	'raise_java'          : '{0}lib_raise_java.py-20131017141946-oy8wrdvoxoudugeu-1/lib_raise_java.py'.format(RAISE_BASE),
-	'raise_libraries'     : '{0}lib_raise_libraries.-20130926135917-cld8cx2qb6r0gg2p-1/lib_raise_libraries.py'.format(RAISE_BASE),
 	'raise_linker'        : '{0}lib_raise_linker.py-20130925020033-8xk1azowpl0ncoh2-1/lib_raise_linker.py'.format(RAISE_BASE),
-	'raise_os'            : '{0}lib_raise_os.py-20130926135933-f37upvzomj5b02bt-1/lib_raise_os.py'.format(RAISE_BASE),
 	'raise_process'       : '{0}lib_raise_process.py-20130926135939-ayh5ule0azobuglj-1/lib_raise_process.py'.format(RAISE_BASE),
 	'raise_python'        : '{0}lib_raise_python.py-20130926135944-772iti7d0besizk2-1/lib_raise_python.py'.format(RAISE_BASE),
-	'raise_terminal'      : '{0}lib_raise_terminal.p-20130926135949-pg14csynoheohu5f-1/lib_raise_terminal.py'.format(RAISE_BASE)
+	'raise_terminal'      : '{0}lib_raise_terminal.p-20130926135949-pg14csynoheohu5f-1/lib_raise_terminal.py'.format(RAISE_BASE),
+	'raise_users'         : '{0}lib_raise_users.py-20130926135933-f37upvzomj5b02bt-1/lib_raise_users.py'.format(RAISE_BASE),
 }
 
 def friendly_size(data_length):

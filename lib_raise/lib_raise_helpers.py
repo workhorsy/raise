@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,10 +26,44 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
+import atexit
+import platform
 from collections import namedtuple
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 
+
+
+os_type = None
+
+
+def setup():
+	global os_type
+
+	# Figure out the general OS type
+	if 'cygwin' in platform.system().lower():
+		os_type = OSType(
+			name =                 'Cygwin'
+		)
+	elif 'windows' in platform.system().lower():
+		os_type = OSType(
+			name =                 'Windows'
+		)
+	else:
+		os_type = OSType(
+			name =                 'Unix'
+		)
+
+	# Make sure Windows SDK tools are found
+	if os_type._name == 'Windows':
+		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
+			Config.early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
+
+
+class OSType(object):
+	def __init__(self, name):
+
+		self._name = name
 
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:
@@ -82,6 +116,21 @@ def require_file_extension(file_name, *required_extensions):
 	extension = os.path.splitext(file_name)[-1].lower()
 	if not extension in required_extensions:
 		Print.exit("File extension should be '{0}' on '{1}'.".format(str.join(', ', required_extensions), file_name))
+
+def call_on_exit(cb):
+	# Set a cleanup function to run on exit
+	if cb:
+		atexit.register(cb)
+
+def expand_envs(string):
+	while True:
+		before = string
+		string = os.path.expandvars(string)
+		if before == string:
+			return string
+
+
+setup()
 
 
 

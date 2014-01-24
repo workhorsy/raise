@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,8 @@
 
 import sys, os
 import lib_raise_config as Config
-import lib_raise_os as OS
+import lib_raise_users as Users
+import lib_raise_helpers as Helpers
 
 
 clear = None
@@ -68,13 +69,13 @@ def set_fancy():
 	global width
 
 	# Figure out how to clear the terminal
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		clear = 'cls'
 	else:
 		clear = 'clear'
 
 	# Figure out the terminal width
-	if OS.os_type._name == 'Windows':
+	if Helpers.os_type._name == 'Windows':
 		import _winreg
 		key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
 		val = _winreg.QueryValueEx(key, "ScreenBufferSize")
@@ -85,7 +86,7 @@ def set_fancy():
 		width = int(os.popen('stty size', 'r').read().split()[1])
 
 	# Figure out the terminal colors
-	if OS.os_type._name != 'Windows':
+	if Helpers.os_type._name != 'Windows':
 		BGColors.MESSAGE = '\033[44m\033[37m'
 		BGColors.OK = '\033[42m\033[37m'
 		BGColors.WARNING = '\033[43m\033[30m'
