@@ -154,24 +154,26 @@ def _cb_dl_done(file_name, data):
 		f.write(data)
 
 if __name__ == '__main__':
-	needs_update = False
+	needs_update = True
+	dir_name = '.lib_raise/'
 
 	# Get the arguments
 	args = str(str.join(' ', sys.argv[1:]))
 
 	# Get the location of the module files
-	dir_name = None
-	if os.path.isfile('lib_raise/lib_raise.py'):
-		dir_name = 'lib_raise/'
-	elif os.path.isfile('.lib_raise/lib_raise.py'):
-		dir_name = '.lib_raise/'
-	elif os.path.isfile('../../lib_raise/lib_raise.py'):
-		dir_name = '../../lib_raise/'
-	elif os.path.isfile('../lib_raise/lib_raise.py'):
-		dir_name = '../lib_raise/'
-	else:
-		dir_name = '.lib_raise/'
-		needs_update = True
+	dirs = ['lib_raise/', '.lib_raise/', '../lib_raise/', '../../lib_raise/']
+	for entry in dirs:
+		if os.path.exists(entry):
+			dir_name = entry
+			has_files = True
+
+			for module, url in RAISE_URLS.items():
+				module = 'lib_{0}.py'.format(module)
+				module = os.path.join(entry, module)
+				if not os.path.exists(module):
+					has_files = False
+			if has_files:
+				needs_update = False
 
 	# Run update if that is the target
 	if args == 'update':
