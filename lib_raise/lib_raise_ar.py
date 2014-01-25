@@ -78,22 +78,22 @@ def build_static_library(ar_file, o_files):
 	command = "ar rcs " + \
 			ar_file + " " + \
 			str.join(' ', o_files)
-
-	native_command = to_native(command)
-	native_ar_file = to_native(ar_file)
-	native_o_files = [to_native(o) for o in o_files]
+	command = to_native(command)
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [native_ar_file], triggers = native_o_files):
+		to_update = [to_native(ar_file)]
+		triggers = [to_native(t) for t in o_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
-		return True
 
 		# Create the output directory if it does not exist
 		FS.create_path_dirs(ar_file)
 
+		return True
+
 	# Create the event
-	event = Process.Event(task, result, plural, singular, native_command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 

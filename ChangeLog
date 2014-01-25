@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1272589: 'Many build commands are using FS.is_outdated wrong'.
 	* Fixed Bug #1230070: 'Add option to print version'.
 	* Fixed Bug #1270697: 'Have updater do more checks to redownload'.
 	* Fixed Bug #1272146: 'Add clang as a C++ compiler'.

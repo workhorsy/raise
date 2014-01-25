@@ -148,18 +148,18 @@ def is_outdated(to_update, triggers):
 			return True
 
 	# Get the modify date of the newest trigger file and file to check
-	s, b = 0, 0
+	newest_trigger, newest_update = 0, 0
 	for trigger in triggers:
 		t = os.path.getmtime(trigger)
-		if t > s:
-			s = t
+		if t > newest_trigger:
+			newest_trigger = t
 	for update in to_update:
 		t = os.path.getmtime(update)
-		if t > b:
-			b = t
+		if t > newest_update:
+			newest_update = t
 
 	# Rebuild if a trigger is newer than the newest file to check
-	if s > b:
+	if newest_trigger > newest_update:
 		return True
 	else:
 		return False

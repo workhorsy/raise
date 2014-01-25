@@ -187,7 +187,10 @@ def build_interface(d_file, i_files=[]):
 	command = dc.to_native(command)
 
 	def setup():
-		if not FS.is_outdated(to_update = [d_file+'i'], triggers = [d_file]):
+		# Skip if the files have not changed since last build
+		to_update = [d_file+'i']
+		triggers = [dc.to_native(t) for t in i_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		if not 'DC' in os.environ:
@@ -218,7 +221,10 @@ def build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
 	command = dc.to_native(command)
 
 	def setup():
-		if not FS.is_outdated(to_update = [o_file], triggers = d_files):
+		# Skip if the files have not changed since last build
+		to_update = [dc.to_native(o_file)]
+		triggers = [dc.to_native(t) for t in d_files + i_files + l_files + h_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		if not 'DC' in os.environ:
@@ -287,6 +293,12 @@ def build_static_library(o_file, d_files, i_files=[], l_files=[], generate_heade
 	command = dc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [dc.to_native(o_file)]
+		triggers = [dc.to_native(t) for t in d_files + i_files + l_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		if not 'DC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
@@ -315,6 +327,12 @@ def build_program(out_file, inc_files, link_files=[]):
 	command = dc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [dc.to_native(out_file)]
+		triggers = [dc.to_native(t) for t in inc_files + link_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		if not 'DC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")

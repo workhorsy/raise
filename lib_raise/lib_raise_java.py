@@ -164,6 +164,12 @@ def build_program(out_file, inc_files, link_files=[]):
 	command = javac.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		#to_update = [javac.to_native(out_file)]
+		#triggers = [javac.to_native(t) for t in inc_files + link_files]
+		#if not FS.is_outdated(to_update, triggers):
+		#	return False
+
 		if not 'JAVAC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'JAVAC' to the Java compiler, and try again.")
@@ -195,6 +201,12 @@ def build_jar(out_file, inc_files, link_files=[]):
 	command = javac.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		#to_update = [javac.to_native(out_file)]
+		#triggers = [javac.to_native(t) for t in inc_files + link_files]
+		#if not FS.is_outdated(to_update, triggers):
+		#	return False
+
 		if not 'JAR' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'JAR' to Java jar, and try again.")

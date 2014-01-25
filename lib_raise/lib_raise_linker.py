@@ -145,7 +145,9 @@ def link_program(out_file, obj_files, i_files=[]):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [out_file], triggers = obj_files):
+		to_update = [linker.to_native(out_file)]
+		triggers = [linker.to_native(t) for t in obj_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		# Make sure the environmental variable is set

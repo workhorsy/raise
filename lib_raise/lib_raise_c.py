@@ -243,6 +243,12 @@ def link_program(out_file, obj_files, i_files=[]):
 	command = cc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [cc.to_native(out_file)]
+		triggers = [cc.to_native(t) for t in obj_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		# Make sure the environmental variable is set
 		if not 'CC' in os.environ:
 			Print.fail()
@@ -278,7 +284,9 @@ def build_object(o_file, c_files, i_files=[]):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [o_file], triggers = c_files):
+		to_update = [cc.to_native(o_file)]
+		triggers = [cc.to_native(t) for t in c_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		# Make sure the environmental variable is set
@@ -313,6 +321,12 @@ def build_program(o_file, c_files, i_files=[]):
 	command = cc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [cc.to_native(o_file)]
+		triggers = [cc.to_native(t) for t in c_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		# Make sure the environmental variable is set
 		if not 'CC' in os.environ:
 			Print.fail()
@@ -345,14 +359,13 @@ def build_shared_library(so_file, o_files):
 				str.join(' ', o_files), 
 				cc._opt_out_file, 
 				so_file)
+	command = cc.to_native(command)
 
-	native_command = cc.to_native(command)
-	native_so_file = cc.to_native(so_file)
-	native_o_files = [cc.to_native(o) for o in o_files]
-	
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [native_so_file], triggers = native_o_files):
+		to_update = [cc.to_native(so_file)]
+		triggers = [cc.to_native(t) for t in o_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		# Create the output directory if it does not exist
@@ -361,7 +374,7 @@ def build_shared_library(so_file, o_files):
 		return True
 
 	# Create the event
-	event = Process.Event(task, result, plural, singular, native_command, setup)
+	event = Process.Event(task, result, plural, singular, command, setup)
 	Process.add_event(event)
 
 def run_print(command):

@@ -184,6 +184,12 @@ def build_program(out_file, inc_files, link_files=[]):
 	command = csc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		#to_update = [csc.to_native(out_file)]
+		#triggers = [csc.to_native(t) for t in inc_files + link_files]
+		#if not FS.is_outdated(to_update, triggers):
+		#	return False
+
 		if not 'CSC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'CSC' to the C# compiler, and try again.")
@@ -215,6 +221,12 @@ def build_shared_library(out_file, inc_files, link_files=[]):
 	command = csc.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		#to_update = [csc.to_native(out_file)]
+		#triggers = [csc.to_native(t) for t in inc_files + link_files]
+		#if not FS.is_outdated(to_update, triggers):
+		#	return False
+
 		if not 'CSC' in os.environ:
 			Print.fail()
 			Print.exit("Set the env variable 'CSC' to the C# compiler, and try again.")

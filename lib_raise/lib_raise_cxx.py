@@ -198,6 +198,12 @@ def build_program(o_file, cxx_files, i_files=[]):
 	command = cxx.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [cxx.to_native(o_file)]
+		triggers = [cxx.to_native(t) for t in cxx_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		# Make sure the environmental variable is set
 		if not 'CXX' in os.environ:
 			Print.fail()
@@ -231,6 +237,12 @@ def build_shared_library(o_file, cxx_files, i_files=[]):
 	command = cxx.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [cxx.to_native(o_file)]
+		triggers = [cxx.to_native(t) for t in cxx_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		# Make sure the environmental variable is set
 		if not 'CXX' in os.environ:
 			Print.fail()
@@ -264,6 +276,12 @@ def link_program(out_file, obj_files, i_files=[]):
 	command = cxx.to_native(command)
 
 	def setup():
+		# Skip if the files have not changed since last build
+		to_update = [cxx.to_native(out_file)]
+		triggers = [cxx.to_native(t) for t in obj_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
+			return False
+
 		# Make sure the environmental variable is set
 		if not 'CXX' in os.environ:
 			Print.fail()
@@ -299,7 +317,9 @@ def build_object(o_file, cxx_files, i_files=[]):
 
 	def setup():
 		# Skip if the files have not changed since last build
-		if not FS.is_outdated(to_update = [o_file], triggers = cxx_files):
+		to_update = [cxx.to_native(o_file)]
+		triggers = [cxx.to_native(t) for t in cxx_files + i_files]
+		if not FS.is_outdated(to_update, triggers):
 			return False
 
 		# Make sure the environmental variable is set
