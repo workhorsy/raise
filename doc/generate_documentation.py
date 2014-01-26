@@ -43,7 +43,7 @@ def run_and_get_stdall(command):
 	if rc != 0:
 		raise Exception('Return not 0 on: ' + command + ', ' + out)
 
-	return out
+	return out.strip()
 
 # A list of the the documentation items to generate examples for
 info = {
