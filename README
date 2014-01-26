@@ -26,6 +26,6 @@ cd examples/c_simple/
 
 
 // Documentation can be regenerated in the doc directory
-python generate_documentation.py
+sudo python generate_documentation.py
 
 

@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 24th 2014
+Last updated on January 25th 2014
 </p>
 
 <p>
@@ -291,7 +291,8 @@ Please have a look at the list of upcomming bug fixes for the upcomming
 <p>
 	Warning! Because Raise uses scripts to generate the documentation, you 
 	won't be able to generate the documentation unless you have all the compilers and
-	tools installed.
+	tools installed. Doing this also requires root, because it runs all the code 
+	examples to get the actual output from those code examples.
 </p>
 
 <p>
@@ -974,9 +975,7 @@ ${template_info['users_privilege_escalation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Effective user id: 0
-Effective user id: 1000
-Effective user id: 0
+${template_info['users_privilege_escalation']['output']}
 	</pre>
 
 
@@ -1838,13 +1837,7 @@ ${template_info['c_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building C program 'main.exe' ...                                            <span class="smile">:)</span>
-Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
-Removing binaries 'main' ...                                                 <span class="smile">:)</span>
-Running C program ...                                                        <span class="smile">:)</span>
-main.exe
-Hello World!
-Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
+${template_info['c_program_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -1869,8 +1862,7 @@ ${template_info['c_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Installing the library 'libexample.so' ...                                   <span class="smile">:)</span>
-Uninstalling the library 'libexample.so' ...                                 <span class="smile">:)</span>
+${template_info['c_library_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -1895,8 +1887,7 @@ ${template_info['c_header_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Installing the header 'libexample.h' ...                                     <span class="smile">:)</span>
-Uninstalling the header 'libexample.h' ...                                   <span class="smile">:)</span>
+${template_info['c_header_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2158,13 +2149,7 @@ ${template_info['cxx_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building C++ program 'main.exe' ...                                         <span class="smile">:)</span>
-Installing the program 'main.exe' ...                                       <span class="smile">:)</span>
-Removing binaries 'main' ...                                                <span class="smile">:)</span>
-Running C++ program ...                                                     <span class="smile">:)</span>
-main.exe
-Hello World!
-Uninstalling the program 'main.exe' ...                                     <span class="smile">:)</span>
+${template_info['cxx_program_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2189,10 +2174,7 @@ ${template_info['cxx_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building C++ shared library 'libadd.so' ...                                 <span class="smile">:)</span>
-Installing the library 'libadd.so' ...                                      <span class="smile">:)</span>
-Uninstalling the library 'libadd.so' ...                                    <span class="smile">:)</span>
-
+${template_info['cxx_library_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2217,8 +2199,7 @@ ${template_info['cxx_header_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Installing the header 'libadd.h' ...                                        <span class="smile">:)</span>
-Uninstalling the header 'libadd.h' ...                                      <span class="smile">:)</span>
+${template_info['cxx_header_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2491,13 +2472,7 @@ ${template_info['d_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building D program 'main.exe' ...                                           <span class="smile">:)</span>
-Installing the program 'main.exe' ...                                       <span class="smile">:)</span>
-Removing binaries 'main' ...                                                <span class="smile">:)</span>
-Running D program ...                                                       <span class="smile">:)</span>
-main.exe
-Hello World!
-Uninstalling the program 'main.exe' ...                                     <span class="smile">:)</span>
+${template_info['d_program_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2522,11 +2497,7 @@ ${template_info['d_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building D object 'libsubtract.o' ...                                       <span class="smile">:)</span>
-Building D static library 'libsubtract.a' ...                               <span class="smile">:)</span>
-Installing the library 'libsubtract.a' ...                                  <span class="smile">:)</span>
-Uninstalling the library 'libsubtract.a' ...                                <span class="smile">:)</span>
-
+${template_info['d_library_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2551,9 +2522,7 @@ ${template_info['d_interface_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building D interface 'libsubtract.di' ...                                   <span class="smile">:)</span>
-Installing the interface 'libsubtract.di' ...                               <span class="smile">:)</span>
-Uninstalling the interface 'libsubtract.di' ...                             <span class="smile">:)</span>
+${template_info['d_interface_installation_and_uninstallation']['output']}
 	</pre>
 
 
@@ -2729,13 +2698,7 @@ ${template_info['csharp_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building C# program 'main.exe' ...                                           <span class="smile">:)</span>
-Installing the program 'main.exe' ...                                        <span class="smile">:)</span>
-Removing binaries 'main' ...                                                 <span class="smile">:)</span>
-Running command ...                                                          <span class="smile">:)</span>
-main
-Hello World!
-Uninstalling the program 'main.exe' ...                                      <span class="smile">:)</span>
+${template_info['csharp_program_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="csharp_library_installation_and_uninstallation"></a>
@@ -2758,9 +2721,7 @@ ${template_info['csharp_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building C# shared library 'math_helper.dll' ...                             <span class="smile">:)</span>
-Installing the library 'math_helper.dll' ...                                 <span class="smile">:)</span>
-Uninstalling the library 'math_helper.dll' ...                               <span class="smile">:)</span>
+${template_info['csharp_library_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="csharp_running_and_printing"></a>
@@ -2934,13 +2895,7 @@ ${template_info['java_program_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building Java program 'main.class' ...                                       <span class="smile">:)</span>
-Installing the program 'main.class' ...                                      <span class="smile">:)</span>
-Removing binaries 'main' ...                                                 <span class="smile">:)</span>
-Running command ...                                                          <span class="smile">:)</span>
-main
-Hello World!
-Uninstalling the program 'main.class' ...                                    <span class="smile">:)</span>
+${template_info['java_program_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="java_library_installation_and_uninstallation"></a>
@@ -2963,9 +2918,7 @@ ${template_info['java_library_installation_and_uninstallation']['example']}
 	</p>
 
 	<pre class="raise_output">
-Building Java jar 'lib_math.jar' ...                                         <span class="smile">:)</span>
-Installing the jar 'lib_math.jar' ...                                        <span class="smile">:)</span>
-Uninstalling the jar 'lib_math.jar' ...                                      <span class="smile">:)</span>
+${template_info['java_library_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="java_running_and_printing"></a>

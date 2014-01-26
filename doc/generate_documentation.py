@@ -66,9 +66,9 @@ info = {
 	'c_building_object' : {},
 	'c_building_program' : {},
 	'c_building_library' : {},
-	'c_program_installation_and_uninstallation' : 'skip_run',
-	'c_library_installation_and_uninstallation' : 'skip_run',
-	'c_header_installation_and_uninstallation' : 'skip_run',
+	'c_program_installation_and_uninstallation' : 'root',
+	'c_library_installation_and_uninstallation' : 'root',
+	'c_header_installation_and_uninstallation' : 'root',
 	'c_running_and_printing' : {},
 
 	'cxx_compilers' : {},
@@ -76,9 +76,9 @@ info = {
 	'cxx_building_object' : {},
 	'cxx_building_program' : {},
 	'cxx_building_library' : {},
-	'cxx_program_installation_and_uninstallation' : 'skip_run',
-	'cxx_library_installation_and_uninstallation' : 'skip_run',
-	'cxx_header_installation_and_uninstallation' : 'skip_run',
+	'cxx_program_installation_and_uninstallation' : 'root',
+	'cxx_library_installation_and_uninstallation' : 'root',
+	'cxx_header_installation_and_uninstallation' : 'root',
 	'cxx_running_and_printing' : {},
 
 	'd_compilers' : {},
@@ -87,32 +87,32 @@ info = {
 	'd_building_program' : {},
 	'd_building_library' : {},
 	'd_building_interface' : {},
-	'd_program_installation_and_uninstallation' : 'skip_run',
-	'd_library_installation_and_uninstallation' : 'skip_run',
-	'd_interface_installation_and_uninstallation' : 'skip_run',
+	'd_program_installation_and_uninstallation' : 'root',
+	'd_library_installation_and_uninstallation' : 'root',
+	'd_interface_installation_and_uninstallation' : 'root',
 	'd_running_and_printing' : {},
 
 	'csharp_compilers' : {},
-	'csharp_compiler_setup' : {},
+	'csharp_compiler_setup' : 'root',
 	'csharp_building_program' : {},
 	'csharp_building_library' : {},
-	'csharp_program_installation_and_uninstallation' : 'skip_run',
-	'csharp_library_installation_and_uninstallation' : 'skip_run',
+	'csharp_program_installation_and_uninstallation' : 'root',
+	'csharp_library_installation_and_uninstallation' : 'root',
 	'csharp_running_and_printing' : {},
 
 	'java_compilers' : {},
 	'java_compiler_setup' : {},
 	'java_building_program' : {},
 	'java_building_library' : {},
-	'java_program_installation_and_uninstallation' : 'skip_run',
-	'java_library_installation_and_uninstallation' : 'skip_run',
+	'java_program_installation_and_uninstallation' : 'root',
+	'java_library_installation_and_uninstallation' : 'root',
 	'java_running_and_printing' : {},
 
 	'users_running_as_root' : 'skip_run',
 	'users_running_as_a_normal_user' : 'skip_run',
 	'users_privilege_escalation' : {},
-	'users_user_name' : 'skip_run',
-	'users_user_id' : 'skip_run',
+	'users_user_name' : {},
+	'users_user_id' : {},
 
 	'find_finding_programs' : {},
 	'find_requiring_programs' : {},
@@ -133,7 +133,34 @@ info = {
 
 cache = {}
 
+def get_normal_user_id():
+	# Get the name from the environmental variable
+	user_name = \
+		os.getenv('SUDO_USER') or \
+		os.getenv('USER') or \
+		os.getenv('LOGNAME')
+
+	# Make sure we got a name
+	if not user_name:
+		raise Exception('Failed to get the normal user name.')
+
+	# Use the user name to get the user id
+	return int(os.popen('id -u {0}'.format(user_name)).read())
+
+
+def to_user(user_id):
+	os.setegid(user_id)
+	os.seteuid(user_id)
+
 if __name__ == '__main__':
+	# Make sure we are root
+	if os.getuid() != 0:
+		print('Must be run as root. Exiting ...')
+		exit(1)
+
+	# Get the normal user id
+	normal_user_id = get_normal_user_id()
+
 	# Load the cache
 	if os.path.isfile('cache.pickle'):
 		with open('cache.pickle', 'rb') as f:
@@ -163,9 +190,18 @@ if __name__ == '__main__':
 			print('cached ...')
 		# Or re-run the code if it has changed
 		else:
-			# Get the output and apply CSS styles
-			if value != 'skip_run':
+			# Get the output as ROOT and apply the CSS
+			if value == 'root':
 				output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
+				if len(output.strip()) == 0:
+					raise Exception('Output for "{0}" was blank.'.format(anchor))
+				output = bytes.join(b"\n", output.split(b"\n")[1 : ])
+				output = add_styles(output)
+			# Get the output and apply CSS styles
+			elif value != 'skip_run':
+				to_user(normal_user_id)
+				output = run_and_get_stdall('{0} raise -plain {1}'.format(sys.executable, anchor))
+				to_user(0)
 				if len(output.strip()) == 0:
 					raise Exception('Output for "{0}" was blank.'.format(anchor))
 				output = bytes.join(b"\n", output.split(b"\n")[1 : ])
