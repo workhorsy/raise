@@ -110,7 +110,7 @@ info = {
 
 	'users_running_as_root' : 'skip_run',
 	'users_running_as_a_normal_user' : 'skip_run',
-	'users_privilege_escalation' : {},
+	'users_privilege_escalation' : 'root',
 	'users_user_name' : {},
 	'users_user_id' : {},
 
