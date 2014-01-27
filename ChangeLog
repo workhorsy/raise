@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1273406: 'Finding libraries needs to be fuzzy like finding headers'.
 	* Fixed Bug #1270695: 'Have all documentation generated'.
 	* Fixed Bug #1272589: 'Many build commands are using FS.is_outdated wrong'.
 	* Fixed Bug #1230070: 'Add option to print version'.
