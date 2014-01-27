@@ -53,29 +53,9 @@ def _get_all_library_paths():
 
 	return paths
 
-def _get_shared_library_from_library_files(library_name, extension, library_files):
-	library_name = library_name.lstrip('lib')
-	whole_name = library_name + extension
-
-	for entry in library_files:
-		if whole_name in entry:
-			return entry
-
-	return None
-
-def _get_static_library_from_library_files(library_name, extension, library_files):
-	library_name = library_name.lstrip('lib')
-	whole_name = library_name + extension
-
-	for entry in library_files:
-		if whole_name in entry and entry.endswith(extension):
-			return entry
-
-	return None
-
-def _get_header_from_library_files(library_name, library_files):
+def _get_matched_file_from_library_files(library_name, extension, library_files):
 	'''
-	Will match header files with this priority:
+	Will match files with this priority:
 	1. Exact match after last path separator
 	2. Exact match different capitalization after last path separator
 	3. Matches ending
@@ -84,28 +64,28 @@ def _get_header_from_library_files(library_name, library_files):
 	library_name = library_name.lstrip('lib')
 
 	# 1. Exact match after last path separator
-	desired_name = '{0}.h'.format(library_name)
+	desired_name = '{0}{1}'.format(library_name, extension)
 	for entry in library_files:
 		file_name = os.path.basename(entry)
 		if file_name == desired_name:
 			return entry
 
 	# 2. Exact match different capitalization after last path separator
-	desired_name = '{0}.h'.format(library_name).lower()
+	desired_name = '{0}{1}'.format(library_name, extension).lower()
 	for entry in library_files:
 		file_name = os.path.basename(entry).lower()
 		if file_name == desired_name:
 			return entry
 
 	# 3. Matches ending
-	desired_name = '{0}.h'.format(library_name)
+	desired_name = '{0}{1}'.format(library_name, extension)
 	for entry in library_files:
 		file_name = os.path.basename(entry)
 		if file_name.endswith(desired_name):
 			return entry
 
 	# 4. Matches ending with different capitalization
-	desired_name = '{0}.h'.format(library_name).lower()
+	desired_name = '{0}{1}'.format(library_name, extension).lower()
 	for entry in library_files:
 		file_name = os.path.basename(entry).lower()
 		if file_name.endswith(desired_name):
@@ -306,17 +286,17 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 
 def get_header_file(header_name, version_cb = None):
 	library_files = _get_library_files(header_name, version_cb)
-	header_file = _get_header_from_library_files(header_name, library_files)
+	header_file = _get_matched_file_from_library_files(header_name, '.h', library_files)
 	return header_file
 
 def get_static_library(lib_name, version_cb = None):
 	library_files = _get_library_files(lib_name, version_cb)
-	static_file = _get_static_library_from_library_files(lib_name, '.a', library_files)
+	static_file = _get_matched_file_from_library_files(lib_name, '.a', library_files)
 	return static_file
 
 def get_shared_library(lib_name, version_cb = None):
 	library_files = _get_library_files(lib_name, version_cb)
-	shared_file = _get_shared_library_from_library_files(lib_name, '.so', library_files)
+	shared_file = _get_matched_file_from_library_files(lib_name, '.so', library_files)
 	return shared_file
 
 def require_header_file(header_name, version_cb = None):

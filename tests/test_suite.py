@@ -737,35 +737,113 @@ class TestFind(TestCase):
 	def set_up(self, id):
 		self.init('Find', id)
 
-	def test_find_installed_library(self):
-		command = '{0} raise -plain find_installed_library'.format(sys.executable)
+	def test_find_installed_shared_library(self):
+		command = '{0} raise -plain find_installed_shared_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'find_installed_library'
-Checking for shared library 'libSDL' ...                                    :)'''
+'''Running target 'find_installed_shared_library'
+Checking for shared library 'SDL' ...                                       :)
+Checking for shared library 'sdl' ...                                       :)
+Checking for shared library 'libSDL' ...                                    :)
+Checking for shared library 'libsdl' ...                                    :)
+Checking for shared library 'SDL' ...                                       :)
+Checking for shared library 'sdl' ...                                       :)
+Checking for shared library 'libSDL' ...                                    :)
+Checking for shared library 'libsdl' ...                                    :)'''
 
 		self.assert_process_output(command, expected)
 
-	def test_find_missing_library(self):
-		command = '{0} raise -plain find_missing_library'.format(sys.executable)
+	def test_find_missing_shared_library(self):
+		command = '{0} raise -plain find_missing_shared_library'.format(sys.executable)
 
 		expected = \
-'''Running target 'find_missing_library'
+'''Running target 'find_missing_shared_library'
 Checking for shared library 'libDoesNotExist' ..............................:(
 Shared library 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
 
 		self.assert_process_output(command, expected, False)
 
-	def test_find_installed_library_bad_version(self):
-		command = '{0} raise -plain find_installed_library_bad_version'.format(sys.executable)
+	def test_find_installed_shared_library_bad_version(self):
+		command = '{0} raise -plain find_installed_shared_library_bad_version'.format(sys.executable)
 
 		expected = \
-'''Running target 'find_installed_library_bad_version'
+'''Running target 'find_installed_shared_library_bad_version'
 Checking for shared library 'libSDL' .......................................:(
 Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
 
 		self.assert_process_output(command, expected, False)
 
+	def test_find_installed_static_library(self):
+		command = '{0} raise -plain find_installed_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_static_library'
+Checking for static library 'SDL' ...                                       :)
+Checking for static library 'sdl' ...                                       :)
+Checking for static library 'libSDL' ...                                    :)
+Checking for static library 'libsdl' ...                                    :)
+Checking for static library 'SDL' ...                                       :)
+Checking for static library 'sdl' ...                                       :)
+Checking for static library 'libSDL' ...                                    :)
+Checking for static library 'libsdl' ...                                    :)'''
+
+		self.assert_process_output(command, expected)
+
+	def test_find_missing_static_library(self):
+		command = '{0} raise -plain find_missing_static_library'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_missing_static_library'
+Checking for static library 'libDoesNotExist' ..............................:(
+Static library 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_installed_static_library_bad_version(self):
+		command = '{0} raise -plain find_installed_static_library_bad_version'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_static_library_bad_version'
+Checking for static library 'libSDL' .......................................:(
+Static library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_installed_header_file(self):
+		command = '{0} raise -plain find_installed_header_file'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_header_file'
+Checking for header file 'SDL' ...                                          :)
+Checking for header file 'sdl' ...                                          :)
+Checking for header file 'libSDL' ...                                       :)
+Checking for header file 'libsdl' ...                                       :)
+Checking for header file 'SDL' ...                                          :)
+Checking for header file 'sdl' ...                                          :)
+Checking for header file 'libSDL' ...                                       :)
+Checking for header file 'libsdl' ...                                       :)'''
+
+		self.assert_process_output(command, expected)
+
+	def test_find_missing_header_file(self):
+		command = '{0} raise -plain find_missing_header_file'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_missing_header_file'
+Checking for header file 'libDoesNotExist' .................................:(
+Header file 'libDoesNotExist (Any version)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_installed_header_file_bad_version(self):
+		command = '{0} raise -plain find_installed_header_file_bad_version'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_header_file_bad_version'
+Checking for header file 'libSDL' ..........................................:(
+Header file 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
 
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
