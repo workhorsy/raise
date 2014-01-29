@@ -21,6 +21,10 @@ def find_missing_shared_library():
 def find_installed_shared_library_bad_version():
 	Find.require_shared_library('libSDL', 'ver >= (99, 0)')
 
+def find_installed_shared_library_cache():
+	Find.require_shared_library('libSDL')
+	Find.require_shared_library('libSDL', 'ver >= (99, 0)')
+
 
 
 def find_installed_static_library():
@@ -39,6 +43,10 @@ def find_missing_static_library():
 def find_installed_static_library_bad_version():
 	Find.require_static_library('libSDL', 'ver >= (99, 0)')
 
+def find_installed_static_library_cache():
+	Find.require_static_library('libSDL')
+	Find.require_static_library('libSDL', 'ver >= (99, 0)')
+
 
 
 def find_installed_header_file():
@@ -55,6 +63,10 @@ def find_missing_header_file():
 	Find.require_header_file('libDoesNotExist')
 
 def find_installed_header_file_bad_version():
+	Find.require_header_file('libSDL', 'ver >= (99, 0)')
+
+def find_installed_header_file_cache():
+	Find.require_header_file('libSDL')
 	Find.require_header_file('libSDL', 'ver >= (99, 0)')
 
 

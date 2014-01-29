@@ -773,6 +773,17 @@ Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 
 		self.assert_process_output(command, expected, False)
 
+	def test_find_installed_shared_library_cache(self):
+		command = '{0} raise -plain find_installed_shared_library_cache'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_shared_library_cache'
+Checking for shared library 'libSDL' ...                                    :)
+Checking for shared library 'libSDL' .......................................:(
+Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
 	def test_find_installed_static_library(self):
 		command = '{0} raise -plain find_installed_static_library'.format(sys.executable)
 
@@ -809,6 +820,19 @@ Static library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 
 		self.assert_process_output(command, expected, False)
 
+	def test_find_installed_static_library_cache(self):
+		command = '{0} raise -plain find_installed_static_library_cache'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_static_library_cache'
+Checking for static library 'libSDL' ...                                    :)
+Checking for static library 'libSDL' .......................................:(
+Static library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+
+
 	def test_find_installed_header_file(self):
 		command = '{0} raise -plain find_installed_header_file'.format(sys.executable)
 
@@ -840,6 +864,17 @@ Header file 'libDoesNotExist (Any version)' not installed. Install and try again
 
 		expected = \
 '''Running target 'find_installed_header_file_bad_version'
+Checking for header file 'libSDL' ..........................................:(
+Header file 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_installed_header_file_cache(self):
+		command = '{0} raise -plain find_installed_header_file_cache'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_installed_header_file_cache'
+Checking for header file 'libSDL' ...                                       :)
 Checking for header file 'libSDL' ..........................................:(
 Header file 'libSDL ver >= (99, 0)' not installed. Install and try again. Exiting ...'''
 

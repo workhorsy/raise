@@ -105,8 +105,9 @@ def _get_library_files(lib_name, version_str = None):
 		version_cb = Helpers.to_version_cb(version_str)
 
 	# Return the file names if already cached
-	if lib_name in lib_file_cache:
-		return lib_file_cache[lib_name]
+	search_param = (version_str, lib_name)
+	if search_param in lib_file_cache:
+		return lib_file_cache[search_param]
 
 	# Try finding the library with pkg-config
 	if not files and program_paths('pkg-config'):
@@ -130,7 +131,7 @@ def _get_library_files(lib_name, version_str = None):
 
 	# Save the file names in the cache
 	if files:
-		lib_file_cache[lib_name] = files
+		lib_file_cache[search_param] = files
 
 	return files
 
