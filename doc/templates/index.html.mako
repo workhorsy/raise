@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 25th 2014
+Last updated on January 28th 2014
 </p>
 
 <p>
@@ -137,6 +137,7 @@ Last updated on January 25th 2014
 	<li>
 		<a href="#find">Finding Programs, Libraries, and Headers Files</a>
 		<ol>
+			<li><a href="#find_by_version">Finding By Version</a></li>
 			<li><a href="#find_finding_programs">Finding Programs</a></li>
 			<li><a href="#find_requiring_programs">Requiring Programs</a></li>
 			<li><a href="#find_finding_libraries">Finding Libraries</a></li>
@@ -1430,8 +1431,45 @@ Below are a few ways Raise will search on common OSes:
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
 
+<a id="find_by_version"></a>
+<h2>11.1. Finding By Version</h2>
+	<p>
+	Version numbers use the standard format major.minor.micro. They are
+	stored in a named tuple. You can access the complete version as
+	a tuple. And you can access the major, minor, or micro section as a
+	property.
+	</p>
+
+	<pre><code data-language="python">
+ver # (1, 2, 0)
+ver.major # 1
+ver.minor # 2
+ver.micro # 0
+	</code></pre>
+
+	<p>
+	When creating your version requirements, you have to use a string:
+	</p>
+
+	<pre><code data-language="python">
+# Version 1.2.0
+'ver == (1, 2, 0)'
+
+# Version 1.2.0 the long way
+'ver.major==1 and ver.minor==2 and ver.micro==0'
+
+# Version 1.9 or greater
+'ver >= (1, 9)'
+
+# Version 1
+'ver.major == 1'
+
+# Version 1.X with an odd minor number like 1.3 not 1.2
+'ver >= (1.0) and ver.minor % 2'
+	</code></pre>
+
 <a id="find_finding_programs"></a>
-<h2>11.1. Finding Programs</h2>
+<h2>11.2. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
 	<span class="fun">Find.program_paths</span> function. There is currently
@@ -1455,7 +1493,7 @@ ${template_info['find_finding_programs']['output']}
 	</pre>
 
 <a id="find_requiring_programs"></a>
-<h2>11.2. Requiring Programs</h2>
+<h2>11.3. Requiring Programs</h2>
 	<p>
 	You can make sure a program is installed, by using the 
 	<span class="fun">Find.require_programs</span> function. If the 
@@ -1480,7 +1518,7 @@ ${template_info['find_requiring_programs']['output']}
 	</pre>
 
 <a id="find_finding_libraries"></a>
-<h2>11.3. Finding Libraries</h2>
+<h2>11.4. Finding Libraries</h2>
 	<p>
 	You can find a library, by searching for it with the
 	<span class="fun">Find.get_static_library</span> and
@@ -1505,7 +1543,7 @@ ${template_info['find_finding_libraries']['output']}
 	</pre>
 
 <a id="find_requiring_libraries"></a>
-<h2>11.4. Requiring Libraries</h2>
+<h2>11.5. Requiring Libraries</h2>
 	<p>
 	You can make sure a library is installed, by using the 
 	<span class="fun">Find.require_static_library</span> and
@@ -1531,7 +1569,7 @@ ${template_info['find_requiring_libraries']['output']}
 	</pre>
 
 <a id="find_finding_headers"></a>
-<h2>11.5. Finding Headers Files</h2>
+<h2>11.6. Finding Headers Files</h2>
 	<p>
 	You can find a header file, by searching for it with the
 	<span class="fun">Find.get_header_file</span> function. Optionally
@@ -1555,7 +1593,7 @@ ${template_info['find_finding_headers']['output']}
 	</pre>
 
 <a id="find_requiring_headers"></a>
-<h2>11.6. Requiring Headers Files</h2>
+<h2>11.7. Requiring Headers Files</h2>
 	<p>
 	You can make sure a header file is installed, by using the 
 	<span class="fun">Find.require_header_file</span> function. 
@@ -1580,7 +1618,7 @@ ${template_info['find_requiring_headers']['output']}
 	</pre>
 
 <a id="find_requiring_python_modules"></a>
-<h2>11.7. Requiring Python Modules</h2>
+<h2>11.8. Requiring Python Modules</h2>
 	<p>
 	You can make sure Python modules are installed by using the 
 	<span class="fun">Python.require_python_modules</span> function. 

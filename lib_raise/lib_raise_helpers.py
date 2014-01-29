@@ -28,6 +28,7 @@
 import os
 import atexit
 import platform
+import ast
 from collections import namedtuple
 import lib_raise_config as Config
 import lib_raise_terminal as Print
@@ -112,6 +113,14 @@ def version_string_to_tuple(version_string):
 		pass
 	return Version(major, minor, micro)
 
+def to_version_cb(version_str):
+	code = "lambda ver: " + version_str
+	try:
+		version_cb = eval(code, {})
+	except:
+		Print.exit('\nInvalid version string:\n"{0}"'.format(version_str))
+	return version_cb
+
 def require_file_extension(file_name, *required_extensions):
 	extension = os.path.splitext(file_name)[-1].lower()
 	if not extension in required_extensions:
@@ -128,6 +137,37 @@ def expand_envs(string):
 		string = os.path.expandvars(string)
 		if before == string:
 			return string
+
+def is_code_safe(source_code):
+	safe_nodes = (
+		ast.Module, ast.Load, ast.Expr, ast.Attribute, ast.Name, 
+		ast.Lambda, ast.arguments, ast.Param, 
+		ast.Str, ast.Num, ast.BoolOp, 
+		ast.Dict, ast.List, ast.Tuple, 
+		ast.Subscript, ast.Slice, 
+		ast.BinOp, ast.UnaryOp, 
+		ast.BitOr, ast.BitXor, ast.BitAnd, 
+		ast.LShift, ast.RShift, 
+		ast.Sub, ast.Add, ast.Div, ast.Mult, ast.Mod, 
+		ast.Eq, ast.NotEq, ast.And, ast.Or, ast.Not, 
+		ast.Is, ast.IsNot, ast.In, ast.NotIn, 
+		ast.Compare, ast.Gt, ast.GtE, ast.Lt, ast.LtE
+	)
+
+	# Make sure the code can be parsed
+	tree = None
+	try:
+		tree = ast.parse(source_code)
+	except SyntaxError:
+		raise False
+
+	# Make sure each code node is in the white list
+	for node in ast.walk(tree):
+		if not isinstance(node, safe_nodes):
+			print(type(node))
+			return False
+
+	return True
 
 
 setup()

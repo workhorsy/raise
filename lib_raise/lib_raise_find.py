@@ -27,7 +27,6 @@
 
 
 import os
-import inspect
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_process as Process
@@ -96,9 +95,14 @@ def _get_matched_file_from_library_files(library_name, extension, library_files)
 # FIXME: Make it work with other packaging systems:
 # http://en.wikipedia.org/wiki/List_of_software_package_management_systems
 # Returns the full path of a library file or None
-def _get_library_files(lib_name, version_cb = None):
+def _get_library_files(lib_name, version_str = None):
 	global lib_file_cache
 	files = []
+
+	# Create a version_cb from the string
+	version_cb = None
+	if version_str and Helpers.is_code_safe(version_str):
+		version_cb = Helpers.to_version_cb(version_str)
 
 	# Return the file names if already cached
 	if lib_name in lib_file_cache:
@@ -284,29 +288,29 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 
 	return matching_files
 
-def get_header_file(header_name, version_cb = None):
-	library_files = _get_library_files(header_name, version_cb)
+def get_header_file(header_name, version_str = None):
+	library_files = _get_library_files(header_name, version_str)
 	header_file = _get_matched_file_from_library_files(header_name, '.h', library_files)
 	return header_file
 
-def get_static_library(lib_name, version_cb = None):
-	library_files = _get_library_files(lib_name, version_cb)
+def get_static_library(lib_name, version_str = None):
+	library_files = _get_library_files(lib_name, version_str)
 	static_file = _get_matched_file_from_library_files(lib_name, '.a', library_files)
 	return static_file
 
-def get_shared_library(lib_name, version_cb = None):
-	library_files = _get_library_files(lib_name, version_cb)
+def get_shared_library(lib_name, version_str = None):
+	library_files = _get_library_files(lib_name, version_str)
 	shared_file = _get_matched_file_from_library_files(lib_name, '.so', library_files)
 	return shared_file
 
-def require_header_file(header_name, version_cb = None):
+def require_header_file(header_name, version_str = None):
 	Print.status("Checking for header file '{0}'".format(header_name))
 
 	# If the header is not installed, make them install it to continue
-	if not get_header_file(header_name, version_cb):
+	if not get_header_file(header_name, version_str):
 		ver = "(Any version)"
-		if version_cb:
-			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
+		if version_str:
+			ver = version_str
 
 		message = "Header file '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -314,15 +318,15 @@ def require_header_file(header_name, version_cb = None):
 	else:
 		Print.ok()
 
-def require_static_library(lib_name, version_cb = None):
+def require_static_library(lib_name, version_str = None):
 	Print.status("Checking for static library '{0}'".format(lib_name))
 
 	# If the static library is not installed, make them install it to continue
-	if not get_static_library(lib_name, version_cb):
+	if not get_static_library(lib_name, version_str):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
-		if version_cb:
-			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
+		if version_str:
+			ver = version_str
 
 		message = "Static library '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -330,15 +334,15 @@ def require_static_library(lib_name, version_cb = None):
 	else:
 		Print.ok()
 
-def require_shared_library(lib_name, version_cb = None):
+def require_shared_library(lib_name, version_str = None):
 	Print.status("Checking for shared library '{0}'".format(lib_name))
 
 	# If the shared library is not installed, make them install it to continue
-	if not get_shared_library(lib_name, version_cb):
+	if not get_shared_library(lib_name, version_str):
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
-		if version_cb:
-			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
+		if version_str:
+			ver = version_str
 
 		message = "Shared library '{0} {1}' not installed. Install and try again."
 		Print.fail()
@@ -346,18 +350,18 @@ def require_shared_library(lib_name, version_cb = None):
 	else:
 		Print.ok()
 
-def require_static_or_shared_library(lib_name, version_cb = None):
+def require_static_or_shared_library(lib_name, version_str = None):
 	Print.status("Checking for static/shared library '{0}'".format(lib_name))
 
-	shared_file = get_shared_library(lib_name, version_cb)
-	static_file = get_shared_library(lib_name, version_cb)
+	shared_file = get_shared_library(lib_name, version_str)
+	static_file = get_shared_library(lib_name, version_str)
 
 	# Make them install the lib if neither was found
 	if not shared_file and not static_file:
 		# Get the version requirement lambda as a printable string
 		ver = "(Any version)"
-		if version_cb:
-			ver = Helpers.between_last(inspect.getsource(version_cb), ': ', ')')
+		if version_str:
+			ver = version_str
 
 		message = "Shared/Static library '{0} {1}' not installed. Install and try again."
 		Print.fail()

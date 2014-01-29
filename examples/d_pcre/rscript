@@ -36,8 +36,8 @@ def _configure():
 	Linker.save_linker(linker)
 
 	# FIXME: Make this cache the file lists instead of getting it again
-	Find.require_header_file('libpcre', lambda ver: ver.major == 8)
-	Find.require_shared_library('libpcre', lambda ver: ver.major == 8)
+	Find.require_header_file('libpcre', 'ver.major == 8')
+	Find.require_shared_library('libpcre', 'ver.major == 8')
 	Find.require_static_library('libphobos2')
 
 def test():

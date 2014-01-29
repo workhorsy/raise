@@ -10,16 +10,16 @@ def find_installed_shared_library():
 	Find.require_shared_library('sdl')
 	Find.require_shared_library('libSDL')
 	Find.require_shared_library('libsdl')
-	Find.require_shared_library('SDL', lambda ver: ver >= (1, 2))
-	Find.require_shared_library('sdl', lambda ver: ver >= (1, 2))
-	Find.require_shared_library('libSDL', lambda ver: ver >= (1, 2))
-	Find.require_shared_library('libsdl', lambda ver: ver >= (1, 2))
+	Find.require_shared_library('SDL', 'ver >= (1, 2)')
+	Find.require_shared_library('sdl', 'ver >= (1, 2)')
+	Find.require_shared_library('libSDL', 'ver >= (1, 2)')
+	Find.require_shared_library('libsdl', 'ver >= (1, 2)')
 
 def find_missing_shared_library():
 	Find.require_shared_library('libDoesNotExist')
 
 def find_installed_shared_library_bad_version():
-	Find.require_shared_library('libSDL', lambda ver: ver >= (99, 0))
+	Find.require_shared_library('libSDL', 'ver >= (99, 0)')
 
 
 
@@ -28,16 +28,16 @@ def find_installed_static_library():
 	Find.require_static_library('sdl')
 	Find.require_static_library('libSDL')
 	Find.require_static_library('libsdl')
-	Find.require_static_library('SDL', lambda ver: ver >= (1, 2))
-	Find.require_static_library('sdl', lambda ver: ver >= (1, 2))
-	Find.require_static_library('libSDL', lambda ver: ver >= (1, 2))
-	Find.require_static_library('libsdl', lambda ver: ver >= (1, 2))
+	Find.require_static_library('SDL', 'ver >= (1, 2)')
+	Find.require_static_library('sdl', 'ver >= (1, 2)')
+	Find.require_static_library('libSDL', 'ver >= (1, 2)')
+	Find.require_static_library('libsdl', 'ver >= (1, 2)')
 
 def find_missing_static_library():
 	Find.require_static_library('libDoesNotExist')
 
 def find_installed_static_library_bad_version():
-	Find.require_static_library('libSDL', lambda ver: ver >= (99, 0))
+	Find.require_static_library('libSDL', 'ver >= (99, 0)')
 
 
 
@@ -46,15 +46,15 @@ def find_installed_header_file():
 	Find.require_header_file('sdl')
 	Find.require_header_file('libSDL')
 	Find.require_header_file('libsdl')
-	Find.require_header_file('SDL', lambda ver: ver >= (1, 2))
-	Find.require_header_file('sdl', lambda ver: ver >= (1, 2))
-	Find.require_header_file('libSDL', lambda ver: ver >= (1, 2))
-	Find.require_header_file('libsdl', lambda ver: ver >= (1, 2))
+	Find.require_header_file('SDL', 'ver >= (1, 2)')
+	Find.require_header_file('sdl', 'ver >= (1, 2)')
+	Find.require_header_file('libSDL', 'ver >= (1, 2)')
+	Find.require_header_file('libsdl', 'ver >= (1, 2)')
 
 def find_missing_header_file():
 	Find.require_header_file('libDoesNotExist')
 
 def find_installed_header_file_bad_version():
-	Find.require_header_file('libSDL', lambda ver: ver >= (99, 0))
+	Find.require_header_file('libSDL', 'ver >= (99, 0)')
 
 
