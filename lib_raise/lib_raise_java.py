@@ -38,23 +38,9 @@ import lib_raise_helpers as Helpers
 
 
 java_compilers = {}
-java_runtimes = {}
-java_jars = {}
-javac = None
-jar = None
-runtime = None
 
 def setup():
 	global java_compilers
-	global java_runtimes
-	global java_jars
-
-	extension_map = {}
-	# Figure out the extensions for this OS
-	extension_map = {
-		'.class' : '.class',
-		'.jar' : '.jar'
-	}
 
 	# Get the names and paths for know Java compilers
 	names = ['javac']
@@ -71,11 +57,10 @@ def setup():
 				no_warnings =          '-nowarn', 
 				verbose =              '-verbose', 
 				deprecation =          '-deprecation', 
-				extension_map = extension_map
+				runtime =              'java', 
+				jar =                  'jar'
 			)
 			java_compilers[comp._name] = comp
-			java_runtimes[comp._name] = 'java'
-			java_jars[comp._name] = 'jar'
 
 	# Make sure there is at least one Java compiler installed
 	if len(java_compilers) == 0:
@@ -86,7 +71,7 @@ def setup():
 
 class JavaCompiler(object):
 	def __init__(self, name, path, debug, no_warnings, verbose, 
-				deprecation, extension_map):
+				deprecation, runtime, jar):
 
 		self._name = name
 		self._path = path
@@ -96,7 +81,6 @@ class JavaCompiler(object):
 		self._opt_no_warnings = no_warnings
 		self._opt_verbose = verbose
 		self._opt_deprecation = deprecation
-		self._opt_extension_map = extension_map
 
 		# Set the default values of the flags
 		self.debug = False
@@ -104,13 +88,136 @@ class JavaCompiler(object):
 		self.verbose = False
 		self.deprecation = False
 
-		self.extension_map = extension_map
+		self._runtime = runtime
+		self._jar = jar
 
-	def to_native(self, command):
-		for before, after in self.extension_map.items():
-			command = command.replace(before, after)
+	def get_java(self):
+		return self._runtime
+	java = property(get_java)
 
-		return command
+	def get_javac(self):
+		return self._name
+	javac = property(get_javac)
+
+	def get_runtime(self):
+		return self._runtime
+	runtime = property(get_runtime)
+
+	def get_jar(self):
+		return self._jar
+	jar = property(get_jar)
+
+	def get_javaflags(self):
+		opts = []
+		if self.debug: opts.append(self._opt_debug)
+		if not self.warnings: opts.append(self._opt_no_warnings)
+		if self.verbose: opts.append(self._opt_verbose)
+		if self.deprecation: opts.append(self._opt_deprecation)
+
+		return str.join(' ', opts)
+	javaflags = property(get_javaflags)
+
+	def build_program(self, out_file, inc_files, link_files=[]):
+		# Make sure the extension is valid
+		if not out_file.endswith('.class'):
+			Print.exit("Out file extension should be '.class' not '.{0}'.".format(out_file.split('.')[-1]))
+
+		# Setup the messages
+		task = 'Building'
+		result = out_file
+		plural = 'Java programs'
+		singular = 'Java program'
+		command = "{0} {1} {2} {3}".format(
+			self.javac, 
+			self.javaflags, 
+			str.join(' ', inc_files), 
+			str.join(' ', link_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			#to_update = [to_native(out_file)]
+			#triggers = [to_native(t) for t in inc_files + link_files]
+			#if not FS.is_outdated(to_update, triggers):
+			#	return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_jar(self, out_file, inc_files, link_files=[]):
+		# Make sure the extension is valid
+		if not out_file.endswith('.jar'):
+			Print.exit("Out file extension should be '.jar' not '.{0}'.".format(out_file.split('.')[-1]))
+
+		# Setup the messages
+		task = 'Building'
+		result = out_file
+		plural = 'Java jars'
+		singular = 'Java jar'
+		command = '{0} -cf {1} {2} {3}'.format(
+			self.jar, 
+			out_file, 
+			str.join(' ', inc_files), 
+			str.join(' ', link_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			#to_update = [to_native(out_file)]
+			#triggers = [to_native(t) for t in inc_files + link_files]
+			#if not FS.is_outdated(to_update, triggers):
+			#	return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def run_print(self, command):
+		Print.status("Running Java program")
+
+		native_command = '{0} {1}'.format(self._runtime, command)
+		native_command = to_native(native_command)
+		runner = Process.ProcessRunner(native_command)
+		runner.run()
+		runner.is_done
+		runner.wait()
+
+		if runner.is_success or runner.is_warning:
+			Print.ok()
+			sys.stdout.write(native_command + '\n')
+			sys.stdout.write(runner.stdall)
+		elif runner.is_failure:
+			Print.fail()
+			sys.stdout.write(native_command + '\n')
+			sys.stdout.write(runner.stdall)
+			Print.exit('Failed to run command.')
+
+
+def to_native(command):
+	extension_map = {}
+	# Figure out the extensions for this OS
+	extension_map = {
+		'.class' : '.class',
+		'.jar' : '.jar'
+	}
+
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
+
+	return command
 
 def get_default_compiler():
 	global java_compilers
@@ -123,129 +230,7 @@ def get_default_compiler():
 
 	return comp
 
-def save_compiler(compiler):
-	global java_runtimes
-	global java_jars
-	global javac
-	global jar
-	global runtime
-
-	# JAVAC
-	javac = compiler
-	runtime = java_runtimes[javac._name]
-	jar = java_jars[javac._name]
-	os.environ['JAVAC'] = javac._name
-	os.environ['JAR'] = jar
-	os.environ['JAVA'] = runtime
-
-	# JAVAFLAGS
-	opts = []
-	if javac.debug: opts.append(javac._opt_debug)
-	if not javac.warnings: opts.append(javac._opt_no_warnings)
-	if javac.verbose: opts.append(javac._opt_verbose)
-	if javac.deprecation: opts.append(javac._opt_deprecation)
-
-	os.environ['JAVAFLAGS'] = str.join(' ', opts)
-
-def build_program(out_file, inc_files, link_files=[]):
-	global javac
-
-	# Make sure the extension is valid
-	if not out_file.endswith('.class'):
-		Print.exit("Out file extension should be '.class' not '.{0}'.".format(out_file.split('.')[-1]))
-
-	# Setup the messages
-	task = 'Building'
-	result = out_file
-	plural = 'Java programs'
-	singular = 'Java program'
-	command = "${JAVAC} ${JAVAFLAGS} " + \
-	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = javac.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		#to_update = [javac.to_native(out_file)]
-		#triggers = [javac.to_native(t) for t in inc_files + link_files]
-		#if not FS.is_outdated(to_update, triggers):
-		#	return False
-
-		if not 'JAVAC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'JAVAC' to the Java compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_jar(out_file, inc_files, link_files=[]):
-	global javac
-
-	# Make sure the extension is valid
-	if not out_file.endswith('.jar'):
-		Print.exit("Out file extension should be '.jar' not '.{0}'.".format(out_file.split('.')[-1]))
-
-	# Setup the messages
-	task = 'Building'
-	result = out_file
-	plural = 'Java jars'
-	singular = 'Java jar'
-	command = "${JAR} " + \
-	'-cf ' + out_file + ' ' + \
-	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = javac.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		#to_update = [javac.to_native(out_file)]
-		#triggers = [javac.to_native(t) for t in inc_files + link_files]
-		#if not FS.is_outdated(to_update, triggers):
-		#	return False
-
-		if not 'JAR' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'JAR' to Java jar, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def run_print(command):
-	global javac
-	global runtime
-	Print.status("Running Java program")
-
-	native_command = '{0} {1}'.format(runtime, command)
-	native_command = javac.to_native(native_command)
-	runner = Process.ProcessRunner(native_command)
-	runner.run()
-	runner.is_done
-	runner.wait()
-
-	if runner.is_success or runner.is_warning:
-		Print.ok()
-		sys.stdout.write(native_command + '\n')
-		sys.stdout.write(runner.stdall)
-	elif runner.is_failure:
-		Print.fail()
-		sys.stdout.write(native_command + '\n')
-		sys.stdout.write(runner.stdall)
-		Print.exit('Failed to run command.')
-
-
 def install_program(name, dir_name):
-	global javac
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.class')
 
@@ -257,7 +242,7 @@ def install_program(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = javac.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -289,8 +274,6 @@ def install_program(name, dir_name):
 				lambda: fn())
 
 def uninstall_program(name, dir_name):
-	global javac
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.class')
 
@@ -302,7 +285,7 @@ def uninstall_program(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = javac.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -325,8 +308,6 @@ def uninstall_program(name, dir_name):
 				lambda: fn())
 
 def install_jar(name, dir_name=None):
-	global javac
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.jar')
 
@@ -338,7 +319,7 @@ def install_jar(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = javac.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -356,8 +337,6 @@ def install_jar(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_jar(name, dir_name=None):
-	global javac
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.jar')
 
@@ -369,7 +348,7 @@ def uninstall_jar(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = javac.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 

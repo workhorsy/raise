@@ -19,47 +19,42 @@ def _configure():
 	javac.warnings = True
 	javac.verbose = False
 	javac.deprecation = False
-	Java.save_compiler(javac)
+	return javac
 
 def setup_failure():
 	# Empty the path and reset the Java module so it finds no compilers
 	os.environ['PATH'] = ''
 	Java.is_setup = False
 	Java.java_compilers = {}
-	Java.java_runtimes = {}
-	Java.java_jars = {}
-	Java.javac = None
-	Java.jar = None
-	Java.runtime = None
 	Java.setup()
 
 def build_program():
 	clean()
-	_configure()
+	javac = _configure()
 
-	Java.build_program('main.class', ['main.java', 'lib_math.java'])
+	javac.build_program('main.class', ['main.java', 'lib_math.java'])
 
-	Java.run_print('main')
+	javac.run_print('main')
 
 def build_jar():
 	clean()
-	_configure()
+	javac = _configure()
 
-	Java.build_jar('lib_math.jar', ['lib_math.java'])
-	Java.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
+	javac.build_jar('lib_math.jar', ['lib_math.java'])
+	javac.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
 
-	Java.run_print('main')
+	javac.run_print('main')
 
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
 	Users.require_root()
 	clean()
-	_configure()
+	javac = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		Java.build_program('main.class', ['main.java', 'lib_math.java'])
+		javac.build_program('main.class', ['main.java', 'lib_math.java'])
 	Users.do_as_normal_user(actual_build)
 
 	# Install
@@ -67,7 +62,7 @@ def install_and_uninstall_program():
 	Java.install_program('main.class', 'raise_example')
 
 	# Run
-	Java.run_print('main')
+	javac.run_print('main')
 
 	# Remove
 	Java.uninstall_program('main.class', 'raise_example')
@@ -76,12 +71,12 @@ def install_and_uninstall_jar():
 	# Configure
 	Users.require_root()
 	clean()
-	_configure()
+	javac = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		Java.build_jar('lib_math.jar', ['lib_math.java'])
-		Java.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
+		javac.build_jar('lib_math.jar', ['lib_math.java'])
+		javac.build_program('main.class', ['main.java'], ['-cp lib_math.jar'])
 	Users.do_as_normal_user(actual_build)
 
 	# Install
@@ -91,7 +86,7 @@ def install_and_uninstall_jar():
 	Java.install_jar('lib_math.jar', 'raise_example')
 
 	# Run
-	Java.run_print('main')
+	javac.run_print('main')
 
 	# Remove
 	Java.uninstall_program('main.class', 'raise_example')

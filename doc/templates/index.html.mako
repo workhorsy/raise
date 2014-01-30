@@ -1761,12 +1761,6 @@ ${template_info['c_compilers']['output']}
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">C.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -2073,12 +2067,6 @@ ${template_info['cxx_compilers']['output']}
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">CXX.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -2375,12 +2363,6 @@ ${template_info['d_compilers']['output']}
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">D.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -2650,12 +2632,6 @@ ${template_info['csharp_compilers']['output']}
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">CS.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -2845,12 +2821,6 @@ ${template_info['java_compilers']['output']}
 		<li>verbose: A bool that tells if it should print extra output the stdout.</li>
 		<li>deprecation: A bool that tells if it should print warnings where deprecated APIs are used.</li>
 	</ul>
-
-	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">Java.save_compiler</span> function.
-	</p>
 
 	<p>
 	Example:

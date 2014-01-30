@@ -37,11 +37,241 @@ import lib_raise_helpers as Helpers
 
 
 d_compilers = {}
-dc = None
+
 
 def setup():
 	global d_compilers
 
+	# Get the names and paths for know D compilers
+	names = ['dmd2', 'dmd', 'ldc2', 'ldc']
+	for name in names:
+		paths = Find.program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name in ['dmd2', 'dmd']:
+			comp = DCompiler(
+				name =                 name, 
+				path =                 paths[0], 
+				setup =                '', 
+				out_file =             '-of', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-w', 
+				optimize =             '-O', 
+				compile_time_flags =   '-version=', 
+				link =                 '-Wl,-as-needed'
+			)
+			d_compilers[comp._name] = comp
+		elif name in ['ldc2', 'ldc']:
+			comp = DCompiler(
+				name =                 name, 
+				path =                 paths[0], 
+				setup =                '', 
+				out_file =             '-of', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-w', 
+				optimize =             '-O2',
+				compile_time_flags =   '-version=', 
+				link =                 '-Wl,-as-needed'
+			)
+			d_compilers[comp._name] = comp
+
+	# Make sure there is at least one D compiler installed
+	if len(d_compilers) == 0:
+		Print.status("Setting up D module")
+		Print.fail()
+		Print.exit("No D compiler found. Install one and try again.")
+
+
+class DCompiler(object):
+	def __init__(self, name, path, setup, out_file, no_link, 
+				debug, warnings_all, optimize, 
+				compile_time_flags, link):
+
+		self._name = name
+		self._path = path
+
+		# Save text for all the options
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_no_link = no_link
+		self._opt_debug = debug
+		self._opt_warnings_all = warnings_all
+		self._opt_optimize = optimize
+
+		self._opt_compile_time_flags = compile_time_flags
+		self._opt_link = link
+
+		# Set the default values of the flags
+		self.debug = False
+		self.warnings_all = False
+		self.optimize = True
+		self.compile_time_flags = []
+
+	def get_dc(self):
+		return self._name
+	dc = property(get_dc)
+
+	def get_dflags(self):
+		opts = []
+		if self.debug: opts.append(self._opt_debug)
+		if self.warnings_all: opts.append(self._opt_warnings_all)
+		if self.optimize: opts.append(self._opt_optimize)
+		for compile_time_flag in self.compile_time_flags:
+			opts.append(self._opt_compile_time_flags + compile_time_flag)
+
+		return str.join(' ', opts)
+	dflags = property(get_dflags)
+
+	def build_interface(self, d_file, i_files=[]):
+		# Setup the messages
+		task = 'Building'
+		result = d_file + 'i'
+		plural = 'D interfaces'
+		singular = 'D interface'
+
+		f = FS.self_deleting_named_temporary_file()
+		command = "{0} {1} -c {2} {3} -Hf{4}i {5}{6}".format(
+			self.dc, 
+			self.dflags, 
+			d_file, 
+			str.join(' ', i_files), 
+			d_file, 
+			self._opt_out_file, 
+			f.name
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [d_file+'i']
+			triggers = [to_native(t) for t in i_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_object(self, o_file, d_files, i_files=[], l_files=[], h_files=[]):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(o_file, '.o')
+
+		# Setup the messages
+		task = 'Building'
+		result = o_file
+		plural = 'D objects'
+		singular = 'D object'
+
+		command = "{0} {1} -c {2}{3} {4} {5} {6}".format(
+			self.dc, 
+			self.dflags, 
+			self._opt_out_file, 
+			o_file, 
+			str.join(' ', d_files), 
+			str.join(' ', i_files), 
+			str.join(' ', l_files)
+		)
+		if h_files:
+			command += " -H -Hdimport -Hf{0}".format(str.join(' ', h_files))
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(o_file)]
+			triggers = [to_native(t) for t in d_files + i_files + l_files + h_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(o_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_static_library(self, o_file, d_files, i_files=[], l_files=[], generate_headers=False):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(o_file, '.a')
+
+		# Setup the messages
+		task = 'Building'
+		result = o_file
+		plural = 'D static libraries'
+		singular = 'D static library'
+
+		command = "{0} {1} -lib {2}{3} {4} {5} {6}".format(
+			self.dc, 
+			self.dflags, 
+			self._opt_out_file, 
+			o_file, 
+			str.join(' ', d_files), 
+			str.join(' ', i_files), 
+			str.join(' ', l_files)
+		)
+		if generate_headers:
+			command += "  -Hdimport -H"
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(o_file)]
+			triggers = [to_native(t) for t in d_files + i_files + l_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(o_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_program(self, out_file, inc_files, link_files=[]):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(out_file, '.exe')
+
+		# Setup the messages
+		task = 'Building'
+		result = out_file
+		plural = 'D programs'
+		singular = 'D program'
+		command = "{0} {1} {2}{3} {4} {5}".format(
+			self.dc, 
+			self.dflags, 
+			self._opt_out_file, 
+			out_file, 
+			str.join(' ', inc_files), 
+			str.join(' ', link_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(out_file)]
+			triggers = [to_native(t) for t in inc_files + link_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+
+def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
 	if Helpers.os_type._name == 'Cygwin':
@@ -66,84 +296,10 @@ def setup():
 			'.a' : '.a'
 		}
 
-	# Get the names and paths for know D compilers
-	names = ['dmd2', 'dmd', 'ldc2', 'ldc']
-	for name in names:
-		paths = Find.program_paths(name)
-		if len(paths) == 0:
-			continue
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
 
-		if name in ['dmd2', 'dmd']:
-			comp = DCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
-				optimize =             '-O', 
-				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed', 
-				extension_map = extension_map
-			)
-			d_compilers[comp._name] = comp
-		elif name in ['ldc2', 'ldc']:
-			comp = DCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
-				optimize =             '-O2',
-				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed', 
-				extension_map = extension_map
-			)
-			d_compilers[comp._name] = comp
-
-	# Make sure there is at least one D compiler installed
-	if len(d_compilers) == 0:
-		Print.status("Setting up D module")
-		Print.fail()
-		Print.exit("No D compiler found. Install one and try again.")
-
-
-class DCompiler(object):
-	def __init__(self, name, path, setup, out_file, no_link, 
-				debug, warnings_all, optimize, 
-				compile_time_flags, link, extension_map):
-
-		self._name = name
-		self._path = path
-
-		# Save text for all the options
-		self._opt_setup = setup
-		self._opt_out_file = out_file
-		self._opt_no_link = no_link
-		self._opt_debug = debug
-		self._opt_warnings_all = warnings_all
-		self._opt_optimize = optimize
-
-		self._opt_compile_time_flags = compile_time_flags
-		self._opt_link = link
-
-		# Set the default values of the flags
-		self.debug = False
-		self.warnings_all = False
-		self.optimize = True
-		self.compile_time_flags = []
-
-		self.extension_map = extension_map
-
-	def to_native(self, command):
-		for before, after in self.extension_map.items():
-			command = command.replace(before, after)
-
-		return command
-
+	return command
 
 def get_default_compiler():
 	global d_compilers
@@ -156,201 +312,10 @@ def get_default_compiler():
 
 	return comp
 
-def save_compiler(compiler):
-	global dc
-
-	# DC
-	dc = compiler
-	os.environ['DC'] = dc._name
-
-	# DFLAGS
-	opts = []
-	if dc.debug: opts.append(dc._opt_debug)
-	if dc.warnings_all: opts.append(dc._opt_warnings_all)
-	if dc.optimize: opts.append(dc._opt_optimize)
-	for compile_time_flag in dc.compile_time_flags:
-		opts.append(dc._opt_compile_time_flags + compile_time_flag)
-
-	os.environ['DFLAGS'] = str.join(' ', opts)
-
-def build_interface(d_file, i_files=[]):
-	global dc
-
-	# Setup the messages
-	task = 'Building'
-	result = d_file + 'i'
-	plural = 'D interfaces'
-	singular = 'D interface'
-
-	f = FS.self_deleting_named_temporary_file()
-	command = "${DC} ${DFLAGS} -c " + d_file + " " + str.join(' ', i_files) + " -Hf" + d_file + "i " + dc._opt_out_file + f.name
-	command = dc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [d_file+'i']
-		triggers = [dc.to_native(t) for t in i_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		if not 'DC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_object(o_file, d_files, i_files=[], l_files=[], h_files=[]):
-	global dc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(o_file, '.o')
-
-	# Setup the messages
-	task = 'Building'
-	result = o_file
-	plural = 'D objects'
-	singular = 'D object'
-
-	command = "${DC} ${DFLAGS} -c " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-	if h_files:
-		command += " -H -Hdimport -Hf" + str.join(' ', h_files)
-	command = dc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [dc.to_native(o_file)]
-		triggers = [dc.to_native(t) for t in d_files + i_files + l_files + h_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		if not 'DC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(o_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-# FIXME: Remove this, as there are no shared libraries in D
-def build_shared_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
-	global dc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(o_file, '.so')
-
-	# Setup the messages
-	task = 'Building'
-	result = o_file
-	plural = 'D shared libraries'
-	singular = 'D shared library'
-
-	command = "${DC} ${DFLAGS} -shared " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-	if generate_headers:
-		command += "  -Hdimport -H"
-	command = dc.to_native(command)
-
-	def setup():
-		if not FS.is_outdated(to_update = [o_file], triggers = d_files):
-			return False
-
-		if not 'DC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(o_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_static_library(o_file, d_files, i_files=[], l_files=[], generate_headers=False):
-	global dc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(o_file, '.a')
-
-	# Setup the messages
-	task = 'Building'
-	result = o_file
-	plural = 'D static libraries'
-	singular = 'D static library'
-
-	command = "${DC} ${DFLAGS} -lib " + dc._opt_out_file + o_file + " " + str.join(' ', d_files) + " " + str.join(' ', i_files) + " " + str.join(' ', l_files)
-	if generate_headers:
-		command += "  -Hdimport -H"
-	command = dc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [dc.to_native(o_file)]
-		triggers = [dc.to_native(t) for t in d_files + i_files + l_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		if not 'DC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(o_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_program(out_file, inc_files, link_files=[]):
-	global dc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(out_file, '.exe')
-
-	# Setup the messages
-	task = 'Building'
-	result = out_file
-	plural = 'D programs'
-	singular = 'D program'
-	command = "${DC} ${DFLAGS} " + dc._opt_out_file + out_file + ' ' + str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = dc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [dc.to_native(out_file)]
-		triggers = [dc.to_native(t) for t in inc_files + link_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		if not 'DC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'DC' to the D compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
 def run_print(command):
-	global dc
 	Print.status("Running D program")
 
-	native_command = dc.to_native(command)
+	native_command = to_native(command)
 	runner = Process.ProcessRunner(native_command)
 	runner.run()
 	runner.is_done
@@ -367,8 +332,6 @@ def run_print(command):
 		Print.exit('Failed to run command.')
 
 def install_program(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -380,7 +343,7 @@ def install_program(name, dir_name=None):
 		prog_root = '/usr/bin/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -398,8 +361,6 @@ def install_program(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_program(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -411,7 +372,7 @@ def uninstall_program(name, dir_name=None):
 		prog_root = '/usr/bin/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -429,8 +390,6 @@ def uninstall_program(name, dir_name=None):
 				lambda: fn())
 
 def install_library(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.a')
 
@@ -442,7 +401,7 @@ def install_library(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -460,8 +419,6 @@ def install_library(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_library(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.a')
 
@@ -473,7 +430,7 @@ def uninstall_library(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -491,8 +448,6 @@ def uninstall_library(name, dir_name=None):
 				lambda: fn())
 
 def install_interface(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.di')
 
@@ -504,7 +459,7 @@ def install_interface(name, dir_name=None):
 		prog_root = '/usr/include/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -522,8 +477,6 @@ def install_interface(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_interface(name, dir_name=None):
-	global dc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.di')
 
@@ -535,7 +488,7 @@ def uninstall_interface(name, dir_name=None):
 		prog_root = '/usr/include/'
 
 	# Get the native install source and dest
-	source = dc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 

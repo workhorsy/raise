@@ -19,23 +19,23 @@ def _configure():
 	csc.optimize = True
 	csc.warnings_all = True
 	csc.warnings_as_errors = True
-	CSharp.save_compiler(csc)
+	return csc
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
 	Users.require_not_root()
 	clean()
-	_configure()
+	csc = _configure()
 
 	# Build the library
-	CSharp.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+	csc.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
 
 	# Build the program
-	CSharp.build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
+	csc.build_program('main.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 
 	# Run the program
-	CSharp.run_print('./main.exe')
+	csc.run_print('./main.exe')
 
 def _remove():
 	CSharp.uninstall_program('raise_example.exe', 'raise_example')
@@ -46,7 +46,7 @@ def remove():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	csc = _configure()
 
 	# Remove the old files
 	_remove()
@@ -56,12 +56,12 @@ def install():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	csc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		CSharp.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
-		CSharp.build_program('raise_example.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
+		csc.build_shared_library('lib_math_helper.dll', ['math_helper.cs'])
+		csc.build_program('raise_example.exe', ['main.cs'], ['-r:lib_math_helper.dll'])
 	Users.do_as_normal_user(actual_build)
 
 	# Remove old install

@@ -36,10 +36,86 @@ import lib_raise_helpers as Helpers
 
 
 linkers = {}
-linker = None
 
 def setup():
 	global linkers
+
+	# Get the names and paths for know linkers
+	names = ['ld', 'link.exe']
+	for name in names:
+		paths = Find.program_paths(name)
+		if len(paths) == 0:
+			continue
+
+		if name == 'link.exe':
+			link = Linker(
+				name            = 'link.exe',
+				setup           = '/nologo', 
+				out_file        = '/out:', 
+				shared          = '/dll '
+			)
+			linkers[link._name] = link
+		elif name == 'ld':
+			link = Linker(
+				name            = 'ld',
+				setup           = '', 
+				out_file        = '-o ', 
+				shared          = '-G'
+			)
+			linkers[link._name] = link
+
+	# Make sure there is at least one linker installed
+	if len(linkers) == 0:
+		Print.status("Setting up Linker module")
+		Print.fail()
+		Print.exit("No Linker found. Install one and try again.")
+
+
+class Linker(object):
+	def __init__(self, name, setup, out_file, shared):
+		self._name = name
+		
+		self._opt_setup = setup
+		self._opt_out_file = out_file
+		self._opt_shared = shared
+
+	def get_link(self):
+		return self._name
+	link = property(get_link)
+
+	def link_program(self, out_file, obj_files, i_files=[]):
+		# Setup the messages
+		task = 'Linking'
+		result = out_file
+		plural = 'programs'
+		singular = 'program'
+		command = "{0} {1}{2} {3} {4}".format(
+					self.link, 
+					linker._opt_out_file, 
+					out_file, 
+					str.join(' ', obj_files), 
+					str.join(' ', i_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(out_file)]
+			triggers = [to_native(t) for t in obj_files + i_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+
+def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
 	if Helpers.os_type._name == 'Cygwin':
@@ -64,54 +140,10 @@ def setup():
 			'.a' : '.a'
 		}
 
-	# Get the names and paths for know linkers
-	names = ['ld', 'link.exe']
-	for name in names:
-		paths = Find.program_paths(name)
-		if len(paths) == 0:
-			continue
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
 
-		if name == 'link.exe':
-			link = Linker(
-				name            = 'link.exe',
-				setup           = '/nologo', 
-				out_file        = '/out:', 
-				shared          = '/dll ',
-				extension_map   = extension_map
-			)
-			linkers[link._name] = link
-		elif name == 'ld':
-			link = Linker(
-				name            = 'ld',
-				setup           = '', 
-				out_file        = '-o ', 
-				shared          = '-G', 
-				extension_map   = extension_map
-			)
-			linkers[link._name] = link
-
-	# Make sure there is at least one linker installed
-	if len(linkers) == 0:
-		Print.status("Setting up Linker module")
-		Print.fail()
-		Print.exit("No Linker found. Install one and try again.")
-
-
-class Linker(object):
-	def __init__(self, name, setup, out_file, shared, extension_map):
-		self._name = name
-		
-		self._opt_setup = setup
-		self._opt_out_file = out_file
-		self._opt_shared = shared
-
-		self.extension_map = extension_map
-
-	def to_native(self, command):
-		for before, after in self.extension_map.items():
-			command = command.replace(before, after)
-
-		return command
+	return command
 
 def get_default_linker():
 	global linkers
@@ -120,49 +152,6 @@ def get_default_linker():
 		return linkers['link.exe']
 	else:
 		return linkers['ld']
-
-def save_linker(new_linker):
-	global linker
-
-	# LINKER
-	linker = new_linker
-	os.environ['LINKER'] = linker._name
-
-def link_program(out_file, obj_files, i_files=[]):
-	global linker
-
-	# Setup the messages
-	task = 'Linking'
-	result = out_file
-	plural = 'programs'
-	singular = 'program'
-	command = "${LINK} " + \
-				linker._opt_out_file + \
-				out_file + ' ' + \
-				str.join(' ', obj_files) + ' ' + \
-				str.join(' ', i_files)
-	command = linker.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [linker.to_native(out_file)]
-		triggers = [linker.to_native(t) for t in obj_files + i_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		# Make sure the environmental variable is set
-		if not 'LINK' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'LINK' to the linker, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
 
 def ldconfig():
 	# Setup the message

@@ -23,37 +23,33 @@ def _configure():
 	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	C.save_compiler(cc)
 
 	dc = D.get_default_compiler()
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
 	dc.warnings_as_errors = True
-	D.save_compiler(dc)
 
-	linker = Linker.get_default_linker()
-	Linker.save_linker(linker)
-
-	# FIXME: Make this cache the file lists instead of getting it again
 	Find.require_header_file('libpcre', 'ver.major == 8')
 	Find.require_shared_library('libpcre', 'ver.major == 8')
 	Find.require_static_library('libphobos2')
+
+	return (cc, dc)
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
 	Users.require_not_root()
 	clean()
-	_configure()
+	cc, dc = _configure()
 
 	# Build the C object file
-	C.build_object('lib_regex.o', ['lib_regex.c'])
+	cc.build_object('lib_regex.o', ['lib_regex.c'])
 
 	# Build the D program using the C object file
 	# FIXME: It should automatically get the library path from the require above
 	link = '-L-l:' + Find.get_shared_library('libpcre')
-	D.build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
+	dc.build_program('raise_example.exe', ['main.d', 'lib_regex.o', 'lib_regex.d'], [link])
 
 	# Run the program
 	D.run_print('./raise_example.exe')
@@ -67,7 +63,7 @@ def remove():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc, dc = _configure()
 
 	# Remove the files
 	_remove()
@@ -79,13 +75,13 @@ def install():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc, dc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		C.build_object('lib_regex.o', ['lib_regex.c'])
-		C.build_shared_library('lib_regex.so', ['lib_regex.o'])
-		D.build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
+		cc.build_object('lib_regex.o', ['lib_regex.c'])
+		cc.build_shared_library('lib_regex.so', ['lib_regex.o'])
+		dc.build_program('raise_example.exe', ['main.d', 'lib_regex.d'], ['-Llib_regex.so', '-L-lpcre'])
 	Users.do_as_normal_user(actual_build)
 
 	# Remove old install

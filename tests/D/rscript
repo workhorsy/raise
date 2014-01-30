@@ -21,60 +21,59 @@ def _configure():
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
-	D.save_compiler(dc)
+	return dc
 
 def setup_failure():
 	# Empty the path and reset the D module so it finds no compilers
 	os.environ['PATH'] = ''
 	D.is_setup = False
 	D.d_compilers = {}
-	D.dc = None
 	D.setup()
 
 def build_object():
 	clean()
-	_configure()
+	dc = _configure()
 
-	D.build_object('lib_math.o', ['lib_math.d'])
-	D.build_object('main.o', ['main.d'])
-	D.build_program('main.exe', ['main.o', 'lib_math.o'])
+	dc.build_object('lib_math.o', ['lib_math.d'])
+	dc.build_object('main.o', ['main.d'])
+	dc.build_program('main.exe', ['main.o', 'lib_math.o'])
 
 	D.run_print('./main.exe')
 
 def build_program():
 	clean()
-	_configure()
+	dc = _configure()
 
-	D.build_program('main.exe', ['main.d', 'lib_math.d'])
+	dc.build_program('main.exe', ['main.d', 'lib_math.d'])
 
 	D.run_print('./main.exe')
 
 def build_static_library():
 	clean()
-	_configure()
+	dc = _configure()
 
-	D.build_object('lib_math.o', ['lib_math.d'])
-	D.build_static_library('lib_math.a', ['lib_math.o'])
-	D.build_program('main.exe', ['main.d', 'lib_math.a'])
+	dc.build_object('lib_math.o', ['lib_math.d'])
+	dc.build_static_library('lib_math.a', ['lib_math.o'])
+	dc.build_program('main.exe', ['main.d', 'lib_math.a'])
 
 	D.run_print('./main.exe')
 
 def build_interface():
 	clean()
-	_configure()
+	dc = _configure()
 
-	D.build_interface('lib_math.d')
+	dc.build_interface('lib_math.d')
 
 # Tests that require root
 def install_and_uninstall_program():
 	# Configure
 	Users.require_root()
 	clean()
-	_configure()
+	dc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		D.build_program('raise_example.exe', ['main.d', 'lib_math.d'])
+		dc.build_program('raise_example.exe', ['main.d', 'lib_math.d'])
 	Users.do_as_normal_user(actual_build)
 
 	# Install
@@ -91,13 +90,13 @@ def install_and_uninstall_static_library():
 	# Configure
 	Users.require_root()
 	clean()
-	_configure()
+	dc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		D.build_object('lib_math.o', ['lib_math.d'])
+		dc.build_object('lib_math.o', ['lib_math.d'])
 		AR.build_static_library('lib_math.a', ['lib_math.o'])
-		D.build_program('raise_example.exe', ['main.d', 'lib_math.a'])
+		dc.build_program('raise_example.exe', ['main.d', 'lib_math.a'])
 	Users.do_as_normal_user(actual_build)
 
 	# Install

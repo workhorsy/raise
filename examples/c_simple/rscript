@@ -20,17 +20,17 @@ def _configure():
 	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	C.save_compiler(cc)
+	return cc
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
 	Users.require_not_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Build the program
-	C.build_program('raise_example.exe', ['main.c'])
+	cc.build_program('raise_example.exe', ['main.c'])
 
 	# Run the program
 	C.run_print('./raise_example.exe')
@@ -43,7 +43,7 @@ def remove():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Remove the old files
 	_remove()
@@ -53,11 +53,11 @@ def install():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		C.build_program('raise_example.exe', ['main.c'])
+		cc.build_program('raise_example.exe', ['main.c'])
 	Users.do_as_normal_user(actual_build)
 
 	# Remove old install

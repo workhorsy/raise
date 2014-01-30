@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1273939: 'Compilers should not store settings in environmental variables'.
 	* Fixed Bug #1273409: 'Find cache does not take version into account'.
 	* Fixed Bug #1273873: 'Change version requirements to use a string instead of lambda'.
 	* Fixed Bug #1273406: 'Finding libraries needs to be fuzzy like finding headers'.

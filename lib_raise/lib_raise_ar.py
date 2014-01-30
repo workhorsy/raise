@@ -31,10 +31,12 @@ import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
 
-extension_map = {}
 
 def setup():
-	global extension_map
+	pass
+
+def to_native(command):
+	extension_map = {}
 	# Figure out the extensions for this OS
 	if Helpers.os_type._name == 'Cygwin':
 		extension_map = {
@@ -58,8 +60,6 @@ def setup():
 			'.a' : '.a'
 		}
 
-def to_native(command):
-	global extension_map
 	for before, after in extension_map.items():
 		command = command.replace(before, after)
 

@@ -22,17 +22,17 @@ def _configure():
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True
 	cxx.compile_time_flags = ['ADD', 'MULTIPLY']
-	CXX.save_compiler(cxx)
+	return cxx
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
 	Users.require_not_root()
 	clean()
-	_configure()
+	cxx = _configure()
 
 	# Build the program
-	CXX.build_program('raise_example.exe', ['main.cc'])
+	cxx.build_program('raise_example.exe', ['main.cc'])
 
 	# Run the program
 	CXX.run_print('./raise_example.exe')

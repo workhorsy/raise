@@ -22,21 +22,21 @@ def _configure():
 	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
-	C.save_compiler(cc)
+	return cc
 
 def test():
 	"""Builds the program, and runs it."""
 	# Setup
 	Users.require_not_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Build the library
-	C.build_object('libexample.o', ['libexample.c'])
+	cc.build_object('libexample.o', ['libexample.c'])
 	AR.build_static_library('libexample.a', ['libexample.o'])
 
 	# Build the program and link against the library
-	C.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
+	cc.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 
 	# Run the program
 	C.run_print('./raise_example.exe')
@@ -51,7 +51,7 @@ def remove():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Remove the files
 	_remove()
@@ -63,13 +63,13 @@ def install():
 	# Setup
 	Users.require_root()
 	clean()
-	_configure()
+	cc = _configure()
 
 	# Build as a normal user
 	def actual_build():
-		C.build_object('libexample.o', ['libexample.c'])
+		cc.build_object('libexample.o', ['libexample.c'])
 		AR.build_static_library('libexample.a', ['libexample.o'])
-		C.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
+		cc.build_program('raise_example.exe', ['main.c'], ['libexample.a'])
 	Users.do_as_normal_user(actual_build)
 
 	# Remove old install

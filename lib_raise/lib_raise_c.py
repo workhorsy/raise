@@ -37,35 +37,10 @@ import lib_raise_helpers as Helpers
 
 
 c_compilers = {}
-cc = None
 
 
 def setup():
 	global c_compilers
-
-	extension_map = {}
-	# Figure out the extensions for this OS
-	if Helpers.os_type._name == 'Cygwin':
-		extension_map = {
-			'.exe' : '.exe',
-			'.o' : '.o',
-			'.so' : '.so',
-			'.a' : '.a'
-		}
-	elif Helpers.os_type._name == 'Windows':
-		extension_map = {
-			'.exe' : '.exe',
-			'.o' : '.obj',
-			'.so' : '.dll',
-			'.a' : '.lib'
-		}
-	else:
-		extension_map = {
-			'.exe' : '',
-			'.o' : '.o',
-			'.so' : '.so',
-			'.a' : '.a'
-		}
 
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'clang', 'cl.exe']
@@ -90,8 +65,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed', 
-				extension_map = extension_map
+				link =                 '-shared -Wl,-as-needed'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'clang':
@@ -110,8 +84,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed', 
-				extension_map = extension_map
+				link =                 '-shared -Wl,-as-needed'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
@@ -131,8 +104,7 @@ def setup():
 				optimize_three =       '/Ox',
 				optimize_size =        '/Os',
 				compile_time_flags =   '/D', 
-				link =                 '/LDd', 
-				extension_map = extension_map
+				link =                 '/LDd'
 			)
 			c_compilers[comp._name] = comp
 
@@ -143,14 +115,14 @@ def setup():
 		Print.exit("No C compiler found. Install one and try again.")
 
 
-# Other C compilers: Clang, DMC, Dingus, Elsa, PCC
+# Other C compilers: DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class CCompiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, warnings_as_errors, 
 				optimize_zero, optimize_one, optimize_two,
 				optimize_three, optimize_size, 
-				compile_time_flags, link, extension_map):
+				compile_time_flags, link):
 
 		self._name = name
 		self._path = path
@@ -178,14 +150,195 @@ class CCompiler(object):
 		self.optimize_level = 1
 		self.compile_time_flags = []
 
-		self.extension_map = extension_map
+	def get_cc(self):
+		return self._name
+	cc = property(get_cc)
 
-	def to_native(self, command):
-		for before, after in self.extension_map.items():
-			command = command.replace(before, after)
+	def get_cflags(self):
+		opts = []
+		opts.append(self._opt_setup)
+		if self.debug: opts.append(self._opt_debug)
+		if self.warnings_all: opts.append(self._opt_warnings_all)
+		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
+		if self.optimize_level == 0: opts.append(self._opt_optimize_zero)
+		if self.optimize_level == 1: opts.append(self._opt_optimize_one)
+		if self.optimize_level == 2: opts.append(self._opt_optimize_two)
+		if self.optimize_level == 3: opts.append(self._opt_optimize_three)
+		if self.optimize_level == 'small': opts.append(self._opt_optimize_size)
+		for compile_time_flag in self.compile_time_flags:
+			opts.append(self._opt_compile_time_flags + compile_time_flag)
 
-		return command
+		return str.join(' ', opts)
+	cflags = property(get_cflags)
 
+	def link_program(self, out_file, obj_files, i_files=[]):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(out_file, '.exe')
+
+		# Setup the messages
+		task = 'Linking'
+		result = out_file
+		plural = 'C programs'
+		singular = 'C program'
+		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
+					self.cc, 
+					self.cflags, 
+					self._opt_link, 
+					str.join(' ', obj_files), 
+					str.join(' ', i_files), 
+					self._opt_out_file, 
+					out_file)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(out_file)]
+			triggers = [to_native(t) for t in obj_files + i_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_object(self, o_file, c_files, i_files=[]):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(o_file, '.o')
+
+		# Setup the messages
+		task = 'Building'
+		result = o_file
+		plural = 'C objects'
+		singular = 'C object'
+		command = '{0} {1} {2} {3}{4} {5} {6}'.format(
+					self.cc, 
+					self.cflags, 
+					self._opt_no_link, 
+					self._opt_out_file, 
+					o_file, 
+					str.join(' ', c_files),
+					str.join(' ', i_files))
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(o_file)]
+			triggers = [to_native(t) for t in c_files + i_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(o_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_program(self, o_file, c_files, i_files=[]):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(o_file, '.exe')
+
+		# Setup the messages
+		task = 'Building'
+		result = o_file
+		plural = 'C programs'
+		singular = 'C program'
+		command = '{0} {1} {2} {3} {4}{5}'.format(
+					self.cc, 
+					self.cflags, 
+					str.join(' ', c_files), 
+					str.join(' ', i_files), 
+					self._opt_out_file, 
+					o_file)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(o_file)]
+			triggers = [to_native(t) for t in c_files + i_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(o_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_shared_library(self, so_file, o_files):
+		# Make sure the extension is valid
+		Helpers.require_file_extension(so_file, '.so')
+
+		# Setup the messages
+		task = 'Building'
+		result = so_file
+		plural = 'C shared libraries'
+		singular = 'C shared library'
+		command = "{0} {1} {2} {3} {4}{5}".format(
+					self._name, 
+					self._opt_setup, 
+					self._opt_link, 
+					str.join(' ', o_files), 
+					self._opt_out_file, 
+					so_file)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			to_update = [to_native(so_file)]
+			triggers = [to_native(t) for t in o_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(so_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+
+def to_native(command):
+	extension_map = {}
+	# Figure out the extensions for this OS
+	if Helpers.os_type._name == 'Cygwin':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
+	elif Helpers.os_type._name == 'Windows':
+		extension_map = {
+			'.exe' : '.exe',
+			'.o' : '.obj',
+			'.so' : '.dll',
+			'.a' : '.lib'
+		}
+	else:
+		extension_map = {
+			'.exe' : '',
+			'.o' : '.o',
+			'.so' : '.so',
+			'.a' : '.a'
+		}
+
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
+
+	return command
 
 def get_default_compiler():
 	global c_compilers
@@ -201,187 +354,10 @@ def get_default_compiler():
 
 	return comp
 
-def save_compiler(compiler):
-	global cc
-
-	# CC
-	cc = compiler
-	os.environ['CC'] = cc._name
-
-	# CFLAGS
-	opts = []
-	opts.append(cc._opt_setup)
-	if cc.debug: opts.append(cc._opt_debug)
-	if cc.warnings_all: opts.append(cc._opt_warnings_all)
-	if cc.warnings_as_errors: opts.append(cc._opt_warnings_as_errors)
-	if cc.optimize_level == 0: opts.append(cc._opt_optimize_zero)
-	if cc.optimize_level == 1: opts.append(cc._opt_optimize_one)
-	if cc.optimize_level == 2: opts.append(cc._opt_optimize_two)
-	if cc.optimize_level == 3: opts.append(cc._opt_optimize_three)
-	if cc.optimize_level == 'small': opts.append(cc._opt_optimize_size)
-	for compile_time_flag in cc.compile_time_flags:
-		opts.append(cc._opt_compile_time_flags + compile_time_flag)
-
-	os.environ['CFLAGS'] = str.join(' ', opts)
-
-def link_program(out_file, obj_files, i_files=[]):
-	global cc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(out_file, '.exe')
-
-	# Setup the messages
-	task = 'Linking'
-	result = out_file
-	plural = 'C programs'
-	singular = 'C program'
-	command = '${CC} ${CFLAGS} ' + \
-				cc._opt_link + ' ' + \
-				str.join(' ', obj_files) + ' ' + \
-				str.join(' ', i_files) + ' ' + \
-				cc._opt_out_file + out_file
-	command = cc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [cc.to_native(out_file)]
-		triggers = [cc.to_native(t) for t in obj_files + i_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		# Make sure the environmental variable is set
-		if not 'CC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_object(o_file, c_files, i_files=[]):
-	global cc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(o_file, '.o')
-
-	# Setup the messages
-	task = 'Building'
-	result = o_file
-	plural = 'C objects'
-	singular = 'C object'
-	command = "${CC} ${CFLAGS} " + \
-				cc._opt_no_link + ' ' +  \
-				cc._opt_out_file + \
-				o_file + ' ' + \
-				str.join(' ', c_files) + ' ' + \
-				str.join(' ', i_files)
-	command = cc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [cc.to_native(o_file)]
-		triggers = [cc.to_native(t) for t in c_files + i_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		# Make sure the environmental variable is set
-		if not 'CC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(o_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_program(o_file, c_files, i_files=[]):
-	global cc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(o_file, '.exe')
-
-	# Setup the messages
-	task = 'Building'
-	result = o_file
-	plural = 'C programs'
-	singular = 'C program'
-	command = '${CC} ${CFLAGS} ' + \
-				str.join(' ', c_files) + ' ' + \
-				str.join(' ', i_files) + ' ' + \
-				cc._opt_out_file + o_file
-	command = cc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [cc.to_native(o_file)]
-		triggers = [cc.to_native(t) for t in c_files + i_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		# Make sure the environmental variable is set
-		if not 'CC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'CC' to the C compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(o_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_shared_library(so_file, o_files):
-	global cc
-
-	# Make sure the extension is valid
-	Helpers.require_file_extension(so_file, '.so')
-
-	# Setup the messages
-	task = 'Building'
-	result = so_file
-	plural = 'C shared libraries'
-	singular = 'C shared library'
-	command = "{0} {1} {2} {3} {4}{5}".format(
-				cc._name, 
-				cc._opt_setup, 
-				cc._opt_link, 
-				str.join(' ', o_files), 
-				cc._opt_out_file, 
-				so_file)
-	command = cc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		to_update = [cc.to_native(so_file)]
-		triggers = [cc.to_native(t) for t in o_files]
-		if not FS.is_outdated(to_update, triggers):
-			return False
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(so_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
 def run_print(command):
-	global cc
 	Print.status("Running C program")
 
-	native_command = cc.to_native(command)
+	native_command = to_native(command)
 	runner = Process.ProcessRunner(native_command)
 	runner.run()
 	runner.is_done
@@ -398,8 +374,6 @@ def run_print(command):
 		Print.exit('Failed to run command.')
 
 def install_program(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -411,7 +385,7 @@ def install_program(name, dir_name=None):
 		prog_root = '/usr/bin/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -429,8 +403,6 @@ def install_program(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_program(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -442,7 +414,7 @@ def uninstall_program(name, dir_name=None):
 		prog_root = '/usr/bin/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -460,8 +432,6 @@ def uninstall_program(name, dir_name=None):
 				lambda: fn())
 
 def install_library(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.so', '.a')
 
@@ -473,7 +443,7 @@ def install_library(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -491,8 +461,6 @@ def install_library(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_library(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.so', '.a')
 
@@ -504,7 +472,7 @@ def uninstall_library(name, dir_name=None):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -522,8 +490,6 @@ def uninstall_library(name, dir_name=None):
 				lambda: fn())
 
 def install_header(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.h')
 
@@ -535,7 +501,7 @@ def install_header(name, dir_name=None):
 		prog_root = '/usr/include/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -553,8 +519,6 @@ def install_header(name, dir_name=None):
 				lambda: fn())
 
 def uninstall_header(name, dir_name=None):
-	global cc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.h')
 
@@ -566,7 +530,7 @@ def uninstall_header(name, dir_name=None):
 		prog_root = '/usr/include/'
 
 	# Get the native install source and dest
-	source = cc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 

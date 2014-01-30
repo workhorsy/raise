@@ -136,16 +136,14 @@ def symlink(source, link_name):
 				lambda: os.symlink(source, link_name))
 
 def is_outdated(to_update, triggers):
-	# Exit if any triggers don't exist
-	for trigger in triggers:
-		if not os.path.isfile(os.path.abspath(trigger)):
-			Print.fail()
-			Print.exit("The file '{0}' does not exist.".format(trigger))
-
 	# Return true if any of the files to check do not exist
 	for update in to_update:
 		if not os.path.isfile(os.path.abspath(update)):
 			return True
+
+	# Drop any entries that are not files
+	to_update = [entry for entry in to_update if os.path.isfile(os.path.abspath(entry))]
+	triggers = [entry for entry in triggers if os.path.isfile(os.path.abspath(entry))]
 
 	# Get the modify date of the newest trigger file and file to check
 	newest_trigger, newest_update = 0, 0

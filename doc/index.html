@@ -1891,12 +1891,6 @@ path: /usr/bin/clang
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">C.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -1912,12 +1906,9 @@ def c_compiler_setup():
  	cc.warnings_as_errors = True
  	cc.compile_time_flags = ['SDL=true']
  
- 	# Save the compiler config in environmental variables
- 	C.save_compiler(cc)
- 
  	# Print environmental variables to see what happens under the hood
- 	print("$CC: {0}".format(os.environ['CC']))
- 	print("$CFLAGS: {0}".format(os.environ['CFLAGS']))
+ 	print("$CC: {0}".format(cc.cc))
+ 	print("$CFLAGS: {0}".format(cc.cflags))
 	</code></pre>
 
 	<p>
@@ -1945,10 +1936,9 @@ def c_building_object():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the object
- 	C.build_object('main.o', ['main.c'])
+ 	cc.build_object('main.o', ['main.c'])
 	</code></pre>
 
 	<p>
@@ -1975,10 +1965,9 @@ def c_building_program():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the program
- 	C.build_program('main.exe', ['main.c'])
+ 	cc.build_program('main.exe', ['main.c'])
 	</code></pre>
 
 	<p>
@@ -2008,13 +1997,12 @@ def c_building_library():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the library into an object
- 	C.build_object('libexample.o', ['libexample.c'])
+ 	cc.build_object('libexample.o', ['libexample.c'])
  
  	# Build the library as a shared and static library
- 	C.build_shared_library('libexample.so', ['libexample.o'])
+ 	cc.build_shared_library('libexample.so', ['libexample.o'])
  	AR.build_static_library('libexample.a', ['libexample.o'])
 	</code></pre>
 
@@ -2045,10 +2033,9 @@ def c_program_installation_and_uninstallation():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the program
- 	C.build_program('main.exe', ['main.c'])
+ 	cc.build_program('main.exe', ['main.c'])
  
  	# Install the program
  	C.install_program('main.exe')
@@ -2094,11 +2081,10 @@ def c_library_installation_and_uninstallation():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the library
- 	C.build_object('libexample.o', ['libexample.c'])
- 	C.build_shared_library('libexample.so', ['libexample.o'])
+ 	cc.build_object('libexample.o', ['libexample.c'])
+ 	cc.build_shared_library('libexample.so', ['libexample.o'])
  
  	# Install the library
  	C.install_library('libexample.so')
@@ -2136,7 +2122,6 @@ def c_header_installation_and_uninstallation():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Install the header
  	C.install_header('libexample.h')
@@ -2171,10 +2156,9 @@ def c_running_and_printing():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Build the program
- 	C.build_program('main.exe', ['main.c'])
+ 	cc.build_program('main.exe', ['main.c'])
  
  	# Run the C program
  	C.run_print('./main.exe')
@@ -2278,17 +2262,17 @@ import lib_raise_ar as AR
 
 	<pre><code data-language="python">
 def cxx_compilers():
- 	cc = CXX.get_default_compiler()
+ 	cxx = CXX.get_default_compiler()
  
  	# Print the compiler name and path for fun
- 	print("name: {0}".format(cc._name))
- 	print("path: {0} ".format(cc._path))
+ 	print("name: {0}".format(cxx._name))
+ 	print("path: {0} ".format(cxx._path))
  
- 	cc = CXX.cxx_compilers['clang++']
+ 	cxx = CXX.cxx_compilers['clang++']
  
  	# Print the compiler name and path for fun
- 	print("name: {0}".format(cc._name))
- 	print("path: {0} ".format(cc._path))
+ 	print("name: {0}".format(cxx._name))
+ 	print("path: {0} ".format(cxx._path))
 	</code></pre>
 
 	<p>
@@ -2326,33 +2310,24 @@ path: /usr/bin/clang++
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">CXX.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
 	<pre><code data-language="python">
 def cxx_compiler_setup():
  	# Get a C++ compiler
- 	cc = CXX.get_default_compiler()
+ 	cxx = CXX.get_default_compiler()
  
  	# Compiler setup
- 	cc.debug = True
- 	cc.optimize_level = 2
- 	cc.warnings_all = True
- 	cc.warnings_as_errors = True
- 	cc.compile_time_flags = ['SDL=true']
- 
- 	# Save the compiler config in environmental variables
- 	CXX.save_compiler(cc)
+ 	cxx.debug = True
+ 	cxx.optimize_level = 2
+ 	cxx.warnings_all = True
+ 	cxx.warnings_as_errors = True
+ 	cxx.compile_time_flags = ['SDL=true']
  
  	# Print environmental variables to see what happens under the hood
- 	print("$CXX: {0}".format(os.environ['CXX']))
- 	print("$CXXFLAGS: {0}".format(os.environ['CXXFLAGS']))
+ 	print("$CXX: {0}".format(cxx.cxx))
+ 	print("$CXXFLAGS: {0}".format(cxx.cxxflags))
 	</code></pre>
 
 	<p>
@@ -2378,12 +2353,11 @@ $CXXFLAGS:  -g -Wall -Werror -O2 -DSDL=true
 	<pre><code data-language="python">
 def cxx_building_object():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the object
- 	CXX.build_object('main.o', ['main.cc'])
+ 	cxx.build_object('main.o', ['main.cc'])
 	</code></pre>
 
 	<p>
@@ -2408,12 +2382,11 @@ Building C++ object 'main.o' ...                                            <spa
 	<pre><code data-language="python">
 def cxx_building_program():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the program
- 	CXX.build_program('main.exe', ['main.cc'])
+ 	cxx.build_program('main.exe', ['main.cc'])
 	</code></pre>
 
 	<p>
@@ -2441,15 +2414,14 @@ Building C++ program 'main.exe' ...                                         <spa
 	<pre><code data-language="python">
 def cxx_building_library():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the library into an object
- 	CXX.build_object('libadd.o', ['libadd.cc'])
+ 	cxx.build_object('libadd.o', ['libadd.cc'])
  
  	# Build the library as a shared and static library
- 	CXX.build_shared_library('libadd.so', ['libadd.o'])
+ 	cxx.build_shared_library('libadd.so', ['libadd.o'])
  	AR.build_static_library('libadd.a', ['libadd.o'])
 	</code></pre>
 
@@ -2478,12 +2450,11 @@ Building static library 'libadd.a' ...                                      <spa
 	<pre><code data-language="python">
 def cxx_program_installation_and_uninstallation():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the program
- 	CXX.build_program('main.exe', ['main.cc'])
+ 	cxx.build_program('main.exe', ['main.cc'])
  
  	# Install the program
  	CXX.install_program('main.exe')
@@ -2527,13 +2498,12 @@ Uninstalling the program 'main.exe' ...                                     <spa
 	<pre><code data-language="python">
 def cxx_library_installation_and_uninstallation():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the library
- 	CXX.build_object('libadd.o', ['libadd.cc'])
- 	CXX.build_shared_library('libadd.so', ['libadd.o'])
+ 	cxx.build_object('libadd.o', ['libadd.cc'])
+ 	cxx.build_shared_library('libadd.so', ['libadd.o'])
  
  	# Install the library
  	CXX.install_library('libadd.so')
@@ -2569,9 +2539,8 @@ Uninstalling the library 'libadd.so' ...                                    <spa
 	<pre><code data-language="python">
 def cxx_header_installation_and_uninstallation():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Install the header
  	CXX.install_header('libadd.h')
@@ -2604,12 +2573,11 @@ Uninstalling the header 'libadd.h' ...                                      <spa
 	<pre><code data-language="python">
 def cxx_running_and_printing():
  	# Get and setup the C++ compiler
- 	cc = CXX.get_default_compiler()
- 	cc.debug = True
- 	CXX.save_compiler(cc)
+ 	cxx = CXX.get_default_compiler()
+ 	cxx.debug = True
  
  	# Build the program
- 	CXX.build_program('main.exe', ['main.cc'])
+ 	cxx.build_program('main.exe', ['main.cc'])
  
  	# Run the C++ program
  	CXX.run_print('./main.exe')
@@ -2751,12 +2719,6 @@ path: /usr/bin/ldc2
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">D.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -2771,12 +2733,9 @@ def d_compiler_setup():
  	dc.warnings_all = True
  	dc.compile_time_flags = ['SDL=true']
  
- 	# Save the compiler config in environmental variables
- 	D.save_compiler(dc)
- 
  	# Print environmental variables to see what happens under the hood
- 	print("$DC: {0}".format(os.environ['DC']))
- 	print("$DFLAGS: {0}".format(os.environ['DFLAGS']))
+ 	print("$DC: {0}".format(dc.dc))
+ 	print("$DFLAGS: {0}".format(dc.dflags))
 	</code></pre>
 
 	<p>
@@ -2804,10 +2763,9 @@ def d_building_object():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the object
- 	D.build_object('main.o', ['main.d'])
+ 	dc.build_object('main.o', ['main.d'])
 	</code></pre>
 
 	<p>
@@ -2834,10 +2792,9 @@ def d_building_program():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the program
- 	D.build_program('main.exe', ['main.d'])
+ 	dc.build_program('main.exe', ['main.d'])
 	</code></pre>
 
 	<p>
@@ -2865,11 +2822,10 @@ def d_building_library():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the library
- 	D.build_object('libsubtract.o', ['libsubtract.d'])
- 	D.build_static_library('libsubtract.a', ['libsubtract.o'])
+ 	dc.build_object('libsubtract.o', ['libsubtract.d'])
+ 	dc.build_static_library('libsubtract.a', ['libsubtract.o'])
 	</code></pre>
 
 	<p>
@@ -2897,10 +2853,9 @@ def d_building_interface():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the interface
- 	D.build_interface('libsubtract.d')
+ 	dc.build_interface('libsubtract.d')
 	</code></pre>
 
 	<p>
@@ -2928,10 +2883,9 @@ def d_program_installation_and_uninstallation():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the program
- 	D.build_program('main.exe', ['main.d'])
+ 	dc.build_program('main.exe', ['main.d'])
  
  	# Install the program
  	D.install_program('main.exe')
@@ -2977,11 +2931,10 @@ def d_library_installation_and_uninstallation():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the library
- 	D.build_object('libsubtract.o', ['libsubtract.d'])
- 	D.build_static_library('libsubtract.a', ['libsubtract.o'])
+ 	dc.build_object('libsubtract.o', ['libsubtract.d'])
+ 	dc.build_static_library('libsubtract.a', ['libsubtract.o'])
  
  	# Install the library
  	D.install_library('libsubtract.a')
@@ -3019,10 +2972,9 @@ def d_interface_installation_and_uninstallation():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the interface
- 	D.build_interface('libsubtract.d')
+ 	dc.build_interface('libsubtract.d')
  
  	# Install the interface
  	D.install_interface('libsubtract.di')
@@ -3058,10 +3010,9 @@ def d_running_and_printing():
  	# Get and setup the D compiler
  	dc = D.get_default_compiler()
  	dc.debug = True
- 	D.save_compiler(dc)
  
  	# Build the program
- 	D.build_program('main.exe', ['main.d'])
+ 	dc.build_program('main.exe', ['main.d'])
  
  	# Run the D program
  	D.run_print('./main.exe')
@@ -3155,12 +3106,6 @@ path: /usr/bin/dmcs
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">CS.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -3175,12 +3120,9 @@ def csharp_compiler_setup():
  	csc.warnings_all = True
  	csc.warnings_as_errors = True
  
- 	# Save the compiler config in environmental variables
- 	CS.save_compiler(csc)
- 
  	# Print environmental variables to see what happens under the hood
- 	print("$CSC: {0}".format(os.environ['CSC']))
- 	print("$CSFLAGS: {0}".format(os.environ['CSFLAGS']))
+ 	print("$CSC: {0}".format(csc.csc))
+ 	print("$CSFLAGS: {0}".format(csc.csflags))
 	</code></pre>
 
 	<p>
@@ -3207,10 +3149,9 @@ def csharp_building_program():
  	# Get and setup the C# compiler
  	csc = CS.get_default_compiler()
  	csc.debug = True
- 	CS.save_compiler(csc)
  
  	# Build the program
- 	CS.build_program('main.exe', ['main.cs'])
+ 	csc.build_program('main.exe', ['main.cs'])
 	</code></pre>
 
 	<p>
@@ -3236,10 +3177,9 @@ def csharp_building_library():
  	# Get and setup the C# compiler
  	csc = CS.get_default_compiler()
  	csc.debug = True
- 	CS.save_compiler(csc)
  
  	# Build the library
- 	CS.build_shared_library('math_helper.dll', ['math_helper.cs'])
+ 	csc.build_shared_library('math_helper.dll', ['math_helper.cs'])
 	</code></pre>
 
 	<p>
@@ -3267,10 +3207,9 @@ def csharp_program_installation_and_uninstallation():
  	# Get and setup the C# compiler
  	csc = CS.get_default_compiler()
  	csc.debug = True
- 	CS.save_compiler(csc)
  
  	# Build the program
- 	CS.build_program('main.exe', ['main.cs'])
+ 	csc.build_program('main.exe', ['main.cs'])
  
  	# Install the program
  	CS.install_program('main.exe', 'csharp_example')
@@ -3317,10 +3256,9 @@ def csharp_library_installation_and_uninstallation():
  	# Get and setup the C# compiler
  	csc = CS.get_default_compiler()
  	csc.debug = True
- 	CS.save_compiler(csc)
  
  	# Build the library
- 	CS.build_shared_library('math_helper.dll', ['math_helper.cs'])
+ 	csc.build_shared_library('math_helper.dll', ['math_helper.cs'])
  
  	# Install the library
  	CS.install_library('math_helper.dll', 'libmath_helper')
@@ -3354,13 +3292,12 @@ def csharp_running_and_printing():
  	# Get and setup the C# compiler
  	csc = CS.get_default_compiler()
  	csc.debug = True
- 	CS.save_compiler(csc)
  
  	# Build the program
- 	CS.build_program('main.exe', ['main.cs'])
+ 	csc.build_program('main.exe', ['main.cs'])
  
  	# Run the C# program
- 	CS.run_print('main.exe')
+ 	csc.run_print('main.exe')
 	</code></pre>
 
 	<p>
@@ -3451,12 +3388,6 @@ path: /usr/bin/javac
 	</ul>
 
 	<p>
-		After the compiler is setup the way you want, the setting MUST be saved in an 
-		environmental variable. This is done with the 
-		<span class="fun">Java.save_compiler</span> function.
-	</p>
-
-	<p>
 	Example:
 	</p>
 
@@ -3471,14 +3402,11 @@ def java_compiler_setup():
  	javac.verbose = False
  	javac.deprecation = True
  
- 	# Save the compiler config in environmental variables
- 	Java.save_compiler(javac)
- 
  	# Print environmental variables to see what happens under the hood
- 	print("$JAVAC: {0}".format(os.environ['JAVAC']))
- 	print("$JAR: {0}".format(os.environ['JAR']))
- 	print("$JAVA: {0}".format(os.environ['JAVA']))
- 	print("$JAVAFLAGS: {0}".format(os.environ['JAVAFLAGS']))
+ 	print("$JAVAC: {0}".format(javac.javac))
+ 	print("$JAR: {0}".format(javac.jar))
+ 	print("$JAVA: {0}".format(javac.java))
+ 	print("$JAVAFLAGS: {0}".format(javac.javaflags))
 	</code></pre>
 
 	<p>
@@ -3507,10 +3435,9 @@ def java_building_program():
  	# Get and setup the Java compiler
  	javac = Java.get_default_compiler()
  	javac.debug = True
- 	Java.save_compiler(javac)
  
  	# Build the program
- 	Java.build_program('main.class', ['main.java'])
+ 	javac.build_program('main.class', ['main.java'])
 	</code></pre>
 
 	<p>
@@ -3536,10 +3463,9 @@ def java_building_library():
  	# Get and setup the java compiler
  	javac = Java.get_default_compiler()
  	javac.debug = True
- 	Java.save_compiler(javac)
  
  	# Build the library
- 	Java.build_jar('math_helper.jar', ['lib_math.java'])
+ 	javac.build_jar('math_helper.jar', ['lib_math.java'])
 	</code></pre>
 
 	<p>
@@ -3567,10 +3493,9 @@ def java_program_installation_and_uninstallation():
  	# Get and setup the Java compiler
  	javac = Java.get_default_compiler()
  	javac.debug = True
- 	Java.save_compiler(javac)
  
  	# Build the program
- 	Java.build_program('main.class', ['main.java'])
+ 	javac.build_program('main.class', ['main.java'])
  
  	# Install the program
  	Java.install_program('main.class', 'java_example')
@@ -3617,10 +3542,9 @@ def java_library_installation_and_uninstallation():
  	# Get and setup the Java compiler
  	javac = Java.get_default_compiler()
  	javac.debug = True
- 	Java.save_compiler(javac)
  
  	# Build the jar
- 	Java.build_jar('lib_math.jar', ['lib_math.java'])
+ 	javac.build_jar('lib_math.jar', ['lib_math.java'])
  
  	# Install the jar
  	Java.install_jar('lib_math.jar', 'lib_math')
@@ -3654,13 +3578,12 @@ def java_running_and_printing():
  	# Get and setup the Java compiler
  	javac = Java.get_default_compiler()
  	javac.debug = True
- 	Java.save_compiler(javac)
  
  	# Build the program
- 	Java.build_program('main.class', ['main.java'])
+ 	javac.build_program('main.class', ['main.java'])
  
  	# Run the Java program
- 	Java.run_print('main')
+ 	javac.run_print('main')
 	</code></pre>
 
 	<p>
@@ -3704,13 +3627,12 @@ def concurrency():
  	# Get and setup the C compiler
  	cc = C.get_default_compiler()
  	cc.debug = True
- 	C.save_compiler(cc)
  
  	# Tell Raise to start queueing the events after this function
  	Process.concurrent_start()
  
- 	C.build_object('main.o', ['main.c'])
- 	C.build_object('libexample.o', ['libexample.c'])
+ 	cc.build_object('main.o', ['main.c'])
+ 	cc.build_object('libexample.o', ['libexample.c'])
  
  	# Tell Raise to start running all the queued events concurrently
  	Process.concurrent_end()

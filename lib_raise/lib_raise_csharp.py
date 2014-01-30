@@ -38,31 +38,9 @@ import lib_raise_helpers as Helpers
 
 
 cs_compilers = {}
-cs_runtimes = {}
-csc = None
-runtime = None
 
 def setup():
 	global cs_compilers
-	global cs_runtimes
-
-	extension_map = {}
-	# Figure out the extensions for this OS
-	if Helpers.os_type._name == 'Cygwin':
-		extension_map = {
-			'.exe' : '.exe',
-			'.dll' : '.dll'
-		}
-	elif Helpers.os_type._name == 'Windows':
-		extension_map = {
-			'.exe' : '.exe',
-			'.dll' : '.dll'
-		}
-	else:
-		extension_map = {
-			'.exe' : '.exe',
-			'.dll' : '.dll'
-		}
 
 	# Get the names and paths for know C# compilers
 	names = ['dmcs', 'csc']
@@ -80,10 +58,9 @@ def setup():
 				warnings_all =         '-warn:4', 
 				warnings_as_errors =   '-warnaserror', 
 				optimize =             '-optimize', 
-				extension_map = extension_map
+				runtime =              'mono'
 			)
 			cs_compilers[comp._name] = comp
-			cs_runtimes[comp._name] = 'mono'
 		elif name in ['csc']:
 			comp = CSCompiler(
 				name =                 name, 
@@ -93,10 +70,9 @@ def setup():
 				warnings_all =         '-warn:4', 
 				warnings_as_errors =   '-warnaserror', 
 				optimize =             '-optimize', 
-				extension_map = extension_map
+				runtime =              ''
 			)
 			cs_compilers[comp._name] = comp
-			cs_runtimes[comp._name] = ''
 
 	# Make sure there is at least one C# compiler installed
 	if len(cs_compilers) == 0:
@@ -108,7 +84,7 @@ def setup():
 class CSCompiler(object):
 	def __init__(self, name, path, out_file, 
 				debug, warnings_all, warnings_as_errors, 
-				optimize, extension_map):
+				optimize, runtime):
 
 		self._name = name
 		self._path = path
@@ -127,14 +103,138 @@ class CSCompiler(object):
 		self.warnings_as_errors = False
 		self.optimize = True
 
-		self.extension_map = extension_map
+		self._runtime = runtime
 
-	def to_native(self, command):
-		for before, after in self.extension_map.items():
-			command = command.replace(before, after)
+	def get_csc(self):
+		return self._name
+	csc = property(get_csc)
 
-		return command
+	def get_csflags(self):
+		opts = []
+		if self.debug: opts.append(self._opt_debug)
+		if self.warnings_all: opts.append(self._opt_warnings_all)
+		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
+		if self.optimize: opts.append(self._opt_optimize)
 
+		return str.join(' ', opts)
+	csflags = property(get_csflags)
+
+	def build_program(self, out_file, inc_files, link_files=[]):
+		# Make sure the extension is valid
+		if not out_file.endswith('.exe'):
+			Print.exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
+
+		# Setup the messages
+		task = 'Building'
+		result = out_file
+		plural = 'C# programs'
+		singular = 'C# program'
+		command = "{0} {1} {2}{3} {4} {5}".format(
+			self.csc, 
+			self.csflags, 
+			self._opt_out_file, 
+			out_file, 
+			str.join(' ', inc_files), 
+			str.join(' ', link_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			#to_update = [to_native(out_file)]
+			#triggers = [to_native(t) for t in inc_files + link_files]
+			#if not FS.is_outdated(to_update, triggers):
+			#	return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def build_shared_library(self, out_file, inc_files, link_files=[]):
+		# Make sure the extension is valid
+		if not out_file.endswith('.dll'):
+			Print.exit("Out file extension should be '.dll' not '.{0}'.".format(out_file.split('.')[-1]))
+
+		# Setup the messages
+		task = 'Building'
+		result = out_file
+		plural = 'C# shared libraries'
+		singular = 'C# shared library'
+		command = "{0} {1} -target:library {2}{3} {4} {5}".format(
+			self.csc, 
+			self.csflags, 
+			self._opt_out_file, 
+			out_file, 
+			str.join(' ', inc_files), 
+			str.join(' ', link_files)
+		)
+		command = to_native(command)
+
+		def setup():
+			# Skip if the files have not changed since last build
+			#to_update = [to_native(out_file)]
+			#triggers = [to_native(t) for t in inc_files + link_files]
+			#if not FS.is_outdated(to_update, triggers):
+			#	return False
+
+			# Create the output directory if it does not exist
+			FS.create_path_dirs(out_file)
+
+			return True
+
+		# Create the event
+		event = Process.Event(task, result, plural, singular, command, setup)
+		Process.add_event(event)
+
+	def run_print(self, command):
+		Print.status("Running C# program")
+
+		native_command = '{0} {1}'.format(self._runtime, command)
+		native_command = to_native(native_command)
+
+		runner = Process.ProcessRunner(native_command)
+		runner.run()
+		runner.is_done
+		runner.wait()
+
+		if runner.is_success or runner.is_warning:
+			Print.ok()
+			sys.stdout.write(command + '\n')
+			sys.stdout.write(runner.stdall)
+		elif runner.is_failure:
+			Print.fail()
+			sys.stdout.write(command + '\n')
+			sys.stdout.write(runner.stdall)
+			Print.exit('Failed to run command.')
+
+def to_native(command):
+	extension_map = {}
+	# Figure out the extensions for this OS
+	if Helpers.os_type._name == 'Cygwin':
+		extension_map = {
+			'.exe' : '.exe',
+			'.dll' : '.dll'
+		}
+	elif Helpers.os_type._name == 'Windows':
+		extension_map = {
+			'.exe' : '.exe',
+			'.dll' : '.dll'
+		}
+	else:
+		extension_map = {
+			'.exe' : '.exe',
+			'.dll' : '.dll'
+		}
+
+	for before, after in extension_map.items():
+		command = command.replace(before, after)
+
+	return command
 
 def get_default_compiler():
 	global cs_compilers
@@ -147,124 +247,7 @@ def get_default_compiler():
 
 	return comp
 
-def save_compiler(compiler):
-	global cs_runtimes
-	global csc
-	global runtime
-
-	# CSC
-	csc = compiler
-	runtime = cs_runtimes[csc._name]
-	os.environ['CSC'] = csc._name
-
-	# CSFLAGS
-	opts = []
-	if csc.debug: opts.append(csc._opt_debug)
-	if csc.warnings_all: opts.append(csc._opt_warnings_all)
-	if csc.warnings_as_errors: opts.append(csc._opt_warnings_as_errors)
-	if csc.optimize: opts.append(csc._opt_optimize)
-
-	os.environ['CSFLAGS'] = str.join(' ', opts)
-
-def build_program(out_file, inc_files, link_files=[]):
-	global csc
-
-	# Make sure the extension is valid
-	if not out_file.endswith('.exe'):
-		Print.exit("Out file extension should be '.exe' not '.{0}'.".format(out_file.split('.')[-1]))
-
-	# Setup the messages
-	task = 'Building'
-	result = out_file
-	plural = 'C# programs'
-	singular = 'C# program'
-	command = "${CSC} ${CSFLAGS} " + \
-	csc._opt_out_file + out_file + ' ' + \
-	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = csc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		#to_update = [csc.to_native(out_file)]
-		#triggers = [csc.to_native(t) for t in inc_files + link_files]
-		#if not FS.is_outdated(to_update, triggers):
-		#	return False
-
-		if not 'CSC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'CSC' to the C# compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def build_shared_library(out_file, inc_files, link_files=[]):
-	global csc
-
-	# Make sure the extension is valid
-	if not out_file.endswith('.dll'):
-		Print.exit("Out file extension should be '.dll' not '.{0}'.".format(out_file.split('.')[-1]))
-
-	# Setup the messages
-	task = 'Building'
-	result = out_file
-	plural = 'C# shared libraries'
-	singular = 'C# shared library'
-	command = "${CSC} ${CSFLAGS} -target:library " + \
-	csc._opt_out_file + out_file + ' ' + \
-	str.join(' ', inc_files) + " " + str.join(' ', link_files)
-	command = csc.to_native(command)
-
-	def setup():
-		# Skip if the files have not changed since last build
-		#to_update = [csc.to_native(out_file)]
-		#triggers = [csc.to_native(t) for t in inc_files + link_files]
-		#if not FS.is_outdated(to_update, triggers):
-		#	return False
-
-		if not 'CSC' in os.environ:
-			Print.fail()
-			Print.exit("Set the env variable 'CSC' to the C# compiler, and try again.")
-
-		# Create the output directory if it does not exist
-		FS.create_path_dirs(out_file)
-
-		return True
-
-	# Create the event
-	event = Process.Event(task, result, plural, singular, command, setup)
-	Process.add_event(event)
-
-def run_print(command):
-	global csc
-	global runtime
-	Print.status("Running C# program")
-
-	native_command = '{0} {1}'.format(runtime, command)
-	native_command = csc.to_native(native_command)
-	runner = Process.ProcessRunner(native_command)
-	runner.run()
-	runner.is_done
-	runner.wait()
-
-	if runner.is_success or runner.is_warning:
-		Print.ok()
-		sys.stdout.write(command + '\n')
-		sys.stdout.write(runner.stdall)
-	elif runner.is_failure:
-		Print.fail()
-		sys.stdout.write(command + '\n')
-		sys.stdout.write(runner.stdall)
-		Print.exit('Failed to run command.')
-
 def install_program(name, dir_name):
-	global csc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -276,7 +259,7 @@ def install_program(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = csc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -307,8 +290,6 @@ def install_program(name, dir_name):
 				lambda: fn())
 
 def uninstall_program(name, dir_name):
-	global csc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.exe')
 
@@ -320,7 +301,7 @@ def uninstall_program(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = csc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -343,8 +324,6 @@ def uninstall_program(name, dir_name):
 				lambda: fn())
 
 def install_library(name, dir_name):
-	global csc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.dll')
 
@@ -356,7 +335,7 @@ def install_library(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = csc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
@@ -374,8 +353,6 @@ def install_library(name, dir_name):
 				lambda: fn())
 
 def uninstall_library(name, dir_name):
-	global csc
-
 	# Make sure the extension is valid
 	Helpers.require_file_extension(name, '.dll')
 
@@ -387,7 +364,7 @@ def uninstall_library(name, dir_name):
 		prog_root = '/usr/lib/'
 
 	# Get the native install source and dest
-	source = csc.to_native(name)
+	source = to_native(name)
 	install_dir = os.path.join(prog_root, dir_name or '')
 	dest = os.path.join(install_dir, source)
 
