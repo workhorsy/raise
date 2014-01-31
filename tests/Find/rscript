@@ -3,8 +3,19 @@
 
 import lib_raise_find as Find
 
+# Version strings
+def find_unparsable_version_code():
+	Find._get_library_files('libSDL', '@')
+
+def find_black_listed_version_code():
+	Find._get_library_files('libSDL', 'eval("False")')
+
+def find_invalid_version_code():
+	Find._get_library_files('libSDL', 'a >= (1, 2)')
 
 
+
+# Shared Libraries
 def find_installed_shared_library():
 	Find.require_shared_library('SDL')
 	Find.require_shared_library('sdl')
@@ -27,6 +38,7 @@ def find_installed_shared_library_cache():
 
 
 
+# Static Libraries
 def find_installed_static_library():
 	Find.require_static_library('SDL')
 	Find.require_static_library('sdl')
@@ -49,6 +61,7 @@ def find_installed_static_library_cache():
 
 
 
+# Header files
 def find_installed_header_file():
 	Find.require_header_file('SDL')
 	Find.require_header_file('sdl')

@@ -101,7 +101,7 @@ def _get_library_files(lib_name, version_str = None):
 
 	# Create a version_cb from the string
 	version_cb = None
-	if version_str and Helpers.is_code_safe(version_str):
+	if version_str:
 		version_cb = Helpers.to_version_cb(version_str)
 
 	# Return the file names if already cached

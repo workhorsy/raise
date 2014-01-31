@@ -737,6 +737,41 @@ class TestFind(TestCase):
 	def set_up(self, id):
 		self.init('Find', id)
 
+	def test_find_unparsable_version_code(self):
+		command = '{0} raise -plain find_unparsable_version_code'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_unparsable_version_code'
+Building version string ....................................................:(
+Version string unparsable. "@", invalid syntax (<unknown>, line 1)
+Fix version string and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_black_listed_version_code(self):
+		command = '{0} raise -plain find_black_listed_version_code'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_black_listed_version_code'
+Building version string ....................................................:(
+Function call not allowed in version string. "eval("False")"
+Fix version string and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+	def test_find_black_listed_version_code(self):
+		command = '{0} raise -plain find_invalid_version_code'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_invalid_version_code'
+Building version string ....................................................:(
+Invalid version string "a >= (1, 2)", global name 'a' is not defined
+Fix version string and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
+
+
 	def test_find_installed_shared_library(self):
 		command = '{0} raise -plain find_installed_shared_library'.format(sys.executable)
 

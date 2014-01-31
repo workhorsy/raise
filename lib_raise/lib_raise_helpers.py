@@ -114,11 +114,77 @@ def version_string_to_tuple(version_string):
 	return Version(major, minor, micro)
 
 def to_version_cb(version_str):
+	black = {
+		'AugAssign' : 'Operation with assignment', 
+		'Assign' : 'Assignment', 
+		'Lambda' : 'Lambda function', 
+		'arguments' : 'Function argument', 
+		'arg' : 'Argument', 
+		'Param' : 'Function parameter', 
+		'Call' : 'Function call', 
+		'If' : 'If statement', 
+		'While' : 'While loop', 
+		'For' : 'For loop', 
+		'Import' : 'Importing', 
+		'ImportFrom' : 'Importing from', 
+		'alias' : 'Aliase', 
+		'ClassDef' : 'Class definition', 
+		'Pass' : 'Pass statements', 
+		'Assert' : 'Assert statement', 
+		'Break' : 'Break statement', 
+		'Continue' : 'Continue statement', 
+		'Del' : 'Del statement', 
+		'Delete' : 'Delete statement', 
+		'ExceptHandler' : 'Exception handler', 
+		'Raise' : 'Raise statement', 
+		'Try' : 'Try block', 
+		'TryExcept' : 'Try block', 
+		'TryFinally' : 'Try finally block', 
+		'Return' : 'Return statement', 
+		'Yield' : 'Yield statement', 
+		'With' : 'With statement', 
+		'Global' : 'Global statement', 
+		'Print' : 'Print statement', 
+	}
+
+	black_list = {}
+	for k, v in black.items():
+		if hasattr(ast, k):
+			t = getattr(ast, k)
+			black_list[t] = v
+
+	# Make sure the code can be parsed
+	tree = None
+	parse_error = None
+	try:
+		tree = ast.parse(version_str)
+	except SyntaxError as e:
+		parse_error = str(e)
+	if parse_error:
+		Print.status('Building version string')
+		Print.fail('Version string unparsable. "{0}", {1}'.format(version_str, parse_error))
+		Print.exit('Fix version string and try again.')
+
+	# Make sure each code node is not in the black list
+	for node in ast.walk(tree):
+		# Is in black list
+		for k, v in black_list.items():
+			if isinstance(node, k):
+				Print.status('Building version string')
+				Print.fail('{0} not allowed in version string. "{1}"'.format(v, version_str))
+				Print.exit('Fix version string and try again.')
+
 	code = "lambda ver: " + version_str
+	version_cb = None
+	# Make sure the code can be parsed into a lambda
 	try:
 		version_cb = eval(code, {})
-	except:
-		Print.exit('\nInvalid version string:\n"{0}"'.format(version_str))
+		version_cb((1, 9))
+	except Exception as e:
+		Print.status('Building version string')
+		Print.fail('Invalid version string "{0}", {1}'.format(version_str, e))
+		Print.exit('Fix version string and try again.')
+
 	return version_cb
 
 def require_file_extension(file_name, *required_extensions):
@@ -138,17 +204,17 @@ def expand_envs(string):
 		if before == string:
 			return string
 
-def is_code_safe(source_code):
+def is_safe_code(source_code):
 	safe_nodes = (
 		ast.Module, ast.Load, ast.Expr, ast.Attribute, ast.Name, 
-		ast.Lambda, ast.arguments, ast.Param, 
 		ast.Str, ast.Num, ast.BoolOp, 
 		ast.Dict, ast.List, ast.Tuple, 
-		ast.Subscript, ast.Slice, 
+		ast.Store, ast.ListComp, ast.comprehension, 
+		ast.Subscript, ast.Slice, ast.Index, 
 		ast.BinOp, ast.UnaryOp, 
 		ast.BitOr, ast.BitXor, ast.BitAnd, 
 		ast.LShift, ast.RShift, 
-		ast.Sub, ast.Add, ast.Div, ast.Mult, ast.Mod, 
+		ast.Sub, ast.Add, ast.Div, ast.Mult, ast.Mod, ast.Pow, 
 		ast.Eq, ast.NotEq, ast.And, ast.Or, ast.Not, 
 		ast.Is, ast.IsNot, ast.In, ast.NotIn, 
 		ast.Compare, ast.Gt, ast.GtE, ast.Lt, ast.LtE
@@ -159,7 +225,7 @@ def is_code_safe(source_code):
 	try:
 		tree = ast.parse(source_code)
 	except SyntaxError:
-		raise False
+		return False
 
 	# Make sure each code node is in the white list
 	for node in ast.walk(tree):
