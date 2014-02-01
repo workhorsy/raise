@@ -137,10 +137,10 @@ class JavaCompiler(object):
 
 		def setup():
 			# Skip if the files have not changed since last build
-			#to_update = [to_native(out_file)]
-			#triggers = [to_native(t) for t in inc_files + link_files]
-			#if not FS.is_outdated(to_update, triggers):
-			#	return False
+			to_update = [to_native(out_file)]
+			triggers = [to_native(t) for t in inc_files + link_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
 
 			# Create the output directory if it does not exist
 			FS.create_path_dirs(out_file)
@@ -171,10 +171,10 @@ class JavaCompiler(object):
 
 		def setup():
 			# Skip if the files have not changed since last build
-			#to_update = [to_native(out_file)]
-			#triggers = [to_native(t) for t in inc_files + link_files]
-			#if not FS.is_outdated(to_update, triggers):
-			#	return False
+			to_update = [to_native(out_file)]
+			triggers = [to_native(t) for t in inc_files + link_files]
+			if not FS.is_outdated(to_update, triggers):
+				return False
 
 			# Create the output directory if it does not exist
 			FS.create_path_dirs(out_file)
