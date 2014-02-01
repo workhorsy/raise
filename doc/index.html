@@ -224,6 +224,12 @@ Last updated on January 31st 2014
 	<li>
 		<a href="#cpu">CPU</a>
 	</li>
+	<li>
+		<a href="#tools">Tools</a>
+		<ol>
+			<li><a href="#tools_update_raise_in_sub_directories">Update Raise in Sub Directories</a></li>
+		</ol>
+	</li>
 </ol>
 
 
@@ -1561,7 +1567,7 @@ def find_finding_programs():
 	</p>
 
 	<pre class="raise_output">
-['/usr/bin/gcc']
+['/bin/gcc', '/usr/bin/gcc']
 	</pre>
 
 <a id="find_requiring_programs"></a>
@@ -1621,10 +1627,10 @@ def find_finding_libraries():
 	</p>
 
 	<pre class="raise_output">
-/usr/lib/i386-linux-gnu/libSDL.a
-/usr/lib/i386-linux-gnu/libSDL.so
-/usr/lib/i386-linux-gnu/libSDL.so
-/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/libSDL.a
+/usr/lib/libSDL.so
+/usr/lib/libSDL.so
+/usr/lib/libSDL.so
 	</pre>
 
 <a id="find_requiring_libraries"></a>
@@ -1867,9 +1873,9 @@ def c_compilers():
 
 	<pre class="raise_output">
 name: gcc
-path: /usr/bin/gcc 
+path: /bin/gcc 
 name: clang
-path: /usr/bin/clang
+path: /bin/clang
 	</pre>
 
 <a id="c_compiler_setup"></a>
@@ -2286,9 +2292,9 @@ def cxx_compilers():
 
 	<pre class="raise_output">
 name: g++
-path: /usr/bin/g++ 
+path: /bin/g++ 
 name: clang++
-path: /usr/bin/clang++
+path: /bin/clang++
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
@@ -2704,9 +2710,9 @@ def d_compilers():
 
 	<pre class="raise_output">
 name: dmd
-path: /usr/bin/dmd 
+path: /bin/dmd 
 name: ldc2
-path: /usr/bin/ldc2
+path: /bin/ldc2
 	</pre>
 
 <a id="d_compiler_setup"></a>
@@ -3091,9 +3097,9 @@ def csharp_compilers():
 
 	<pre class="raise_output">
 name: dmcs
-path: /usr/bin/dmcs 
+path: /bin/dmcs 
 name: dmcs
-path: /usr/bin/dmcs
+path: /bin/dmcs
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
@@ -3373,9 +3379,9 @@ def java_compilers():
 
 	<pre class="raise_output">
 name: javac
-path: /usr/bin/javac 
+path: /bin/javac 
 name: javac
-path: /usr/bin/javac
+path: /bin/javac
 	</pre>
 
 <a id="java_compiler_setup"></a>
@@ -3698,12 +3704,63 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: x86_32
 Bits: 32
-MHz: 1833.000
-Name: Genuine Intel(R) CPU           T2400  @ 1.83GHz
+MHz: 1600.000
+Name: Intel(R) Atom(TM) CPU N270   @ 1.60GHz
 Vendor Name: GenuineIntel
-Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, vmx, xtpr
+Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, ds_cpl, dtes64, dtherm, dts, est, fpu, fxsr, ht, lahf_lm, mca, mce, mmx, monitor, movbe, msr, mtrr, pae, pat, pbe, pdcm, pebs, pge, pni, sep, ss, sse, sse2, ssse3, tm, tm2, tsc, vme, xtpr
 Cores: 2
 	</pre>
+
+
+<hr />
+
+
+<a id="tools"></a>
+<h1>19. Tools</h1>
+
+<p>
+If you choose to do development on Raise itself, there are some tools that
+can make it easier. These are located in the "tools" directory. These scripts
+are smart enough to automatically figure out the correct directories to work 
+on. So you do not need to run them from the "tools" directory. Any directory 
+will do. 
+</p>
+
+<a id="tools_update_raise_in_sub_directories"></a>
+<h2>19.1. Update Raise in Sub Directories</h2>
+
+	<p>
+	If you make changes to the root "raise" file, you will want those
+	same changes to be copied to all the other directories that have 
+	their own "raise" file (tests, docs, and examples). Instead of having
+	to do this manually, you can use the 
+	"tools/update_raise_in_sub_directories.py" script. It will automatically
+	look through all the sub directories and replace any files named "raise"
+	with the root "raise" file.
+	</p>
+
+	<p>
+	If you are wondering why symlinks were not used, instead of copying the 
+	"raise" file all over the place. It is because they are not supported on
+	Windows. On Windows checking out code from a Bazaar VCS fails, if there
+	is a symlink in your project. The NTFS file system does not support 
+	symlinks (and no, 
+	<a href="http://en.wikipedia.org/wiki/NTFS_junction_point" target="_blank" rel="external">
+	NTFS Junction Points</a>
+	 won't work on a single file).
+	</p>
+
+	<p>
+	Fore more information, see this bug in Python 
+	<a href="http://bugs.python.org/issue1578269" target="_blank" rel="external">http://bugs.python.org/issue1578269</a>
+	and this bug Bazaar 
+	<a href="http://wiki.bazaar.canonical.com/WindowsSymlinkSupport" target="_blank" rel="external">http://wiki.bazaar.canonical.com/WindowsSymlinkSupport</a>
+	.
+	</p>
+
+	<pre><code data-language="shell">
+python tools/update_raise_in_sub_directories.py
+	</code></pre>
 
 
 <hr />

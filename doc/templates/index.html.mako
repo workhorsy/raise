@@ -224,6 +224,12 @@ Last updated on January 31st 2014
 	<li>
 		<a href="#cpu">CPU</a>
 	</li>
+	<li>
+		<a href="#tools">Tools</a>
+		<ol>
+			<li><a href="#tools_update_raise_in_sub_directories">Update Raise in Sub Directories</a></li>
+		</ol>
+	</li>
 </ol>
 
 
@@ -3031,6 +3037,57 @@ ${template_info['cpu']['example']}
 	<pre class="raise_output" style="white-space: pre-wrap;">
 ${template_info['cpu']['output']}
 	</pre>
+
+
+<hr />
+
+
+<a id="tools"></a>
+<h1>19. Tools</h1>
+
+<p>
+If you choose to do development on Raise itself, there are some tools that
+can make it easier. These are located in the "tools" directory. These scripts
+are smart enough to automatically figure out the correct directories to work 
+on. So you do not need to run them from the "tools" directory. Any directory 
+will do. 
+</p>
+
+<a id="tools_update_raise_in_sub_directories"></a>
+<h2>19.1. Update Raise in Sub Directories</h2>
+
+	<p>
+	If you make changes to the root "raise" file, you will want those
+	same changes to be copied to all the other directories that have 
+	their own "raise" file (tests, docs, and examples). Instead of having
+	to do this manually, you can use the 
+	"tools/update_raise_in_sub_directories.py" script. It will automatically
+	look through all the sub directories and replace any files named "raise"
+	with the root "raise" file.
+	</p>
+
+	<p>
+	If you are wondering why symlinks were not used, instead of copying the 
+	"raise" file all over the place. It is because they are not supported on
+	Windows. On Windows checking out code from a Bazaar VCS fails, if there
+	is a symlink in your project. The NTFS file system does not support 
+	symlinks (And no, 
+	<a href="http://en.wikipedia.org/wiki/NTFS_junction_point" target="_blank" rel="external">
+	NTFS Junction Points</a>
+	 won't work on a single file).
+	</p>
+
+	<p>
+	Fore more information, see this bug in Python 
+	<a href="http://bugs.python.org/issue1578269" target="_blank" rel="external">http://bugs.python.org/issue1578269</a>
+	and this bug Bazaar 
+	<a href="http://wiki.bazaar.canonical.com/WindowsSymlinkSupport" target="_blank" rel="external">http://wiki.bazaar.canonical.com/WindowsSymlinkSupport</a>
+	.
+	</p>
+
+	<pre><code data-language="shell">
+python tools/update_raise_in_sub_directories.py
+	</code></pre>
 
 
 <hr />

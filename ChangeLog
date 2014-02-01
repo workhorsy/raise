@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1223223: 'Symlinks break code checkout on Windows'.
 	* Fixed Bug #1274796: 'Error messages need to show line numbers'.
 	* Fixed Bug #1273939: 'Compilers should not store settings in environmental variables'.
 	* Fixed Bug #1273409: 'Find cache does not take version into account'.
