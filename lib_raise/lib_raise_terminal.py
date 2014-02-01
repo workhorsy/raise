@@ -149,7 +149,9 @@ def exit(message):
 	line = ''
 	# Only print the line number in non plain mode
 	if not Config.is_nolineno:
-		line = '\n(Called from {0})'.format(Helpers.get_rscript_line())
+		no = Helpers.get_rscript_line()
+		if no and no != '?':
+			line = '\n(Called from {0})'.format(no)
 
 	message = '{0}{1} Exiting ...{3}{2}\n'.format(
 		BGColors.FAIL, 
