@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 28th 2014
+Last updated on January 31st 2014
 </p>
 
 <p>
@@ -60,6 +60,7 @@ Last updated on January 28th 2014
 			<li><a href="#command_line_update">Update</a></li>
 			<li><a href="#command_line_version">Version</a></li>
 			<li><a href="#command_line_plain">Plain</a></li>
+			<li><a href="#command_line_nolineno">No Line Number</a></li>
 			<li><a href="#command_line_inspect">Inspect</a></li>
 		</ol>
 	</li>
@@ -454,8 +455,12 @@ cd raise/examples/c_simple
 <h2>3.3. Plain</h2>
     ./raise -plain - Don't clear, don't use color, and fix the width to 79
 
+<a id="command_line_nolineno"></a>
+<h2>3.4. No Line Number</h2>
+    ./raise -nolineno - Don't print line numbers on error exit
+
 <a id="command_line_inspect"></a>
-<h2>3.4. Inspect</h2>
+<h2>3.5. Inspect</h2>
     ./raise -inspect target_name - Print the source code to the target
 
 
@@ -3693,7 +3698,7 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: x86_32
 Bits: 32
-MHz: 1833.000
+MHz: 1333.000
 Name: Genuine Intel(R) CPU           T2400  @ 1.83GHz
 Vendor Name: GenuineIntel
 Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, vmx, xtpr

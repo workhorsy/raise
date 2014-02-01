@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -314,7 +314,7 @@ class TestBasics(TestCase):
 		self.init('Basics', id)
 
 	def test_require_root(self):
-		command = '{0} raise -plain simple_require_root'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_root'.format(sys.executable)
 
 		expected = \
 "Running target 'simple_require_root'"
@@ -322,7 +322,7 @@ class TestBasics(TestCase):
 		self.assert_process_output(command, expected)
 
 	def test_require_not_root_failure(self):
-		command = '{0} raise -plain simple_require_not_root_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_not_root_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_require_not_root_failure'
@@ -344,7 +344,7 @@ class TestC(TestCase):
 		self.init('C', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_program'
@@ -361,7 +361,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 		self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_shared_library'
@@ -383,7 +383,7 @@ Uninstalling the library 'lib_math.so' ...                                  :)''
 		self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_static_library'
@@ -418,7 +418,7 @@ class TestCXX(TestCase):
 		self.init('CXX', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_program'
@@ -435,7 +435,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 		self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_shared_library'
@@ -457,7 +457,7 @@ Uninstalling the library 'lib_math.so' ...                                  :)''
 		self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_static_library'
@@ -492,7 +492,7 @@ class TestD(TestCase):
 		self.init('D', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_program'
@@ -511,7 +511,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain install_and_uninstall_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_static_library'
@@ -547,7 +547,7 @@ class TestCSharp(TestCase):
 		self.init('CSharp', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_program'
@@ -565,7 +565,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 
 
 	def test_install_and_uninstall_shared_library(self):
-		command = '{0} raise -plain install_and_uninstall_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_shared_library'
@@ -599,7 +599,7 @@ class TestJava(TestCase):
 		self.init('Java', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain install_and_uninstall_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_program'
@@ -617,7 +617,7 @@ Uninstalling the program 'main.class' ...                                   :)''
 
 
 	def test_install_and_uninstall_jar(self):
-		command = '{0} raise -plain install_and_uninstall_jar'.format(sys.executable)
+		command = '{0} raise -plain -nolineno install_and_uninstall_jar'.format(sys.executable)
 
 		expected = \
 '''Running target 'install_and_uninstall_jar'

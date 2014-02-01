@@ -34,6 +34,7 @@ pwd = os.sys.path[0]
 python = sys.executable
 is_plain = False
 is_inspect = False
+is_nolineno = False
 
 
 def early_exit(message):

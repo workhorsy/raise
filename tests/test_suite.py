@@ -291,7 +291,7 @@ class TestBasics(TestCase):
 		self.init('Basics', id)
 
 	def test_nothing(self):
-		command = '{0} raise -plain simple_nothing'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_nothing'.format(sys.executable)
 
 		expected = \
 "Running target 'simple_nothing'"
@@ -299,7 +299,7 @@ class TestBasics(TestCase):
 		self.assert_process_output(command, expected)
 
 	def test_status(self):
-		command = '{0} raise -plain simple_status'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_status'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_status'
@@ -308,7 +308,7 @@ Simple status ...'''
 		self.assert_process_output(command, expected)
 
 	def test_ok(self):
-		command = '{0} raise -plain simple_ok'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_ok'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_ok'
@@ -317,7 +317,7 @@ Simple ok ...                                                               :)''
 		self.assert_process_output(command, expected)
 
 	def test_fail(self):
-		command = '{0} raise -plain simple_fail'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_fail'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_fail'
@@ -326,7 +326,7 @@ Simple fail ................................................................:(''
 		self.assert_process_output(command, expected)
 
 	def test_warning(self):
-		command = '{0} raise -plain simple_warning'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_warning'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_warning'
@@ -335,7 +335,7 @@ Simple warning .............................................................:\\'
 		self.assert_process_output(command, expected)
 
 	def test_require_program(self):
-		command = '{0} raise -plain simple_require_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_require_program'
@@ -344,7 +344,7 @@ Checking for program 'python' ...                                           :)''
 		self.assert_process_output(command, expected)
 
 	def test_require_program_failure(self):
-		command = '{0} raise -plain simple_require_program_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_program_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_require_program_failure'
@@ -354,7 +354,7 @@ Install the program 'no_such_program' and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_require_not_root(self):
-		command = '{0} raise -plain simple_require_not_root'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_not_root'.format(sys.executable)
 
 		expected = \
 "Running target 'simple_require_not_root'"
@@ -362,7 +362,7 @@ Install the program 'no_such_program' and try again. Exiting ...'''
 		self.assert_process_output(command, expected)
 
 	def test_require_root_failure(self):
-		command = '{0} raise -plain simple_require_root_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno simple_require_root_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'simple_require_root_failure'
@@ -384,7 +384,7 @@ class TestC(TestCase):
 		self.init('C', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'setup_failure'
@@ -394,7 +394,7 @@ No C compiler found. Install one and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -410,7 +410,7 @@ Running C program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -424,7 +424,7 @@ Running C program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_shared_library'
@@ -440,7 +440,7 @@ Running C program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'
@@ -469,7 +469,7 @@ class TestD(TestCase):
 		self.init('D', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'setup_failure'
@@ -479,7 +479,7 @@ No D compiler found. Install one and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -494,7 +494,7 @@ Running D program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -511,7 +511,7 @@ Running D program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'
@@ -528,7 +528,7 @@ Running D program ...                                                       :)
 		self.assert_process_output(command, expected)
 
 	def test_build_interface(self):
-		command = '{0} raise -plain build_interface'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_interface'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_interface'
@@ -553,7 +553,7 @@ class TestCXX(TestCase):
 		self.init('CXX', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'setup_failure'
@@ -563,7 +563,7 @@ No C++ compiler found. Install one and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -577,7 +577,7 @@ Running C++ program ...                                                     :)
 		self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -plain build_object'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_object'
@@ -593,7 +593,7 @@ Running C++ program ...                                                     :)
 		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_shared_library'
@@ -609,7 +609,7 @@ Running C++ program ...                                                     :)
 		self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain build_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_static_library'
@@ -638,7 +638,7 @@ class TestCSharp(TestCase):
 		self.init('CSharp', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'setup_failure'
@@ -648,7 +648,7 @@ No C# compiler found. Install one and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -662,7 +662,7 @@ main.exe
 		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain build_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_shared_library'
@@ -690,7 +690,7 @@ class TestJava(TestCase):
 		self.init('Java', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain setup_failure'.format(sys.executable)
+		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
 
 		expected = \
 '''Running target 'setup_failure'
@@ -700,7 +700,7 @@ No Java compiler found. Install one and try again. Exiting ...'''
 		self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain build_program'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_program'
@@ -714,7 +714,7 @@ java main
 		self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain build_jar'.format(sys.executable)
+		command = '{0} raise -plain -nolineno build_jar'.format(sys.executable)
 
 		expected = \
 '''Running target 'build_jar'
@@ -738,7 +738,7 @@ class TestFind(TestCase):
 		self.init('Find', id)
 
 	def test_find_unparsable_version_code(self):
-		command = '{0} raise -plain find_unparsable_version_code'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_unparsable_version_code'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_unparsable_version_code'
@@ -749,7 +749,7 @@ Fix version string and try again. Exiting ...'''
 		self.assert_process_output(command, expected, False)
 
 	def test_find_black_listed_version_code(self):
-		command = '{0} raise -plain find_black_listed_version_code'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_black_listed_version_code'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_black_listed_version_code'
@@ -760,7 +760,7 @@ Fix version string and try again. Exiting ...'''
 		self.assert_process_output(command, expected, False)
 
 	def test_find_black_listed_version_code(self):
-		command = '{0} raise -plain find_invalid_version_code'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_invalid_version_code'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_invalid_version_code'
@@ -773,7 +773,7 @@ Fix version string and try again. Exiting ...'''
 
 
 	def test_find_installed_shared_library(self):
-		command = '{0} raise -plain find_installed_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_shared_library'
@@ -789,7 +789,7 @@ Checking for shared library 'libsdl' ...                                    :)''
 		self.assert_process_output(command, expected)
 
 	def test_find_missing_shared_library(self):
-		command = '{0} raise -plain find_missing_shared_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_missing_shared_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_missing_shared_library'
@@ -799,7 +799,7 @@ Shared library 'libDoesNotExist (Any version)' not installed. Install and try ag
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_shared_library_bad_version(self):
-		command = '{0} raise -plain find_installed_shared_library_bad_version'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_shared_library_bad_version'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_shared_library_bad_version'
@@ -809,7 +809,7 @@ Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_shared_library_cache(self):
-		command = '{0} raise -plain find_installed_shared_library_cache'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_shared_library_cache'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_shared_library_cache'
@@ -820,7 +820,7 @@ Shared library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_static_library(self):
-		command = '{0} raise -plain find_installed_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_static_library'
@@ -836,7 +836,7 @@ Checking for static library 'libsdl' ...                                    :)''
 		self.assert_process_output(command, expected)
 
 	def test_find_missing_static_library(self):
-		command = '{0} raise -plain find_missing_static_library'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_missing_static_library'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_missing_static_library'
@@ -846,7 +846,7 @@ Static library 'libDoesNotExist (Any version)' not installed. Install and try ag
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_static_library_bad_version(self):
-		command = '{0} raise -plain find_installed_static_library_bad_version'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_static_library_bad_version'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_static_library_bad_version'
@@ -856,7 +856,7 @@ Static library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_static_library_cache(self):
-		command = '{0} raise -plain find_installed_static_library_cache'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_static_library_cache'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_static_library_cache'
@@ -869,7 +869,7 @@ Static library 'libSDL ver >= (99, 0)' not installed. Install and try again. Exi
 
 
 	def test_find_installed_header_file(self):
-		command = '{0} raise -plain find_installed_header_file'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_header_file'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_header_file'
@@ -885,7 +885,7 @@ Checking for header file 'libsdl' ...                                       :)''
 		self.assert_process_output(command, expected)
 
 	def test_find_missing_header_file(self):
-		command = '{0} raise -plain find_missing_header_file'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_missing_header_file'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_missing_header_file'
@@ -895,7 +895,7 @@ Header file 'libDoesNotExist (Any version)' not installed. Install and try again
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_header_file_bad_version(self):
-		command = '{0} raise -plain find_installed_header_file_bad_version'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_header_file_bad_version'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_header_file_bad_version'
@@ -905,7 +905,7 @@ Header file 'libSDL ver >= (99, 0)' not installed. Install and try again. Exitin
 		self.assert_process_output(command, expected, False)
 
 	def test_find_installed_header_file_cache(self):
-		command = '{0} raise -plain find_installed_header_file_cache'.format(sys.executable)
+		command = '{0} raise -plain -nolineno find_installed_header_file_cache'.format(sys.executable)
 
 		expected = \
 '''Running target 'find_installed_header_file_cache'

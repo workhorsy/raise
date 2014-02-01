@@ -29,6 +29,7 @@ import os
 import atexit
 import platform
 import ast
+import inspect
 from collections import namedtuple
 import lib_raise_config as Config
 import lib_raise_terminal as Print
@@ -179,7 +180,7 @@ def to_version_cb(version_str):
 	# Make sure the code can be parsed into a lambda
 	try:
 		version_cb = eval(code, {})
-		version_cb((1, 9))
+		version_cb(version_string_to_tuple('(1, 9)'))
 	except Exception as e:
 		Print.status('Building version string')
 		Print.fail('Invalid version string "{0}", {1}'.format(version_str, e))
@@ -234,6 +235,20 @@ def is_safe_code(source_code):
 			return False
 
 	return True
+
+def get_rscript_line():
+	frame = inspect.currentframe()
+	info, file, line = None, None, None
+	while frame:
+		info = inspect.getframeinfo(frame)
+		file = os.path.abspath(info[0])
+		line = info[1]
+		frame = frame.f_back
+		#print(file, line)
+		if file.endswith('rscript'):
+			return '{0} Ln {1}'.format(file, line)
+
+	return '?'
 
 
 setup()

@@ -146,7 +146,17 @@ def fail(post_fail_message=None):
 	sys.stdout.flush()
 
 def exit(message):
-	message = '{0}{1} Exiting ...{2}\n'.format(BGColors.FAIL, message, BGColors.ENDC)
+	line = ''
+	# Only print the line number in non plain mode
+	if not Config.is_nolineno:
+		line = '\n(Called from {0})'.format(Helpers.get_rscript_line())
+
+	message = '{0}{1} Exiting ...{3}{2}\n'.format(
+		BGColors.FAIL, 
+		message, 
+		BGColors.ENDC, 
+		line
+	)
 
 	sys.stdout.write(message)
 	sys.stdout.flush()
