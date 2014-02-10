@@ -43,7 +43,7 @@ def setup():
 	global d_compilers
 
 	# Get the names and paths for know D compilers
-	names = ['dmd2', 'dmd', 'ldc2', 'ldc']
+	names = ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
@@ -60,7 +60,11 @@ def setup():
 				warnings_all =         '-w', 
 				optimize =             '-O', 
 				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed'
+				link =                 '-Wl,-as-needed', 
+				interface =            '-H', 
+				interface_file =       '-Hf', 
+				interface_dir =        '-Hd'
+
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['ldc2', 'ldc']:
@@ -74,7 +78,27 @@ def setup():
 				warnings_all =         '-w', 
 				optimize =             '-O2',
 				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed'
+				link =                 '-Wl,-as-needed', 
+				interface =            '-H', 
+				interface_file =       '-Hf', 
+				interface_dir =        '-Hd'
+			)
+			d_compilers[comp._name] = comp
+		elif name in ['gdc']:
+			comp = DCompiler(
+				name =                 name, 
+				path =                 paths[0], 
+				setup =                '', 
+				out_file =             '-o ', 
+				no_link =              '-c', 
+				debug =                '-g', 
+				warnings_all =         '-Werror', 
+				optimize =             '-O2', 
+				compile_time_flags =   '-version=', 
+				link =                 '-Wl,-as-needed', 
+				interface =            '-fintfc=', 
+				interface_file =       '-fintfc-file=', 
+				interface_dir =        '-fintfc-dir='
 			)
 			d_compilers[comp._name] = comp
 
@@ -88,7 +112,8 @@ def setup():
 class DCompiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, optimize, 
-				compile_time_flags, link):
+				compile_time_flags, link, 
+				interface, interface_file, interface_dir):
 
 		self._name = name
 		self._path = path
@@ -103,6 +128,10 @@ class DCompiler(object):
 
 		self._opt_compile_time_flags = compile_time_flags
 		self._opt_link = link
+
+		self._opt_interface = interface
+		self._opt_interface_file = interface_file
+		self._opt_interface_dir = interface_dir
 
 		# Set the default values of the flags
 		self.debug = False
@@ -133,11 +162,13 @@ class DCompiler(object):
 		singular = 'D interface'
 
 		f = FS.self_deleting_named_temporary_file()
-		command = "{0} {1} -c {2} {3} -Hf{4}i {5}{6}".format(
+		command = "{0} {1} {2} {3} {4} {5}{6}i {7}{8}".format(
 			self.dc, 
 			self.dflags, 
+			self._opt_no_link, 
 			d_file, 
 			str.join(' ', i_files), 
+			self._opt_interface_file, 
 			d_file, 
 			self._opt_out_file, 
 			f.name
@@ -167,9 +198,10 @@ class DCompiler(object):
 		plural = 'D objects'
 		singular = 'D object'
 
-		command = "{0} {1} -c {2}{3} {4} {5} {6}".format(
+		command = "{0} {1} {2} {3}{4} {5} {6} {7}".format(
 			self.dc, 
 			self.dflags, 
+			self._opt_no_link, 
 			self._opt_out_file, 
 			o_file, 
 			str.join(' ', d_files), 
@@ -177,7 +209,12 @@ class DCompiler(object):
 			str.join(' ', l_files)
 		)
 		if h_files:
-			command += " -H -Hdimport -Hf{0}".format(str.join(' ', h_files))
+			command += " {0} {1}import {2}{3}".format(
+				self._opt_interface, 
+				self._opt_interface_dir, 
+				self._opt_interface_file, 
+				str.join(' ', h_files)
+			)
 		command = to_native(command)
 
 		def setup():
@@ -216,7 +253,10 @@ class DCompiler(object):
 			str.join(' ', l_files)
 		)
 		if generate_headers:
-			command += "  -Hdimport -H"
+			command += "  {0}import {1}".format(
+				self._opt_interface_dir, 
+				self._opt_interface, 
+			)
 		command = to_native(command)
 
 		def setup():
@@ -305,7 +345,7 @@ def get_default_compiler():
 	global d_compilers
 
 	comp = None
-	for name in ['dmd2', 'dmd', 'ldc2', 'ldc']:
+	for name in ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']:
 		if name in d_compilers:
 			comp = d_compilers[name]
 			break

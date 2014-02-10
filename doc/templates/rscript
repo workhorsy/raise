@@ -352,6 +352,12 @@ def d_compilers():
 	print("name: {0}".format(dc._name))
 	print("path: {0} ".format(dc._path))
 
+	dc = D.d_compilers['gdc']
+
+	# Print the compiler name and path for fun
+	print("name: {0}".format(dc._name))
+	print("path: {0} ".format(dc._path))
+
 def d_compiler_setup():
 	# Get a D compiler
 	dc = D.get_default_compiler()

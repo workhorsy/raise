@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on January 31st 2014
+Last updated on February 10th 2014
 </p>
 
 <p>
@@ -487,7 +487,7 @@ C and C++ are fully supported with GCC, and Clang. MS cl.exe support is not yet 
 <h2>4.2. D</h2>
 
 <p>
-D is fully supported with DMD and LDC.
+D is fully supported with DMD, LDC, and GDC.
 </p>
 
 <a id="c_sharp_support"></a>
@@ -1567,7 +1567,7 @@ def find_finding_programs():
 	</p>
 
 	<pre class="raise_output">
-['/bin/gcc', '/usr/bin/gcc']
+['/usr/bin/gcc']
 	</pre>
 
 <a id="find_requiring_programs"></a>
@@ -1627,10 +1627,10 @@ def find_finding_libraries():
 	</p>
 
 	<pre class="raise_output">
-/usr/lib/libSDL.a
-/usr/lib/libSDL.so
-/usr/lib/libSDL.so
-/usr/lib/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.a
+/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.so
 	</pre>
 
 <a id="find_requiring_libraries"></a>
@@ -1873,9 +1873,9 @@ def c_compilers():
 
 	<pre class="raise_output">
 name: gcc
-path: /bin/gcc 
+path: /usr/bin/gcc 
 name: clang
-path: /bin/clang
+path: /usr/bin/clang
 	</pre>
 
 <a id="c_compiler_setup"></a>
@@ -2292,9 +2292,9 @@ def cxx_compilers():
 
 	<pre class="raise_output">
 name: g++
-path: /bin/g++ 
+path: /usr/bin/g++ 
 name: clang++
-path: /bin/clang++
+path: /usr/bin/clang++
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
@@ -2669,7 +2669,7 @@ import lib_raise_d as D
 <h2>14.2. D Compilers</h2>
 
 	<p>
-		Raise supports the DMD, and LDC D compilers. The compiler
+		Raise supports the DMD, LDC, and GDC D compilers. The compiler
 		 is abstracted away in a generalized way, as to make it so you don't 
 		have to worry about compiler specific functionality.
 	</p>
@@ -2702,6 +2702,12 @@ def d_compilers():
  	# Print the compiler name and path for fun
  	print("name: {0}".format(dc._name))
  	print("path: {0} ".format(dc._path))
+ 
+ 	dc = D.d_compilers['gdc']
+ 
+ 	# Print the compiler name and path for fun
+ 	print("name: {0}".format(dc._name))
+ 	print("path: {0} ".format(dc._path))
 	</code></pre>
 
 	<p>
@@ -2710,9 +2716,11 @@ def d_compilers():
 
 	<pre class="raise_output">
 name: dmd
-path: /bin/dmd 
+path: /usr/bin/dmd 
 name: ldc2
-path: /bin/ldc2
+path: /usr/bin/ldc2 
+name: gdc
+path: /usr/bin/gdc
 	</pre>
 
 <a id="d_compiler_setup"></a>
@@ -3097,9 +3105,9 @@ def csharp_compilers():
 
 	<pre class="raise_output">
 name: dmcs
-path: /bin/dmcs 
+path: /usr/bin/dmcs 
 name: dmcs
-path: /bin/dmcs
+path: /usr/bin/dmcs
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
@@ -3379,9 +3387,9 @@ def java_compilers():
 
 	<pre class="raise_output">
 name: javac
-path: /bin/javac 
+path: /usr/bin/javac 
 name: javac
-path: /bin/javac
+path: /usr/bin/javac
 	</pre>
 
 <a id="java_compiler_setup"></a>
@@ -3704,10 +3712,10 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: x86_32
 Bits: 32
-MHz: 1600.000
-Name: Intel(R) Atom(TM) CPU N270   @ 1.60GHz
+MHz: 1833.000
+Name: Genuine Intel(R) CPU           T2400  @ 1.83GHz
 Vendor Name: GenuineIntel
-Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, ds_cpl, dtes64, dtherm, dts, est, fpu, fxsr, ht, lahf_lm, mca, mce, mmx, monitor, movbe, msr, mtrr, pae, pat, pbe, pdcm, pebs, pge, pni, sep, ss, sse, sse2, ssse3, tm, tm2, tsc, vme, xtpr
+Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, vmx, xtpr
 Cores: 2
 	</pre>
 
@@ -3744,7 +3752,7 @@ will do.
 	"raise" file all over the place. It is because they are not supported on
 	Windows. On Windows checking out code from a Bazaar VCS fails, if there
 	is a symlink in your project. The NTFS file system does not support 
-	symlinks (and no, 
+	symlinks (And no, 
 	<a href="http://en.wikipedia.org/wiki/NTFS_junction_point" target="_blank" rel="external">
 	NTFS Junction Points</a>
 	 won't work on a single file).
