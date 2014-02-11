@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 10th 2014
+Last updated on February 11th 2014
 </p>
 
 <p>
@@ -1887,6 +1887,7 @@ path: /usr/bin/clang
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
 				<li>0 for no optimizations</li>
@@ -1912,6 +1913,7 @@ def c_compiler_setup():
  
  	# Compiler setup
  	cc.debug = True
+ 	cc.position_independent_code = True
  	cc.optimize_level = 2
  	cc.warnings_all = True
  	cc.warnings_as_errors = True
@@ -1928,7 +1930,7 @@ def c_compiler_setup():
 
 	<pre class="raise_output">
 $CC: gcc
-$CFLAGS:  -g -Wall -Werror -O2 -DSDL=true
+$CFLAGS:  -g -fPIC -Wall -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="c_building_object"></a>
@@ -2306,6 +2308,7 @@ path: /usr/bin/clang++
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
 				<li>0 for no optimizations</li>
@@ -2331,6 +2334,7 @@ def cxx_compiler_setup():
  
  	# Compiler setup
  	cxx.debug = True
+ 	cxx.position_independent_code = True
  	cxx.optimize_level = 2
  	cxx.warnings_all = True
  	cxx.warnings_as_errors = True
@@ -2347,7 +2351,7 @@ def cxx_compiler_setup():
 
 	<pre class="raise_output">
 $CXX: g++
-$CXXFLAGS:  -g -Wall -Werror -O2 -DSDL=true
+$CXXFLAGS:  -g -fPIC -Wall -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="cxx_building_object"></a>

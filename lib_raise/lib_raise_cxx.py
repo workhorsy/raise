@@ -56,6 +56,7 @@ def setup():
 				out_file =             '-o ', 
 				no_link =              '-c', 
 				debug =                '-g', 
+				position_independent_code = '-fPIC', 
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
 				optimize_zero =        '-O0',
@@ -75,6 +76,7 @@ def setup():
 				out_file =             '-o ', 
 				no_link =              '-c', 
 				debug =                '-g', 
+				position_independent_code = '-fPIC', 
 				warnings_all =         '-Wall', 
 				warnings_as_errors =   '-Werror', 
 				optimize_zero =        '-O0',
@@ -95,6 +97,7 @@ def setup():
 				out_file =             '/Fe', 
 				no_link =              '/c', 
 				debug =                '', 
+				position_independent_code = '', 
 				warnings_all =         '/Wall', 
 				warnings_as_errors =   '', 
 				optimize_zero =        '/Od',
@@ -116,7 +119,8 @@ def setup():
 
 class CXXCompiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
-				debug, warnings_all, warnings_as_errors, 
+				debug, position_independent_code, 
+				warnings_all, warnings_as_errors, 
 				optimize_zero, optimize_one, optimize_two,
 				optimize_three, optimize_size, 
 				compile_time_flags, link):
@@ -129,6 +133,7 @@ class CXXCompiler(object):
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
 		self._opt_debug = debug
+		self._opt_position_independent_code = position_independent_code
 		self._opt_warnings_all = warnings_all
 		self._opt_warnings_as_errors = warnings_as_errors
 		self._opt_optimize_zero = optimize_zero
@@ -142,6 +147,7 @@ class CXXCompiler(object):
 
 		# Set the default values of the flags
 		self.debug = False
+		self.position_independent_code = False
 		self.warnings_all = False
 		self.warnings_as_errors = False
 		self.optimize_level = 1
@@ -155,6 +161,7 @@ class CXXCompiler(object):
 		opts = []
 		opts.append(self._opt_setup)
 		if self.debug: opts.append(self._opt_debug)
+		if self.position_independent_code: opts.append(self._opt_position_independent_code)
 		if self.warnings_all: opts.append(self._opt_warnings_all)
 		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
 		if self.optimize_level == 0: opts.append(self._opt_optimize_zero)

@@ -124,6 +124,7 @@ def c_compiler_setup():
 
 	# Compiler setup
 	cc.debug = True
+	cc.position_independent_code = True
 	cc.optimize_level = 2
 	cc.warnings_all = True
 	cc.warnings_as_errors = True
@@ -241,6 +242,7 @@ def cxx_compiler_setup():
 
 	# Compiler setup
 	cxx.debug = True
+	cxx.position_independent_code = True
 	cxx.optimize_level = 2
 	cxx.warnings_all = True
 	cxx.warnings_as_errors = True

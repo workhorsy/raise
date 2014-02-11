@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 10th 2014
+Last updated on February 11th 2014
 </p>
 
 <p>
@@ -1757,6 +1757,7 @@ ${template_info['c_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
 				<li>0 for no optimizations</li>
@@ -2063,6 +2064,7 @@ ${template_info['cxx_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
 				<li>0 for no optimizations</li>
