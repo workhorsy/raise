@@ -44,6 +44,7 @@ LIB_RAISE_VERSION = '0.4.0 dev'
 RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
+	'cpuinfo.py'          : '{0}cpuinfo.py-20140213011104-ys50gdvnav1t3ah0-1/cpuinfo.py'.format(RAISE_BASE),
 	'raise'               : '{0}raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_BASE),
 	'raise_ar'            : '{0}lib_raise_ar.py-20131002010124-c22ldygq1nz33jv5-1/lib_raise_ar.py'.format(RAISE_BASE),
 	'raise_c'             : '{0}lib_raise_c.py-20130925020012-1prflcfy9f1w5w74-1/lib_raise_c.py'.format(RAISE_BASE),
@@ -86,8 +87,12 @@ def update(dir_name):
 		os.mkdir(dir_name)
 
 	for module, url in RAISE_URLS.items():
+		# Get the real name if a raise module
+		if not module.endswith('.py'):
+			module = "lib_{0}.py".format(module)
+
 		# Get the file name for script
-		file_name = os.path.join(dir_name, "lib_{0}.py".format(module))
+		file_name = os.path.join(dir_name, module)
 
 		# Download the file and call the cb after each chunk
 		_download_file(url, file_name)
@@ -168,7 +173,9 @@ if __name__ == '__main__':
 			has_files = True
 
 			for module, url in RAISE_URLS.items():
-				module = 'lib_{0}.py'.format(module)
+				# Get the real name if a raise module
+				if not module.endswith('.py'):
+					module = 'lib_{0}.py'.format(module)
 				module = os.path.join(entry, module)
 				if not os.path.exists(module):
 					has_files = False

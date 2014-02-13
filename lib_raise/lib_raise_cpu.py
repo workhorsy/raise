@@ -152,7 +152,7 @@ def setup():
 		# If not, try querying the CPU cpuid register
 		if not info:
 			info = cpuinfo.get_cpu_info_from_cpuid()
-		else:
+		if not info:
 			raise Exception('Failed to get CPU info.')
 
 		# Get the CPU arch and bits
