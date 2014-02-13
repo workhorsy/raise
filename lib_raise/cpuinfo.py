@@ -794,11 +794,13 @@ def get_cpu_info():
 	# Try the Windows registry
 	if is_windows:
 		info = get_cpu_info_from_registry()
+
 	# Try /proc/cpuinfo
-	elif not info:
+	if not info:
 		info = get_cpu_info_from_proc_cpuinfo()
+
 	# Try querying the CPU cpuid register
-	elif not info:
+	if not info:
 		info = get_cpu_info_from_cpuid()
 
 	return info
