@@ -804,24 +804,15 @@ def get_cpu_info():
 		info = get_cpu_info_from_cpuid()
 
 	return info
-'''
-info = get_cpu_info_from_proc_cpuinfo()
-print(info['vendor_id'])
-print(info['processor_brand'])
-print(info['processor_hz'])
-print(info['processor_arch'])
-print(info['processor_bits'])
-print(info['processor_count'])
-print(info['processor_raw_arch_string'])
 
+if __name__ == '__main__':
+	info = get_cpu_info()
+	print('Vendor ID', info['vendor_id'])
+	print('Brand', info['processor_brand'])
+	print('Hz', info['processor_hz'])
+	print('Arch', info['processor_arch'])
+	print('Bits', info['processor_bits'])
+	print('Count', info['processor_count'])
+	print('Flags:', info['flags'])
 
-info = get_cpu_info_from_cpuid()
-print(info['vendor_id'])
-print(info['processor_brand'])
-print(info['processor_hz'])
-print(info['processor_arch'])
-print(info['processor_bits'])
-print(info['processor_count'])
-print(info['processor_raw_arch_string'])
-'''
 
