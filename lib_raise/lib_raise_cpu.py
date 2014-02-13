@@ -32,6 +32,7 @@ import re
 import lib_raise_helpers as Helpers
 import lib_raise_config as Config
 import lib_raise_users as Users
+import cpuinfo
 
 
 arch = None
@@ -66,6 +67,7 @@ def setup():
 		else:
 			Config.early_exit('Unknown architecture {0}.'.format(dirty_arch))
 
+	# FIXME: Move all this into the cpuinfo.py library as a fallback for Windows
 	# For Windows get the CPU info from the register
 	if Helpers.os_type._name == 'Windows':
 		import _winreg
@@ -142,24 +144,31 @@ def setup():
 		# Get a list of only the flags that are true
 		flags = [k for k, v in flags.items() if v]
 		flags.sort()
-	# For everything else, use /proc/cpuinfo
+	# For everything else, assume unix/linux
 	else:
+		# First try /proc/cpuinfo
+		info = cpuinfo.get_cpu_info_from_proc_cpuinfo()
+
+		# If not, try querying the CPU cpuid register
+		if not info:
+			info = cpuinfo.get_cpu_info_from_cpuid()
+		else:
+			raise Exception('Failed to get CPU info.')
+
 		# Get the CPU arch and bits
 		set_arch(platform.machine())
 
 		# Get the CPU MHz
-		cpuinfo = os.popen('cat /proc/cpuinfo').read()
-		mhz = Helpers.between(cpuinfo, 'cpu MHz		: ', '\n')
+		mhz = info['processor_hz']
 
 		# Get the CPU name
-		name = Helpers.between(cpuinfo, 'model name	: ', '\n')
+		name = info['processor_brand']
 
 		# Get the CPU vendor name
-		vendor_name = Helpers.between(cpuinfo, 'vendor_id	: ', '\n')
+		vendor_name = info['vendor_id']
 
 		# Get the CPU features
-		flags = Helpers.between(cpuinfo, 'flags		: ', '\n').split()
-		flags.sort()
+		flags = info['flags']
 
 	# Figure out how many cpus there are
 	cpus_total = multiprocessing.cpu_count()
