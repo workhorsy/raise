@@ -58,20 +58,20 @@ def setup():
 		Config.early_exit('Failed to get CPU info.')
 
 	# Make sure to show an error if we could not get the CPU arch or bits
-	if not info['processor_arch'] or not info['processor_bits']:
-		Config.early_exit('Unknown CPU architecture "{0}".'.format(info['processor_raw_arch_string']))
+	if not info['arch'] or not info['bits']:
+		Config.early_exit('Unknown CPU architecture "{0}".'.format(info['raw_arch_string']))
 
 	# Get the CPU arch
-	arch = info['processor_arch']
+	arch = info['arch']
 
 	# Get the CPU bits
-	bits = info['processor_bits']
+	bits = info['bits']
 
 	# Get the CPU MHz
-	mhz = info['processor_hz']
+	mhz = info['hz']
 
 	# Get the CPU name
-	name = info['processor_brand']
+	name = info['brand']
 
 	# Get the CPU vendor name
 	vendor_name = info['vendor_id']
@@ -80,7 +80,7 @@ def setup():
 	flags = info['flags']
 
 	# Figure out how many cpus there are
-	cpus_total = info['processor_count']
+	cpus_total = info['count']
 	cpus_free = cpus_total
 
 setup()
