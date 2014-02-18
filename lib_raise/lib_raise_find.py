@@ -109,10 +109,6 @@ def _get_library_files(lib_name, version_str = None):
 	if search_param in lib_file_cache:
 		return lib_file_cache[search_param]
 
-	# Try finding the library with pkg-config
-	if not files and program_paths('pkg-config'):
-		files = _get_library_files_from_pkg_config(lib_name, version_cb)
-
 	# Try finding the library with dpkg
 	if not files and program_paths('dpkg'):
 		files = _get_library_files_from_dpkg(lib_name, version_cb)
@@ -124,6 +120,10 @@ def _get_library_files(lib_name, version_str = None):
 	# Try finding the library with pkg_info
 	if not files and program_paths('pkg_info'):
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
+
+	# Try finding the library with pkg-config
+	if not files and program_paths('pkg-config'):
+		files = _get_library_files_from_pkg_config(lib_name, version_cb)
 
 	# Try finding the library in the file system. But only if there is no version requirement.
 	if not version_cb and not files:
@@ -148,7 +148,9 @@ def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 	for package in result.split("\n"):
 		# Get the name
 		name = package.split()[0]
-		if name.lower() != 'lib' + lib_name.lower():
+
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
 			continue
 
 		# Get the version, libdir, and includedir
@@ -169,7 +171,12 @@ def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 				for entry in files:
 					# Get the whole file name
 					f = os.path.join(root, entry)
-					if f.split('.')[0].endswith(lib_name) and os.path.isfile(f):
+
+					# Save the file if the name is in the root
+					if lib_name.lower() in root.lower():
+						matching_files.append(f)
+					# Save the file if the lib name is in the file
+					elif 'lib' + lib_name.lower() in entry.lower():
 						matching_files.append(f)
 
 	return matching_files
@@ -466,5 +473,6 @@ def program_paths(program_name):
 			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
 				paths.append(pext)
 	return paths
+
 
 
