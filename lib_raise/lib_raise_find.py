@@ -203,6 +203,10 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 		version = Helpers.between_last(package.split()[2], ':', '-')
 		version = Helpers.version_string_to_tuple(version)
 
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
+
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
 			continue
@@ -239,6 +243,10 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 		version = Helpers.between_last(result, 'Version     : ', '\n')
 		version = Helpers.version_string_to_tuple(version)
 
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
+
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
 			continue
@@ -261,7 +269,7 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 	matching_files = []
 
 	# Find all packages that contain the name
-	result = Process.run_and_get_stdout("pkg_info -Ix {0}".format(lib_name))
+	result = Process.run_and_get_stdout("pkg_info | grep -i {0}".format(lib_name))
 	if not result:
 		return matching_files
 
@@ -271,6 +279,10 @@ def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 		name = package.split()[0]
 		version = Helpers.before(name.split('-')[-1], '_')
 		version = Helpers.version_string_to_tuple(version)
+
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
 
 		# Skip this package if the version does not match
 		if version_cb and not version_cb(version):
