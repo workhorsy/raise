@@ -331,8 +331,8 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 		result = Process.run_and_get_stdout("rpm -qi {0}".format(package))
 		if not result:
 			continue
-		name = Helpers.between_last(result, 'Name        : ', '\n')
-		version = Helpers.between_last(result, 'Version     : ', '\n')
+		name = Helpers.between(result, 'Name        : ', '\n')
+		version = Helpers.between(result, 'Version     : ', '\n')
 		version = Helpers.version_string_to_tuple(version)
 
 		# Skip this package if the library name is not in the package name
