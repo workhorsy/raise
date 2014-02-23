@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 11th 2014
+Last updated on February 23rd 2014
 </p>
 
 <p>
