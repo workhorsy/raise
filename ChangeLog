@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1228913: 'Make library searching work on Arch'.
 	* Fixed Bug #1279599: 'Make getting CPU info have more fallback techniques'.
 	* Fixed Bug #1277752: 'Add PIC flag to C/C++ compilers'.
 	* Fixed Bug #1223223: 'Symlinks break code checkout on Windows'.

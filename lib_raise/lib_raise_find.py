@@ -52,6 +52,37 @@ def _get_all_library_paths():
 
 	return paths
 
+def _get_best_match(names, desired):
+	'''
+	Will match files with this priority:
+	1. Exact match
+	2. Exact match different capitalization
+	3. Matches start or end
+	4. Matches start or end different capitalization
+	'''
+
+	# 1. Exact match
+	for name in names:
+		if name == desired:
+			return name
+
+	# 2. Exact match different capitalization
+	for name in names:
+		if name.lower() == desired.lower():
+			return name
+
+	# 3. Matches start or end
+	for name in names:
+		if name.startswith(desired) or name.endswith(desired):
+			return name
+
+	# 4. Matches start or end different capitalization
+	for name in names:
+		if name.lower().startswith(desired.lower()) or name.lower().endswith(desired.lower()):
+			return name
+
+	return None
+
 def _get_matched_file_from_library_files(library_name, extension, library_files):
 	'''
 	Will match files with this priority:
@@ -120,6 +151,10 @@ def _get_library_files(lib_name, version_str = None):
 	# Try finding the library with rpm
 	if not files and program_paths('rpm'):
 		files = _get_library_files_from_rpm(lib_name, version_cb)
+
+	# Try finding the library with pacman
+	if not files and program_paths('pacman'):
+		files = _get_library_files_from_pacman(lib_name, version_cb)
 
 	# Try finding the library with pkg_info
 	if not files and program_paths('pkg_info'):
@@ -192,6 +227,56 @@ def _get_library_files_from_fs(lib_name):
 				f = os.path.join(root, entry)
 				if lib_name in f and os.path.isfile(f):
 					matching_files.append(f)
+
+	return matching_files
+
+def _get_library_files_from_pacman(lib_name, version_cb = None):
+	matching_files = []
+	lib_name = lib_name.lstrip('lib')
+
+	# Find all packages that contain the name
+	result = Process.run_and_get_stdout("pacman -Sl | grep -i {0}".format(lib_name))
+	if not result:
+		return matching_files
+
+	# Get the best package name
+	packages = [p.split()[1] for p in result.split("\n")]
+	best_name = _get_best_match(packages, lib_name)
+	if not best_name:
+		return matching_files
+
+	# For each package
+	for package in result.split("\n"):
+		# Get the name
+		name = package.split()[1]
+
+		# Skip this package if it is not the best name
+		if not best_name == name:
+			continue
+
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
+
+		# Get the version
+		version = package.split()[2]
+		version = version.split('-')[0]
+		version = Helpers.version_string_to_tuple(version)
+
+		# Skip this package if the version does not match
+		if version_cb and not version_cb(version):
+			continue
+
+		# Get the library files
+		result = Process.run_and_get_stdout('pacman -Ql {0}'.format(name))
+		if not result:
+			continue
+
+		# Save all the files
+		for entry in result.split("\n"):
+			entry = entry.split()[1]
+			if os.path.isfile(entry):
+				matching_files.append(entry)
 
 	return matching_files
 

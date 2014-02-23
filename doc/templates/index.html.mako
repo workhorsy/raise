@@ -1438,6 +1438,7 @@ Below are a few ways Raise will search on common OSes:
 	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>Dpkg: Debian, Ubuntu, Linux Mint</li>
 	<li>RPM: Red Hat, Fedora, openSUSE, Mandriva</li>
+	<li>Pacman: Arch, Manjaro</li>
 	<li>pkg_info: FreeBSD</li>
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
