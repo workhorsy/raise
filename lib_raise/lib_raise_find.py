@@ -140,10 +140,6 @@ def _get_library_files(lib_name, version_str = None):
 	if search_param in lib_file_cache:
 		return lib_file_cache[search_param]
 
-	# Try finding the library with pkg-config
-	if not files and program_paths('pkg-config'):
-		files = _get_library_files_from_pkg_config(lib_name, version_cb)
-
 	# Try finding the library with dpkg
 	if not files and program_paths('dpkg'):
 		files = _get_library_files_from_dpkg(lib_name, version_cb)
@@ -159,6 +155,10 @@ def _get_library_files(lib_name, version_str = None):
 	# Try finding the library with pkg_info
 	if not files and program_paths('pkg_info'):
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
+
+	# Try finding the library with pkg-config
+	if not files and program_paths('pkg-config'):
+		files = _get_library_files_from_pkg_config(lib_name, version_cb)
 
 	# Try finding the library in the file system. But only if there is no version requirement.
 	if not version_cb and not files:
