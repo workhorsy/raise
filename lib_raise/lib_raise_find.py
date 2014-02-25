@@ -141,31 +141,31 @@ def _get_library_files(lib_name, version_str = None):
 	if search_param in lib_file_cache:
 		return lib_file_cache[search_param]
 
-	# Try finding the library with dpkg
-	if not files and program_paths('dpkg'):
+	# Try finding with dpkg
+	if not files:
 		files = _get_library_files_from_dpkg(lib_name, version_cb)
 
-	# Try finding the library with rpm
-	if not files and program_paths('rpm'):
+	# Try finding with rpm
+	if not files:
 		files = _get_library_files_from_rpm(lib_name, version_cb)
 
-	# Try finding the library with pacman
-	if not files and program_paths('pacman'):
+	# Try finding with pacman
+	if not files:
 		files = _get_library_files_from_pacman(lib_name, version_cb)
 
-	# Try finding the library with slackware
+	# Try finding with slackware
 	if not files:
 		files = _get_library_files_from_slackware(lib_name, version_cb)
 
-	# Try finding the library with pkg_info
-	if not files and program_paths('pkg_info'):
+	# Try finding with pkg_info
+	if not files:
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
 
-	# Try finding the library with pkg-config
-	if not files and program_paths('pkg-config'):
+	# Try finding with pkg-config
+	if not files:
 		files = _get_library_files_from_pkg_config(lib_name, version_cb)
 	
-	# Try finding the library in the file system. But only if there is no version requirement.
+	# Try finding with the file system. But only if there is no version requirement.
 	if not version_cb and not files:
 		files = _get_library_files_from_fs(lib_name)
 
@@ -178,6 +178,10 @@ def _get_library_files(lib_name, version_str = None):
 def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 	matching_files = []
 	lib_name = lib_name.lstrip('lib')
+
+	# Just return if there is no pkg-config
+	if not program_paths('pkg-config'):
+		return matching_files
 
 	# Find all packages that contain the name
 	result = Process.run_and_get_stdout("pkg-config --list-all | grep -i {0}".format(lib_name))
@@ -239,6 +243,10 @@ def _get_library_files_from_pacman(lib_name, version_cb = None):
 	matching_files = []
 	lib_name = lib_name.lstrip('lib')
 
+	# Just return if there is no pacman
+	if not program_paths('pacman'):
+		return matching_files
+
 	# Find all packages that contain the name
 	result = Process.run_and_get_stdout("pacman -Sl | grep -i {0}".format(lib_name))
 	if not result:
@@ -288,6 +296,10 @@ def _get_library_files_from_pacman(lib_name, version_cb = None):
 def _get_library_files_from_dpkg(lib_name, version_cb = None):
 	matching_files = []
 
+	# Just return if there is no dpkg
+	if not program_paths('dpkg'):
+		return matching_files
+
 	# Find all packages that contain the name
 	result = Process.run_and_get_stdout("dpkg --list | grep -i {0}".format(lib_name))
 	if not result:
@@ -324,6 +336,10 @@ def _get_library_files_from_dpkg(lib_name, version_cb = None):
 def _get_library_files_from_rpm(lib_name, version_cb = None):
 	lib_name = lib_name.lstrip('lib')
 	matching_files = []
+
+	# Just return if there is no rpm
+	if not program_paths('rpm'):
+		return matching_files
 
 	# Find all packages that contain the name
 	result = Process.run_and_get_stdout("rpm -qa | grep -i {0}".format(lib_name))
@@ -364,6 +380,10 @@ def _get_library_files_from_rpm(lib_name, version_cb = None):
 def _get_library_files_from_pkg_info(lib_name, version_cb = None):
 	lib_name = lib_name.lstrip('lib')
 	matching_files = []
+
+	# Just return if there is not pkg_info
+	if not program_paths('pkg_info'):
+		return matching_files
 
 	# Find all packages that contain the name
 	result = Process.run_and_get_stdout("pkg_info | grep -i {0}".format(lib_name))
