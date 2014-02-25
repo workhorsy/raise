@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 23rd 2014
+Last updated on February 24th 2014
 </p>
 
 <p>
@@ -1439,6 +1439,7 @@ Below are a few ways Raise will search on common OSes:
 	<li>Dpkg: Debian, Ubuntu, Linux Mint</li>
 	<li>RPM: Red Hat, Fedora, openSUSE, Mandriva</li>
 	<li>Pacman: Arch, Manjaro</li>
+	<li>Slack: Slackware, Salix, Zenwalk, Porteus, Vector Linux, Absolute Linux</li>
 	<li>pkg_info: FreeBSD</li>
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
