@@ -157,6 +157,10 @@ def _get_library_files(lib_name, version_str = None):
 	if not files:
 		files = _get_library_files_from_slackware(lib_name, version_cb)
 
+	# Try finding with portage
+	if not files:
+		files = _get_library_files_from_portage(lib_name, version_cb)
+
 	# Try finding with pkg_info
 	if not files:
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
@@ -463,6 +467,56 @@ def _get_library_files_from_slackware(lib_name, version_cb = None):
 		# Get the files
 		for entry in Helpers.after(result, 'FILE LIST:').split("\n"):
 			entry = '/' + entry
+			if os.path.isfile(entry):
+				matching_files.append(entry)
+
+	return matching_files
+
+def _get_library_files_from_portage(lib_name, version_cb = None):
+	matching_files = []
+
+	# Just return if there is not portage
+	if not program_paths('qlist'):
+		return matching_files
+
+	# Find all the packages that contain the name
+	result = Process.run_and_get_stdout("qlist -C -I -v | grep -i {0}".format(lib_name))
+	if not result:
+		return matching_files
+
+	# For each package
+	for package in result.split("\n"):
+		# Get the name (Everything before the version number)
+		name = []
+		for n in package.split('-'):
+			if re.match('^(\d|\.)+$', n):
+				break
+			name.append(n)
+		name = str.join('-', name)
+		name = Helpers.after(name, '/')
+
+		# Get the version
+		version = None
+		for n in package.split('-'):
+			if re.match('^(\d|\.)+$', n):
+				version = n
+				break
+		version = Helpers.version_string_to_tuple(version)
+
+		# Skip this package if the version does not match
+		if version_cb and not version_cb(version):
+			continue
+
+		# Skip this package if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
+
+		# Get the files
+		result = Process.run_and_get_stdout("qlist -C {0}".format(name))
+		if not result:
+			continue
+
+		for entry in result.split("\n"):
 			if os.path.isfile(entry):
 				matching_files.append(entry)
 
