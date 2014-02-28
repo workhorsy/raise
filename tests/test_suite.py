@@ -459,7 +459,7 @@ Running C program ...                                                       :)
 class TestD(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['dmd', 'dmd2', 'ldc2']:
+		for prog in ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']:
 			if program_paths(prog):
 				return True
 
@@ -543,7 +543,7 @@ Building D interface 'lib_math.di' ...                                      :)''
 class TestCXX(TestCase):
 	@classmethod
 	def has_prerequisites(cls):
-		for prog in ['g++', 'cl.exe']:
+		for prog in ['g++', 'clang++', 'cl.exe']:
 			if program_paths(prog):
 				return True
 
