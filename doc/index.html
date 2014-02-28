@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 24th 2014
+Last updated on February 27th 2014
 </p>
 
 <p>
@@ -1499,15 +1499,15 @@ it will fall-back to searching the file system. Raise can also include the
 version number when searching for libraries and header files.
 </p>
 
-Below are a few ways Raise will search on common OSes:
+Raise searches the OS packaging sources in this order:
 <ol>
-	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>Dpkg: Debian, Ubuntu, Linux Mint</li>
 	<li>RPM: Red Hat, Fedora, openSUSE, Mandriva</li>
 	<li>Pacman: Arch, Manjaro</li>
 	<li>Slack: Slackware, Salix, Zenwalk, Porteus, Vector Linux, Absolute Linux</li>
 	<li>Portage: Gentoo, Sabayon, Funtoo</li>
 	<li>pkg_info: FreeBSD</li>
+	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
 
@@ -1571,7 +1571,7 @@ def find_finding_programs():
 	</p>
 
 	<pre class="raise_output">
-['/usr/bin/gcc']
+['/bin/gcc', '/usr/bin/gcc']
 	</pre>
 
 <a id="find_requiring_programs"></a>
@@ -1631,10 +1631,10 @@ def find_finding_libraries():
 	</p>
 
 	<pre class="raise_output">
-/usr/lib/i386-linux-gnu/libSDL.a
-/usr/lib/i386-linux-gnu/libSDL.so
-/usr/lib/i386-linux-gnu/libSDL.so
-/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/libSDL.a
+/usr/lib/libSDL.so
+/usr/lib/libSDL.so
+/usr/lib/libSDL.so
 	</pre>
 
 <a id="find_requiring_libraries"></a>
@@ -1877,9 +1877,9 @@ def c_compilers():
 
 	<pre class="raise_output">
 name: gcc
-path: /usr/bin/gcc 
+path: /bin/gcc 
 name: clang
-path: /usr/bin/clang
+path: /bin/clang
 	</pre>
 
 <a id="c_compiler_setup"></a>
@@ -2298,9 +2298,9 @@ def cxx_compilers():
 
 	<pre class="raise_output">
 name: g++
-path: /usr/bin/g++ 
+path: /bin/g++ 
 name: clang++
-path: /usr/bin/clang++
+path: /bin/clang++
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
@@ -2718,9 +2718,9 @@ def d_compilers():
 
 	<pre class="raise_output">
 name: dmd
-path: /usr/bin/dmd 
+path: /bin/dmd 
 name: ldc2
-path: /usr/bin/ldc2
+path: /bin/ldc2
 	</pre>
 
 <a id="d_compiler_setup"></a>
@@ -3105,9 +3105,9 @@ def csharp_compilers():
 
 	<pre class="raise_output">
 name: dmcs
-path: /usr/bin/dmcs 
+path: /bin/dmcs 
 name: dmcs
-path: /usr/bin/dmcs
+path: /bin/dmcs
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
@@ -3387,9 +3387,9 @@ def java_compilers():
 
 	<pre class="raise_output">
 name: javac
-path: /usr/bin/javac 
+path: /bin/javac 
 name: javac
-path: /usr/bin/javac
+path: /bin/javac
 	</pre>
 
 <a id="java_compiler_setup"></a>
@@ -3712,10 +3712,10 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: X86_32
 Bits: 32
-MHz: 1.0000 GHz
-Name: Genuine Intel(R) CPU           T2400  @ 1.83GHz
+MHz: 1.6000 GHz
+Name: Intel(R) Atom(TM) CPU N270   @ 1.60GHz
 Vendor Name: GenuineIntel
-Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, vmx, xtpr
+Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, ds_cpl, dtes64, dtherm, dts, est, fpu, fxsr, ht, lahf_lm, mca, mce, mmx, monitor, movbe, msr, mtrr, pae, pat, pbe, pdcm, pebs, pge, pni, sep, ss, sse, sse2, ssse3, tm, tm2, tsc, vme, xtpr
 Cores: 2
 	</pre>
 

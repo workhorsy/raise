@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 24th 2014
+Last updated on February 27th 2014
 </p>
 
 <p>
@@ -1433,15 +1433,15 @@ it will fall-back to searching the file system. Raise can also include the
 version number when searching for libraries and header files.
 </p>
 
-Below are a few ways Raise will search on common OSes:
+Raise searches the OS packaging sources in this order:
 <ol>
-	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>Dpkg: Debian, Ubuntu, Linux Mint</li>
 	<li>RPM: Red Hat, Fedora, openSUSE, Mandriva</li>
 	<li>Pacman: Arch, Manjaro</li>
 	<li>Slack: Slackware, Salix, Zenwalk, Porteus, Vector Linux, Absolute Linux</li>
 	<li>Portage: Gentoo, Sabayon, Funtoo</li>
 	<li>pkg_info: FreeBSD</li>
+	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
 
