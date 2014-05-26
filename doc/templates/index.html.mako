@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on February 27th 2014
+Last updated on May 26th 2014
 </p>
 
 <p>
@@ -263,7 +263,7 @@ The Raise documentation is license under
 <h2>1.2. Authors and Copyright</h2>
 
 <p>
-Copyright &copy; 2013 - 2014 Matthew Brennan Jones <a href="mailto:mattjones@workhorsy.org">&lt;mattjones@workhorsy.org&gt;</a>
+Copyright &copy; 2013 - 2014 Matthew Brennan Jones <a href="mailto:matthew.brennan.jones@gmail.com">&lt;matthew.brennan.jones@gmail.com&gt;</a>
 </p>
 
 <p>
