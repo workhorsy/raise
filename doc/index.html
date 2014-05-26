@@ -2735,6 +2735,7 @@ path: /bin/ldc2
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+		<li>unittest: A bool that tells the compiler to include unit tests.</li>
 	</ul>
 
 	<p>
@@ -2750,6 +2751,7 @@ def d_compiler_setup():
  	dc.debug = True
  	dc.optimize = True
  	dc.warnings_all = True
+ 	dc.unittest = True
  	dc.compile_time_flags = ['SDL=true']
  
  	# Print environmental variables to see what happens under the hood
@@ -2763,7 +2765,7 @@ def d_compiler_setup():
 
 	<pre class="raise_output">
 $DC: dmd
-$DFLAGS: -g -w -O -version=SDL=true
+$DFLAGS: -g -w -O -unittest -version=SDL=true
 	</pre>
 
 <a id="d_building_object"></a>

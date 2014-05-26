@@ -2376,6 +2376,7 @@ ${template_info['d_compilers']['output']}
 		<li>optimize: A bool that tell if it should optimize or not.</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
+		<li>unittest: A bool that tells the compiler to include unit tests.</li>
 	</ul>
 
 	<p>

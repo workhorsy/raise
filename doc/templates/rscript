@@ -362,6 +362,7 @@ def d_compiler_setup():
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
+	dc.unittest = True
 	dc.compile_time_flags = ['SDL=true']
 
 	# Print environmental variables to see what happens under the hood

@@ -63,8 +63,8 @@ def setup():
 				link =                 '-Wl,-as-needed', 
 				interface =            '-H', 
 				interface_file =       '-Hf', 
-				interface_dir =        '-Hd'
-
+				interface_dir =        '-Hd', 
+				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['ldc2', 'ldc']:
@@ -81,7 +81,8 @@ def setup():
 				link =                 '-Wl,-as-needed', 
 				interface =            '-H', 
 				interface_file =       '-Hf', 
-				interface_dir =        '-Hd'
+				interface_dir =        '-Hd', 
+				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['gdc']:
@@ -98,7 +99,8 @@ def setup():
 				link =                 '-Wl,-as-needed', 
 				interface =            '-fintfc=', 
 				interface_file =       '-fintfc-file=', 
-				interface_dir =        '-fintfc-dir='
+				interface_dir =        '-fintfc-dir=', 
+				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
 
@@ -113,7 +115,8 @@ class DCompiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
 				debug, warnings_all, optimize, 
 				compile_time_flags, link, 
-				interface, interface_file, interface_dir):
+				interface, interface_file, interface_dir, 
+				unittest):
 
 		self._name = name
 		self._path = path
@@ -133,10 +136,13 @@ class DCompiler(object):
 		self._opt_interface_file = interface_file
 		self._opt_interface_dir = interface_dir
 
+		self._opt_unittest = unittest
+
 		# Set the default values of the flags
 		self.debug = False
 		self.warnings_all = False
 		self.optimize = True
+		self.unittest = False
 		self.compile_time_flags = []
 
 	def get_dc(self):
@@ -148,6 +154,7 @@ class DCompiler(object):
 		if self.debug: opts.append(self._opt_debug)
 		if self.warnings_all: opts.append(self._opt_warnings_all)
 		if self.optimize: opts.append(self._opt_optimize)
+		if self.unittest: opts.append(self._opt_unittest)
 		for compile_time_flag in self.compile_time_flags:
 			opts.append(self._opt_compile_time_flags + compile_time_flag)
 
@@ -188,7 +195,7 @@ class DCompiler(object):
 		event = Process.Event(task, result, plural, singular, command, setup)
 		Process.add_event(event)
 
-	def build_object(self, o_file, d_files, i_files=[], l_files=[], h_files=[]):
+	def build_object(self, o_file, d_files, i_files=[], l_files=[], h_file='', h_dir=''):
 		# Make sure the extension is valid
 		Helpers.require_file_extension(o_file, '.o')
 
@@ -208,19 +215,26 @@ class DCompiler(object):
 			str.join(' ', i_files), 
 			str.join(' ', l_files)
 		)
-		if h_files:
-			command += " {0} {1}import {2}{3}".format(
-				self._opt_interface, 
-				self._opt_interface_dir, 
-				self._opt_interface_file, 
-				str.join(' ', h_files)
+		if h_file or h_dir:
+			command += " {0}".format(self._opt_interface)
+
+		if h_file:
+			command += " {0}{1}".format(
+				self._opt_interface_file, h_file
+			)
+
+		if h_dir:
+			command += " {0}{1}".format(
+				self._opt_interface_dir, h_dir
 			)
 		command = to_native(command)
+		#print("!!! command: {0}".format(command))
 
 		def setup():
 			# Skip if the files have not changed since last build
 			to_update = [to_native(o_file)]
-			triggers = [to_native(t) for t in d_files + i_files + l_files + h_files]
+			triggers = [to_native(t) for t in d_files + i_files + l_files]
+			if h_file: triggers.append(h_file)
 			if not FS.is_outdated(to_update, triggers):
 				return False
 
