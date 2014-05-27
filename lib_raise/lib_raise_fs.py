@@ -160,7 +160,7 @@ def glob_names(names):
 
 	# Is a string
 	if isinstance(names, basestring):
-		return glob_name(name)
+		return glob_name(names)
 
 	# Is a list
 	entries = []
