@@ -75,7 +75,7 @@ def install():
 	def actual_build():
 		cc.build_object('libexample.o', ['libexample.c'])
 		cc.build_shared_library('libexample.so', ['libexample.o'])
-		c.build_program('raise_example.exe', ['main.c'], ['libexample.so'])
+		cc.build_program('raise_example.exe', ['main.c'], ['libexample.so'])
 	Users.do_as_normal_user(actual_build)
 
 	# Remove old install
