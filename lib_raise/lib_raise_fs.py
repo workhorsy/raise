@@ -26,6 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
+import glob
 import tempfile, shutil, filecmp
 import atexit
 import lib_raise_config as Config
@@ -78,13 +79,14 @@ def remove_dir(name, and_children = False):
 		Print.exit("Can't remove the current directory '{0}'.".format(name))
 
 	try:
-		if os.path.islink(name):
-			os.unlink(name)
-		elif os.path.isdir(name):
-			if and_children:
-				shutil.rmtree(name)
-			else:
-				os.rmdir(name)
+		for entry in glob_names(name):
+			if os.path.islink(entry):
+				os.unlink(entry)
+			elif os.path.isdir(entry):
+				if and_children:
+					shutil.rmtree(entry)
+				else:
+					os.rmdir(entry)
 		success = True
 	except OSError as e:
 		if 'No such file or directory' in e:
@@ -101,10 +103,11 @@ def remove_file(name, ignore_failure = False):
 	success = False
 
 	try:
-		if os.path.islink(name):
-			os.unlink(name)
-		elif os.path.isfile(name):
-			os.remove(name)
+		for entry in glob_names(name):
+			if os.path.islink(entry):
+				os.unlink(entry)
+			elif os.path.isfile(entry):
+				os.remove(entry)
 		success = True
 	except Exception as e:
 		if ignore_failure:
@@ -135,7 +138,41 @@ def symlink(source, link_name):
 					"Failed linking '{0}' to '{1}'.".format(source, link_name),
 				lambda: os.symlink(source, link_name))
 
+def glob_name(name):
+	entries = []
+	globs = glob.glob(name)
+
+	# No matches, so just return the original string
+	if len(globs) == 0:
+		entries.append(name)
+	# Matches, so return all the matches
+	else:
+		for entry in globs:
+			entries.append(entry)
+
+	return entries
+
+def glob_names(names):
+	import types
+
+	if names is None:
+		return None
+
+	# Is a string
+	if isinstance(names, basestring):
+		return glob_name(name)
+
+	# Is a list
+	entries = []
+	for name in names:
+		for entry in glob_name(name):
+			entries.append(entry)
+	return entries
+
 def is_outdated(to_update, triggers):
+	to_update = glob_names(to_update)
+	triggers = glob_names(triggers)
+
 	# Return true if any of the files to check do not exist
 	for update in to_update:
 		if not os.path.isfile(os.path.abspath(update)):
