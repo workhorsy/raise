@@ -674,18 +674,23 @@ def require_programs(prog_names):
 
 def program_paths(program_name):
 	paths = []
-	exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
+	exts = []
+	if 'PATHEXT' in os.environ:
+		exts = os.environ['PATHEXT'].split(os.pathsep)
+
 	path = os.environ['PATH']
 	for p in os.environ['PATH'].split(os.pathsep):
-		p = os.path.join(p, program_name)
+		full_name = os.path.join(p, program_name)
+
 		# Save the path if it is executable
-		if os.access(p, os.X_OK) and not os.path.isdir(p):
-			paths.append(p)
+		if os.access(full_name, os.X_OK) and not os.path.isdir(full_name):
+			paths.append(full_name)
 		# Save the path if we found one with a common extension like .exe
 		for e in exts:
-			pext = p + e
-			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
-				paths.append(pext)
+			full_name_ext = full_name + e
+
+			if os.access(full_name_ext, os.X_OK) and not os.path.isdir(full_name_ext):
+				paths.append(full_name_ext)
 	return paths
 
 
