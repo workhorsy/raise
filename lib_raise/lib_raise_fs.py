@@ -33,6 +33,11 @@ import lib_raise_config as Config
 import lib_raise_process as Process
 import lib_raise_terminal as Print
 
+def is_string_like(thing):
+	try:
+		return isinstance(thing, basestring)
+	except NameError as err:
+		return isinstance(thing, str)
 
 def change_dir(name):
 	Process.do_on_fail_exit("Changing to dir '{0}'".format(name),
@@ -159,7 +164,7 @@ def glob_names(names):
 		return None
 
 	# Is a string
-	if isinstance(names, basestring):
+	if is_string_like(names):
 		return glob_name(names)
 
 	# Is a list
