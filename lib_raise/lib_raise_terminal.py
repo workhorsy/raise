@@ -76,10 +76,13 @@ def set_fancy():
 
 	# Figure out the terminal width
 	if Helpers.os_type._name == 'Windows':
-		import _winreg
-		key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Console")
-		val = _winreg.QueryValueEx(key, "ScreenBufferSize")
-		_winreg.CloseKey(key)
+		try:
+			import _winreg as winreg
+		except ImportError as err:
+			import winreg
+		key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Console")
+		val = winreg.QueryValueEx(key, "ScreenBufferSize")
+		winreg.CloseKey(key)
 		size = hex(val[0])
 		width = int('0x' + size[-4 : len(size)], 16)
 	else:
