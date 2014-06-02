@@ -26,6 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
+import sys
 import glob
 import tempfile, shutil, filecmp
 import atexit
@@ -33,10 +34,12 @@ import lib_raise_config as Config
 import lib_raise_process as Process
 import lib_raise_terminal as Print
 
+PY2 = sys.version_info[0] == 2
+
 def is_string_like(thing):
-	try:
+	if PY2:
 		return isinstance(thing, basestring)
-	except NameError as err:
+	else:
 		return isinstance(thing, str)
 
 def change_dir(name):
