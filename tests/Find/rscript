@@ -83,3 +83,11 @@ def find_installed_header_file_cache():
 	Find.require_header_file('libSDL', 'ver >= (99, 0)')
 
 
+
+# Environmental variables
+def find_environmental_variable_success():
+	Find.require_environmental_variable('PATH')
+
+def find_environmental_variable_fail():
+	Find.require_environmental_variable('NOPE')
+

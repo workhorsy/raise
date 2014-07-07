@@ -120,6 +120,7 @@ info = {
 	'find_requiring_libraries' : {},
 	'find_finding_headers' : {},
 	'find_requiring_headers' : {},
+	'find_requiring_environmental_variable' : {},
 	'find_requiring_python_modules' : {},
 
 	'concurrency' : {},

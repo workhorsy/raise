@@ -915,6 +915,25 @@ Header file 'libSDL ver >= (99, 0)' not installed. Install and try again. Exitin
 
 		self.assert_process_output(command, expected, False)
 
+	def test_find_environmental_variable_success(self):
+		command = '{0} raise -plain -nolineno find_environmental_variable_success'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_environmental_variable_success'
+Checking for environmental variable 'PATH' ...                              :)'''
+
+		self.assert_process_output(command, expected, True)
+
+	def test_find_environmental_variable_fail(self):
+		command = '{0} raise -plain -nolineno find_environmental_variable_fail'.format(sys.executable)
+
+		expected = \
+'''Running target 'find_environmental_variable_fail'
+Checking for environmental variable 'NOPE' .................................:(
+The environmental variable 'NOPE' was not found. Set it and try again. Exiting ...'''
+
+		self.assert_process_output(command, expected, False)
+
 if __name__ == '__main__':
 	runner = ConcurrentTestRunner()
 	runner.add_test_case(TestBasics)

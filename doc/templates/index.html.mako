@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on May 26th 2014
+Last updated on July 6th 2014
 </p>
 
 <p>
@@ -145,6 +145,7 @@ Last updated on May 26th 2014
 			<li><a href="#find_requiring_libraries">Requiring Libraries</a></li>
 			<li><a href="#find_finding_headers">Finding Headers Files</a></li>
 			<li><a href="#find_requiring_headers">Requiring Headers Files</a></li>
+			<li><a href="#find_requiring_environmental_variables">Requiring Environmental Variables</a></li>
 			<li><a href="#find_requiring_python_modules">Requiring Python Modules</a></li>
 		</ol>
 	</li>
@@ -1631,6 +1632,29 @@ ${template_info['find_requiring_headers']['example']}
 ${template_info['find_requiring_headers']['output']}
 	</pre>
 
+<a id="find_requiring_environmental_variables"></a>
+<h2>11.8. Requiring Environmental Variables</h2>
+	<p>
+	You can search for environmental variables by using the 
+	<span class="fun">Find.require_environmental_variable</span> function. 
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+${template_info['find_requiring_environmental_variable']['example']}
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+${template_info['find_requiring_environmental_variable']['output']}
+	</pre>
+
 <a id="find_requiring_python_modules"></a>
 <h2>11.8. Requiring Python Modules</h2>
 	<p>
@@ -1653,7 +1677,6 @@ ${template_info['find_requiring_python_modules']['example']}
 	<pre class="raise_output">
 ${template_info['find_requiring_python_modules']['output']}
 	</pre>
-
 
 <hr />
 

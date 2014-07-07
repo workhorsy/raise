@@ -693,5 +693,13 @@ def program_paths(program_name):
 				paths.append(full_name_ext)
 	return paths
 
+def require_environmental_variable(env_name, version_cb = None):
+	Print.status("Checking for environmental variable '{0}'".format(env_name))
 
+	if not os.environ.get(env_name):
+		message = "The environmental variable '{0}' was not found. Set it and try again."
+		Print.fail()
+		Print.exit(message.format(env_name))
+	else:
+		Print.ok()
 

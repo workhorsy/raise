@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on May 26th 2014
+Last updated on July 6th 2014
 </p>
 
 <p>
@@ -145,6 +145,7 @@ Last updated on May 26th 2014
 			<li><a href="#find_requiring_libraries">Requiring Libraries</a></li>
 			<li><a href="#find_finding_headers">Finding Headers Files</a></li>
 			<li><a href="#find_requiring_headers">Requiring Headers Files</a></li>
+			<li><a href="#find_requiring_environmental_variables">Requiring Environmental Variables</a></li>
 			<li><a href="#find_requiring_python_modules">Requiring Python Modules</a></li>
 		</ol>
 	</li>
@@ -1027,7 +1028,7 @@ def users_privilege_escalation():
 
 	<pre class="raise_output">
 Effective user id: 0
-Effective user id: 1000
+Effective user id: 1001
 Effective user id: 0
 	</pre>
 
@@ -1571,7 +1572,7 @@ def find_finding_programs():
 	</p>
 
 	<pre class="raise_output">
-['/bin/gcc', '/usr/bin/gcc']
+['/usr/bin/gcc']
 	</pre>
 
 <a id="find_requiring_programs"></a>
@@ -1631,10 +1632,10 @@ def find_finding_libraries():
 	</p>
 
 	<pre class="raise_output">
-/usr/lib/libSDL.a
-/usr/lib/libSDL.so
-/usr/lib/libSDL.so
-/usr/lib/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.a
+/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.so
+/usr/lib/i386-linux-gnu/libSDL.so
 	</pre>
 
 <a id="find_requiring_libraries"></a>
@@ -1744,6 +1745,31 @@ Checking for header file 'libSDL' ...                                       <spa
 Checking for header file 'libSDL' ...                                       <span class="smile">:)</span>
 	</pre>
 
+<a id="find_requiring_environmental_variables"></a>
+<h2>11.8. Requiring Environmental Variables</h2>
+	<p>
+	You can search for environmental variables by using the 
+	<span class="fun">Find.require_environmental_variable</span> function. 
+	</p>
+
+	<p>
+	Example:
+	</p>
+
+	<pre><code data-language="python">
+def find_requiring_environmental_variable():
+ 	# Require that PATH exists
+ 	Find.require_environmental_variable('PATH')
+	</code></pre>
+
+	<p>
+	Example output:
+	</p>
+
+	<pre class="raise_output">
+Checking for environmental variable 'PATH' ...                              <span class="smile">:)</span>
+	</pre>
+
 <a id="find_requiring_python_modules"></a>
 <h2>11.8. Requiring Python Modules</h2>
 	<p>
@@ -1770,7 +1796,6 @@ Checking for python module 'os' ...                                         <spa
 Checking for python module 'sys' ...                                        <span class="smile">:)</span>
 Checking for python module 'platform' ...                                   <span class="smile">:)</span>
 	</pre>
-
 
 <hr />
 
@@ -1877,9 +1902,9 @@ def c_compilers():
 
 	<pre class="raise_output">
 name: gcc
-path: /bin/gcc 
+path: /usr/bin/gcc 
 name: clang
-path: /bin/clang
+path: /usr/bin/clang
 	</pre>
 
 <a id="c_compiler_setup"></a>
@@ -2298,9 +2323,9 @@ def cxx_compilers():
 
 	<pre class="raise_output">
 name: g++
-path: /bin/g++ 
+path: /usr/bin/g++ 
 name: clang++
-path: /bin/clang++
+path: /usr/bin/clang++
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
@@ -2718,9 +2743,9 @@ def d_compilers():
 
 	<pre class="raise_output">
 name: dmd
-path: /bin/dmd 
+path: /usr/bin/dmd 
 name: ldc2
-path: /bin/ldc2
+path: /usr/bin/ldc2
 	</pre>
 
 <a id="d_compiler_setup"></a>
@@ -3107,9 +3132,9 @@ def csharp_compilers():
 
 	<pre class="raise_output">
 name: dmcs
-path: /bin/dmcs 
+path: /usr/bin/dmcs 
 name: dmcs
-path: /bin/dmcs
+path: /usr/bin/dmcs
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
@@ -3389,9 +3414,9 @@ def java_compilers():
 
 	<pre class="raise_output">
 name: javac
-path: /bin/javac 
+path: /usr/bin/javac 
 name: javac
-path: /bin/javac
+path: /usr/bin/javac
 	</pre>
 
 <a id="java_compiler_setup"></a>
@@ -3714,10 +3739,10 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: X86_32
 Bits: 32
-MHz: 1.3330 GHz
-Name: Intel(R) Atom(TM) CPU N270   @ 1.60GHz
+MHz: 800.0000 MHz
+Name: Genuine Intel(R) CPU           T2050  @ 1.60GHz
 Vendor Name: GenuineIntel
-Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, ds_cpl, dtes64, dtherm, dts, est, fpu, fxsr, ht, lahf_lm, mca, mce, mmx, monitor, movbe, msr, mtrr, pae, pat, pbe, pdcm, pebs, pge, pni, sep, ss, sse, sse2, ssse3, tm, tm2, tsc, vme, xtpr
+Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, xtpr
 Cores: 2
 	</pre>
 

@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.4.0 Dev - June 2 2014) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.4.0 Dev - July 6 2014) http://launchpad.net/raise")
 		print("OPTIONS:")
 		print("    -plain    - Don't clear, don't use color, and fix the width to 79")
 		print("    -nolineno - Don't print line numbers on error exit")

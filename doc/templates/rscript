@@ -743,6 +743,10 @@ def find_requiring_headers():
 	# SDL Library of version 1.X
 	Find.require_header_file('libSDL', 'ver.major == 1')
 
+def find_requiring_environmental_variable():
+	# Require that PATH exists
+	Find.require_environmental_variable('PATH')
+
 def find_requiring_python_modules():
 	# Require that os, sys, and platform are installed
 	Python.require_python_modules(['os', 'sys', 'platform'])
