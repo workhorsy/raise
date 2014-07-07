@@ -45,6 +45,27 @@ def run_and_get_stdall(command):
 
 	return out.strip()
 
+def program_paths(program_name):
+	paths = []
+	exts = []
+	if 'PATHEXT' in os.environ:
+		exts = os.environ['PATHEXT'].split(os.pathsep)
+
+	path = os.environ['PATH']
+	for p in os.environ['PATH'].split(os.pathsep):
+		full_name = os.path.join(p, program_name)
+
+		# Save the path if it is executable
+		if os.access(full_name, os.X_OK) and not os.path.isdir(full_name):
+			paths.append(full_name)
+		# Save the path if we found one with a common extension like .exe
+		for e in exts:
+			full_name_ext = full_name + e
+
+			if os.access(full_name_ext, os.X_OK) and not os.path.isdir(full_name_ext):
+				paths.append(full_name_ext)
+	return paths
+
 # A list of the the documentation items to generate examples for
 info = {
 	'installation' : {},
@@ -158,6 +179,13 @@ if __name__ == '__main__':
 	if os.getuid() != 0:
 		print('Must be run as root. Exiting ...')
 		exit(1)
+
+	# Make sure requiremnts are installed
+	reqs = ['gcc', 'g++', 'clang', 'clang++', 'dmcs', 'javac', 'dmd', 'ldc2']
+	for req in reqs:
+		if not program_paths(req):
+			print("Could not find '{0}'. Exiting ...".format(req))
+			exit(1)
 
 	# Get the normal user id
 	normal_user_id = get_normal_user_id()
