@@ -128,7 +128,7 @@ class JavaCompiler(object):
 		plural = 'Java programs'
 		singular = 'Java program'
 		command = "{0} {1} {2} {3}".format(
-			self.javac, 
+			self._path, 
 			self.javaflags, 
 			str.join(' ', inc_files), 
 			str.join(' ', link_files)

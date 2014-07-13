@@ -185,7 +185,7 @@ class CXXCompiler(object):
 		plural = 'C++ programs'
 		singular = 'C++ program'
 		command = '{0} {1} {2} {3} {4}{5}'.format(
-					self.cxx, 
+					self._path, 
 					self.cxxflags, 
 					str.join(' ', cxx_files), 
 					str.join(' ', i_files), 
@@ -219,7 +219,7 @@ class CXXCompiler(object):
 		plural = 'C++ shared libraries'
 		singular = 'C++ shared library'
 		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
-					self.cxx, 
+					self._path, 
 					self.cxxflags, 
 					self._opt_link, 
 					str.join(' ', cxx_files), 
@@ -254,7 +254,7 @@ class CXXCompiler(object):
 		plural = 'C++ programs'
 		singular = 'C++ program'
 		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
-					self.cxx, 
+					self._path, 
 					self.cxxflags, 
 					self._opt_link, 
 					str.join(' ', obj_files), 
@@ -289,7 +289,7 @@ class CXXCompiler(object):
 		plural = 'C++ objects'
 		singular = 'C++ object'
 		command = "{0} {1} {2} {3}{4} {5} {6}".format(
-					self.cxx, 
+					self._path, 
 					self.cxxflags, 
 					self._opt_no_link, 
 					self._opt_out_file, 

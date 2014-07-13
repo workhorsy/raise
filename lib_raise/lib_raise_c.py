@@ -188,7 +188,7 @@ class CCompiler(object):
 		plural = 'C programs'
 		singular = 'C program'
 		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
-					self.cc, 
+					self._path, 
 					self.cflags, 
 					self._opt_link, 
 					str.join(' ', obj_files), 
@@ -223,7 +223,7 @@ class CCompiler(object):
 		plural = 'C objects'
 		singular = 'C object'
 		command = '{0} {1} {2} {3}{4} {5} {6}'.format(
-					self.cc, 
+					self._path, 
 					self.cflags, 
 					self._opt_no_link, 
 					self._opt_out_file, 
@@ -258,7 +258,7 @@ class CCompiler(object):
 		plural = 'C programs'
 		singular = 'C program'
 		command = '{0} {1} {2} {3} {4}{5}'.format(
-					self.cc, 
+					self._path, 
 					self.cflags, 
 					str.join(' ', c_files), 
 					str.join(' ', i_files), 

@@ -170,7 +170,7 @@ class DCompiler(object):
 
 		f = FS.self_deleting_named_temporary_file()
 		command = "{0} {1} {2} {3} {4} {5}{6}i {7}{8}".format(
-			self.dc, 
+			self._path, 
 			self.dflags, 
 			self._opt_no_link, 
 			d_file, 
@@ -206,7 +206,7 @@ class DCompiler(object):
 		singular = 'D object'
 
 		command = "{0} {1} {2} {3}{4} {5} {6} {7}".format(
-			self.dc, 
+			self._path, 
 			self.dflags, 
 			self._opt_no_link, 
 			self._opt_out_file, 
@@ -258,7 +258,7 @@ class DCompiler(object):
 		singular = 'D static library'
 
 		command = "{0} {1} -lib {2}{3} {4} {5} {6}".format(
-			self.dc, 
+			self._path, 
 			self.dflags, 
 			self._opt_out_file, 
 			o_file, 
@@ -299,7 +299,7 @@ class DCompiler(object):
 		plural = 'D programs'
 		singular = 'D program'
 		command = "{0} {1} {2}{3} {4} {5}".format(
-			self.dc, 
+			self._path, 
 			self.dflags, 
 			self._opt_out_file, 
 			out_file, 

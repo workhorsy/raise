@@ -130,7 +130,7 @@ class CSCompiler(object):
 		plural = 'C# programs'
 		singular = 'C# program'
 		command = "{0} {1} {2}{3} {4} {5}".format(
-			self.csc, 
+			self._path, 
 			self.csflags, 
 			self._opt_out_file, 
 			out_file, 
@@ -166,7 +166,7 @@ class CSCompiler(object):
 		plural = 'C# shared libraries'
 		singular = 'C# shared library'
 		command = "{0} {1} -target:library {2}{3} {4} {5}".format(
-			self.csc, 
+			self._path, 
 			self.csflags, 
 			self._opt_out_file, 
 			out_file, 
