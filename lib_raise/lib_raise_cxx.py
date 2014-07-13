@@ -96,17 +96,17 @@ def setup():
 				setup =                '/nologo /EHsc', 
 				out_file =             '/Fe', 
 				no_link =              '/c', 
-				debug =                '', 
+				debug =                '/Zi', 
 				position_independent_code = '', 
 				warnings_all =         '/Wall', 
-				warnings_as_errors =   '', 
+				warnings_as_errors =   '/WX', 
 				optimize_zero =        '/Od',
 				optimize_one =         '/O1',
 				optimize_two =         '/O2',
 				optimize_three =       '/Ox',
 				optimize_size =        '/Os',
-				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed'
+				compile_time_flags =   '/D', 
+				link =                 '/LDd'
 			)
 			cxx_compilers[comp._name] = comp
 
