@@ -84,8 +84,8 @@ def setup():
 				debug =                '-g', 
 				position_independent_code = '-fPIC', 
 				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror', 
 				warnings_extra =       '-Wextra', 
+				warnings_as_errors =   '-Werror', 
 				optimize_zero =        '-O0',
 				optimize_one =         '-O1',
 				optimize_two =         '-O2',
@@ -106,8 +106,8 @@ def setup():
 				debug =                '-g', 
 				position_independent_code = '-fPIC', 
 				warnings_all =         '-Wall', 
-				warnings_as_errors =   '-Werror', 
 				warnings_extra =       '-Wextra', 
+				warnings_as_errors =   '-Werror', 
 				optimize_zero =        '-O0',
 				optimize_one =         '-O1',
 				optimize_two =         '-O2',
@@ -129,8 +129,8 @@ def setup():
 				debug =                '/Zi', 
 				position_independent_code = '', 
 				warnings_all =         '/Wall', 
-				warnings_as_errors =   '/WX', 
 				warnings_extra =       None, 
+				warnings_as_errors =   '/WX', 
 				optimize_zero =        '/Od',
 				optimize_one =         '/O1',
 				optimize_two =         '/O2',
@@ -153,7 +153,7 @@ def setup():
 class CCompiler(object):
 	def __init__(self, name, path, standards, setup, out_file, 
 				no_link, debug, position_independent_code, 
-				warnings_all, warnings_as_errors, warnings_extra, 
+				warnings_all, warnings_extra, warnings_as_errors, 
 				optimize_zero, optimize_one, optimize_two,
 				optimize_three, optimize_size, 
 				compile_time_flags, link):
@@ -169,8 +169,8 @@ class CCompiler(object):
 		self._opt_debug = debug
 		self._opt_position_independent_code = position_independent_code
 		self._opt_warnings_all = warnings_all
-		self._opt_warnings_as_errors = warnings_as_errors
 		self._opt_warnings_extra = warnings_extra
+		self._opt_warnings_as_errors = warnings_as_errors
 		self._opt_optimize_zero = optimize_zero
 		self._opt_optimize_one = optimize_one
 		self._opt_optimize_two = optimize_two
@@ -185,8 +185,8 @@ class CCompiler(object):
 		self.standard = None
 		self.position_independent_code = False
 		self.warnings_all = False
-		self.warnings_as_errors = False
 		self.warnings_extra = False
+		self.warnings_as_errors = False
 		self.optimize_level = 1
 		self.compile_time_flags = []
 
@@ -201,8 +201,8 @@ class CCompiler(object):
 		if self.standard: opts.append(self._opt_standards[self.standard])
 		if self.position_independent_code: opts.append(self._opt_position_independent_code)
 		if self.warnings_all: opts.append(self._opt_warnings_all)
-		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
 		if self.warnings_extra: opts.append(self._opt_warnings_extra)
+		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
 		if self.optimize_level == 0: opts.append(self._opt_optimize_zero)
 		if self.optimize_level == 1: opts.append(self._opt_optimize_one)
 		if self.optimize_level == 2: opts.append(self._opt_optimize_two)

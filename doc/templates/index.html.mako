@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on July 6th 2014
+Last updated on July 13th 2014
 </p>
 
 <p>
@@ -1783,6 +1783,20 @@ ${template_info['c_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>standard:
+			<ul>
+				<li>C.Standard.std1989 for the C 1989 standard</li>
+				<li>C.Standard.std1990 for the C 1990 standard</li>
+				<li>C.Standard.std1999 for the C 1999 standard</li>
+				<li>C.Standard.std2011 for the C 2011 standard</li>
+				<li>C.Standard.std201x for the next C standard</li>
+				<li>C.Standard.gnu1989 for the C GNU 1989 standard</li>
+				<li>C.Standard.gnu1990 for the C GNU 1990 standard</li>
+				<li>C.Standard.gnu1999 for the C GNU 1999 standard</li>
+				<li>C.Standard.gnu2011 for the C GNU 2011 standard</li>
+				<li>C.Standard.gnu201x for the next C GNU standard</li>
+			</ul>
+		</li>
 		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
@@ -1794,6 +1808,7 @@ ${template_info['c_compilers']['output']}
 			</ul>
 		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_extra: A bool that tells if it should check for extra warnings that are not in warnings_all.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
@@ -2090,6 +2105,18 @@ ${template_info['cxx_compilers']['output']}
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>standard:
+			<ul>
+				<li>CXX.Standard.std1998 for the C++ 1998 standard.</li>
+				<li>CXX.Standard.std2003 for the C++ 2003 standard.</li>
+				<li>CXX.Standard.std2011 for the C++ 2011 standard.</li>
+				<li>CXX.Standard.std201x for the next C++ standard.</li>
+				<li>CXX.Standard.gnu1998 for the C++ GNU 1998 standard.</li>
+				<li>CXX.Standard.gnu2003 for the C++ GNU 2003 standard.</li>
+				<li>CXX.Standard.gnu2011 for the C++ GNU 2011 standard.</li>
+				<li>CXX.Standard.gnu201x for the next C++ GNU standard.</li>
+			</ul>
+		</li>
 		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
@@ -2101,6 +2128,7 @@ ${template_info['cxx_compilers']['output']}
 			</ul>
 		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_extra: A bool that tells if it should check for extra warnings that are not in warnings_all.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>

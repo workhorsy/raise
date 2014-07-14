@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on July 6th 2014
+Last updated on July 13th 2014
 </p>
 
 <p>
@@ -1916,6 +1916,20 @@ path: /usr/bin/clang
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>standard:
+			<ul>
+				<li>C.Standard.std1989 for the C 1989 standard</li>
+				<li>C.Standard.std1990 for the C 1990 standard</li>
+				<li>C.Standard.std1999 for the C 1999 standard</li>
+				<li>C.Standard.std2011 for the C 2011 standard</li>
+				<li>C.Standard.std201x for the next C standard</li>
+				<li>C.Standard.gnu1989 for the C GNU 1989 standard</li>
+				<li>C.Standard.gnu1990 for the C GNU 1990 standard</li>
+				<li>C.Standard.gnu1999 for the C GNU 1999 standard</li>
+				<li>C.Standard.gnu2011 for the C GNU 2011 standard</li>
+				<li>C.Standard.gnu201x for the next C GNU standard</li>
+			</ul>
+		</li>
 		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
@@ -1927,6 +1941,7 @@ path: /usr/bin/clang
 			</ul>
 		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_extra: A bool that tells if it should check for extra warnings that are not in warnings_all.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
@@ -1942,9 +1957,11 @@ def c_compiler_setup():
  
  	# Compiler setup
  	cc.debug = True
+ 	cc.standard = C.Standard.std2011
  	cc.position_independent_code = True
  	cc.optimize_level = 2
  	cc.warnings_all = True
+ 	cc.warnings_extra = True
  	cc.warnings_as_errors = True
  	cc.compile_time_flags = ['SDL=true']
  
@@ -1959,7 +1976,7 @@ def c_compiler_setup():
 
 	<pre class="raise_output">
 $CC: gcc
-$CFLAGS:  -g -fPIC -Wall -Werror -O2 -DSDL=true
+$CFLAGS:  -g -std=c11 -fPIC -Wall -Werror -Wextra -O2 -DSDL=true
 	</pre>
 
 <a id="c_building_object"></a>
@@ -2337,6 +2354,18 @@ path: /usr/bin/clang++
 
 	<ul>
 		<li>debug: A bool that tells if it should use debugging symbols or not.</li>
+		<li>standard:
+			<ul>
+				<li>CXX.Standard.std1998 for the C++ 1998 standard.</li>
+				<li>CXX.Standard.std2003 for the C++ 2003 standard.</li>
+				<li>CXX.Standard.std2011 for the C++ 2011 standard.</li>
+				<li>CXX.Standard.std201x for the next C++ standard.</li>
+				<li>CXX.Standard.gnu1998 for the C++ GNU 1998 standard.</li>
+				<li>CXX.Standard.gnu2003 for the C++ GNU 2003 standard.</li>
+				<li>CXX.Standard.gnu2011 for the C++ GNU 2011 standard.</li>
+				<li>CXX.Standard.gnu201x for the next C++ GNU standard.</li>
+			</ul>
+		</li>
 		<li>position_independent_code: A bool that tells if the code will be position independent.</li>
 		<li>optimize_level:
 			<ul>
@@ -2348,6 +2377,7 @@ path: /usr/bin/clang++
 			</ul>
 		</li>
 		<li>warnings_all: A bool that tells if it should show extra warning information.</li>
+		<li>warnings_extra: A bool that tells if it should check for extra warnings that are not in warnings_all.</li>
 		<li>warnings_as_errors: A bool that tells if it should count warnings as errors.</li>
 		<li>compile_time_flags: A list of compile time flags/macros/variables.</li>
 	</ul>
@@ -2363,9 +2393,11 @@ def cxx_compiler_setup():
  
  	# Compiler setup
  	cxx.debug = True
+ 	cxx.standard = CXX.Standard.std2011
  	cxx.position_independent_code = True
  	cxx.optimize_level = 2
  	cxx.warnings_all = True
+ 	cxx.warnings_extra = True
  	cxx.warnings_as_errors = True
  	cxx.compile_time_flags = ['SDL=true']
  
@@ -2380,7 +2412,7 @@ def cxx_compiler_setup():
 
 	<pre class="raise_output">
 $CXX: g++
-$CXXFLAGS:  -g -fPIC -Wall -Werror -O2 -DSDL=true
+$CXXFLAGS:  -g -std=c++11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="cxx_building_object"></a>

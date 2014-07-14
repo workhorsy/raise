@@ -124,9 +124,11 @@ def c_compiler_setup():
 
 	# Compiler setup
 	cc.debug = True
+	cc.standard = C.Standard.std2011
 	cc.position_independent_code = True
 	cc.optimize_level = 2
 	cc.warnings_all = True
+	cc.warnings_extra = True
 	cc.warnings_as_errors = True
 	cc.compile_time_flags = ['SDL=true']
 
@@ -242,9 +244,11 @@ def cxx_compiler_setup():
 
 	# Compiler setup
 	cxx.debug = True
+	cxx.standard = CXX.Standard.std2011
 	cxx.position_independent_code = True
 	cxx.optimize_level = 2
 	cxx.warnings_all = True
+	cxx.warnings_extra = True
 	cxx.warnings_as_errors = True
 	cxx.compile_time_flags = ['SDL=true']
 
