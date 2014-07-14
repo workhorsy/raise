@@ -17,6 +17,7 @@ def clean():
 
 def _configure():
 	cxx = CXX.get_default_compiler()
+	cxx.standard = CXX.Standard.std2011
 	cxx.debug = True
 	cxx.optimize_level = 2
 	cxx.warnings_all = True

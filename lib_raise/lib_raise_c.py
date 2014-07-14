@@ -38,6 +38,17 @@ import lib_raise_helpers as Helpers
 
 c_compilers = {}
 
+class Standard(object):
+	std1989 = 1
+	std1990 = 2
+	std1999 = 3
+	std2011 = 4
+	std201x = 5
+	gnu1989 = 6
+	gnu1990 = 7
+	gnu1999 = 8
+	gnu2011 = 9
+	gnu201x = 10
 
 def setup():
 	global c_compilers
@@ -49,10 +60,24 @@ def setup():
 		if len(paths) == 0:
 			continue
 
+		standards = {
+			Standard.std1989 : '-std=c89', 
+			Standard.std1990 : '-std=c90', 
+			Standard.std1999 : '-std=c99', 
+			Standard.std2011 : '-std=c11', 
+			Standard.std201x : '-std=c1x', 
+			Standard.gnu1989 : '-std=gnu89', 
+			Standard.gnu1990 : '-std=gnu90', 
+			Standard.gnu1999 : '-std=gnu99', 
+			Standard.gnu2011 : '-std=gnu11', 
+			Standard.gnu201x : '-std=gnu1x'
+		}
+
 		if name == 'gcc':
 			comp = CCompiler(
 				name =                 'gcc', 
 				path =                 paths[0], 
+				standards =             standards, 
 				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
@@ -73,6 +98,7 @@ def setup():
 			comp = CCompiler(
 				name =                 'clang', 
 				path =                 paths[0], 
+				standards =             standards, 
 				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
@@ -94,6 +120,7 @@ def setup():
 			comp = CCompiler(
 				name =                 'cl.exe', 
 				path =                 paths[0], 
+				standards =             None, 
 				setup =                '/nologo', 
 				out_file =             '/Fe', 
 				no_link =              '/c', 
@@ -121,8 +148,8 @@ def setup():
 # Other C compilers: DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class CCompiler(object):
-	def __init__(self, name, path, setup, out_file, no_link, 
-				debug, position_independent_code, 
+	def __init__(self, name, path, standards, setup, out_file, 
+				no_link, debug, position_independent_code, 
 				warnings_all, warnings_as_errors, 
 				optimize_zero, optimize_one, optimize_two,
 				optimize_three, optimize_size, 
@@ -132,6 +159,7 @@ class CCompiler(object):
 		self._path = path
 
 		# Save text for all the options
+		self._opt_standards = standards
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
@@ -150,6 +178,7 @@ class CCompiler(object):
 
 		# Set the default values of the flags
 		self.debug = False
+		self.standard = None
 		self.position_independent_code = False
 		self.warnings_all = False
 		self.warnings_as_errors = False
@@ -164,6 +193,7 @@ class CCompiler(object):
 		opts = []
 		opts.append(self._opt_setup)
 		if self.debug: opts.append(self._opt_debug)
+		if self.standard: opts.append(self._opt_standards[self.standard])
 		if self.position_independent_code: opts.append(self._opt_position_independent_code)
 		if self.warnings_all: opts.append(self._opt_warnings_all)
 		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
@@ -175,7 +205,8 @@ class CCompiler(object):
 		for compile_time_flag in self.compile_time_flags:
 			opts.append(self._opt_compile_time_flags + compile_time_flag)
 
-		return str.join(' ', opts)
+		flags = str.join(' ', opts)
+		return flags
 	cflags = property(get_cflags)
 
 	def link_program(self, out_file, obj_files, i_files=[]):

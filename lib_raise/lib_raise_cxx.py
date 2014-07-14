@@ -38,6 +38,16 @@ import lib_raise_helpers as Helpers
 
 cxx_compilers = {}
 
+class Standard(object):
+	std1998 = 1
+	std2003 = 2
+	std2011 = 3
+	std201x = 4
+	gnu1998 = 5
+	gnu2003 = 6
+	gnu2011 = 7
+	gnu201x = 8
+
 def setup():
 	global cxx_compilers
 
@@ -48,10 +58,22 @@ def setup():
 		if len(paths) == 0:
 			continue
 
+		standards = {
+			Standard.std1998 : '-std=c++98', 
+			Standard.std2003 : '-std=c++03', 
+			Standard.std2011 : '-std=c++11', 
+			Standard.std201x : '-std=c++1x', 
+			Standard.gnu1998 : '-std=gnu++98', 
+			Standard.gnu2003 : '-std=gnu++03', 
+			Standard.gnu2011 : '-std=gnu++11', 
+			Standard.gnu201x : '-std=gnu++1x'
+		}
+
 		if name == 'g++':
 			comp = CXXCompiler(
 				name =                 'g++', 
 				path =                 paths[0], 
+				standards =             standards, 
 				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
@@ -72,6 +94,7 @@ def setup():
 			comp = CXXCompiler(
 				name =                 'clang++', 
 				path =                 paths[0], 
+				standards =             standards, 
 				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
@@ -93,6 +116,7 @@ def setup():
 			comp = CXXCompiler(
 				name =                 'cl.exe', 
 				path =                 paths[0], 
+				standards =             None, 
 				setup =                '/nologo /EHsc', 
 				out_file =             '/Fe', 
 				no_link =              '/c', 
@@ -118,8 +142,8 @@ def setup():
 
 
 class CXXCompiler(object):
-	def __init__(self, name, path, setup, out_file, no_link, 
-				debug, position_independent_code, 
+	def __init__(self, name, path, standards, setup, out_file, 
+				no_link, debug, position_independent_code, 
 				warnings_all, warnings_as_errors, 
 				optimize_zero, optimize_one, optimize_two,
 				optimize_three, optimize_size, 
@@ -129,6 +153,7 @@ class CXXCompiler(object):
 		self._path = path
 
 		# Save text for all the options
+		self._opt_standards = standards
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
@@ -147,6 +172,7 @@ class CXXCompiler(object):
 
 		# Set the default values of the flags
 		self.debug = False
+		self.standard = None
 		self.position_independent_code = False
 		self.warnings_all = False
 		self.warnings_as_errors = False
@@ -161,6 +187,7 @@ class CXXCompiler(object):
 		opts = []
 		opts.append(self._opt_setup)
 		if self.debug: opts.append(self._opt_debug)
+		if self.standard: opts.append(self._opt_standards[self.standard])
 		if self.position_independent_code: opts.append(self._opt_position_independent_code)
 		if self.warnings_all: opts.append(self._opt_warnings_all)
 		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
@@ -172,7 +199,8 @@ class CXXCompiler(object):
 		for compile_time_flag in self.compile_time_flags:
 			opts.append(self._opt_compile_time_flags + compile_time_flag)
 
-		return str.join(' ', opts)
+		flags = str.join(' ', opts)
+		return flags
 	cxxflags = property(get_cxxflags)
 
 	def build_program(self, o_file, cxx_files, i_files=[]):

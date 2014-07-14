@@ -16,6 +16,7 @@ def clean():
 
 def _configure():
 	cc = C.get_default_compiler()
+	cc.standard = C.Standard.std2011
 	cc.debug = True
 	cc.optimize_level = 2
 	cc.warnings_all = True
