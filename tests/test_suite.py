@@ -58,9 +58,19 @@ def chomp(s):
 	return s
 
 class TestCase(object):
+	known_prereqs = []
+	found_prereqs = []
+
 	@classmethod
-	def has_prerequisites(cls):
-		raise NotImplementedError("The has_prerequisites class method should be overridden on any child classes.")
+	def init_prereqs(cls):
+		cls.found_prereqs = []
+		for prog in cls.known_prereqs:
+			if program_paths(prog):
+				cls.found_prereqs.append(prog)
+
+	@classmethod
+	def get_prereqs(cls):
+		return cls.found_prereqs
 
 	def set_up(self, id):
 		pass
@@ -140,7 +150,8 @@ class ConcurrentTestRunner(object):
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
 			# Skip this test suite if it does not have the prerequisites
-			if not test_case_cls.has_prerequisites():
+			test_case_cls.init_prereqs()
+			if not test_case_cls.get_prereqs():
 				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
 				continue
 
@@ -284,7 +295,7 @@ class TestProcessRunner(object):
 
 class TestBasics(TestCase):
 	@classmethod
-	def has_prerequisites(cls):
+	def get_prereqs(cls):
 		return True
 
 	def set_up(self, id):
@@ -372,31 +383,27 @@ Must be run as root. Exiting ...'''
 
 
 class TestC(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['gcc', 'clang', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['gcc', 'clang', 'cl.exe']
 
 	def set_up(self, id):
 		self.init('C', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'setup_failure'
 Setting up C module ........................................................:(
 No C compiler found. Install one and try again. Exiting ...'''
 
-		self.assert_process_output(command, expected, is_success = False)
+			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_object(self):
-		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_object'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -407,12 +414,13 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_program(self):
-		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -421,12 +429,13 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain -nolineno build_shared_library'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_shared_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -437,12 +446,13 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -453,35 +463,31 @@ Running C program ...                                                       :)
 ./main.exe
 7 * 12 = 84'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestD(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']
 
 	def set_up(self, id):
 		self.init('D', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'setup_failure'
 Setting up D module ........................................................:(
 No D compiler found. Install one and try again. Exiting ...'''
 
-		self.assert_process_output(command, expected, is_success = False)
+			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_program'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
@@ -491,12 +497,13 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_object'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
@@ -508,12 +515,13 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_static_library'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
@@ -525,47 +533,44 @@ Running D program ...                                                       :)
 ./main.exe
 9 * 12 = 108'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_interface(self):
-		command = '{0} raise -plain -nolineno build_interface'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_interface'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_interface'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
 Building D interface 'lib_math.di' ...                                      :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestCXX(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['g++', 'clang++', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['g++', 'clang++', 'cl.exe']
 
 	def set_up(self, id):
 		self.init('CXX', id)
 
 	def test_setup_failure(self):
-		command = '{0} raise -plain -nolineno setup_failure'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'setup_failure'
 Setting up C++ module ......................................................:(
 No C++ compiler found. Install one and try again. Exiting ...'''
 
-		self.assert_process_output(command, expected, is_success = False)
+			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		command = '{0} raise -plain -nolineno build_program'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -574,12 +579,13 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		command = '{0} raise -plain -nolineno build_object'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_object'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -590,12 +596,13 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		command = '{0} raise -plain -nolineno build_shared_library'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_shared_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -606,12 +613,13 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		command = '{0} raise -plain -nolineno build_static_library'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'build_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -622,17 +630,11 @@ Running C++ program ...                                                     :)
 ./main.exe
 7 + 9 = 16'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestCSharp(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['dmcs', 'csc']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['dmcs', 'csc']
 
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -678,13 +680,7 @@ main.exe
 
 
 class TestJava(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['javac']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['javac']
 
 	def set_up(self, id):
 		self.init('Java', id)
@@ -731,7 +727,7 @@ java main
 
 class TestFind(TestCase):
 	@classmethod
-	def has_prerequisites(cls):
+	def get_prereqs(cls):
 		return True
 
 	def set_up(self, id):

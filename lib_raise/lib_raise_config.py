@@ -35,6 +35,7 @@ python = sys.executable
 is_plain = False
 is_inspect = False
 is_nolineno = False
+arg = []
 
 
 def early_exit(message):

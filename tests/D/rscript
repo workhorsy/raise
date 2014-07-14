@@ -8,6 +8,7 @@ import lib_raise_users as Users
 import lib_raise_d as D
 import lib_raise_ar as AR
 import lib_raise_fs as FS
+import lib_raise_config as Config
 
 
 def clean():
@@ -17,7 +18,7 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	dc = D.get_default_compiler()
+	dc = D.d_compilers[Config.arg]
 	dc.debug = True
 	dc.optimize = True
 	dc.warnings_all = True
@@ -73,6 +74,7 @@ def install_and_uninstall_program():
 
 	# Build as a normal user
 	def actual_build():
+		FS.remove_binaries('raise_example')
 		dc.build_program('raise_example.exe', ['main.d', 'lib_math.d'])
 	Users.do_as_normal_user(actual_build)
 

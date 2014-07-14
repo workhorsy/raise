@@ -75,9 +75,19 @@ def chown_r(dir_name, uid, gid):
 			os.chown(absolute_entry, uid, gid)
 
 class TestCase(object):
+	known_prereqs = []
+	found_prereqs = []
+
 	@classmethod
-	def has_prerequisites(cls):
-		raise NotImplementedError("The has_prerequisites class method should be overridden on any child classes.")
+	def init_prereqs(cls):
+		cls.found_prereqs = []
+		for prog in cls.known_prereqs:
+			if program_paths(prog):
+				cls.found_prereqs.append(prog)
+
+	@classmethod
+	def get_prereqs(cls):
+		return cls.found_prereqs
 
 	def set_up(self, id):
 		pass
@@ -163,7 +173,8 @@ class ConcurrentTestRunner(object):
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
 			# Skip this test suite if it does not have the prerequisites
-			if not test_case_cls.has_prerequisites():
+			test_case_cls.init_prereqs()
+			if not test_case_cls.get_prereqs():
 				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
 				continue
 
@@ -307,7 +318,7 @@ class TestProcessRunner(object):
 
 class TestBasics(TestCase):
 	@classmethod
-	def has_prerequisites(cls):
+	def get_prereqs(cls):
 		return True
 
 	def set_up(self, id):
@@ -332,24 +343,20 @@ Must not be run as root. Exiting ...'''
 
 
 class TestC(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['gcc', 'clang', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['gcc', 'clang', 'cl.exe']
 
 	def set_up(self, id):
 		self.init('C', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
+Removing binaries 'raise_example' ...                                       :)
 Building C program 'raise_example.exe' ...                                  :)
 Uninstalling the program 'raise_example.exe' ...                            :)
 Installing the program 'raise_example.exe' ...                              :)
@@ -358,12 +365,13 @@ raise_example.exe
 7 * 12 = 84
 Uninstalling the program 'raise_example.exe' ...                            :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_shared_library'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_shared_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -380,12 +388,13 @@ raise_example.exe
 Uninstalling the program 'raise_example.exe' ...                            :)
 Uninstalling the library 'lib_math.so' ...                                  :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
+		for prog in TestC.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -402,28 +411,24 @@ raise_example.exe
 Uninstalling the program 'raise_example.exe' ...                            :)
 Uninstalling the library 'lib_math.a' ...                                   :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestCXX(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['g++', 'cl.exe']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['g++', 'clang++', 'cl.exe']
 
 	def set_up(self, id):
 		self.init('CXX', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_program'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
+Removing binaries 'raise_example' ...                                       :)
 Building C++ program 'raise_example.exe' ...                                :)
 Uninstalling the program 'raise_example.exe' ...                            :)
 Installing the program 'raise_example.exe' ...                              :)
@@ -432,12 +437,13 @@ raise_example.exe
 7 + 9 = 16
 Uninstalling the program 'raise_example.exe' ...                            :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_shared_library'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_shared_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_shared_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -454,12 +460,13 @@ raise_example.exe
 Uninstalling the program 'raise_example.exe' ...                            :)
 Uninstalling the library 'lib_math.so' ...                                  :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
+		for prog in TestCXX.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_static_library'
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
@@ -476,29 +483,25 @@ raise_example.exe
 Uninstalling the program 'raise_example.exe' ...                            :)
 Uninstalling the library 'lib_math.a' ...                                   :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestD(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['dmd', 'dmd2', 'ldc2']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['dmd', 'dmd2', 'ldc2']
 
 	def set_up(self, id):
 		self.init('D', id)
 
 	def test_install_and_uninstall_program(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_program'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_program'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
 Removing binaries 'main' ...                                                :)
+Removing binaries 'raise_example' ...                                       :)
 Building D program 'raise_example.exe' ...                                  :)
 Uninstalling the program 'raise_example.exe' ...                            :)
 Installing the program 'raise_example.exe' ...                              :)
@@ -507,13 +510,14 @@ raise_example.exe
 9 * 12 = 108
 Uninstalling the program 'raise_example.exe' ...                            :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 	def test_install_and_uninstall_static_library(self):
-		command = '{0} raise -plain -nolineno install_and_uninstall_static_library'.format(sys.executable)
+		for prog in TestD.get_prereqs():
+			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
-		expected = \
+			expected = \
 '''Running target 'install_and_uninstall_static_library'
 Removing the file 'lib_math.di' ...                                         :)
 Removing binaries 'lib_math' ...                                            :)
@@ -531,17 +535,11 @@ raise_example.exe
 Uninstalling the program 'raise_example.exe' ...                            :)
 Uninstalling the library 'lib_math.a' ...                                   :)'''
 
-		self.assert_process_output(command, expected)
+			self.assert_process_output(command, expected)
 
 
 class TestCSharp(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['dmcs', 'csc']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['dmcs', 'csc']
 
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -587,13 +585,7 @@ Uninstalling the library 'lib_math.dll' ...                                 :)''
 
 
 class TestJava(TestCase):
-	@classmethod
-	def has_prerequisites(cls):
-		for prog in ['javac']:
-			if program_paths(prog):
-				return True
-
-		return False
+	known_prereqs = ['javac']
 
 	def set_up(self, id):
 		self.init('Java', id)
@@ -643,6 +635,7 @@ if __name__ == '__main__':
 	runner.add_test_case(TestBasics)
 	runner.add_test_case(TestC)
 	runner.add_test_case(TestCXX)
+	runner.add_test_case(TestD)
 	runner.add_test_case(TestCSharp)
 	runner.add_test_case(TestJava)
 	runner.run()

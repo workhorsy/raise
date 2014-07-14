@@ -53,6 +53,7 @@ if __name__ == '__main__':
 			if arg == '-plain': Config.is_plain = True
 			elif arg == '-inspect': Config.is_inspect = True
 			elif arg == '-nolineno' : Config.is_nolineno = True
+			elif arg.startswith('-arg=') : Config.arg = arg.split('-arg=')[1]
 		else:
 			args.append(arg)
 
@@ -92,6 +93,7 @@ if __name__ == '__main__':
 		print("    -plain    - Don't clear, don't use color, and fix the width to 79")
 		print("    -nolineno - Don't print line numbers on error exit")
 		print("    -inspect  - Print the source code to the target")
+		print("    -arg=     - Pass an argument to the rscript")
 		print("")
 		print("COMMANDS:")
 		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")

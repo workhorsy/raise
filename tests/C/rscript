@@ -8,6 +8,7 @@ import lib_raise_users as Users
 import lib_raise_c as C
 import lib_raise_ar as AR
 import lib_raise_fs as FS
+import lib_raise_config as Config
 
 
 def clean():
@@ -16,7 +17,7 @@ def clean():
 	FS.remove_binaries('main')
 
 def _configure():
-	cc = C.get_default_compiler()
+	cc = C.c_compilers[Config.arg]
 	cc.debug = True
 	cc.position_independent_code = True
 	cc.optimize_level = 2
@@ -85,6 +86,7 @@ def install_and_uninstall_program():
 
 	# Build as a normal user
 	def actual_build():
+		FS.remove_binaries('raise_example')
 		cc.build_program('raise_example.exe', ['main.c', 'lib_math.c'])
 	Users.do_as_normal_user(actual_build)
 
