@@ -494,7 +494,7 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 
 
 class TestD(TestCase):
-	known_prereqs = ['dmd', 'dmd2', 'ldc2']
+	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']
 
 	def set_up(self, id):
 		self.init('D', id)
