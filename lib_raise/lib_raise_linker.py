@@ -118,14 +118,14 @@ class Linker(object):
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type._name == 'Cygwin':
+	if Helpers.os_type == Helpers.OSType.cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif Helpers.os_type._name == 'Windows':
+	elif Helpers.os_type == Helpers.OSType.windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
@@ -148,7 +148,7 @@ def to_native(command):
 def get_default_linker():
 	global linkers
 
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		return linkers['link.exe']
 	else:
 		return linkers['ld']
@@ -158,7 +158,7 @@ def ldconfig():
 	Print.status("Running 'ldconfig'")
 
 	# Skip ldconfig on Cygwin
-	if Helpers.os_type._name == 'Cygwin':
+	if Helpers.os_type == Helpers.OSType.cygwin:
 		Print.ok()
 		return
 

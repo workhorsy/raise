@@ -38,34 +38,26 @@ import lib_raise_terminal as Print
 
 os_type = None
 
+class OSType(object):
+	cygwin = 'Cygwin'
+	windows = 'Windows'
+	unix = 'Unix'
 
 def setup():
 	global os_type
 
 	# Figure out the general OS type
 	if 'cygwin' in platform.system().lower():
-		os_type = OSType(
-			name =                 'Cygwin'
-		)
+		os_type = OSType.cygwin
 	elif 'windows' in platform.system().lower():
-		os_type = OSType(
-			name =                 'Windows'
-		)
+		os_type = OSType.windows
 	else:
-		os_type = OSType(
-			name =                 'Unix'
-		)
+		os_type = OSType.unix
 
 	# Make sure Windows SDK tools are found
-	if os_type._name == 'Windows':
+	if os_type == OSType.windows:
 		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
 			Config.early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
-
-
-class OSType(object):
-	def __init__(self, name):
-
-		self._name = name
 
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:

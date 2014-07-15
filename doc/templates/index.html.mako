@@ -502,7 +502,7 @@ import lib_raise_helpers as Helpers
 
 <p>
 	Raise uses a string for the OS Type. Any time you need to check what
-	OS your script is running under, you can use <span class="fun">Helpers.os_type._name</span>.
+	OS your script is running under, you can use <span class="fun">Helpers.os_type</span>.
 </p>
 
 There are three basic OS types:

@@ -520,7 +520,7 @@ import lib_raise_helpers as Helpers
 
 <p>
 	Raise uses a string for the OS Type. Any time you need to check what
-	OS your script is running under, you can use <span class="fun">Helpers.os_type._name</span>.
+	OS your script is running under, you can use <span class="fun">Helpers.os_type</span>.
 </p>
 
 There are three basic OS types:
@@ -533,7 +533,7 @@ There are three basic OS types:
 
 <pre><code data-language="python">
 def operating_system_support():
- 	print("OS: {0}".format(Helpers.os_type._name))
+ 	print("OS: {0}".format(Helpers.os_type))
 </code></pre>
 
 <p>
@@ -1976,7 +1976,7 @@ def c_compiler_setup():
 
 	<pre class="raise_output">
 $CC: gcc
-$CFLAGS:  -g -std=c11 -fPIC -Wall -Werror -Wextra -O2 -DSDL=true
+$CFLAGS:  -g -std=c11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="c_building_object"></a>
@@ -3771,7 +3771,7 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: X86_32
 Bits: 32
-MHz: 800.0000 MHz
+MHz: 1.6000 GHz
 Name: Genuine Intel(R) CPU           T2050  @ 1.60GHz
 Vendor Name: GenuineIntel
 Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, xtpr

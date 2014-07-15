@@ -69,13 +69,13 @@ def set_fancy():
 	global width
 
 	# Figure out how to clear the terminal
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		clear = 'cls'
 	else:
 		clear = 'clear'
 
 	# Figure out the terminal width
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		try:
 			import _winreg as winreg
 		except ImportError as err:
@@ -89,7 +89,7 @@ def set_fancy():
 		width = int(os.popen('stty size', 'r').read().split()[1])
 
 	# Figure out the terminal colors
-	if Helpers.os_type._name != 'Windows':
+	if Helpers.os_type != Helpers.OSType.windows:
 		BGColors.MESSAGE = '\033[44m\033[37m'
 		BGColors.OK = '\033[42m\033[37m'
 		BGColors.WARNING = '\033[43m\033[30m'

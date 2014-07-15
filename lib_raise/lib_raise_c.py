@@ -357,14 +357,14 @@ class CCompiler(object):
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type._name == 'Cygwin':
+	if Helpers.os_type == Helpers.OSType.cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif Helpers.os_type._name == 'Windows':
+	elif Helpers.os_type == Helpers.OSType.windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
@@ -388,7 +388,7 @@ def get_default_compiler():
 	global c_compilers
 	comp = None
 
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		comp = c_compilers['cl.exe']
 	else:
 		if 'gcc' in c_compilers:
@@ -423,7 +423,7 @@ def install_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -452,7 +452,7 @@ def uninstall_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -481,7 +481,7 @@ def install_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -510,7 +510,7 @@ def uninstall_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -539,7 +539,7 @@ def install_header(name, dir_name=None):
 
 	# Get the location headers are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'
@@ -568,7 +568,7 @@ def uninstall_header(name, dir_name=None):
 
 	# Get the location header are stored in
 	prog_root = None
-	if Helpers.os_type._name == 'Windows':
+	if Helpers.os_type == Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'

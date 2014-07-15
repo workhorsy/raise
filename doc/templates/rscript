@@ -46,7 +46,7 @@ Users
 '''
 
 def operating_system_support():
-	print("OS: {0}".format(Helpers.os_type._name))
+	print("OS: {0}".format(Helpers.os_type))
 
 '''
 installation
