@@ -155,6 +155,13 @@ class ConcurrentTestRunner(object):
 				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
 				continue
 
+			# Print any reqs that were not found
+			missing_prereqs = set(test_case_cls.known_prereqs) - set(test_case_cls.found_prereqs)
+			if missing_prereqs:
+				print("For suite '{0}'".format(test_case_cls.__name__))
+				for prereq in missing_prereqs:
+					print("    Could not find '{0}'".format(prereq))
+
 			# Find all the tests in the suite
 			test_case = test_case_cls()
 			members = inspect.getmembers(test_case, predicate=inspect.ismethod)
