@@ -151,12 +151,17 @@ class DCompiler(object):
 
 	def get_dflags(self):
 		opts = []
-		if self.debug: opts.append(self._opt_debug)
-		if self.warnings_all: opts.append(self._opt_warnings_all)
-		if self.optimize: opts.append(self._opt_optimize)
-		if self.unittest: opts.append(self._opt_unittest)
-		for compile_time_flag in self.compile_time_flags:
-			opts.append(self._opt_compile_time_flags + compile_time_flag)
+		if self.debug and self._opt_debug:
+			opts.append(self._opt_debug)
+		if self.warnings_all and self._opt_warnings_all:
+			opts.append(self._opt_warnings_all)
+		if self.optimize and self._opt_optimize:
+			opts.append(self._opt_optimize)
+		if self.unittest and self._opt_unittest:
+			opts.append(self._opt_unittest)
+		if self._opt_compile_time_flags:
+			for compile_time_flag in self.compile_time_flags:
+				opts.append(self._opt_compile_time_flags + compile_time_flag)
 
 		return str.join(' ', opts)
 	dflags = property(get_dflags)
@@ -169,7 +174,7 @@ class DCompiler(object):
 		singular = 'D interface'
 
 		f = FS.self_deleting_named_temporary_file()
-		command = "{0} {1} {2} {3} {4} {5}{6}i {7}{8}".format(
+		command = '"{0}" {1} {2} {3} {4} {5}{6}i {7}{8}'.format(
 			self._path, 
 			self.dflags, 
 			self._opt_no_link, 
@@ -205,7 +210,7 @@ class DCompiler(object):
 		plural = 'D objects'
 		singular = 'D object'
 
-		command = "{0} {1} {2} {3}{4} {5} {6} {7}".format(
+		command = '"{0}" {1} {2} {3}{4} {5} {6} {7}'.format(
 			self._path, 
 			self.dflags, 
 			self._opt_no_link, 
@@ -257,7 +262,7 @@ class DCompiler(object):
 		plural = 'D static libraries'
 		singular = 'D static library'
 
-		command = "{0} {1} -lib {2}{3} {4} {5} {6}".format(
+		command = '"{0}" {1} -lib {2}{3} {4} {5} {6}'.format(
 			self._path, 
 			self.dflags, 
 			self._opt_out_file, 
@@ -298,7 +303,7 @@ class DCompiler(object):
 		result = out_file
 		plural = 'D programs'
 		singular = 'D program'
-		command = "{0} {1} {2}{3} {4} {5}".format(
+		command = '"{0}" {1} {2}{3} {4} {5}'.format(
 			self._path, 
 			self.dflags, 
 			self._opt_out_file, 

@@ -54,11 +54,6 @@ def setup():
 	else:
 		os_type = OSType.unix
 
-	# Make sure Windows SDK tools are found
-	if os_type == OSType.windows:
-		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
-			Config.early_exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
-
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:
 		if s.endswith(sep):

@@ -111,10 +111,14 @@ class CSCompiler(object):
 
 	def get_csflags(self):
 		opts = []
-		if self.debug: opts.append(self._opt_debug)
-		if self.warnings_all: opts.append(self._opt_warnings_all)
-		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
-		if self.optimize: opts.append(self._opt_optimize)
+		if self.debug and self._opt_debug:
+			opts.append(self._opt_debug)
+		if self.warnings_all and self._opt_warnings_all:
+			opts.append(self._opt_warnings_all)
+		if self.warnings_as_errors and self._opt_warnings_as_errors:
+			opts.append(self._opt_warnings_as_errors)
+		if self.optimize and self._opt_optimize:
+			opts.append(self._opt_optimize)
 
 		return str.join(' ', opts)
 	csflags = property(get_csflags)
@@ -129,7 +133,7 @@ class CSCompiler(object):
 		result = out_file
 		plural = 'C# programs'
 		singular = 'C# program'
-		command = "{0} {1} {2}{3} {4} {5}".format(
+		command = '"{0}" {1} {2}{3} {4} {5}'.format(
 			self._path, 
 			self.csflags, 
 			self._opt_out_file, 
@@ -165,7 +169,7 @@ class CSCompiler(object):
 		result = out_file
 		plural = 'C# shared libraries'
 		singular = 'C# shared library'
-		command = "{0} {1} -target:library {2}{3} {4} {5}".format(
+		command = '"{0}" {1} -target:library {2}{3} {4} {5}'.format(
 			self._path, 
 			self.csflags, 
 			self._opt_out_file, 

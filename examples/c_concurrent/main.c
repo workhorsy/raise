@@ -14,6 +14,9 @@ int main(int argc, char* argv[]) {
 	int b;
 	int c;
 
+	assert(argc);
+	assert(argv);
+	
 	a = multiply(7, 12);
 	assert(a == 84);
 	printf("7 * 12 = %d\n", a);

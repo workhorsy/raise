@@ -20,7 +20,7 @@ def _configure():
 	cxx.standard = CXX.Standard.std2011
 	cxx.debug = True
 	cxx.optimize_level = 2
-	cxx.warnings_all = True
+	cxx.warnings_all = False
 	cxx.warnings_as_errors = True
 	cxx.compile_time_flags = ['ADD', 'MULTIPLY']
 	return cxx

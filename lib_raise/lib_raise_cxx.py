@@ -51,7 +51,7 @@ class Standard(object):
 def setup():
 	global cxx_compilers
 
-	# Get the names and paths for know C++ compilers
+	# Get the names and paths for known C++ compilers
 	names = ['g++', 'clang++', 'cl.exe']
 	for name in names:
 		paths = Find.program_paths(name)
@@ -190,20 +190,33 @@ class CXXCompiler(object):
 
 	def get_cxxflags(self):
 		opts = []
-		opts.append(self._opt_setup)
-		if self.debug: opts.append(self._opt_debug)
-		if self.standard: opts.append(self._opt_standards[self.standard])
-		if self.position_independent_code: opts.append(self._opt_position_independent_code)
-		if self.warnings_all: opts.append(self._opt_warnings_all)
-		if self.warnings_extra: opts.append(self._opt_warnings_extra)
-		if self.warnings_as_errors: opts.append(self._opt_warnings_as_errors)
-		if self.optimize_level == 0: opts.append(self._opt_optimize_zero)
-		if self.optimize_level == 1: opts.append(self._opt_optimize_one)
-		if self.optimize_level == 2: opts.append(self._opt_optimize_two)
-		if self.optimize_level == 3: opts.append(self._opt_optimize_three)
-		if self.optimize_level == 'small': opts.append(self._opt_optimize_size)
-		for compile_time_flag in self.compile_time_flags:
-			opts.append(self._opt_compile_time_flags + compile_time_flag)
+		if self._opt_setup:
+			opts.append(self._opt_setup)
+		if self.debug and self._opt_debug:
+			opts.append(self._opt_debug)
+		if self.standard and self._opt_standards:
+			opts.append(self._opt_standards[self.standard])
+		if self.position_independent_code and self._opt_position_independent_code:
+			opts.append(self._opt_position_independent_code)
+		if self.warnings_all and self._opt_warnings_all:
+			opts.append(self._opt_warnings_all)
+		if self.warnings_extra and self._opt_warnings_extra:
+			opts.append(self._opt_warnings_extra)
+		if self.warnings_as_errors and self._opt_warnings_as_errors:
+			opts.append(self._opt_warnings_as_errors)
+		if self.optimize_level == 0 and self._opt_optimize_zero:
+			opts.append(self._opt_optimize_zero)
+		if self.optimize_level == 1 and self._opt_optimize_one:
+			opts.append(self._opt_optimize_one)
+		if self.optimize_level == 2 and self._opt_optimize_two:
+			opts.append(self._opt_optimize_two)
+		if self.optimize_level == 3 and self._opt_optimize_three:
+			opts.append(self._opt_optimize_three)
+		if self.optimize_level == 'small' and self._opt_optimize_size:
+			opts.append(self._opt_optimize_size)
+		if self._opt_compile_time_flags:
+			for compile_time_flag in self.compile_time_flags:
+				opts.append(self._opt_compile_time_flags + compile_time_flag)
 
 		flags = str.join(' ', opts)
 		return flags
@@ -218,7 +231,7 @@ class CXXCompiler(object):
 		result = o_file
 		plural = 'C++ programs'
 		singular = 'C++ program'
-		command = '{0} {1} {2} {3} {4}{5}'.format(
+		command = '"{0}" {1} {2} {3} {4}{5}'.format(
 					self._path, 
 					self.cxxflags, 
 					str.join(' ', cxx_files), 
@@ -252,7 +265,7 @@ class CXXCompiler(object):
 		result = o_file
 		plural = 'C++ shared libraries'
 		singular = 'C++ shared library'
-		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
+		command = '"{0}" {1} {2} {3} {4} {5}{6}'.format(
 					self._path, 
 					self.cxxflags, 
 					self._opt_link, 
@@ -287,7 +300,7 @@ class CXXCompiler(object):
 		result = out_file
 		plural = 'C++ programs'
 		singular = 'C++ program'
-		command = '{0} {1} {2} {3} {4} {5}{6}'.format(
+		command = '"{0}" {1} {2} {3} {4} {5}{6}'.format(
 					self._path, 
 					self.cxxflags, 
 					self._opt_link, 
@@ -322,7 +335,7 @@ class CXXCompiler(object):
 		result = o_file
 		plural = 'C++ objects'
 		singular = 'C++ object'
-		command = "{0} {1} {2} {3}{4} {5} {6}".format(
+		command = '"{0}" {1} {2} {3}{4} {5} {6}'.format(
 					self._path, 
 					self.cxxflags, 
 					self._opt_no_link, 
@@ -384,6 +397,12 @@ def get_default_compiler():
 	comp = None
 
 	if Helpers.os_type == Helpers.OSType.windows:
+		# Make sure Windows SDK tools are found
+		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
+			Print.status("Setting up cl.exe")
+			Print.fail()
+			Print.exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
+
 		comp = cxx_compilers['cl.exe']
 	else:
 		if 'g++' in cxx_compilers:

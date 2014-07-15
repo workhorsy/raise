@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1325810: 'Make Windows SDK only required for C/C++'.
 	* Fixed Bug #1326100: 'Make tests run with all compilers'.
 	* Fixed Bug #1277758: 'Add standard flags to C/C++ compilers'.
 	* Fixed Bug #1338428: 'Add a require environmental variable function'.

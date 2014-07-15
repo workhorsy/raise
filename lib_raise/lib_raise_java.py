@@ -109,10 +109,14 @@ class JavaCompiler(object):
 
 	def get_javaflags(self):
 		opts = []
-		if self.debug: opts.append(self._opt_debug)
-		if not self.warnings: opts.append(self._opt_no_warnings)
-		if self.verbose: opts.append(self._opt_verbose)
-		if self.deprecation: opts.append(self._opt_deprecation)
+		if self.debug and self._opt_debug:
+			opts.append(self._opt_debug)
+		if not self.warnings and self._opt_no_warnings:
+			opts.append(self._opt_no_warnings)
+		if self.verbose and self._opt_verbose:
+			opts.append(self._opt_verbose)
+		if self.deprecation and self._opt_deprecation:
+			opts.append(self._opt_deprecation)
 
 		return str.join(' ', opts)
 	javaflags = property(get_javaflags)
@@ -127,7 +131,7 @@ class JavaCompiler(object):
 		result = out_file
 		plural = 'Java programs'
 		singular = 'Java program'
-		command = "{0} {1} {2} {3}".format(
+		command = '"{0}" {1} {2} {3}'.format(
 			self._path, 
 			self.javaflags, 
 			str.join(' ', inc_files), 
@@ -161,7 +165,7 @@ class JavaCompiler(object):
 		result = out_file
 		plural = 'Java jars'
 		singular = 'Java jar'
-		command = '{0} -cf {1} {2} {3}'.format(
+		command = '"{0}" -cf {1} {2} {3}'.format(
 			self.jar, 
 			out_file, 
 			str.join(' ', inc_files), 
