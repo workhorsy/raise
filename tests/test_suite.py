@@ -762,7 +762,7 @@ Fix version string and try again. Exiting ...'''
 
 		self.assert_process_output(command, expected, False)
 
-	def test_find_black_listed_version_code(self):
+	def test_find_invalid_version_code(self):
 		command = '{0} raise -plain -nolineno find_invalid_version_code'.format(sys.executable)
 
 		expected = \
