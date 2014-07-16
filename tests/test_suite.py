@@ -768,7 +768,7 @@ Fix version string and try again. Exiting ...'''
 		expected = \
 '''Running target 'find_invalid_version_code'
 Building version string ....................................................:(
-Invalid version string "a >= (1, 2)", global name 'a' is not defined
+Invalid version string "a >= (1, 2)", name 'a' is not defined
 Fix version string and try again. Exiting ...'''
 
 		self.assert_process_output(command, expected, False)

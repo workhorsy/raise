@@ -169,8 +169,9 @@ def to_version_cb(version_str):
 		version_cb = eval(code, {})
 		version_cb(version_string_to_tuple('(1, 9)'))
 	except Exception as e:
+		message = str(e).lstrip('global ')
 		Print.status('Building version string')
-		Print.fail('Invalid version string "{0}", {1}'.format(version_str, e))
+		Print.fail('Invalid version string "{0}", {1}'.format(version_str, message))
 		Print.exit('Fix version string and try again.')
 
 	return version_cb
