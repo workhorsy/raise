@@ -238,7 +238,6 @@ class DCompiler(object):
 				self._opt_interface_dir, h_dir
 			)
 		command = to_native(command)
-		#print("!!! command: {0}".format(command))
 
 		def setup():
 			# Skip if the files have not changed since last build
