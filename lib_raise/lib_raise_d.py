@@ -77,11 +77,11 @@ def setup():
 				debug =                '-g', 
 				warnings_all =         '-w', 
 				optimize =             '-O2',
-				compile_time_flags =   '-version=', 
+				compile_time_flags =   '-d-version=', 
 				link =                 '-Wl,-as-needed', 
 				interface =            '-H', 
-				interface_file =       '-Hf', 
-				interface_dir =        '-Hd', 
+				interface_file =       '-Hf=', 
+				interface_dir =        '-Hd=', 
 				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
@@ -95,7 +95,7 @@ def setup():
 				debug =                '-g', 
 				warnings_all =         '-Werror', 
 				optimize =             '-O2', 
-				compile_time_flags =   '-version=', 
+				compile_time_flags =   '-f-version=', 
 				link =                 '-Wl,-as-needed', 
 				interface =            '-fintfc=', 
 				interface_file =       '-fintfc-file=', 
