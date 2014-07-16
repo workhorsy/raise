@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on July 13th 2014
+Last updated on July 15th 2014
 </p>
 
 <p>
@@ -489,7 +489,7 @@ C and C++ are fully supported with GCC, and Clang. MS cl.exe support is not yet 
 <h2>4.2. D</h2>
 
 <p>
-D is fully supported with DMD, LDC, and GDC.
+D is fully supported with DMD, and LDC. GDC support is disabled, because the packages in debian/ubuntu are broken.
 </p>
 
 <a id="c_sharp_support"></a>
@@ -1976,7 +1976,7 @@ def c_compiler_setup():
 
 	<pre class="raise_output">
 $CC: gcc
-$CFLAGS:  -g -std=c11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
+$CFLAGS: -g -std=c11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="c_building_object"></a>
@@ -2412,7 +2412,7 @@ def cxx_compiler_setup():
 
 	<pre class="raise_output">
 $CXX: g++
-$CXXFLAGS:  -g -std=c++11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
+$CXXFLAGS: -g -std=c++11 -fPIC -Wall -Wextra -Werror -O2 -DSDL=true
 	</pre>
 
 <a id="cxx_building_object"></a>
@@ -2734,7 +2734,7 @@ import lib_raise_d as D
 <h2>14.2. D Compilers</h2>
 
 	<p>
-		Raise supports the DMD, LDC, and GDC D compilers. The compiler
+		Raise supports the DMD, and LDC, D compilers (not GDC). The compiler
 		 is abstracted away in a generalized way, as to make it so you don't 
 		have to worry about compiler specific functionality.
 	</p>
@@ -3771,7 +3771,7 @@ def cpu():
 	<pre class="raise_output" style="white-space: pre-wrap;">
 Architechture: X86_32
 Bits: 32
-MHz: 1.6000 GHz
+MHz: 1.3330 GHz
 Name: Genuine Intel(R) CPU           T2050  @ 1.60GHz
 Vendor Name: GenuineIntel
 Flags: acpi, aperfmperf, apic, arch_perfmon, bts, clflush, cmov, constant_tsc, cx8, de, dtherm, dts, est, fpu, fxsr, ht, mca, mce, mmx, monitor, msr, mtrr, nx, pae, pbe, pdcm, pge, pni, pse, sep, ss, sse, sse2, tm, tm2, tsc, vme, xtpr

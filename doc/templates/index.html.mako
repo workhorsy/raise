@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on July 13th 2014
+Last updated on July 15th 2014
 </p>
 
 <p>
@@ -471,7 +471,7 @@ C and C++ are fully supported with GCC, and Clang. MS cl.exe support is not yet 
 <h2>4.2. D</h2>
 
 <p>
-D is fully supported with DMD, LDC, and GDC.
+D is fully supported with DMD, and LDC. GDC support is disabled, because the packages in debian/ubuntu are broken.
 </p>
 
 <a id="c_sharp_support"></a>
@@ -2383,7 +2383,7 @@ import lib_raise_d as D
 <h2>14.2. D Compilers</h2>
 
 	<p>
-		Raise supports the DMD, LDC, and GDC D compilers. The compiler
+		Raise supports the DMD, and LDC, D compilers (not GDC). The compiler
 		 is abstracted away in a generalized way, as to make it so you don't 
 		have to worry about compiler specific functionality.
 	</p>

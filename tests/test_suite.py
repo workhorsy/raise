@@ -474,7 +474,7 @@ Running C program ...                                                       :)
 
 
 class TestD(TestCase):
-	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']
+	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc'] # gdc
 
 	def set_up(self, id):
 		self.init('D', id)

@@ -43,7 +43,7 @@ def setup():
 	global d_compilers
 
 	# Get the names and paths for know D compilers
-	names = ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']
+	names = ['dmd2', 'dmd', 'ldc2', 'ldc'] #gdc
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
@@ -56,6 +56,7 @@ def setup():
 				setup =                '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
+				lib =                  '-lib', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
 				optimize =             '-O', 
@@ -74,6 +75,7 @@ def setup():
 				setup =                '', 
 				out_file =             '-of', 
 				no_link =              '-c', 
+				lib =                  '-lib', 
 				debug =                '-g', 
 				warnings_all =         '-w', 
 				optimize =             '-O2',
@@ -86,12 +88,14 @@ def setup():
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['gdc']:
+			# http://wiki.dlang.org/GDC/Using_GDC
 			comp = DCompiler(
 				name =                 name, 
 				path =                 paths[0], 
 				setup =                '', 
 				out_file =             '-o ', 
 				no_link =              '-c', 
+				lib =                  '-lib', 
 				debug =                '-g', 
 				warnings_all =         '-Werror', 
 				optimize =             '-O2', 
@@ -113,7 +117,7 @@ def setup():
 
 class DCompiler(object):
 	def __init__(self, name, path, setup, out_file, no_link, 
-				debug, warnings_all, optimize, 
+				lib, debug, warnings_all, optimize, 
 				compile_time_flags, link, 
 				interface, interface_file, interface_dir, 
 				unittest):
@@ -125,6 +129,7 @@ class DCompiler(object):
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_no_link = no_link
+		self._opt_lib = lib
 		self._opt_debug = debug
 		self._opt_warnings_all = warnings_all
 		self._opt_optimize = optimize
@@ -262,9 +267,10 @@ class DCompiler(object):
 		plural = 'D static libraries'
 		singular = 'D static library'
 
-		command = '"{0}" {1} -lib {2}{3} {4} {5} {6}'.format(
+		command = '"{0}" {1} {2} {3}{4} {5} {6} {7}'.format(
 			self._path, 
 			self.dflags, 
+			self._opt_lib, 
 			self._opt_out_file, 
 			o_file, 
 			str.join(' ', d_files), 
@@ -364,7 +370,7 @@ def get_default_compiler():
 	global d_compilers
 
 	comp = None
-	for name in ['dmd2', 'dmd', 'ldc2', 'ldc', 'gdc']:
+	for name in ['dmd2', 'dmd', 'ldc2', 'ldc']: # gdc
 		if name in d_compilers:
 			comp = d_compilers[name]
 			break
