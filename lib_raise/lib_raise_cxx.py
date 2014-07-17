@@ -110,7 +110,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed'
+				link =                 '-shared -Wl'
 			)
 			cxx_compilers[comp._name] = comp
 		elif name == 'cl.exe':
@@ -404,6 +404,11 @@ def get_default_compiler():
 			Print.exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
 		comp = cxx_compilers['cl.exe']
+	elif Helpers.os_type == Helpers.OSType.darwin:
+		if 'clang++' in cxx_compilers:
+			comp = cxx_compilers['clang++']
+		elif 'g++' in cxx_compilers:
+			comp = cxx_compilers['g++']
 	else:
 		if 'g++' in cxx_compilers:
 			comp = cxx_compilers['g++']
