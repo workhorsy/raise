@@ -394,7 +394,6 @@ def to_native(command):
 
 def get_default_compiler():
 	global cxx_compilers
-	comp = None
 
 	if Helpers.os_type == Helpers.OSType.windows:
 		# Make sure Windows SDK tools are found
@@ -403,19 +402,13 @@ def get_default_compiler():
 			Print.fail()
 			Print.exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
-		comp = cxx_compilers['cl.exe']
+		return cxx_compilers.get('cl.exe')
 	elif Helpers.os_type == Helpers.OSType.darwin:
-		if 'clang++' in cxx_compilers:
-			comp = cxx_compilers['clang++']
-		elif 'g++' in cxx_compilers:
-			comp = cxx_compilers['g++']
+		return cxx_compilers.get('clang++') or cxx_compilers.get('g++')
 	else:
-		if 'g++' in cxx_compilers:
-			comp = cxx_compilers['g++']
-		elif 'clang++' in cxx_compilers:
-			comp = cxx_compilers['clang++']
+		return cxx_compilers.get('g++') or cxx_compilers.get('clang++')
 
-	return comp
+	return None
 
 def run_print(command):
 	Print.status("Running C++ program")

@@ -368,13 +368,11 @@ def to_native(command):
 def get_default_compiler():
 	global d_compilers
 
-	comp = None
 	for name in ['dmd2', 'dmd', 'ldc2', 'ldc']: # gdc
 		if name in d_compilers:
-			comp = d_compilers[name]
-			break
+			return d_compilers[name]
 
-	return comp
+	return None
 
 def run_print(command):
 	Print.status("Running D program")

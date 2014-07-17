@@ -226,13 +226,11 @@ def to_native(command):
 def get_default_compiler():
 	global java_compilers
 
-	comp = None
 	for name in ['javac']:
 		if name in java_compilers:
-			comp = java_compilers[name]
-			break
+			return java_compilers[name]
 
-	return comp
+	return None
 
 def install_program(name, dir_name):
 	# Make sure the extension is valid

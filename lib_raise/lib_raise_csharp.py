@@ -243,13 +243,11 @@ def to_native(command):
 def get_default_compiler():
 	global cs_compilers
 
-	comp = None
 	for name in ['dmcs', 'csc']:
 		if name in cs_compilers:
-			comp = cs_compilers[name]
-			break
+			return cs_compilers[name]
 
-	return comp
+	return None
 
 def install_program(name, dir_name):
 	# Make sure the extension is valid
