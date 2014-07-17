@@ -238,7 +238,7 @@ def install_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -257,7 +257,7 @@ def install_program(name, dir_name):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-		if Helpers.os_type != Helpers.OSType.windows:
+		if not Helpers.os_type in Helpers.OSType.windows:
 			script_name = Helpers.before(name, '.')
 			script_path = os.path.join('/usr/bin/', script_name)
 			with open(script_path, 'w') as f:
@@ -281,7 +281,7 @@ def uninstall_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -300,7 +300,7 @@ def uninstall_program(name, dir_name):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-		if Helpers.os_type != Helpers.OSType.windows:
+		if not Helpers.os_type in Helpers.OSType.windows:
 			script_name = Helpers.before(name, '.')
 			if os.path.isfile('/usr/bin/' + script_name):
 				os.remove('/usr/bin/' + script_name)
@@ -315,7 +315,7 @@ def install_jar(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -344,7 +344,7 @@ def uninstall_jar(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'

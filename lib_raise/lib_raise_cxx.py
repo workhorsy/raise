@@ -365,14 +365,14 @@ class CXXCompiler(object):
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type == Helpers.OSType.cygwin:
+	if Helpers.os_type in Helpers.OSType.cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif Helpers.os_type == Helpers.OSType.windows:
+	elif Helpers.os_type in Helpers.OSType.windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
@@ -395,7 +395,7 @@ def to_native(command):
 def get_default_compiler():
 	global cxx_compilers
 
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		# Make sure Windows SDK tools are found
 		if not 'WINDOWSSDKDIR' in os.environ and not 'WINDOWSSDKVERSIONOVERRIDE' in os.environ:
 			Print.status("Setting up cl.exe")
@@ -403,7 +403,7 @@ def get_default_compiler():
 			Print.exit('Windows SDK not found. Must be run from Windows SDK Command Prompt.')
 
 		return cxx_compilers.get('cl.exe')
-	elif Helpers.os_type == Helpers.OSType.darwin:
+	elif Helpers.os_type in Helpers.OSType.unix:
 		return cxx_compilers.get('clang++') or cxx_compilers.get('g++')
 	else:
 		return cxx_compilers.get('g++') or cxx_compilers.get('clang++')
@@ -435,7 +435,7 @@ def install_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -464,7 +464,7 @@ def uninstall_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -493,7 +493,7 @@ def install_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -522,7 +522,7 @@ def uninstall_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -551,7 +551,7 @@ def install_header(name, dir_name=None):
 
 	# Get the location headers are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'
@@ -580,7 +580,7 @@ def uninstall_header(name, dir_name=None):
 
 	# Get the location header are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Helpers.os_type in Helpers.OSType.windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'

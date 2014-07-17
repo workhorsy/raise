@@ -38,14 +38,14 @@ def setup():
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type == Helpers.OSType.cygwin:
+	if Helpers.os_type in Helpers.OSType.cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif Helpers.os_type == Helpers.OSType.windows:
+	elif Helpers.os_type in Helpers.OSType.windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',

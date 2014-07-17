@@ -53,7 +53,7 @@ def do_as_normal_user(cb):
 	prev_id = -1
 
 	# Change the user to the normal user
-	if not Helpers.os_type in [Helpers.OSType.windows, Helpers.OSType.cygwin]:
+	if not Helpers.os_type in Helpers.OSType.withoutRoot:
 		prev_id = os.geteuid()
 		user_id = get_normal_user_id()
 		os.setegid(user_id)
@@ -75,7 +75,7 @@ def do_as_normal_user(cb):
 		exception = traceback.format_exc()
 	finally:
 		# Return the user to normal
-		if not Helpers.os_type in [Helpers.OSType.windows, Helpers.OSType.cygwin]:
+		if not Helpers.os_type in Helpers.OSType.withoutRoot:
 			os.setegid(prev_id)
 			os.seteuid(prev_id)
 
@@ -88,11 +88,11 @@ def require_root():
 	is_root = False
 
 	# Cygwin
-	if Helpers.os_type == Helpers.OSType.cygwin:
+	if Helpers.os_type in Helpers.OSType.cygwin:
 		# Cygwin has no root user
 		is_root = True
 	# Windows
-	elif Helpers.os_type == Helpers.OSType.windows:
+	elif Helpers.os_type in Helpers.OSType.windows:
 		try:
 			# Only Admin can read the C:\windows\temp
 			sys_root = os.environ.get('SystemRoot', 'C:\windows')
@@ -110,7 +110,7 @@ def require_root():
 
 def require_not_root():
 	# On Windows/Cygwin it does not matter if we are root. So just return
-	if Helpers.os_type in [Helpers.OSType.windows, Helpers.OSType.cygwin]:
+	if Helpers.os_type in Helpers.OSType.withoutRoot:
 		return
 
 	# Make sure we are NOT root

@@ -37,7 +37,7 @@ import lib_raise_terminal as Print
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if Helpers.os_type == Helpers.OSType.windows:
+		if Helpers.os_type in Helpers.OSType.windows:
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]
