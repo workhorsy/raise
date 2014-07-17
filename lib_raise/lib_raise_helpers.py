@@ -41,16 +41,21 @@ os_type = None
 class OSType(object):
 	cygwin = 'Cygwin'
 	windows = 'Windows'
+	darwin = 'Darwin'
 	unix = 'Unix'
 
 def setup():
 	global os_type
 
+	uname = platform.system().lower()
+
 	# Figure out the general OS type
-	if 'cygwin' in platform.system().lower():
+	if 'cygwin' in uname:
 		os_type = OSType.cygwin
-	elif 'windows' in platform.system().lower():
+	elif 'windows' in uname:
 		os_type = OSType.windows
+	elif 'darwin' in uname:
+		os_type = OSType.darwin
 	else:
 		os_type = OSType.unix
 
