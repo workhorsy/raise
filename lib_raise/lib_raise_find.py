@@ -276,6 +276,7 @@ def _get_library_files_from_ports(lib_name, version_cb = None):
 
 		# Get the valid files
 		for entry in library_files.split("\n"):
+			entry = entry.strip()
 			if os.path.isfile(entry):
 				matching_files.append(entry)
 
