@@ -165,6 +165,10 @@ def _get_library_files(lib_name, version_str = None):
 	if not files:
 		files = _get_library_files_from_pkg_info(lib_name, version_cb)
 
+	# Try finding with ports
+	if not files:
+		files = _get_library_files_from_ports(lib_name, version_cb)
+
 	# Try finding with pkg-config
 	if not files:
 		files = _get_library_files_from_pkg_config(lib_name, version_cb)
@@ -226,6 +230,54 @@ def _get_library_files_from_pkg_config(lib_name, version_cb = None):
 					# Save the file if the lib name is in the file
 					elif 'lib' + lib_name.lower() in entry.lower():
 						matching_files.append(f)
+
+	return matching_files
+
+def _get_library_files_from_ports(lib_name, version_cb = None):
+	matching_files = []
+	lib_name = lib_name.lstrip('lib')
+
+	# Just return if there is no port
+	if not program_paths('port'):
+		return matching_files
+
+	# Find all packages that contain the name
+	result = Process.run_and_get_stdout("port list | grep -i {0}".format(lib_name))
+	if not result:
+		return matching_files
+
+	# For each package
+	for package in result.split("\n"):
+		# Get the name
+		name = package.split()[0]
+
+		# Skip if the library name is not in the package name
+		if not lib_name.lower() in name.lower():
+			continue
+
+		# Skip if not a devel package
+		if not package.split()[2].startswith('devel/'):
+			continue
+
+		# Get the version
+		version = package.split()[1].lstrip('@')
+		if not version:
+			continue
+		version = Helpers.version_string_to_tuple(version)
+
+		# Skip if the version does not match
+		if version_cb and not version_cb(version):
+			continue
+
+		# Get the files and skip if there are none
+		library_files = Process.run_and_get_stdout("port contents {0}".format(name))
+		if not library_files:
+			continue
+
+		# Get the valid files
+		for entry in library_files.split("\n"):
+			if os.path.isfile(entry):
+				matching_files.append(entry)
 
 	return matching_files
 
