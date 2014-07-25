@@ -28,6 +28,7 @@
 import os, sys
 import subprocess
 import time
+from osinfo import *
 import lib_raise_config as Config
 import lib_raise_helpers as Helpers
 import lib_raise_cpu as CPU
@@ -37,7 +38,7 @@ import lib_raise_terminal as Print
 
 class ProcessRunner(object):
 	def __init__(self, command):
-		if Helpers.os_type in Helpers.OSType.windows:
+		if Config.os_type in OSType.Windows:
 			# Remove starting ./
 			if command.startswith('./'):
 				command = command[2 :]

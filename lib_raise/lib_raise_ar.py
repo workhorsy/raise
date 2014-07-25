@@ -25,6 +25,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from osinfo import *
 import lib_raise_config as Config
 import lib_raise_users as Users
 import lib_raise_fs as FS
@@ -38,14 +39,14 @@ def setup():
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type in Helpers.OSType.cygwin:
+	if Config.os_type in OSType.Cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
 			'.a' : '.a'
 		}
-	elif Helpers.os_type in Helpers.OSType.windows:
+	elif Config.os_type in OSType.Windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',

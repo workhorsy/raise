@@ -36,42 +36,6 @@ import lib_raise_terminal as Print
 
 
 
-os_type = None
-
-class OSType(object):
-	bsd = ['BSD']
-	cygwin = ['Cygwin']
-	darwin = ['Darwin']
-	linux = ['Linux']
-	solaris = ['Solaris']
-	windows = ['Windows']
-
-	unknown = ['Unknown']
-
-	withoutRoot = [windows, cygwin]
-	unix = [bsd, darwin, solaris]
-	nix = [bsd, darwin, linux, solaris]
-
-def setup():
-	global os_type
-
-	# Figure out the general OS type
-	uname = platform.system().lower()
-	if 'bsd' in uname:
-		os_type = OSType.bsd
-	elif 'cygwin' in uname:
-		os_type = OSType.cygwin
-	elif 'darwin' in uname:
-		os_type = OSType.darwin
-	elif 'linux' in uname:
-		os_type = OSType.linux
-	elif 'solaris' in uname:
-		os_type = OSType.solaris
-	elif 'windows' in uname:
-		os_type = OSType.windows
-	else:
-		os_type = OSType.unknown
-
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:
 		if s.endswith(sep):
@@ -256,8 +220,6 @@ def get_rscript_line():
 
 	return '?'
 
-
-setup()
 
 
 

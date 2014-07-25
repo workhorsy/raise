@@ -26,6 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import sys, os
+from osinfo import *
 import lib_raise_config as Config
 import lib_raise_users as Users
 import lib_raise_helpers as Helpers
@@ -69,13 +70,13 @@ def set_fancy():
 	global width
 
 	# Figure out how to clear the terminal
-	if Helpers.os_type in Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		clear = 'cls'
 	else:
 		clear = 'clear'
 
 	# Figure out the terminal width
-	if Helpers.os_type in Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		try:
 			import _winreg as winreg
 		except ImportError as err:
@@ -89,7 +90,7 @@ def set_fancy():
 		width = int(os.popen('stty size', 'r').read().split()[1])
 
 	# Figure out the terminal colors
-	if not Helpers.os_type in Helpers.OSType.windows:
+	if not Config.os_type in OSType.Windows:
 		BGColors.MESSAGE = '\033[44m\033[37m'
 		BGColors.OK = '\033[42m\033[37m'
 		BGColors.WARNING = '\033[43m\033[30m'
