@@ -93,7 +93,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl,-as-needed'
+				link =                 '-shared'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'clang':
@@ -115,7 +115,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared -Wl'
+				link =                 '-shared'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
@@ -376,6 +376,13 @@ def to_native(command):
 			'.exe' : '.exe',
 			'.o' : '.o',
 			'.so' : '.so',
+			'.a' : '.a'
+		}
+	elif Config.os_type in OSType.MacOS:
+		extension_map = {
+			'.exe' : '',
+			'.o' : '.o',
+			'.so' : '.dylib',
 			'.a' : '.a'
 		}
 	elif Config.os_type in OSType.Windows:

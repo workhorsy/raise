@@ -28,6 +28,7 @@
 
 import os
 import re
+from osinfo import *
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_process as Process
@@ -586,8 +587,16 @@ def get_static_library(lib_name, version_str = None):
 	return static_file
 
 def get_shared_library(lib_name, version_str = None):
+	extension = None
+	if Config.os_type in OSType.MacOS:
+		extension = '.dylib'
+	elif Config.os_type in OSType.Windows:
+		extension = '.dll'
+	else:
+		extension = '.so'
+
 	library_files = _get_library_files(lib_name, version_str)
-	shared_file = _get_matched_file_from_library_files(lib_name, '.so', library_files)
+	shared_file = _get_matched_file_from_library_files(lib_name, extension, library_files)
 	return shared_file
 
 def require_header_file(header_name, version_str = None):
