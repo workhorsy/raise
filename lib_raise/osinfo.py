@@ -41,9 +41,9 @@ class OSType(object):
 
 	unknown = ['Unknown']
 
-	withoutRoot = [Cygwin, Windows]
-	Unix = [BSD, MacOS, Solaris]
-	Nix = [BSD, Linux, MacOS, Solaris]
+	withoutRoot = [Cygwin[0], Windows[0]]
+	Unix = [BSD[0], MacOS[0], Solaris[0]]
+	Nix = [BSD[0], Linux[0], MacOS[0], Solaris[0]]
 
 class OSBrand(object):
 	Arch = ['Arch']
@@ -251,10 +251,11 @@ def get_os_info():
 	return (os_type, os_brand, os_release)
 
 if __name__ == '__main__':
-	info = get_os_info()
-	print('type: {0}'.format(info[0]))
-	print('brand: {0}'.format(info[1]))
-	print('release: {0}'.format(info[2]))
+	os_type, os_brand, os_release = get_os_info()
+
+	print('type: {0}'.format(os_type))
+	print('brand: {0}'.format(os_brand))
+	print('release: {0}'.format(os_release))
 
 
 
