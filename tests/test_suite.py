@@ -33,29 +33,13 @@ import time
 import multiprocessing
 import shutil
 
+# Add lib raise libraries to path
+sys.path.append(os.path.join('..', 'lib_raise'))
 
-def program_paths(program_name):
-	paths = []
-	exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
-	path = os.environ['PATH']
-	for p in os.environ['PATH'].split(os.pathsep):
-		p = os.path.join(p, program_name)
-		# Save the path if it is executable
-		if os.access(p, os.X_OK) and not os.path.isdir(p):
-			paths.append(p)
-		# Save the path if we found one with a common extension like .exe
-		for e in exts:
-			pext = p + e
-			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
-				paths.append(pext)
-	return paths
+from osinfo import *
+import lib_raise_find as Find
+import lib_raise_helpers as Helpers
 
-def chomp(s):
-	for sep in ['\r\n', '\n', '\r']:
-		if s.endswith(sep):
-			return s[:-len(sep)]
-
-	return s
 
 class TestCase(object):
 	known_prereqs = []
@@ -65,7 +49,7 @@ class TestCase(object):
 	def init_prereqs(cls):
 		cls.found_prereqs = []
 		for prog in cls.known_prereqs:
-			if program_paths(prog):
+			if Find.program_paths(prog):
 				cls.found_prereqs.append(prog)
 
 	@classmethod
@@ -276,8 +260,8 @@ class TestProcessRunner(object):
 			pass
 
 		# Chomp the terminating newline off the ends of output
-		self._stdout = chomp(self._stdout)
-		self._stderr = chomp(self._stderr)
+		self._stdout = Helpers.chomp(self._stdout)
+		self._stderr = Helpers.chomp(self._stderr)
 
 	def get_is_success(self):
 		return self._return_code == 0
