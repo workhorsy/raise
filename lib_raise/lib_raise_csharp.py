@@ -39,15 +39,18 @@ import lib_raise_helpers as Helpers
 
 
 cs_compilers = {}
+missing_compilers = []
 
 def setup():
 	global cs_compilers
+	global missing_compilers
 
 	# Get the names and paths for know C# compilers
 	names = ['dmcs', 'csc']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		if name in ['dmcs']:

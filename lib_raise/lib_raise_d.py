@@ -38,16 +38,19 @@ import lib_raise_helpers as Helpers
 
 
 d_compilers = {}
+missing_compilers = []
 
 
 def setup():
 	global d_compilers
+	global missing_compilers
 
 	# Get the names and paths for know D compilers
 	names = ['dmd2', 'dmd', 'ldc2', 'ldc'] #gdc
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		if name in ['dmd2', 'dmd']:

@@ -38,6 +38,7 @@ import lib_raise_helpers as Helpers
 
 
 cxx_compilers = {}
+missing_compilers = []
 
 class Standard(object):
 	std1998 = 1
@@ -51,12 +52,14 @@ class Standard(object):
 
 def setup():
 	global cxx_compilers
+	global missing_compilers
 
 	# Get the names and paths for known C++ compilers
 	names = ['g++', 'clang++', 'cl.exe']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		standards = {
@@ -75,6 +78,7 @@ def setup():
 			if Config.os_type in OSType.MacOS:
 				version = Process.run_and_get_stdout('g++ --version')
 				if version and 'clang' in version.lower():
+					missing_compilers.append(name)
 					continue
 
 			comp = CXXCompiler(

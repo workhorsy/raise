@@ -37,13 +37,27 @@ import shutil
 sys.path.append(os.path.join('..', 'lib_raise'))
 
 from osinfo import *
+import lib_raise_c as C
+import lib_raise_csharp as CSharp
+import lib_raise_cxx as CXX
+import lib_raise_config as Config
+import lib_raise_d as D
 import lib_raise_find as Find
 import lib_raise_helpers as Helpers
+import lib_raise_java as Java
 
 
 class TestCase(object):
-	known_prereqs = []
+	missing_prereqs = []
 	found_prereqs = []
+
+	@classmethod
+	def get_missing_prereqs(cls):
+		return cls.missing_prereqs
+
+	@classmethod
+	def get_found_prereqs(cls):
+		return cls.found_prereqs
 
 	@classmethod
 	def init_prereqs(cls):
@@ -66,6 +80,8 @@ class TestCase(object):
 		self.pwd = os.getcwd()
 		self.build_dir = 'build_{0}'.format(self.id)
 		shutil.copytree(test_dir, self.build_dir)
+
+		# Change to the build dir
 		os.chdir(self.build_dir)
 
 	def tear_down(self):
@@ -134,16 +150,14 @@ class ConcurrentTestRunner(object):
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
 			# Skip this test suite if it does not have the prerequisites
-			test_case_cls.init_prereqs()
-			if not test_case_cls.get_prereqs():
+			if not test_case_cls.get_found_prereqs():
 				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
 				continue
 
 			# Print any reqs that were not found
-			missing_prereqs = set(test_case_cls.known_prereqs) - set(test_case_cls.found_prereqs)
-			if missing_prereqs:
+			if test_case_cls.get_missing_prereqs():
 				print("For suite '{0}'".format(test_case_cls.__name__))
-				for prereq in missing_prereqs:
+				for prereq in test_case_cls.get_missing_prereqs():
 					print("    Could not find '{0}'".format(prereq))
 
 			# Find all the tests in the suite
@@ -286,7 +300,7 @@ class TestProcessRunner(object):
 
 class TestBasics(TestCase):
 	@classmethod
-	def get_prereqs(cls):
+	def get_found_prereqs(cls):
 		return True
 
 	def set_up(self, id):
@@ -374,13 +388,14 @@ Must be run as root. Exiting ...'''
 
 
 class TestC(TestCase):
-	known_prereqs = ['gcc', 'clang', 'cl.exe']
+	found_prereqs = C.c_compilers.keys()
+	missing_prereqs = C.missing_compilers
 
 	def set_up(self, id):
 		self.init('C', id)
 
 	def test_setup_failure(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
 			expected = \
@@ -391,7 +406,7 @@ No C compiler found. Install one and try again. Exiting ...'''
 			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_object(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
 			expected = \
@@ -408,7 +423,7 @@ Running C program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_program(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
 			expected = \
@@ -423,7 +438,7 @@ Running C program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_shared_library'.format(sys.executable, prog)
 
 			expected = \
@@ -440,7 +455,7 @@ Running C program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -458,13 +473,14 @@ Running C program ...                                                       :)
 
 
 class TestD(TestCase):
-	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc'] # gdc
+	found_prereqs = D.d_compilers.keys()
+	missing_prereqs = D.missing_compilers
 
 	def set_up(self, id):
 		self.init('D', id)
 
 	def test_setup_failure(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
 			expected = \
@@ -475,7 +491,7 @@ No D compiler found. Install one and try again. Exiting ...'''
 			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
 			expected = \
@@ -491,7 +507,7 @@ Running D program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
 			expected = \
@@ -509,7 +525,7 @@ Running D program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -527,7 +543,7 @@ Running D program ...                                                       :)
 			self.assert_process_output(command, expected)
 
 	def test_build_interface(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_interface'.format(sys.executable, prog)
 
 			expected = \
@@ -541,13 +557,14 @@ Building D interface 'lib_math.di' ...                                      :)''
 
 
 class TestCXX(TestCase):
-	known_prereqs = ['g++', 'clang++', 'cl.exe']
+	found_prereqs = CXX.cxx_compilers.keys()
+	missing_prereqs = CXX.missing_compilers
 
 	def set_up(self, id):
 		self.init('CXX', id)
 
 	def test_setup_failure(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} setup_failure'.format(sys.executable, prog)
 
 			expected = \
@@ -558,7 +575,7 @@ No C++ compiler found. Install one and try again. Exiting ...'''
 			self.assert_process_output(command, expected, is_success = False)
 
 	def test_build_program(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_program'.format(sys.executable, prog)
 
 			expected = \
@@ -573,7 +590,7 @@ Running C++ program ...                                                     :)
 			self.assert_process_output(command, expected)
 
 	def test_build_object(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_object'.format(sys.executable, prog)
 
 			expected = \
@@ -590,7 +607,7 @@ Running C++ program ...                                                     :)
 			self.assert_process_output(command, expected)
 
 	def test_build_shared_library(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_shared_library'.format(sys.executable, prog)
 
 			expected = \
@@ -607,7 +624,7 @@ Running C++ program ...                                                     :)
 			self.assert_process_output(command, expected)
 
 	def test_build_static_library(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} build_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -625,7 +642,8 @@ Running C++ program ...                                                     :)
 
 
 class TestCSharp(TestCase):
-	known_prereqs = ['dmcs', 'csc']
+	found_prereqs = CSharp.cs_compilers.keys()
+	missing_prereqs = CSharp.missing_compilers
 
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -671,7 +689,8 @@ main.exe
 
 
 class TestJava(TestCase):
-	known_prereqs = ['javac']
+	found_prereqs = Java.java_compilers.keys()
+	missing_prereqs = Java.missing_compilers
 
 	def set_up(self, id):
 		self.init('Java', id)
@@ -718,7 +737,7 @@ java main
 
 class TestFind(TestCase):
 	@classmethod
-	def get_prereqs(cls):
+	def get_found_prereqs(cls):
 		return True
 
 	def set_up(self, id):

@@ -39,15 +39,18 @@ import lib_raise_helpers as Helpers
 
 
 java_compilers = {}
+missing_compilers = []
 
 def setup():
 	global java_compilers
+	global missing_compilers
 
 	# Get the names and paths for know Java compilers
 	names = ['javac']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		if name in ['javac']:

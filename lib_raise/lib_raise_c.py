@@ -38,6 +38,7 @@ import lib_raise_helpers as Helpers
 
 
 c_compilers = {}
+missing_compilers = []
 
 class Standard(object):
 	std1989 = 1
@@ -53,12 +54,14 @@ class Standard(object):
 
 def setup():
 	global c_compilers
+	global missing_compilers
 
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'clang', 'cl.exe']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		standards = {
@@ -79,6 +82,7 @@ def setup():
 			if Config.os_type in OSType.MacOS:
 				version = Process.run_and_get_stdout('gcc --version')
 				if version and 'clang' in version.lower():
+					missing_compilers.append(name)
 					continue
 
 			comp = CCompiler(
