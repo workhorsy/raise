@@ -71,6 +71,12 @@ def setup():
 		}
 
 		if name == 'g++':
+			# On Mac OS X skip this compiler if it is clang pretending to be g++
+			if Config.os_type in OSType.MacOS:
+				version = Process.run_and_get_stdout('g++ --version')
+				if version and 'clang' in version.lower():
+					continue
+
 			comp = CXXCompiler(
 				name =                 'g++', 
 				path =                 paths[0], 
@@ -89,7 +95,7 @@ def setup():
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
 				compile_time_flags =   '-D', 
-				link =                 '-shared'
+				link =                 '-shared -Wl,-as-needed'
 			)
 			cxx_compilers[comp._name] = comp
 		elif name == 'clang++':
