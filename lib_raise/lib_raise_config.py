@@ -26,9 +26,11 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os, sys
+import osinfo
 import lib_raise_terminal as Print
 
 
+os_type = None
 target_name = None
 pwd = os.sys.path[0]
 python = sys.executable
@@ -36,6 +38,13 @@ is_plain = False
 is_inspect = False
 is_nolineno = False
 arg = []
+
+
+def setup():
+	global os_type
+
+	# Figure out the general OS type
+	os_type, os_brand, os_release = osinfo.get_os_info()
 
 
 def early_exit(message):
@@ -70,6 +79,8 @@ def import_rscript(globals_var, locals_var):
 
 	return targets
 
+
+setup()
 
 
 

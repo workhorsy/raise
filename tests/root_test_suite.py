@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <mattjones@workhorsy.org>
+# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -33,29 +33,20 @@ import time
 import multiprocessing
 import shutil
 
+# Add lib raise libraries to path
+sys.path.append(os.path.join('..', 'lib_raise'))
 
-def program_paths(program_name):
-	paths = []
-	exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
-	path = os.environ['PATH']
-	for p in os.environ['PATH'].split(os.pathsep):
-		p = os.path.join(p, program_name)
-		# Save the path if it is executable
-		if os.access(p, os.X_OK) and not os.path.isdir(p):
-			paths.append(p)
-		# Save the path if we found one with a common extension like .exe
-		for e in exts:
-			pext = p + e
-			if os.access(pext, os.X_OK) and not os.path.isdir(pext):
-				paths.append(pext)
-	return paths
+from osinfo import *
+import lib_raise_c as C
+import lib_raise_csharp as CSharp
+import lib_raise_cxx as CXX
+import lib_raise_config as Config
+import lib_raise_d as D
+import lib_raise_find as Find
+import lib_raise_helpers as Helpers
+import lib_raise_java as Java
 
-def chomp(s):
-	for sep in ['\r\n', '\n', '\r']:
-		if s.endswith(sep):
-			return s[:-len(sep)]
 
-	return s
 
 def chown_r(dir_name, uid, gid):
 	# Just return if this OS does not support chown
@@ -75,18 +66,15 @@ def chown_r(dir_name, uid, gid):
 			os.chown(absolute_entry, uid, gid)
 
 class TestCase(object):
-	known_prereqs = []
+	missing_prereqs = []
 	found_prereqs = []
 
 	@classmethod
-	def init_prereqs(cls):
-		cls.found_prereqs = []
-		for prog in cls.known_prereqs:
-			if program_paths(prog):
-				cls.found_prereqs.append(prog)
+	def get_missing_prereqs(cls):
+		return cls.missing_prereqs
 
 	@classmethod
-	def get_prereqs(cls):
+	def get_found_prereqs(cls):
 		return cls.found_prereqs
 
 	def set_up(self, id):
@@ -164,7 +152,7 @@ class ConcurrentTestRunner(object):
 
 	def run(self):
 		# Get the number of CPU cores
-		cpus_total = 1
+		cpus_total = multiprocessing.cpu_count()
 		cpus_free = cpus_total
 		ready_members = []
 		total = 0
@@ -173,16 +161,14 @@ class ConcurrentTestRunner(object):
 		# Get each test instance and method
 		for test_case_cls in self.test_cases:
 			# Skip this test suite if it does not have the prerequisites
-			test_case_cls.init_prereqs()
-			if not test_case_cls.get_prereqs():
+			if not test_case_cls.get_found_prereqs():
 				print('Skipping test suite "{0}"'.format(test_case_cls.__name__))
 				continue
 
 			# Print any reqs that were not found
-			missing_prereqs = set(test_case_cls.known_prereqs) - set(test_case_cls.found_prereqs)
-			if missing_prereqs:
+			if test_case_cls.get_missing_prereqs():
 				print("For suite '{0}'".format(test_case_cls.__name__))
-				for prereq in missing_prereqs:
+				for prereq in test_case_cls.get_missing_prereqs():
 					print("    Could not find '{0}'".format(prereq))
 
 			# Find all the tests in the suite
@@ -299,8 +285,8 @@ class TestProcessRunner(object):
 			pass
 
 		# Chomp the terminating newline off the ends of output
-		self._stdout = chomp(self._stdout)
-		self._stderr = chomp(self._stderr)
+		self._stdout = Helpers.chomp(self._stdout)
+		self._stderr = Helpers.chomp(self._stderr)
 
 	def get_is_success(self):
 		return self._return_code == 0
@@ -350,13 +336,14 @@ Must not be run as root. Exiting ...'''
 
 
 class TestC(TestCase):
-	known_prereqs = ['gcc', 'clang', 'cl.exe']
+	found_prereqs = C.c_compilers.keys()
+	missing_prereqs = C.missing_compilers
 
 	def set_up(self, id):
 		self.init('C', id)
 
 	def test_install_and_uninstall_program(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
 			expected = \
@@ -375,7 +362,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_shared_library'.format(sys.executable, prog)
 
 			expected = \
@@ -398,7 +385,7 @@ Uninstalling the library 'lib_math.so' ...                                  :)''
 			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		for prog in TestC.get_prereqs():
+		for prog in TestC.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -422,13 +409,14 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 
 
 class TestCXX(TestCase):
-	known_prereqs = ['g++', 'clang++', 'cl.exe']
+	found_prereqs = CXX.cxx_compilers.keys()
+	missing_prereqs = CXX.missing_compilers
 
 	def set_up(self, id):
 		self.init('CXX', id)
 
 	def test_install_and_uninstall_program(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
 			expected = \
@@ -447,7 +435,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_shared_library(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_shared_library'.format(sys.executable, prog)
 
 			expected = \
@@ -470,7 +458,7 @@ Uninstalling the library 'lib_math.so' ...                                  :)''
 			self.assert_process_output(command, expected)
 
 	def test_install_and_uninstall_static_library(self):
-		for prog in TestCXX.get_prereqs():
+		for prog in TestCXX.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -494,13 +482,14 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 
 
 class TestD(TestCase):
-	known_prereqs = ['dmd2', 'dmd', 'ldc2', 'ldc'] # gdc
+	found_prereqs = D.d_compilers.keys()
+	missing_prereqs = D.missing_compilers
 
 	def set_up(self, id):
 		self.init('D', id)
 
 	def test_install_and_uninstall_program(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_program'.format(sys.executable, prog)
 
 			expected = \
@@ -521,7 +510,7 @@ Uninstalling the program 'raise_example.exe' ...                            :)''
 
 
 	def test_install_and_uninstall_static_library(self):
-		for prog in TestD.get_prereqs():
+		for prog in TestD.get_found_prereqs():
 			command = '{0} raise -plain -nolineno -arg={1} install_and_uninstall_static_library'.format(sys.executable, prog)
 
 			expected = \
@@ -546,7 +535,8 @@ Uninstalling the library 'lib_math.a' ...                                   :)''
 
 
 class TestCSharp(TestCase):
-	known_prereqs = ['dmcs', 'csc']
+	found_prereqs = CSharp.cs_compilers.keys()
+	missing_prereqs = CSharp.missing_compilers
 
 	def set_up(self, id):
 		self.init('CSharp', id)
@@ -592,7 +582,8 @@ Uninstalling the library 'lib_math.dll' ...                                 :)''
 
 
 class TestJava(TestCase):
-	known_prereqs = ['javac']
+	found_prereqs = Java.java_compilers.keys()
+	missing_prereqs = Java.missing_compilers
 
 	def set_up(self, id):
 		self.init('Java', id)

@@ -28,6 +28,7 @@
 import os, sys
 import shutil
 import stat
+from osinfo import *
 import lib_raise_terminal as Print
 import lib_raise_config as Config
 import lib_raise_users as Users
@@ -38,15 +39,18 @@ import lib_raise_helpers as Helpers
 
 
 java_compilers = {}
+missing_compilers = []
 
 def setup():
 	global java_compilers
+	global missing_compilers
 
 	# Get the names and paths for know Java compilers
 	names = ['javac']
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		if name in ['javac']:
@@ -226,13 +230,11 @@ def to_native(command):
 def get_default_compiler():
 	global java_compilers
 
-	comp = None
 	for name in ['javac']:
 		if name in java_compilers:
-			comp = java_compilers[name]
-			break
+			return java_compilers[name]
 
-	return comp
+	return None
 
 def install_program(name, dir_name):
 	# Make sure the extension is valid
@@ -240,7 +242,7 @@ def install_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -259,7 +261,7 @@ def install_program(name, dir_name):
 		# Copy the file
 		shutil.copy2(source, dest)
 
-		if Helpers.os_type != Helpers.OSType.windows:
+		if not Config.os_type in OSType.Windows:
 			script_name = Helpers.before(name, '.')
 			script_path = os.path.join('/usr/bin/', script_name)
 			with open(script_path, 'w') as f:
@@ -283,7 +285,7 @@ def uninstall_program(name, dir_name):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -302,7 +304,7 @@ def uninstall_program(name, dir_name):
 		if dir_name and os.path.isdir(install_dir) and not os.listdir(install_dir):
 			shutil.rmtree(install_dir)
 
-		if Helpers.os_type != Helpers.OSType.windows:
+		if not Config.os_type in OSType.Windows:
 			script_name = Helpers.before(name, '.')
 			if os.path.isfile('/usr/bin/' + script_name):
 				os.remove('/usr/bin/' + script_name)
@@ -317,7 +319,7 @@ def install_jar(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -346,7 +348,7 @@ def uninstall_jar(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'

@@ -36,24 +36,6 @@ import lib_raise_terminal as Print
 
 
 
-os_type = None
-
-class OSType(object):
-	cygwin = 'Cygwin'
-	windows = 'Windows'
-	unix = 'Unix'
-
-def setup():
-	global os_type
-
-	# Figure out the general OS type
-	if 'cygwin' in platform.system().lower():
-		os_type = OSType.cygwin
-	elif 'windows' in platform.system().lower():
-		os_type = OSType.windows
-	else:
-		os_type = OSType.unix
-
 def chomp(s):
 	for sep in ['\r\n', '\n', '\r']:
 		if s.endswith(sep):
@@ -238,8 +220,6 @@ def get_rscript_line():
 
 	return '?'
 
-
-setup()
 
 
 

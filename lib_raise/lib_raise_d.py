@@ -27,6 +27,7 @@
 
 import sys, os
 import shutil
+from osinfo import *
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_users as Users
@@ -37,16 +38,19 @@ import lib_raise_helpers as Helpers
 
 
 d_compilers = {}
+missing_compilers = []
 
 
 def setup():
 	global d_compilers
+	global missing_compilers
 
 	# Get the names and paths for know D compilers
 	names = ['dmd2', 'dmd', 'ldc2', 'ldc'] #gdc
 	for name in names:
 		paths = Find.program_paths(name)
 		if len(paths) == 0:
+			missing_compilers.append(name)
 			continue
 
 		if name in ['dmd2', 'dmd']:
@@ -338,14 +342,14 @@ class DCompiler(object):
 def to_native(command):
 	extension_map = {}
 	# Figure out the extensions for this OS
-	if Helpers.os_type == Helpers.OSType.cygwin:
+	if Config.os_type in OSType.Cygwin:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
 			'.so' : '.dll',
 			'.a' : '.lib'
 		}
-	elif Helpers.os_type == Helpers.OSType.windows:
+	elif Config.os_type in OSType.Windows:
 		extension_map = {
 			'.exe' : '.exe',
 			'.o' : '.obj',
@@ -368,13 +372,11 @@ def to_native(command):
 def get_default_compiler():
 	global d_compilers
 
-	comp = None
 	for name in ['dmd2', 'dmd', 'ldc2', 'ldc']: # gdc
 		if name in d_compilers:
-			comp = d_compilers[name]
-			break
+			return d_compilers[name]
 
-	return comp
+	return None
 
 def run_print(command):
 	Print.status("Running D program")
@@ -401,7 +403,7 @@ def install_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -430,7 +432,7 @@ def uninstall_program(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/bin/'
@@ -459,7 +461,7 @@ def install_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -488,7 +490,7 @@ def uninstall_library(name, dir_name=None):
 
 	# Get the location programs are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/lib/'
@@ -517,7 +519,7 @@ def install_interface(name, dir_name=None):
 
 	# Get the location interfaces are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'
@@ -546,7 +548,7 @@ def uninstall_interface(name, dir_name=None):
 
 	# Get the location interfaces are stored in
 	prog_root = None
-	if Helpers.os_type == Helpers.OSType.windows:
+	if Config.os_type in OSType.Windows:
 		prog_root = os.environ.get('programfiles', 'C:\Program Files')
 	else:
 		prog_root = '/usr/include/'
