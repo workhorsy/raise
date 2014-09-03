@@ -44,7 +44,7 @@ LIB_RAISE_VERSION = '0.4.0 dev'
 RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
-	'cpuinfo.py'                : '{0}cpuinfo.py-20140213011104-ys50gdvnav1t3ah0-1/cpuinfo.py'.format(RAISE_BASE),
+	'cpuinfo.py'                : '{0}cache_file_change_da-20140903184909-p1qtqgv69ab1t7wn-1/cache_file_change_date.py'.format(RAISE_BASE),
 	'cache_file_change_date.py' : '{0}cache_file_change_date.py-20130926135933-f37upvzomj5b02bt-1/cache_file_change_date.py'.format(RAISE_BASE),
 	'raise'                     : '{0}raise-20120417054845-dmqxla979coc2eqq-1/lib_raise.py'.format(RAISE_BASE),
 	'raise_ar'                  : '{0}lib_raise_ar.py-20131002010124-c22ldygq1nz33jv5-1/lib_raise_ar.py'.format(RAISE_BASE),
