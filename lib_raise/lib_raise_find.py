@@ -32,9 +32,7 @@ import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
-
-
-lib_file_cache = {}
+from cache_file_change_date import *
 
 
 # Returns all the paths that libraries are installed in
@@ -128,18 +126,33 @@ def _get_matched_file_from_library_files(library_name, extension, library_files)
 # http://en.wikipedia.org/wiki/List_of_software_package_management_systems
 # Returns the full path of a library file or None
 def _get_library_files(lib_name, version_str = None):
-	global lib_file_cache
 	files = []
 
 	# Create a version_cb from the string
 	version_cb = None
 	if version_str:
 		version_cb = Helpers.to_version_cb(version_str)
-
-	# Return the file names if already cached
 	search_param = (version_str, lib_name)
-	if search_param in lib_file_cache:
-		return lib_file_cache[search_param]
+
+	# If the query is cached, and none of the resulting files have 
+	# changed, return the cache.
+	cacher = None
+	files = None
+	try:
+		cacher = CacheFileChangeDateClient()
+		files = cacher.get_data(search_param)
+		none_have_changed = True
+		if files:
+			for entry in files:
+				response = cacher.has_file_changed(entry)
+				has_changed = response['has_changed']
+				if has_changed == True:
+					none_have_changed = False
+
+			if none_have_changed:
+				return files
+	except Exception as ex:
+		pass
 
 	# Try finding with dpkg
 	if not files:
@@ -174,8 +187,11 @@ def _get_library_files(lib_name, version_str = None):
 		files = _get_library_files_from_fs(lib_name)
 
 	# Save the file names in the cache
-	if files:
-		lib_file_cache[search_param] = files
+	if cacher and files:
+		try:
+			cacher.set_data(search_param, files)
+		except Exception as ex:
+			pass
 
 	return files
 
