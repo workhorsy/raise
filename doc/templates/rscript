@@ -19,6 +19,8 @@ import lib_raise_cpu as CPU
 import lib_raise_terminal as Terminal
 import lib_raise_helpers as Helpers
 
+import osinfo
+
 
 def cleanup():
 	for entry in ['example', 'new_example']:
@@ -46,7 +48,20 @@ Users
 '''
 
 def operating_system_support():
-	print("OS: {0}".format(Helpers.os_type))
+	import osinfo
+
+	# Print the OS info
+	os_type, os_brand, os_release = osinfo.get_os_info()
+	print("Type: {0}".format(os_type))
+	print("Brand: {0}".format(os_brand))
+	print("Release: {0}".format(os_release))
+
+	# Run code depending on the OS
+	if os_type in osinfo.OSType.Linux:
+		print("You're on Linux")
+	elif os_type in osinfo.OSType.Windows:
+		if os_brand in osinfo.OSBrand.WindowsXP:
+			print("Sorry, Windows XP is not supported")
 
 '''
 installation

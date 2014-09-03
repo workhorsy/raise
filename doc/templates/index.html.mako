@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on July 15th 2014
+Last updated on September 3rd 2014
 </p>
 
 <p>
@@ -335,7 +335,7 @@ process, as its own line.
 
 
 	<ol>
-		<li>Should be fast for incremental and clean builds, even with 10,000 of files.</li>
+		<li>Should be fast for incremental and clean builds, even with 10,000s of files.</li>
 		<li>Should be able to automatically find libraries and programs.</li>
 		<li>Should work with Python instead of creating its own language or using a graph.</li>
 		<li>Should run without needing to be installed.</li>
@@ -343,7 +343,7 @@ process, as its own line.
 		<li>Should not require any external dependencies, libraries, or tools.</li>
 		<li>Should do everything implicitly instead of explicitly.</li>
 		<li>Should work consistently across platforms.</li>
-		<li>Should be easy to do things sequentially or concurrently.</li>
+		<li>Should easily do things sequentially or concurrently.</li>
 		<li>Should present output in a uniform and intuitive way.</li>
 	</ol>
 
@@ -365,7 +365,7 @@ from inside your project's directory.
 <p>
 Raise consists of a small shim script called "raise" and a directory of 
 modules called ".lib_raise". The "raise" shim is safe to save into your VCS 
-along with your source code. It is small (7kB) and should not change very often. 
+along with your source code. It is small (8kB) and should not change very often. 
 All the ".lib_raise" modules are automatically downloaded by the "raise" 
 shim. You should not check the ".lib_raise" directory into your VCS.
 </p>
@@ -497,20 +497,26 @@ Java works with OpenJDK 7.
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
-import lib_raise_helpers as Helpers
+import osinfo
 	</code></pre>
 
 <p>
-	Raise uses a string for the OS Type. Any time you need to check what
-	OS your script is running under, you can use <span class="fun">Helpers.os_type</span>.
+	Raise uses the ostype module to get info about the os it is running under. 
+	See the ostype website for more information: 
+	<a href="https://github.com/workhorsy/py-osinfo" target="_blank" rel="external">https://github.com/workhorsy/py-osinfo</a>
 </p>
 
-There are three basic OS types:
+There are eight basic OS types:
 
 <ul>
-	<li>Cygwin: Cygwin running on Windows</li>
-	<li>Unix: All Unix and Linux based OSes</li>
-	<li>Windows: All Windows OSes</li>
+	<li>BeOS: Haiku, BeOS</li>
+	<li>BSD: FreeBSD, NetBSD, OpenBSD, et cetera</li>
+	<li>Cygwin: Cygwin on Windows</li>
+	<li>MacOS: OS X 10.X</li>
+	<li>Linux: Debian, Fedora, OpenSUSE, Slackware, Ubuntu, et cetera</li>
+	<li>Solaris: Open Solaris, Oracle Solaris, Open Indiana</li>
+	<li>Windows: XP, Vista, 7, 8</li>
+	<li>unknown: The default value, when it can't figure out the type</li>
 </ul>
 
 <pre><code data-language="python">
@@ -566,15 +572,16 @@ Partially supported.
 </p>
 
 <p>Tested on 
-<a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>, and 
-<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>. 
+<a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>,
+<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>, and 
+<a href="http://en.wikipedia.org/wiki/Windows_8" target="_blank" rel="external">Windows 8</a>.
 There are still issues with 
 building and finding C/C++ libraries on Windows. It is recommended 
 that Windows users use Cygwin.
 </p>
 
 <p>
-Has not been tested on Windows 8 or Windows RT.
+Has not been tested on Windows Vista or Windows RT.
 </p>
 
 <a id="cygwin_support"></a>
@@ -592,19 +599,12 @@ Fully Supported.
 <h2>5.5. OS X</h2>
 
 <p>
-Not supported or tested. 
+Partially Supported
 </p>
 
 <p>
-As of November 2nd 2013 there is no way to purchase OS X 10.9 without using 
-the Mac App Store (running on OS X only), or buying dedicated hardware. 
-I will not be fixing this until Apple allows me to buy a full install disk 
-of the current release, and install it in a virtual machine without hacks.
-</p>
-
-<p>
-If other contributors want to donate a machine, or add this feature 
-themselves, they are welcome to do it.
+Can build basic exes, shared/static libraries. Can find libraries installed
+with MacPorts. There are bugs with installing software, and many small bugs.
 </p>
 
 <p>
@@ -1442,6 +1442,7 @@ Raise searches the OS packaging sources in this order:
 	<li>Slack: Slackware, Salix, Zenwalk, Porteus, Vector Linux, Absolute Linux</li>
 	<li>Portage: Gentoo, Sabayon, Funtoo</li>
 	<li>pkg_info: FreeBSD</li>
+	<li>MacPorts: OS X</li>
 	<li>Pkg-config: Linux, BSD, Windows, Mac OS X, Solaris</li>
 	<li>File System: The PATH as well as common places for your OS.</li>
 </ol>
@@ -1706,13 +1707,15 @@ import lib_raise_ar as AR
 			<th>Raise</th>
 			<th>Cygwin</th>
 			<th>Windows</th>
-			<th>Standard</th>
+			<th>OS X</th>
+			<th>Linux/Unix</th>
 		</tr>
 		<tr>
 			<td>Executable</td>
 			<td>.exe</td>
 			<td>.exe</td>
 			<td>.exe</td>
+			<td></td>
 			<td></td>
 		</tr>
 		<tr>
@@ -1721,12 +1724,14 @@ import lib_raise_ar as AR
 			<td>.o</td>
 			<td>.obj</td>
 			<td>.o</td>
+			<td>.o</td>
 		</tr>
 		<tr>
 			<td>Shared Library</td>
 			<td>.so</td>
 			<td>.so</td>
 			<td>.dll</td>
+			<td>.dylib</td>
 			<td>.so</td>
 		</tr>
 		<tr>
@@ -1734,6 +1739,7 @@ import lib_raise_ar as AR
 			<td>.a</td>
 			<td>.a</td>
 			<td>.lib</td>
+			<td>.a</td>
 			<td>.a</td>
 		</tr>
 	</table>
@@ -2028,13 +2034,15 @@ import lib_raise_ar as AR
 			<th>Raise</th>
 			<th>Cygwin</th>
 			<th>Windows</th>
-			<th>Standard</th>
+			<th>OS X</th>
+			<th>Linux/Unix</th>
 		</tr>
 		<tr>
 			<td>Executable</td>
 			<td>.exe</td>
 			<td>.exe</td>
 			<td>.exe</td>
+			<td></td>
 			<td></td>
 		</tr>
 		<tr>
@@ -2043,6 +2051,7 @@ import lib_raise_ar as AR
 			<td>.o</td>
 			<td>.obj</td>
 			<td>.o</td>
+			<td>.o</td>
 		</tr>
 		<tr>
 			<td>Shared Library</td>
@@ -2050,12 +2059,14 @@ import lib_raise_ar as AR
 			<td>.so</td>
 			<td>.dll</td>
 			<td>.so</td>
+			<td>.dylib</td>
 		</tr>
 		<tr>
 			<td>Static Library</td>
 			<td>.a</td>
 			<td>.a</td>
 			<td>.lib</td>
+			<td>.a</td>
 			<td>.a</td>
 		</tr>
 	</table>
