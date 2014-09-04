@@ -30,22 +30,6 @@
 # FIXME: Check how this compares to numpy. How does numpy get MHz and sse3 detection when the registry
 # does not have this info, and there is no /proc/cpuinfo ? Does it use win32 __cpuinfo ?
 
-# Assembly code can be assembled and disassembled like this:
-'''
-; cpuid.asm
-; clear && nasm -o out -f bin cpuid.asm && ndisasm out
-BITS 32
-section .data
-section .text
-global main
-
-main:
-	mov ax, 1
-	cpuid
-	mov ax, bx
-	ret
-'''
-
 import os
 import re
 import time
@@ -170,20 +154,66 @@ def program_paths(program_name):
 				paths.append(pext)
 	return paths
 
-def to_friendly_hz(ticks):
-	ticks = float(ticks)
+def to_friendly_hz(ticks, scale):
+	# Get the raw Hz as a string
+	left, right = to_raw_hz(ticks, scale)
+	ticks = '{0}.{1}'.format(left, right)
 
-	hz_map = [
-		{'GHz' : 1000000000.0}, 
-		{'MHz' : 1000000.0}, 
-		{'KHz' : 1000.0}, 
-		{'Hz' : 1.0}
-	]
+	# Get the location of the dot, and remove said dot
+	dot_index = ticks.index('.')
+	ticks = ticks.replace('.', '')
 
-	for pair in hz_map:
-		for symbol, place in pair.items():
-			if ticks >= place:
-				return '{0:.4f} {1}'.format(ticks / place, symbol)
+	# Get the Hz symbol and scale
+	symbol = "Hz"
+	scale = 0
+	if dot_index > 9:
+		symbol = "GHz"
+		scale = 9
+	elif dot_index > 6:
+		symbol = "MHz"
+		scale = 6
+	elif dot_index > 3:
+		symbol = "KHz"
+		scale = 3
+
+	# Get the Hz with the dot at the new scaled point
+	ticks = '{0}.{1}'.format(ticks[:-scale-1], ticks[-scale-1:])
+
+	# Format the ticks to have 4 numbers after the decimal
+	# and remove any superfluous zeroes.
+	ticks = '{0:.4f} {1}'.format(float(ticks), symbol)
+	ticks = ticks.rstrip('0')
+	
+	return ticks
+
+def to_raw_hz(ticks, scale):
+	# Scale the numbers
+	ticks = ticks.lstrip('0')
+	old_index = ticks.index('.')
+	ticks = ticks.replace('.', '')
+	ticks = ticks.ljust(scale + old_index+1, '0')
+	new_index = old_index + scale
+	ticks = '{0}.{1}'.format(ticks[:new_index], ticks[new_index:])
+	left, right = ticks.split('.')
+	left, right = int(left), int(right)
+	return (left, right)
+
+def to_hz_string(ticks):
+	# Convert to string
+	ticks = '{0}'.format(ticks)
+
+	# Add decimal if missing
+	if not '.' in ticks:
+		ticks = '{0}.0'.format(ticks)
+
+	# Remove trailing zeros
+	ticks = ticks.rstrip('0')
+
+	# Add one trailing zero for empty right side
+	if ticks.endswith('.'):
+		ticks = '{0}0'.format(ticks)
+
+	return ticks
 
 def parse_arch(raw_arch_string):
 	arch, bits = None, None
@@ -192,34 +222,34 @@ def parse_arch(raw_arch_string):
 	# X86
 	if re.match('^i\d86$|^x86$|^x86_32$|^i86pc$|^ia32$|^ia-32$|^bepc$', raw_arch_string):
 		arch = 'X86_32'
-		bits = '32'
+		bits = 32
 	elif re.match('^x64$|^x86_64$|^x86_64t$|^i686-64$|^amd64$|^ia64$|^ia-64$', raw_arch_string):
 		arch = 'X86_64'
-		bits = '64'
+		bits = 64
 	# ARM
 	elif re.match('^armv8-a$', raw_arch_string):
 		arch = 'ARM_8'
-		bits = '64'
+		bits = 64
 	elif re.match('^armv7$|^armv7[a-z]$|^armv7-[a-z]$', raw_arch_string):
 		arch = 'ARM_7'
-		bits = '32'
+		bits = 32
 	elif re.match('^armv8$|^armv8[a-z]$|^armv8-[a-z]$', raw_arch_string):
 		arch = 'ARM_8'
-		bits = '32'
+		bits = 32
 	# PPC
 	elif re.match('^ppc32$|^prep$|^pmac$|^powermac$', raw_arch_string):
 		arch = 'PPC_32'
-		bits = '32'
+		bits = 32
 	elif re.match('^powerpc$|^ppc64$', raw_arch_string):
 		arch = 'PPC_64'
-		bits = '64'
+		bits = 64
 	# SPARC
 	elif re.match('^sparc32$|^sparc$', raw_arch_string):
 		arch = 'SPARC_32'
-		bits = '32'
+		bits = 32
 	elif re.match('^sparc64$|^sun4u$|^sun4v$', raw_arch_string):
 		arch = 'SPARC_64'
-		bits = '64'
+		bits = 64
 
 
 	return (arch, bits)
@@ -269,15 +299,21 @@ class CPUID(object):
 			if not address:
 				raise Exception("Failed to valloc")
 
-			# Mark the memory segment as safe for code execution
+			# Mark the memory segment as writeable only
 			if not self.is_selinux_enforcing:
-				READ_WRITE_EXECUTE = 0x1 | 0x2 | 0x4
-				if ctypes.pythonapi.mprotect(address, size, READ_WRITE_EXECUTE) < 0:
+				WRITE = 0x2
+				if ctypes.pythonapi.mprotect(address, size, WRITE) < 0:
 					raise Exception("Failed to mprotect")
-				
+
 			# Copy the byte code into the memory segment
 			if ctypes.pythonapi.memmove(address, byte_code, size) < 0:
 				raise Exception("Failed to memmove")
+
+			# Mark the memory segment as writeable and executable only
+			if not self.is_selinux_enforcing:
+				WRITE_EXECUTE = 0x2 | 0x4
+				if ctypes.pythonapi.mprotect(address, size, WRITE_EXECUTE) < 0:
+					raise Exception("Failed to mprotect")
 
 		# Cast the memory segment into a function
 		functype = ctypes.CFUNCTYPE(restype, *argtypes)
@@ -300,13 +336,18 @@ class CPUID(object):
 		# Call the byte code like a function
 		retval = func()
 
+		size = ctypes.c_size_t(len(byte_code))
+
 		# Free the function memory segment
-		# FIXME: This should set the memory as non executable before freeing
 		if is_windows:
-			size = ctypes.c_size_t(len(byte_code))
 			MEM_RELEASE = ctypes.c_ulong(0x8000)
 			ctypes.windll.kernel32.VirtualFree(address, size, MEM_RELEASE)
 		else:
+			# Remove the executable tag on the memory
+			READ_WRITE = 0x1 | 0x2
+			if ctypes.pythonapi.mprotect(address, size, READ_WRITE) < 0:
+				raise Exception("Failed to mprotect")
+
 			ctypes.pythonapi.free(address)
 
 		return retval
@@ -369,7 +410,7 @@ class CPUID(object):
 		for reg in [ebx, edx, ecx]:
 			for n in [0, 8, 16, 24]:
 				vendor_id.append(chr((reg >> n) & 0xFF))
-		vendor_id = str.join('', vendor_id)
+		vendor_id = ''.join(vendor_id)
 
 		return vendor_id
 
@@ -502,11 +543,11 @@ class CPUID(object):
 		# Get the Extended CPU flags
 		extended_flags = {}
 		if max_extension_support >= 0x80000001:
-			# EDX
-			edx = self._run_asm(
+			# EBX
+			ebx = self._run_asm(
 				b"\xB8\x01\x00\x00\x80" # mov ax,0x80000001
 				b"\x0f\xa2"         # cpuid
-				b"\x89\xD0"         # mov ax,dx
+				b"\x89\xD8"         # mov ax,bx
 				b"\xC3"             # ret
 			)
 
@@ -520,38 +561,38 @@ class CPUID(object):
 
 			# Get the extended CPU flags
 			extended_flags = {
-				'fpu' : is_bit_set(edx, 0),
-				'vme' : is_bit_set(edx, 1),
-				'de' : is_bit_set(edx, 2),
-				'pse' : is_bit_set(edx, 3),
-				'tsc' : is_bit_set(edx, 4),
-				'msr' : is_bit_set(edx, 5),
-				'pae' : is_bit_set(edx, 6),
-				'mce' : is_bit_set(edx, 7),
-				'cx8' : is_bit_set(edx, 8),
-				'apic' : is_bit_set(edx, 9),
-				#'reserved' : is_bit_set(edx, 10),
-				'syscall' : is_bit_set(edx, 11),
-				'mtrr' : is_bit_set(edx, 12),
-				'pge' : is_bit_set(edx, 13),
-				'mca' : is_bit_set(edx, 14),
-				'cmov' : is_bit_set(edx, 15),
-				'pat' : is_bit_set(edx, 16),
-				'pse36' : is_bit_set(edx, 17),
-				#'reserved' : is_bit_set(edx, 18),
-				'mp' : is_bit_set(edx, 19),
-				'nx' : is_bit_set(edx, 20),
-				#'reserved' : is_bit_set(edx, 21),
-				'mmxext' : is_bit_set(edx, 22),
-				'mmx' : is_bit_set(edx, 23),
-				'fxsr' : is_bit_set(edx, 24),
-				'fxsr_opt' : is_bit_set(edx, 25),
-				'pdpe1gp' : is_bit_set(edx, 26),
-				'rdtscp' : is_bit_set(edx, 27),
-				#'reserved' : is_bit_set(edx, 28),
-				'lm' : is_bit_set(edx, 29),
-				'3dnowext' : is_bit_set(edx, 30),
-				'3dnow' : is_bit_set(edx, 31),
+				'fpu' : is_bit_set(ebx, 0),
+				'vme' : is_bit_set(ebx, 1),
+				'de' : is_bit_set(ebx, 2),
+				'pse' : is_bit_set(ebx, 3),
+				'tsc' : is_bit_set(ebx, 4),
+				'msr' : is_bit_set(ebx, 5),
+				'pae' : is_bit_set(ebx, 6),
+				'mce' : is_bit_set(ebx, 7),
+				'cx8' : is_bit_set(ebx, 8),
+				'apic' : is_bit_set(ebx, 9),
+				#'reserved' : is_bit_set(ebx, 10),
+				'syscall' : is_bit_set(ebx, 11),
+				'mtrr' : is_bit_set(ebx, 12),
+				'pge' : is_bit_set(ebx, 13),
+				'mca' : is_bit_set(ebx, 14),
+				'cmov' : is_bit_set(ebx, 15),
+				'pat' : is_bit_set(ebx, 16),
+				'pse36' : is_bit_set(ebx, 17),
+				#'reserved' : is_bit_set(ebx, 18),
+				'mp' : is_bit_set(ebx, 19),
+				'nx' : is_bit_set(ebx, 20),
+				#'reserved' : is_bit_set(ebx, 21),
+				'mmxext' : is_bit_set(ebx, 22),
+				'mmx' : is_bit_set(ebx, 23),
+				'fxsr' : is_bit_set(ebx, 24),
+				'fxsr_opt' : is_bit_set(ebx, 25),
+				'pdpe1gp' : is_bit_set(ebx, 26),
+				'rdtscp' : is_bit_set(ebx, 27),
+				#'reserved' : is_bit_set(ebx, 28),
+				'lm' : is_bit_set(ebx, 29),
+				'3dnowext' : is_bit_set(ebx, 30),
+				'3dnow' : is_bit_set(ebx, 31),
 
 				'lahf_lm' : is_bit_set(ecx, 0),
 				'cmp_legacy' : is_bit_set(ecx, 1),
@@ -579,9 +620,9 @@ class CPUID(object):
 				'perfctr_core' : is_bit_set(ecx, 23),
 				'perfctr_nb' : is_bit_set(ecx, 24),
 				#'reserved' : is_bit_set(ecx, 25),
-				#'reserved' : is_bit_set(ecx, 26),
-				#'reserved' : is_bit_set(ecx, 27),
-				#'reserved' : is_bit_set(ecx, 28),
+				'dbx' : is_bit_set(ecx, 26),
+				'perftsc' : is_bit_set(ecx, 27),
+				'pci_l2i' : is_bit_set(ecx, 28),
 				#'reserved' : is_bit_set(ecx, 29),
 				#'reserved' : is_bit_set(ecx, 30),
 				#'reserved' : is_bit_set(ecx, 31)
@@ -717,7 +758,7 @@ class CPUID(object):
 
 		return retval
 
-	def get_hz(self):
+	def get_raw_hz(self):
 		start = self.get_ticks()
 
 		time.sleep(1)
@@ -726,7 +767,7 @@ class CPUID(object):
 
 		ticks = (end - start)
 
-		return to_friendly_hz(ticks)
+		return ticks
 
 
 def get_cpu_info_from_cpuid():
@@ -753,16 +794,21 @@ def get_cpu_info_from_cpuid():
 	cache_info = cpuid.get_cache(max_extension_support)
 	info = cpuid.get_info()
 
+	# Get the Hz and scale
+	processor_hz = cpuid.get_raw_hz()
+	processor_hz = to_hz_string(processor_hz)
+
 	return {
 	'vendor_id' : cpuid.get_vendor_id(), 
 	'brand' : cpuid.get_processor_brand(max_extension_support), 
-	'hz' : cpuid.get_hz(), 
+	'hz' : to_friendly_hz(processor_hz, 0), 
+	'raw_hz' : to_raw_hz(processor_hz, 0), 
 	'arch' : arch, 
 	'bits' : bits, 
 	'count' : multiprocessing.cpu_count(), 
 	'raw_arch_string' : raw_arch_string, 
 
-	'l2_cache_size:' : cache_info['size_kb'], 
+	'l2_cache_size' : cache_info['size_kb'], 
 	'l2_cache_line_size' : cache_info['line_size_b'], 
 	'l2_cache_associativity' : hex(cache_info['associativity']), 
 
@@ -804,9 +850,9 @@ def get_cpu_info_from_proc_cpuinfo():
 	vendor_id = _get_field(output, 'vendor_id', 'vendor id', 'vendor')
 	processor_brand = _get_field(output, 'model name','cpu')
 	cache_size = _get_field(output, 'cache size')
-	stepping = _get_field(output, 'stepping')
-	model = _get_field(output, 'model')
-	family = _get_field(output, 'cpu family')
+	stepping = int(_get_field(output, 'stepping'))
+	model = int(_get_field(output, 'model'))
+	family = int(_get_field(output, 'cpu family'))
 
 	# Flags
 	flags = _get_field(output, 'flags', 'Features').split()
@@ -815,8 +861,8 @@ def get_cpu_info_from_proc_cpuinfo():
 	# Convert from MHz string to Hz
 	processor_hz = _get_field(output, 'cpu MHz', 'cpu speed', 'clock')
 	processor_hz = processor_hz.lower().rstrip('mhz').strip()
-	processor_hz = float(processor_hz) * 1000000.0
-	processor_hz = to_friendly_hz(processor_hz)
+	processor_hz = '01612.0'
+	processor_hz = to_hz_string(processor_hz)
 
 	# Get the CPU arch and bits
 	raw_arch_string = platform.machine()
@@ -825,13 +871,14 @@ def get_cpu_info_from_proc_cpuinfo():
 	return {
 	'vendor_id' : vendor_id, 
 	'brand' : processor_brand, 
-	'hz' : processor_hz, 
+	'hz' : to_friendly_hz(processor_hz, 6), 
+	'raw_hz' : to_raw_hz(processor_hz, 6), 
 	'arch' : arch, 
 	'bits' : bits, 
 	'count' : multiprocessing.cpu_count(), 
 	'raw_arch_string' : raw_arch_string, 
 
-	'l2_cache_size:' : cache_size, 
+	'l2_cache_size' : cache_size, 
 	'l2_cache_line_size' : 0, 
 	'l2_cache_associativity' : 0, 
 
@@ -862,9 +909,9 @@ def get_cpu_info_from_sysctl():
 	vendor_id = _get_field(output, 'machdep.cpu.vendor')
 	processor_brand = _get_field(output, 'machdep.cpu.brand_string')
 	cache_size = _get_field(output, 'machdep.cpu.cache.size')
-	stepping = _get_field(output, 'machdep.cpu.stepping')
-	model = _get_field(output, 'machdep.cpu.model')
-	family = _get_field(output, 'machdep.cpu.family')
+	stepping = int(_get_field(output, 'machdep.cpu.stepping'))
+	model = int(_get_field(output, 'machdep.cpu.model'))
+	family = int(_get_field(output, 'machdep.cpu.family'))
 
 	# Flags
 	flags = _get_field(output, 'machdep.cpu.features').lower().split()
@@ -873,14 +920,13 @@ def get_cpu_info_from_sysctl():
 	# Convert from GHz/MHz string to Hz
 	scale = 1
 	if processor_brand.lower().endswith('mhz'):
-		scale = 1000000.0
+		scale = 6
 	elif processor_brand.lower().endswith('ghz'):
-		scale = 1000000000.0
+		scale = 9
 	processor_hz = processor_brand.lower()
 	processor_hz = processor_hz.split('@')[1]
 	processor_hz = processor_hz.rstrip('mhz').rstrip('ghz').strip()
-	processor_hz = float(processor_hz) * scale
-	processor_hz = to_friendly_hz(processor_hz)
+	processor_hz = to_hz_string(processor_hz)
 
 	# Get the CPU arch and bits
 	raw_arch_string = platform.machine()
@@ -889,13 +935,14 @@ def get_cpu_info_from_sysctl():
 	return {
 	'vendor_id' : vendor_id, 
 	'brand' : processor_brand, 
-	'hz' : processor_hz, 
+	'hz' : to_friendly_hz(processor_hz, scale), 
+	'raw_hz' : to_raw_hz(processor_hz, scale), 
 	'arch' : arch, 
 	'bits' : bits, 
 	'count' : multiprocessing.cpu_count(), 
 	'raw_arch_string' : raw_arch_string, 
 
-	'l2_cache_size:' : cache_size, 
+	'l2_cache_size' : cache_size, 
 	'l2_cache_line_size' : 0, 
 	'l2_cache_associativity' : 0, 
 
@@ -935,8 +982,7 @@ def get_cpu_info_from_registry():
 	key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
 	processor_hz = winreg.QueryValueEx(key, "~Mhz")[0]
 	winreg.CloseKey(key)
-	processor_hz = float(processor_hz) * 1000000.0
-	processor_hz = to_friendly_hz(processor_hz)
+	processor_hz = to_hz_string(processor_hz)
 
 	# Get the CPU name
 	key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
@@ -1003,19 +1049,91 @@ def get_cpu_info_from_registry():
 	return {
 	'vendor_id' : vendor_id, 
 	'brand' : processor_brand, 
-	'hz' : processor_hz, 
+	'hz' : to_friendly_hz(processor_hz, 6), 
+	'raw_hz' : to_raw_hz(processor_hz, 6), 
 	'arch' : arch, 
 	'bits' : bits, 
 	'count' : multiprocessing.cpu_count(), 
 	'raw_arch_string' : raw_arch_string, 
 
-	'l2_cache_size:' : 0, 
+	'l2_cache_size' : 0, 
 	'l2_cache_line_size' : 0, 
 	'l2_cache_associativity' : 0, 
 
 	'stepping' : 0, 
 	'model' : 0, 
 	'family' : 0, 
+	'processor_type' : 0, 
+	'extended_model' : 0, 
+	'extended_family' : 0, 
+	'flags' : flags
+	}
+
+def get_cpu_info_from_solaris():
+	'''
+	Returns the CPU info gathered from isainfo and psrinfo. Will 
+	return None if isainfo or psrinfo are not found.
+	'''
+	# Just return None if there is no isainfo or psrinfo
+	if not program_paths('isainfo') or not program_paths('psrinfo'):
+		return None
+
+	# If isainfo fails return None
+	flag_output = run_and_get_stdout('isainfo -vb')
+	if flag_output == None:
+		return None
+
+	# If psrinfo fails return None
+	output = run_and_get_stdout('psrinfo -v')
+	if output == None:
+		return None
+
+	# Various fields
+	vendor_id = 'unknown'
+	processor_brand = 'unknown'
+	cache_size = 0
+	stepping = 0
+	model = 0
+	family = 0
+
+	# Flags
+	flags = flag_output.split('\n')[1].strip().lower().split()
+	flags.sort()
+
+	speed = output.split('\n')[2]
+	speed = speed.split(' at ')[1].split(',')[0].strip()
+	speed = speed.strip()
+	# Convert from GHz/MHz string to Hz
+	scale = 1
+	if speed.lower().endswith('mhz'):
+		scale = 6
+	elif speed.lower().endswith('ghz'):
+		scale = 9
+	processor_hz = speed
+	processor_hz = processor_hz.lower().rstrip('mhz').rstrip('ghz').strip()
+	processor_hz = to_hz_string(processor_hz)
+
+	# Get the CPU arch and bits
+	raw_arch_string = platform.machine()
+	arch, bits = parse_arch(raw_arch_string)
+
+	return {
+	'vendor_id' : vendor_id, 
+	'brand' : processor_brand, 
+	'hz' : to_friendly_hz(processor_hz, scale), 
+	'raw_hz' : to_raw_hz(processor_hz, scale), 
+	'arch' : arch, 
+	'bits' : bits, 
+	'count' : multiprocessing.cpu_count(), 
+	'raw_arch_string' : raw_arch_string, 
+
+	'l2_cache_size' : cache_size, 
+	'l2_cache_line_size' : 0, 
+	'l2_cache_associativity' : 0, 
+
+	'stepping' : stepping, 
+	'model' : model, 
+	'family' : family, 
 	'processor_type' : 0, 
 	'extended_model' : 0, 
 	'extended_family' : 0, 
@@ -1037,6 +1155,10 @@ def get_cpu_info():
 	if not info:
 		info = get_cpu_info_from_sysctl()
 
+	# Try solaris
+	if not info:
+		info = get_cpu_info_from_solaris()
+
 	# Try querying the CPU cpuid register
 	if not info:
 		info = get_cpu_info_from_cpuid()
@@ -1045,25 +1167,27 @@ def get_cpu_info():
 
 if __name__ == '__main__':
 	info = get_cpu_info()
-	print('Vendor ID', info['vendor_id'])
-	print('Brand', info['brand'])
-	print('Hz', info['hz'])
-	print('Arch', info['arch'])
-	print('Bits', info['bits'])
-	print('Count', info['count'])
 
-	print('Raw Arch String', info['raw_arch_string'])
+	print('Vendor ID: {0}'.format(info['vendor_id']))
+	print('Brand: {0}'.format(info['brand']))
+	print('Hz: {0}'.format(info['hz']))
+	print('Raw Hz: {0}'.format(info['raw_hz']))
+	print('Arch: {0}'.format(info['arch']))
+	print('Bits: {0}'.format(info['bits']))
+	print('Count: {0}'.format(info['count']))
 
-	print('L2 Cache Size', info['l2_cache_size:'])
-	print('L2 Cache Line Size', info['l2_cache_line_size'])
-	print('L2 Cache Associativity', info['l2_cache_associativity'])
+	print('Raw Arch String: {0}'.format(info['raw_arch_string']))
 
-	print('Stepping', info['stepping'])
-	print('Model', info['model'])
-	print('Family', info['family'])
-	print('Processor Type', info['processor_type'])
-	print('Extended Model', info['extended_model'])
-	print('Extended Family', info['extended_family'])
-	print('Flags:', info['flags'])
+	print('L2 Cache Size: {0}'.format(info['l2_cache_size']))
+	print('L2 Cache Line Size: {0}'.format(info['l2_cache_line_size']))
+	print('L2 Cache Associativity: {0}'.format(info['l2_cache_associativity']))
+
+	print('Stepping: {0}'.format(info['stepping']))
+	print('Model: {0}'.format(info['model']))
+	print('Family: {0}'.format(info['family']))
+	print('Processor Type: {0}'.format(info['processor_type']))
+	print('Extended Model: {0}'.format(info['extended_model']))
+	print('Extended Family: {0}'.format(info['extended_family']))
+	print('Flags: {0}'.format(', '.join(info['flags'])))
 
 

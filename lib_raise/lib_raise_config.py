@@ -44,7 +44,7 @@ def setup():
 	global os_type
 
 	# Figure out the general OS type
-	os_type, os_brand, os_release = osinfo.get_os_info()
+	os_type, os_brand, os_release, os_kernel = osinfo.get_os_info()
 
 
 def early_exit(message):
