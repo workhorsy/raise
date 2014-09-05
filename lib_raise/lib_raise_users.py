@@ -88,8 +88,8 @@ def do_as_normal_user(cb):
 def require_root():
 	is_root = False
 
-	# Cygwin
-	if Config.os_type in OSType.Cygwin:
+	# Cygwin and BeOS
+	if Config.os_type in OSType.Cygwin or Config.os_type in OSType.BeOS:
 		# Cygwin has no root user
 		is_root = True
 	# Windows
@@ -110,7 +110,7 @@ def require_root():
 		Print.exit("Must be run as root.")
 
 def require_not_root():
-	# On Windows/Cygwin it does not matter if we are root. So just return
+	# On Windows/Cygwin/BeOS it does not matter if we are root. So just return
 	if Config.os_type in OSType.withoutRoot:
 		return
 
