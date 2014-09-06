@@ -188,6 +188,20 @@ if __name__ == '__main__':
 	if args == 'version':
 		print(LIB_RAISE_VERSION)
 		exit(0)
+	# Print the version if that is the target
+	elif args == 'help':
+		print("COMMANDS:")
+		print("    ./raise help    - Print the help menu")
+		print("    ./raise version - Print the version of Raise")
+		print("    ./raise update  - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
+		print("")
+		print("OPTIONS:")
+		print("    -plain    - Don't clear, don't use color, and fix the width to 79")
+		print("    -nolineno - Don't print line numbers on error exit")
+		print("    -inspect  - Print the source code to the target")
+		print("    -arg=     - Pass an argument to the rscript")
+		print("")
+		exit(0)
 
 	# Run update if that is the target
 	if args == 'update':
