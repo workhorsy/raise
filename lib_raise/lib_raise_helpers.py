@@ -28,9 +28,7 @@
 import os
 import atexit
 import platform
-import ast
 import inspect
-from collections import namedtuple
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 
@@ -70,94 +68,6 @@ def between(s, l, r):
 def between_last(s, l, r):
 	return before_last(after(s, l), r)
 
-def version_string_to_tuple(version_string):
-	# Get the version number
-	Version = namedtuple('Version', 'major minor micro')
-	major, minor, micro = 0, 0, 0
-	try:
-		version = version_string.split('.')
-		major = int(version[0])
-		minor = int(version[1])
-		micro = int(version[2])
-	except Exception as e:
-		pass
-	return Version(major, minor, micro)
-
-def to_version_cb(version_str):
-	black = {
-		'AugAssign' : 'Operation with assignment', 
-		'Assign' : 'Assignment', 
-		'Lambda' : 'Lambda function', 
-		'arguments' : 'Function argument', 
-		'arg' : 'Argument', 
-		'Param' : 'Function parameter', 
-		'Call' : 'Function call', 
-		'If' : 'If statement', 
-		'While' : 'While loop', 
-		'For' : 'For loop', 
-		'Import' : 'Importing', 
-		'ImportFrom' : 'Importing from', 
-		'alias' : 'Aliase', 
-		'ClassDef' : 'Class definition', 
-		'Pass' : 'Pass statements', 
-		'Assert' : 'Assert statement', 
-		'Break' : 'Break statement', 
-		'Continue' : 'Continue statement', 
-		'Del' : 'Del statement', 
-		'Delete' : 'Delete statement', 
-		'ExceptHandler' : 'Exception handler', 
-		'Raise' : 'Raise statement', 
-		'Try' : 'Try block', 
-		'TryExcept' : 'Try block', 
-		'TryFinally' : 'Try finally block', 
-		'Return' : 'Return statement', 
-		'Yield' : 'Yield statement', 
-		'With' : 'With statement', 
-		'Global' : 'Global statement', 
-		'Print' : 'Print statement', 
-	}
-
-	black_list = {}
-	for k, v in black.items():
-		if hasattr(ast, k):
-			t = getattr(ast, k)
-			black_list[t] = v
-
-	# Make sure the code can be parsed
-	tree = None
-	parse_error = None
-	try:
-		tree = ast.parse(version_str)
-	except SyntaxError as e:
-		parse_error = str(e)
-	if parse_error:
-		Print.status('Building version string')
-		Print.fail('Version string unparsable. "{0}", {1}'.format(version_str, parse_error))
-		Print.exit('Fix version string and try again.')
-
-	# Make sure each code node is not in the black list
-	for node in ast.walk(tree):
-		# Is in black list
-		for k, v in black_list.items():
-			if isinstance(node, k):
-				Print.status('Building version string')
-				Print.fail('{0} not allowed in version string. "{1}"'.format(v, version_str))
-				Print.exit('Fix version string and try again.')
-
-	code = "lambda ver: " + version_str
-	version_cb = None
-	# Make sure the code can be parsed into a lambda
-	try:
-		version_cb = eval(code, {})
-		version_cb(version_string_to_tuple('(1, 9)'))
-	except Exception as e:
-		message = str(e).lstrip('global ')
-		Print.status('Building version string')
-		Print.fail('Invalid version string "{0}", {1}'.format(version_str, message))
-		Print.exit('Fix version string and try again.')
-
-	return version_cb
-
 def require_file_extension(file_name, *required_extensions):
 	extension = os.path.splitext(file_name)[-1].lower()
 	if not extension in required_extensions:
@@ -174,37 +84,6 @@ def expand_envs(string):
 		string = os.path.expandvars(string)
 		if before == string:
 			return string
-
-def is_safe_code(source_code):
-	safe_nodes = (
-		ast.Module, ast.Load, ast.Expr, ast.Attribute, ast.Name, 
-		ast.Str, ast.Num, ast.BoolOp, 
-		ast.Dict, ast.List, ast.Tuple, 
-		ast.Store, ast.ListComp, ast.comprehension, 
-		ast.Subscript, ast.Slice, ast.Index, 
-		ast.BinOp, ast.UnaryOp, 
-		ast.BitOr, ast.BitXor, ast.BitAnd, 
-		ast.LShift, ast.RShift, 
-		ast.Sub, ast.Add, ast.Div, ast.Mult, ast.Mod, ast.Pow, 
-		ast.Eq, ast.NotEq, ast.And, ast.Or, ast.Not, 
-		ast.Is, ast.IsNot, ast.In, ast.NotIn, 
-		ast.Compare, ast.Gt, ast.GtE, ast.Lt, ast.LtE
-	)
-
-	# Make sure the code can be parsed
-	tree = None
-	try:
-		tree = ast.parse(source_code)
-	except SyntaxError:
-		return False
-
-	# Make sure each code node is in the white list
-	for node in ast.walk(tree):
-		if not isinstance(node, safe_nodes):
-			print(type(node))
-			return False
-
-	return True
 
 def get_rscript_line():
 	frame = inspect.currentframe()

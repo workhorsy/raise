@@ -3,15 +3,17 @@
 
 import lib_raise_find as Find
 
+import libfinder
+
 # Version strings
 def find_unparsable_version_code():
-	Find._get_library_files('libSDL', '@')
+	libfinder._get_library_files('libSDL', '@')
 
 def find_black_listed_version_code():
-	Find._get_library_files('libSDL', 'eval("False")')
+	libfinder._get_library_files('libSDL', 'eval("False")')
 
 def find_invalid_version_code():
-	Find._get_library_files('libSDL', 'a >= (1, 2)')
+	libfinder._get_library_files('libSDL', 'a >= (1, 2)')
 
 
 
