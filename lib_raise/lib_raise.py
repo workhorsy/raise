@@ -88,16 +88,10 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.4.0 dev - September 3 2014) http://launchpad.net/raise")
-		print("OPTIONS:")
-		print("    -plain    - Don't clear, don't use color, and fix the width to 79")
-		print("    -nolineno - Don't print line numbers on error exit")
-		print("    -inspect  - Print the source code to the target")
-		print("    -arg=     - Pass an argument to the rscript")
-		print("")
+		print("Raise build automation tool (Version 0.4.0 dev - September 6 2014) http://launchpad.net/raise")
 		print("COMMANDS:")
-		print("    ./raise update - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
-		print("    ./raise version - Print the version of Raise")
+		print("    ./raise help    - Print the help menu")
+		print("    ./raise update  - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
 		print("")
 
 		# Print all the targets

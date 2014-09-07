@@ -1,4 +1,5 @@
 * Release 0.4.0
+	* Fixed Bug #1365825: 'Add a help menu'.
 	* Fixed Bug #1365128: 'Add basic OS X support'.
 	* Fixed Bug #1365123: 'Add basic file data cache server'.
 	* Fixed Bug #1325809: 'Compile time flags are broken in LDC and GDC'.
