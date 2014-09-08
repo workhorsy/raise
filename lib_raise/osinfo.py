@@ -54,6 +54,7 @@ class OSBrand(object):
 	Chakra = ['Chakra']
 	Clonezilla = ['Clonezilla']
 	CrunchBang = ['CrunchBang']
+	Cygwin = ['Cygwin']
 	DamnSmallLinux = ['DamnSmallLinux']
 	Debian = ['Debian']
 	DragonFlyBSD = ['DragonFlyBSD']
@@ -157,6 +158,8 @@ def _get_os_brand(os_type):
 			return OSBrand.OpenBSD[0]
 		elif name in 'pcbsd':
 			return OSBrand.PCBSD[0]
+	elif os_type in OSType.Cygwin:
+                return platform.system()
 	elif os_type in OSType.MacOS:
 		name = platform.mac_ver()[0].lower().strip()
 		if name.startswith('10'):
@@ -171,7 +174,15 @@ def _get_os_brand(os_type):
 		name = linux_dist[0].lower() or dist[0].lower()
 		name = name.strip()
 
-		if name in 'centos':
+		if not name:
+			if os.path.isfile('/etc/lsb-release'):
+				with open('/etc/lsb-release') as f:
+					name = f.read()
+					name = name.split('DISTRIB_ID=')[1].split('\n')[0]
+					name = name.lower()
+					if 'manjaro' in name:
+						return OSBrand.Manjaro[0]
+		elif name in 'centos':
 			return OSBrand.CentOS[0]
 		elif name in 'debian':
 			return OSBrand.Debian[0]
@@ -179,6 +190,8 @@ def _get_os_brand(os_type):
 			return OSBrand.Fedora[0]
 		elif name in 'linuxmint':
 			return OSBrand.LinuxMint[0]
+		elif name in 'manjaro':
+			return OSBrand.Manjaro[0]
 		elif name in 'redhat':
 			return OSBrand.RedHat[0]
 		elif name in 'scientific linux':
@@ -214,6 +227,8 @@ def _get_os_release(os_type):
 		os_release = platform.release().lower()
 	elif os_type in OSType.BSD:
 		os_release = platform.release().lower().rstrip('-release')
+	elif os_type in OSType.Cygwin:
+                os_release = platform.release().split('(')[0]
 	elif os_type in OSType.Linux:
 		if os.path.isfile('/etc/lsb-release-crunchbang'):
 			with open('/etc/lsb-release-crunchbang', 'r') as f:
@@ -225,6 +240,12 @@ def _get_os_release(os_type):
 				data = f.read().lower().strip().split()
 				if data and len(data) > 2:
 					os_release = data[2]
+		elif os.path.isfile('/etc/lsb-release'):
+			with open('/etc/lsb-release') as f:
+				data = f.read()
+				data = data.split('DISTRIB_RELEASE=')[1].split('\n')[0]
+				data = data.lower()
+				os_release = data
 		else:
 			linux_dist = platform.linux_distribution()
 			os_release = linux_dist[1].lower() or dist[1].lower()
@@ -253,6 +274,11 @@ def _get_os_kernel(os_type):
 		os_kernel = k
 	elif os_type in OSType.BSD:
 		k = platform.release().split('-')[0].split('.')
+		k = [int(n) for n in k]
+		k = tuple(k)
+		os_kernel = k
+	elif os_type in OSType.Cygwin:
+		k = platform.release().split('(')[0].split('.')
 		k = [int(n) for n in k]
 		k = tuple(k)
 		os_kernel = k
@@ -294,7 +320,3 @@ if __name__ == '__main__':
 	print('brand: {0}'.format(os_brand))
 	print('release: {0}'.format(os_release))
 	print('kernel: {0}'.format(os_kernel))
-
-
-
-
