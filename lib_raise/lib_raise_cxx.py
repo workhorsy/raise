@@ -37,6 +37,7 @@ import lib_raise_process as Process
 import lib_raise_helpers as Helpers
 
 from osinfo import *
+import findlib
 
 
 cxx_compilers = {}
@@ -434,7 +435,7 @@ def run_print(command):
 	Print.status("Running C++ program")
 
 	native_command = to_native(command)
-	runner = Process.ProcessRunner(native_command)
+	runner = findlib.ProcessRunner(native_command)
 	runner.run()
 	runner.is_done
 	runner.wait()
