@@ -26,7 +26,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
-from osinfo import *
+
 import lib_raise_config as Config
 import lib_raise_users as Users
 import lib_raise_fs as FS
@@ -34,6 +34,8 @@ import lib_raise_process as Process
 import lib_raise_find as Find
 import lib_raise_terminal as Print
 import lib_raise_helpers as Helpers
+
+from osinfo import *
 
 
 linkers = {}

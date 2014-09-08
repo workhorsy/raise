@@ -28,7 +28,7 @@
 import sys, os
 import shutil
 import stat
-from osinfo import *
+
 import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_users as Users
@@ -37,6 +37,8 @@ import lib_raise_fs as FS
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
 
+from osinfo import *
+import findlib
 
 cs_compilers = {}
 missing_compilers = []
@@ -205,7 +207,7 @@ class CSCompiler(object):
 		native_command = '{0} {1}'.format(self._runtime, command)
 		native_command = to_native(native_command)
 
-		runner = Process.ProcessRunner(native_command)
+		runner = findlib.ProcessRunner(native_command)
 		runner.run()
 		runner.is_done
 		runner.wait()

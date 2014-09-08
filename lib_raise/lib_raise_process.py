@@ -35,123 +35,7 @@ import lib_raise_cpu as CPU
 import lib_raise_users as Users
 import lib_raise_terminal as Print
 
-
-class ProcessRunner(object):
-	def __init__(self, command):
-		if Config.os_type in OSType.Windows:
-			# Remove starting ./
-			if command.startswith('./'):
-				command = command[2 :]
-			# Replace ${BLAH} with %BLAH%
-			command = command.replace('${', '%').replace('}', '%')
-
-		self._command = command
-		self._process = None
-		self._return_code = None
-		self._stdout = None
-		self._stderr = None
-		self._status = None
-
-	def run(self):
-		# Recursively expand all environmental variables
-		env = {}
-		for key, value in os.environ.items():
-			env[key] = Helpers.expand_envs(value)
-
-		self._stdout = b''
-		self._stderr = b''
-
-		# Start the process and save the output
-		self._process = subprocess.Popen(
-			self._command, 
-			stderr = subprocess.PIPE, 
-			stdout = subprocess.PIPE, 
-			shell = True, 
-			env = env
-		)
-
-	def wait(self):
-		# Wait for the process to actually exit
-		self._process.wait()
-
-		# Get the return code
-		rc = self._process.returncode
-		if hasattr(os, 'WIFEXITED') and os.WIFEXITED(rc):
-			rc = os.WEXITSTATUS(rc)
-		self._return_code = rc
-
-		# Get the standard out and error in the correct format
-		try:
-			self._stderr = str(self._stderr, 'UTF-8')
-		except Exception as err:
-			pass
-		try:
-			self._stdout = str(self._stdout, 'UTF-8')
-		except Exception as err:
-			pass
-
-		# Chomp the terminating newline off the ends of output
-		self._stdout = Helpers.chomp(self._stdout)
-		self._stderr = Helpers.chomp(self._stderr)
-
-		# :( Failure
-		if self._return_code:
-			self._status = Print.Emoticons.FROWN
-		else:
-			# :\ Warning
-			if len(self._stderr):
-				self._status = Print.Emoticons.NORMAL
-			# :) Success
-			else:
-				self._status = Print.Emoticons.SMILE
-
-	def get_is_done(self):
-		# You have to poll a process to update the retval. Even if it has stopped already
-		if self._process.returncode == None:
-			self._process.poll()
-
-		# Read the output from the buffer
-		sout, serr = self._process.communicate()
-		self._stdout += sout
-		self._stderr += serr
-
-		# Return true if there is a return code
-		return self._process.returncode != None
-	is_done = property(get_is_done)
-
-	def get_is_success(self):
-		self._require_wait()
-		return self._status == Print.Emoticons.SMILE
-	is_success = property(get_is_success)
-
-	def get_is_warning(self):
-		self._require_wait()
-		return self._status == Print.Emoticons.NORMAL
-	is_warning = property(get_is_warning)
-
-	def get_is_failure(self):
-		self._require_wait()
-		return self._status == Print.Emoticons.FROWN
-	is_failure = property(get_is_failure)
-
-	def get_stderr(self):
-		self._require_wait()
-		return self._stderr
-	stderr = property(get_stderr)
-
-	def get_stdout(self):
-		self._require_wait()
-		return self._stdout
-	stdout = property(get_stdout)
-
-	def get_stdall(self):
-		self._require_wait()
-		return self._stdout + '\n' + self._stderr
-	stdall = property(get_stdall)
-
-	def _require_wait(self):
-		if self._return_code == None:
-			raise Exception("Wait needs to be called before any info on the process can be gotten.")
+import findlib
 
 
 class Event(object):
@@ -192,7 +76,7 @@ class Event(object):
 			Print.status("{0} {1} '{2}'".format(self._task, self._singular, self._result))
 
 		# Start the process
-		self._runner = ProcessRunner(self._command)
+		self._runner = findlib.ProcessRunner(self._command)
 		self._status = 'running'
 		self._runner.run()
 		return True
@@ -265,34 +149,6 @@ def concurrent_end():
 	Event.is_concurrent = False
 	Event.is_first_concurrent = False
 
-def run_print(command):
-	Print.status("Running command")
-
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.is_done
-	runner.wait()
-
-	if runner.is_success or runner.is_warning:
-		Print.ok()
-		sys.stdout.write(command + '\n')
-		sys.stdout.write(runner.stdall)
-	elif runner.is_failure:
-		Print.fail()
-		sys.stdout.write(command + '\n')
-		sys.stdout.write(runner.stdall)
-		Print.exit('Failed to run command.')
-
-def run_and_get_stdout(command):
-	runner = ProcessRunner(command)
-	runner.run()
-	runner.is_done
-	runner.wait()
-	if runner.is_failure:
-		return None
-	else:
-		return runner.stdout
-
 def do_on_fail_exit(start_message, fail_message, cb):
 	Print.status(start_message)
 
@@ -306,7 +162,7 @@ def do_on_fail_exit(start_message, fail_message, cb):
 			Print.exit(fail_message)
 	# Or run it as a process if a string
 	elif type(cb) == str:
-		runner = ProcessRunner(cb)
+		runner = findlib.ProcessRunner(cb)
 		runner.run()
 		runner.is_done
 		runner.wait()
