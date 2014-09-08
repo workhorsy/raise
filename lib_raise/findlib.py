@@ -78,28 +78,28 @@ def between_last(s, l, r):
 
 
 def _on_ok():
-	raise NotImplemented('The function "{0}" should be overridden in module.'.format(__name__))
+	pass
 
 def _on_warn(message=None):
-	raise NotImplemented('The function "{0}" should be overridden in module.'.format(__name__))
+	pass
 
 def _on_fail(message= None):
-	raise NotImplemented('The function "{0}" should be overridden in module.'.format(__name__))
+	pass
 
 def _on_exit(message):
-	raise NotImplemented('The function "{0}" should be overridden in module.'.format(__name__))
+	pass
 
 def _on_status(message):
-	raise NotImplemented('The function "{0}" should be overridden in module.'.format(__name__))
+	pass
 
 def _ok_symbol():
-	return ''
+	return 'ok'
 
 def _warn_symbol():
-	return ''
+	return 'warn'
 
 def _fail_symbol():
-	return ''
+	return 'fail'
 
 class ProcessRunner(object):
 	def __init__(self, command):
