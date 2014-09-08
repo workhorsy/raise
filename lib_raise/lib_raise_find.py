@@ -32,10 +32,11 @@ import lib_raise_config as Config
 import lib_raise_terminal as Print
 import lib_raise_process as Process
 import lib_raise_helpers as Helpers
+import lib_raise_terminal as Terminal
 
 import findlib
+import findlib_server
 from osinfo import *
-from cache_file_change_date import *
 
 def program_paths(program_name):
 	return findlib.program_paths(program_name)
@@ -133,4 +134,40 @@ def require_environmental_variable(env_name, version_cb = None):
 		Print.exit(message.format(env_name))
 	else:
 		Print.ok()
+
+
+def _on_ok():
+	Terminal.ok()
+findlib._on_ok = _on_ok
+
+def _on_warn(message=None):
+	Terminal.warning(message)
+findlib._on_warn = _on_warn
+
+def _on_fail(message=None):
+	Terminal.fail(message)
+findlib._on_fail = _on_fail
+
+def _on_exit(message):
+	Terminal.exit(message)
+findlib._on_exit = _on_exit
+
+def _on_status(message):
+	Terminal.status(message)
+findlib._on_status = _on_status
+
+def _ok_symbol():
+	return Terminal.Emoticons.SMILE
+findlib._ok_symbol = _ok_symbol
+
+def _warn_symbol():
+	return Terminal.Emoticons.NORMAL
+findlib._warn_symbol = _warn_symbol
+
+def _fail_symbol():
+	return Terminal.Emoticons.FROWN
+findlib._fail_symbol = _fail_symbol
+
+
+
 

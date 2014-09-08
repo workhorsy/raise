@@ -36,7 +36,6 @@ import lib_raise_terminal as Print
 import lib_raise_helpers as Helpers
 
 from osinfo import *
-import libfinder
 
 
 linkers = {}
@@ -47,7 +46,7 @@ def setup():
 	# Get the names and paths for know linkers
 	names = ['ld', 'link.exe']
 	for name in names:
-		paths = libfinder.program_paths(name)
+		paths = Find.program_paths(name)
 		if len(paths) == 0:
 			continue
 
