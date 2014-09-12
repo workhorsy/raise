@@ -20,6 +20,7 @@ import lib_raise_terminal as Terminal
 import lib_raise_helpers as Helpers
 
 import osinfo
+import findlib
 
 
 def cleanup():
@@ -544,7 +545,7 @@ def csharp_program_installation_and_uninstallation():
 	#FIXME: CS.run_print does not work on Linux, because when installed it runs 
 	# the app from a shell script that does "mono blah.exe".
 	#CS.run_print('main.exe')
-	Process.run_print("main")
+	findlib.run_print("main")
 
 	# Uninstall the program
 	CS.uninstall_program('main.exe', 'csharp_example')
@@ -639,7 +640,7 @@ def java_program_installation_and_uninstallation():
 	#FIXME: Java.run_print does not work on Linux, because when installed it runs 
 	# the app from a shell script that does "java blah".
 	#Java.run_print('main')
-	Process.run_print("main")
+	findlib.run_print("main")
 
 	# Uninstall the program
 	Java.uninstall_program('main.class', 'java_example')

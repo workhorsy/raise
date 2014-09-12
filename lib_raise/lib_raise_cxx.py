@@ -79,7 +79,7 @@ def setup():
 		if name == 'g++':
 			# On Mac OS X skip this compiler if it is clang pretending to be g++
 			if Config.os_type in OSType.MacOS:
-				version = Process.run_and_get_stdout('g++ --version')
+				version = findlib.run_and_get_stdout('g++ --version')
 				if version and 'clang' in version.lower():
 					missing_compilers.append(name)
 					continue
