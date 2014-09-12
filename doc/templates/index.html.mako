@@ -396,7 +396,7 @@ ${template_info['installation']['output']}
 <h2>2.1. Normal Installation</h2>
 
 	<pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.3.0/+download/raise
+wget http://launchpad.net/raise/trunk/0.4.0/+download/raise
 chmod +x raise
 ./raise
 	</code></pre>
@@ -405,7 +405,7 @@ chmod +x raise
 <h2>2.2. Windows Installation</h2>
 
 <p>
-Download from <a href="http://launchpad.net/raise/trunk/0.3.0/+download/raise"> http://launchpad.net/raise/trunk/0.3.0/+download/raise</a>
+Download from <a href="http://launchpad.net/raise/trunk/0.4.0/+download/raise"> http://launchpad.net/raise/trunk/0.4.0/+download/raise</a>
 </p>
 
 	<pre><code data-language="shell">
