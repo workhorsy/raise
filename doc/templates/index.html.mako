@@ -76,14 +76,14 @@ Last updated on September 12th 2014
 	<li>
 		<a href="#operating_system_support">Operating System Support</a>
 		<ol>
-			<li><a href="#linux_support">Linux</a></li>
-			<li><a href="#freebsd_support">FreeBSD</a></li>
-			<li><a href="#windows_support">Windows</a></li>
+			<li><a href="#bsd_support">BSD</a></li>
 			<li><a href="#cygwin_support">Cygwin</a></li>
+			<li><a href="#haiku_support">Haiku</a></li>
+			<li><a href="#linux_support">Linux</a></li>
+			<li><a href="#mobile_support">Android, iOS, Chrome OS</a></li>
 			<li><a href="#os_x_support">OS X</a></li>
 			<li><a href="#solaris_support">Solaris</a></li>
-			<li><a href="#haiku_support">Haiku</a></li>
-			<li><a href="#mobile_support">Android, iOS, Chrome OS</a></li>
+			<li><a href="#windows_support">Windows</a></li>
 		</ol>
 	</li>
 	<li>
@@ -531,8 +531,58 @@ Example output:
 ${template_info['operating_system_support']['output']}
 </pre>
 
+<a id="bsd_support"></a>
+<h2>5.1. BSD</h2>
+
+<p>
+Fully supported.
+</p>
+
+<p>
+Has been tested on FreeBSD, and PCBSD, but not on OpenBSD, NetBSD, or DragonflyBSD.
+</p>
+
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368955" target="_blank" rel="external">On PCBSD font background colors are too light.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368957" target="_blank" rel="external">On BSD gcc may be named with a number and hard to find.</a></li>
+</ol>
+
+<p>
+<a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
+</p>
+
+<a id="cygwin_support"></a>
+<h2>5.2. Cygwin</h2>
+
+<p>
+Fully Supported.
+</p>
+
+<p>
+<a href="http://cygwin.com" target="_blank" rel="external">Cygwin</a>
+</p>
+
+
+<a id="haiku_support"></a>
+<h2>5.3. Haiku</h2>
+
+<p>
+Partially supported.
+</p>
+
+<p>
+Can build basic exes, shared/static libraries, but not install anything, or search
+for programs/libraries. Not yet tested on BeOS.
+</p>
+
+<p>
+<a href="https://haiku-os.org" target="_blank" rel="external">Haiku</a>
+<p>
+
+
 <a id="linux_support"></a>
-<h2>5.1. Linux</h2>
+<h2>5.4. Linux</h2>
 
 <p>
 Fully supported.
@@ -549,29 +599,59 @@ Tested primarily on
 "just work" on other Linux distros.
 </p>
 
-<a id="freebsd_support"></a>
-<h2>5.2. FreeBSD</h2>
+
+<a id="mobile_support"></a>
+<h2>5.5. Android, iOS, Chrome OS</h2>
+
+<p>
+Not supported.
+</p>
+
+<p>
+None of the mobile OSes are supported. They either do not support the required 
+compilers, or are locked down too tightly to use. Hopefully this will change in 
+the future.
+</p>
+
+
+<a id="os_x_support"></a>
+<h2>5.6. OS X</h2>
+
+<p>
+Partially Supported
+</p>
+
+<p>
+Can build basic exes, shared/static libraries, and find programs/libraries.
+</p>
+
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368959" target="_blank" rel="external">Running gcc when not installed on OS X pops up a gui.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368960" target="_blank" rel="external">On OS X Add Fink and Homebrew support.</a></li>
+</ol>
+
+<p>
+<a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
+</p>
+
+
+<a id="solaris_support"></a>
+<h2>5.7. Solaris</h2>
 
 <p>
 Fully supported.
 </p>
 
-<p>
-Has not yet been tested on other BSDs such as OpenBSD, NetBSD, or DragonflyBSD.
-</p>
-
-Bugs:
-<ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368955" target="_blank">On PCBSD font background colors are too light.</a></li>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368957" target="_blank">On BSD gcc may be named with a number and hard to find.</a></li>
-<ol>
+<p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
 
 <p>
-<a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
-</p>
+<a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
+<p>
+
 
 <a id="windows_support"></a>
-<h2>5.3. Windows</h2>
+<h2>5.8. Windows</h2>
 
 <p>
 Partially supported.
@@ -588,87 +668,11 @@ that Windows users use Cygwin.
 
 Bugs:
 <ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1247015" target="_blank">Static and shared libraries are broken on Windows</a></li>
-<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1247015" target="_blank" rel="external">Static and shared libraries are broken on Windows</a></li>
+</ol>
 
 <p>
 Has not been tested on Windows Vista or Windows RT.
-</p>
-
-<a id="cygwin_support"></a>
-<h2>5.4. Cygwin</h2>
-
-<p>
-Fully Supported.
-</p>
-
-<p>
-<a href="http://cygwin.com" target="_blank" rel="external">Cygwin</a>
-</p>
-
-<a id="os_x_support"></a>
-<h2>5.5. OS X</h2>
-
-<p>
-Partially Supported
-</p>
-
-<p>
-Can build basic exes, shared/static libraries. Can find libraries installed
-with MacPorts. There are bugs with installing software, and many small bugs.
-</p>
-
-Bugs:
-<ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368959" target="_blank">Running gcc when not installed on OS X pops up a gui.</a></li>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368960" target="_blank">On OS X Add Fink and Homebrew support.</a></li>
-<ol>
-
-<p>
-<a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
-</p>
-
-<a id="solaris_support"></a>
-<h2>5.6. Solaris</h2>
-
-<p>
-Fully supported.
-</p>
-
-<p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
-
-<p>
-<a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
-<p>
-
-<a id="haiku_support"></a>
-<h2>5.7. Haiku</h2>
-
-<p>
-Partially supported.
-</p>
-
-<p>
-Can build basic exes, shared/static libraries, but not install anything, or search
-for programs/libraries.
-</p>
-
-<p>
-<a href="https://haiku-os.org" target="_blank" rel="external">Haiku</a>
-<p>
-
-
-<a id="mobile_support"></a>
-<h2>5.8. Android, iOS, Chrome OS</h2>
-
-<p>
-Not supported.
-</p>
-
-<p>
-None of the mobile OSes are supported. They either do not support the required 
-compilers, or are locked down too tightly to use. Hopefully this will change in 
-the future.
 </p>
 
 
