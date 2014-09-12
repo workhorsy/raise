@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 3rd 2014
+Last updated on September 12th 2014
 </p>
 
 <p>
@@ -81,7 +81,7 @@ Last updated on September 3rd 2014
 			<li><a href="#windows_support">Windows</a></li>
 			<li><a href="#cygwin_support">Cygwin</a></li>
 			<li><a href="#os_x_support">OS X</a></li>
-			<li><a href="#open_indiana_support">Open Indiana</a></li>
+			<li><a href="#solaris_support">Solaris</a></li>
 			<li><a href="#haiku_support">Haiku</a></li>
 			<li><a href="#mobile_support">Android, iOS, Chrome OS</a></li>
 		</ol>
@@ -510,7 +510,7 @@ There are eight basic OS types:
 
 <ul>
 	<li>BeOS: Haiku, BeOS</li>
-	<li>BSD: FreeBSD, NetBSD, OpenBSD, et cetera</li>
+	<li>BSD: FreeBSD, NetBSD, OpenBSD, PCBSD, et cetera</li>
 	<li>Cygwin: Cygwin on Windows</li>
 	<li>MacOS: OS X 10.X</li>
 	<li>Linux: Debian, Fedora, OpenSUSE, Slackware, Ubuntu, et cetera</li>
@@ -560,6 +560,12 @@ Fully supported.
 Has not yet been tested on other BSDs such as OpenBSD, NetBSD, or DragonflyBSD.
 </p>
 
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368955" target="_blank">On PCBSD font background colors are too light.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368957" target="_blank">On BSD gcc may be named with a number and hard to find.</a></li>
+<ol>
+
 <p>
 <a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
 </p>
@@ -579,6 +585,11 @@ There are still issues with
 building and finding C/C++ libraries on Windows. It is recommended 
 that Windows users use Cygwin.
 </p>
+
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1247015" target="_blank">Static and shared libraries are broken on Windows</a></li>
+<ol>
 
 <p>
 Has not been tested on Windows Vista or Windows RT.
@@ -607,23 +618,24 @@ Can build basic exes, shared/static libraries. Can find libraries installed
 with MacPorts. There are bugs with installing software, and many small bugs.
 </p>
 
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368959" target="_blank">Running gcc when not installed on OS X pops up a gui.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368960" target="_blank">On OS X Add Fink and Homebrew support.</a></li>
+<ol>
+
 <p>
 <a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
 </p>
 
-<a id="open_indiana_support"></a>
-<h2>5.6. Open Indiana</h2>
+<a id="solaris_support"></a>
+<h2>5.6. Solaris</h2>
 
 <p>
-Not supported.
+Fully supported.
 </p>
 
-<p>
-Was not able to get it to work. As of October 17th 2013 (oi_151a_prestable8) 
-they are still 
-<a href="http://wiki.openindiana.org/oi/Compiler+Migration" target="_blank" rel="external">migrating from SunStudio</a> 
-to GCC/Clang. A basic C/C++ "Hello World" program does not compile. 
-</p>
+<p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
 
 <p>
 <a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
@@ -633,12 +645,12 @@ to GCC/Clang. A basic C/C++ "Hello World" program does not compile.
 <h2>5.7. Haiku</h2>
 
 <p>
-Not supported.
+Partially supported.
 </p>
 
 <p>
-Was not able to get it to work. As of October 17th 2013 (R1 Alpha 4.1) The 
-Python version uses all memory, and crashes. 
+Can build basic exes, shared/static libraries, but not install anything, or search
+for programs/libraries.
 </p>
 
 <p>

@@ -51,10 +51,11 @@ def operating_system_support():
 	import osinfo
 
 	# Print the OS info
-	os_type, os_brand, os_release = osinfo.get_os_info()
+	os_type, os_brand, os_release, os_kernel = osinfo.get_os_info()
 	print("Type: {0}".format(os_type))
 	print("Brand: {0}".format(os_brand))
 	print("Release: {0}".format(os_release))
+	print("Kernel: {0}".format(os_kernel))
 
 	# Run code depending on the OS
 	if os_type in osinfo.OSType.Linux:
