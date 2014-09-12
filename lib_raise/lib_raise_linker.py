@@ -36,6 +36,7 @@ import lib_raise_terminal as Print
 import lib_raise_helpers as Helpers
 
 from osinfo import *
+import findlib
 
 
 linkers = {}
@@ -172,7 +173,7 @@ def ldconfig():
 		Print.exit("Could not find 'ldconfig'.")
 
 	# Run the process
-	runner = Process.ProcessRunner(prog[0])
+	runner = findlib.ProcessRunner(prog[0])
 	runner.run()
 	runner.is_done
 	runner.wait()
