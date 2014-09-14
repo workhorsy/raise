@@ -40,8 +40,8 @@ else:
 	from urllib.request import urlopen
 
 # Get the location of Lib Raise for this version
-LIB_RAISE_VERSION = '0.4.0'
-RAISE_VERSION = '0.4.0'
+LIB_RAISE_VERSION = '0.5.0 Dev'
+RAISE_VERSION = 'main'
 RAISE_BASE = 'http://bazaar.launchpad.net/~workhorsy/raise/{0}/download/head:/'.format(RAISE_VERSION)
 RAISE_URLS = {
 	'cpuinfo.py'                : '{0}cpuinfo.py-20140213011104-ys50gdvnav1t3ah0-1/cpuinfo.py'.format(RAISE_BASE),
