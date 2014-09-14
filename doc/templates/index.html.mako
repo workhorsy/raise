@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Raise Documentation 0.4 Dev</title>
+		<title>Raise Documentation 0.5 Dev</title>
 		<link type="text/css" rel="Stylesheet" href="styles.css" />
 		<link href="themes/obsidian.css" rel="stylesheet" type="text/css" media="screen" />
 	</head>
 
 	<body>
 
-<h1 class="header">Raise Documentation 0.4 Dev</h1>
+<h1 class="header">Raise Documentation 0.5 Dev</h1>
 
 <p>
 A small build automation tool that ships with your software.
@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 12th 2014
+Last updated on September 13th 2014
 </p>
 
 <p>
@@ -282,8 +282,8 @@ contact one of the authors.
 
 <p>
 Please have a look at the list of upcomming bug fixes for the upcomming 
-<a href="https://launchpad.net/raise/+milestone/0.4.0" target="_blank" rel="external">
-0.4.0 release</a>.
+<a href="https://launchpad.net/raise/+milestone/0.5.0" target="_blank" rel="external">
+0.5.0 release</a>.
 
 </p>
 
@@ -396,7 +396,7 @@ ${template_info['installation']['output']}
 <h2>2.1. Normal Installation</h2>
 
 	<pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.4.0/+download/raise
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
 chmod +x raise
 ./raise
 	</code></pre>
@@ -405,7 +405,7 @@ chmod +x raise
 <h2>2.2. Windows Installation</h2>
 
 <p>
-Download from <a href="http://launchpad.net/raise/trunk/0.4.0/+download/raise"> http://launchpad.net/raise/trunk/0.4.0/+download/raise</a>
+Download from <a href="http://launchpad.net/raise/trunk/0.5.0/+download/raise"> http://launchpad.net/raise/trunk/0.5.0/+download/raise</a>
 </p>
 
 	<pre><code data-language="shell">
