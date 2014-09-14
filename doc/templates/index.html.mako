@@ -49,9 +49,15 @@ Last updated on September 13th 2014
 	<li>
 		<a href="#installation">Installation</a>
 		<ol>
-			<li><a href="#installation_normal">Normal</a></li>
-			<li><a href="#installation_windows">Windows</a></li>
-			<li><a href="#installation_from_trunk">From Trunk</a></li>
+			<li><a href="#bsd_install">BSD</a></li>
+			<li><a href="#cygwin_install">Cygwin</a></li>
+			<li><a href="#haiku_install">Haiku</a></li>
+			<li><a href="#linux_install">Linux</a></li>
+			<li><a href="#mobile_install">Android, iOS, Chrome OS</a></li>
+			<li><a href="#os_x_install">OS X</a></li>
+			<li><a href="#solaris_install">Solaris</a></li>
+			<li><a href="#windows_install">Windows</a></li>
+			<li><a href="#trunk_install">From Trunk</a></li>
 		</ol>
 	</li>
 	<li>
@@ -71,19 +77,6 @@ Last updated on September 13th 2014
 			<li><a href="#d_support">D</a></li>
 			<li><a href="#c_sharp_support">C#</a></li>
 			<li><a href="#java_support">Java</a></li>
-		</ol>
-	</li>
-	<li>
-		<a href="#operating_system_support">Operating System Support</a>
-		<ol>
-			<li><a href="#bsd_support">BSD</a></li>
-			<li><a href="#cygwin_support">Cygwin</a></li>
-			<li><a href="#haiku_support">Haiku</a></li>
-			<li><a href="#linux_support">Linux</a></li>
-			<li><a href="#mobile_support">Android, iOS, Chrome OS</a></li>
-			<li><a href="#os_x_support">OS X</a></li>
-			<li><a href="#solaris_support">Solaris</a></li>
-			<li><a href="#windows_support">Windows</a></li>
 		</ol>
 	</li>
 	<li>
@@ -355,8 +348,6 @@ process, as its own line.
 <a id="installation"></a>
 <h1>2. Installation</h1>
 
-
-
 <p>
 Raise should not be installed into your Operating System. It is designed to run
 from inside your project's directory.
@@ -392,28 +383,209 @@ raise
 ${template_info['installation']['output']}
 </pre>
 
-<a id="installation_normal"></a>
-<h2>2.1. Normal Installation</h2>
+There are eight basic OS types:
 
-	<pre><code data-language="shell">
+<ul>
+	<li>BeOS: Haiku, BeOS</li>
+	<li>BSD: FreeBSD, NetBSD, OpenBSD, PCBSD, et cetera</li>
+	<li>Cygwin: Cygwin on Windows</li>
+	<li>MacOS: OS X 10.X</li>
+	<li>Linux: Debian, Fedora, OpenSUSE, Slackware, Ubuntu, et cetera</li>
+	<li>Solaris: Open Solaris, Oracle Solaris, Open Indiana</li>
+	<li>Windows: XP, Vista, 7, 8</li>
+	<li>unknown: The default value, when it can't figure out the type</li>
+</ul>
+
+<a id="bsd_install"></a>
+<h2>2.1. BSD</h2>
+
+<p>
+Fully supported.
+</p>
+
+<p>
+Has been tested on FreeBSD, and PCBSD, but not on OpenBSD, NetBSD, or DragonflyBSD.
+</p>
+
+<pre><code data-language="shell">
 wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
 chmod +x raise
 ./raise
-	</code></pre>
+</code></pre>
 
-<a id="installation_windows"></a>
-<h2>2.2. Windows Installation</h2>
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368955" target="_blank" rel="external">On PCBSD font background colors are too light.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368957" target="_blank" rel="external">On BSD gcc may be named with a number and hard to find.</a></li>
+</ol>
+
+<p>
+<a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
+</p>
+
+<a id="cygwin_install"></a>
+<h2>2.2. Cygwin</h2>
+
+<p>
+Fully Supported.
+</p>
+
+<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+chmod +x raise
+./raise
+</code></pre>
+
+<p>
+<a href="http://cygwin.com" target="_blank" rel="external">Cygwin</a>
+</p>
+
+
+<a id="haiku_install"></a>
+<h2>2.3. Haiku</h2>
+
+<p>
+Partially supported.
+</p>
+
+<p>
+Can build basic exes, shared/static libraries, but not install anything, or search
+for programs/libraries. Not yet tested on BeOS.
+</p>
+
+<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+chmod +x raise
+./raise
+</code></pre>
+
+<p>
+<a href="https://haiku-os.org" target="_blank" rel="external">Haiku</a>
+<p>
+
+
+<a id="linux_install"></a>
+<h2>2.4. Linux</h2>
+
+<p>
+Fully supported.
+</p>
+
+<p>
+Primarily developed on Linux with kernel 2.6 and greater. 
+Tested primarily on 
+<a href="http://ubuntu.com" target="_blank" rel="external">Ubuntu</a>, 
+<a href="http://debian.org" target="_blank" rel="external">Debian</a>, 
+<a href="http://linuxmint.com" target="_blank" rel="external">Linux Mint</a>, 
+<a href="http://fedoraproject.org" target="_blank" rel="external">Fedora</a>, and 
+<a href="http://centos.org" target="_blank" rel="external">Centos</a>. It should 
+"just work" on other Linux distros.
+</p>
+
+<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+chmod +x raise
+./raise
+</code></pre>
+
+
+<a id="mobile_install"></a>
+<h2>2.5. Android, iOS, Chrome OS</h2>
+
+<p>
+Not supported.
+</p>
+
+<p>
+None of the mobile OSes are supported. They either do not support the required 
+compilers, or are locked down too tightly to use. Hopefully this will change in 
+the future.
+</p>
+
+
+<a id="os_x_install"></a>
+<h2>2.6. OS X</h2>
+
+<p>
+Partially Supported
+</p>
+
+<p>
+Can build basic exes, shared/static libraries, and find programs/libraries.
+</p>
+
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368959" target="_blank" rel="external">Running gcc when not installed on OS X pops up a gui.</a></li>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1368960" target="_blank" rel="external">On OS X Add Fink and Homebrew support.</a></li>
+</ol>
+
+<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+chmod +x raise
+./raise
+</code></pre>
+
+<p>
+<a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
+</p>
+
+
+<a id="solaris_install"></a>
+<h2>2.7. Solaris</h2>
+
+<p>
+Fully supported.
+</p>
+
+<p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
+
+<pre><code data-language="shell">
+wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+chmod +x raise
+./raise
+</code></pre>
+
+<p>
+<a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
+<p>
+
+
+<a id="windows_install"></a>
+<h2>2.8. Windows</h2>
+
+<p>
+Partially supported.
+</p>
+
+<p>Tested on 
+<a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>,
+<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>, and 
+<a href="http://en.wikipedia.org/wiki/Windows_8" target="_blank" rel="external">Windows 8</a>.
+There are still issues with 
+building and finding C/C++ libraries on Windows. It is recommended 
+that Windows users use Cygwin.
+</p>
 
 <p>
 Download from <a href="http://launchpad.net/raise/trunk/0.5.0/+download/raise"> http://launchpad.net/raise/trunk/0.5.0/+download/raise</a>
 </p>
 
-	<pre><code data-language="shell">
+<pre><code data-language="shell">
 python raise
-	</code></pre>
+</code></pre>
 
-<a id="installation_from_trunk"></a>
-<h2>2.3. From Trunk Installation</h2>
+Bugs:
+<ol>
+	<li><a href="https://bugs.launchpad.net/raise/+bug/1247015" target="_blank" rel="external">Static and shared libraries are broken on Windows</a></li>
+</ol>
+
+<p>
+Has not been tested on Windows Vista or Windows RT.
+</p>
+
+<a id="trunk_install"></a>
+<h2>2.9. From Trunk Installation</h2>
 
 	<p>
 		Source code can be checked out using the 
@@ -492,195 +664,8 @@ Java works with OpenJDK 7.
 <hr />
 
 
-<a id="operating_system_support"></a>
-<h1>5. Operating System Support</h1>
-
-	<pre><code data-language="python">
-# Most of this section requires the modules:
-import osinfo
-	</code></pre>
-
-<p>
-	Raise uses the ostype module to get info about the os it is running under. 
-	See the ostype website for more information: 
-	<a href="https://github.com/workhorsy/py-osinfo" target="_blank" rel="external">https://github.com/workhorsy/py-osinfo</a>
-</p>
-
-There are eight basic OS types:
-
-<ul>
-	<li>BeOS: Haiku, BeOS</li>
-	<li>BSD: FreeBSD, NetBSD, OpenBSD, PCBSD, et cetera</li>
-	<li>Cygwin: Cygwin on Windows</li>
-	<li>MacOS: OS X 10.X</li>
-	<li>Linux: Debian, Fedora, OpenSUSE, Slackware, Ubuntu, et cetera</li>
-	<li>Solaris: Open Solaris, Oracle Solaris, Open Indiana</li>
-	<li>Windows: XP, Vista, 7, 8</li>
-	<li>unknown: The default value, when it can't figure out the type</li>
-</ul>
-
-<pre><code data-language="python">
-${template_info['operating_system_support']['example']}
-</code></pre>
-
-<p>
-Example output:
-</p>
-
-<pre class="raise_output">
-${template_info['operating_system_support']['output']}
-</pre>
-
-<a id="bsd_support"></a>
-<h2>5.1. BSD</h2>
-
-<p>
-Fully supported.
-</p>
-
-<p>
-Has been tested on FreeBSD, and PCBSD, but not on OpenBSD, NetBSD, or DragonflyBSD.
-</p>
-
-Bugs:
-<ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368955" target="_blank" rel="external">On PCBSD font background colors are too light.</a></li>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368957" target="_blank" rel="external">On BSD gcc may be named with a number and hard to find.</a></li>
-</ol>
-
-<p>
-<a href="http://freebsd.org" target="_blank" rel="external">FreeBSD</a>
-</p>
-
-<a id="cygwin_support"></a>
-<h2>5.2. Cygwin</h2>
-
-<p>
-Fully Supported.
-</p>
-
-<p>
-<a href="http://cygwin.com" target="_blank" rel="external">Cygwin</a>
-</p>
-
-
-<a id="haiku_support"></a>
-<h2>5.3. Haiku</h2>
-
-<p>
-Partially supported.
-</p>
-
-<p>
-Can build basic exes, shared/static libraries, but not install anything, or search
-for programs/libraries. Not yet tested on BeOS.
-</p>
-
-<p>
-<a href="https://haiku-os.org" target="_blank" rel="external">Haiku</a>
-<p>
-
-
-<a id="linux_support"></a>
-<h2>5.4. Linux</h2>
-
-<p>
-Fully supported.
-</p>
-
-<p>
-Primarily developed on Linux with kernel 2.6 and greater. 
-Tested primarily on 
-<a href="http://ubuntu.com" target="_blank" rel="external">Ubuntu</a>, 
-<a href="http://debian.org" target="_blank" rel="external">Debian</a>, 
-<a href="http://linuxmint.com" target="_blank" rel="external">Linux Mint</a>, 
-<a href="http://fedoraproject.org" target="_blank" rel="external">Fedora</a>, and 
-<a href="http://centos.org" target="_blank" rel="external">Centos</a>. It should 
-"just work" on other Linux distros.
-</p>
-
-
-<a id="mobile_support"></a>
-<h2>5.5. Android, iOS, Chrome OS</h2>
-
-<p>
-Not supported.
-</p>
-
-<p>
-None of the mobile OSes are supported. They either do not support the required 
-compilers, or are locked down too tightly to use. Hopefully this will change in 
-the future.
-</p>
-
-
-<a id="os_x_support"></a>
-<h2>5.6. OS X</h2>
-
-<p>
-Partially Supported
-</p>
-
-<p>
-Can build basic exes, shared/static libraries, and find programs/libraries.
-</p>
-
-Bugs:
-<ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368959" target="_blank" rel="external">Running gcc when not installed on OS X pops up a gui.</a></li>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1368960" target="_blank" rel="external">On OS X Add Fink and Homebrew support.</a></li>
-</ol>
-
-<p>
-<a href="http://en.wikipedia.org/wiki/OS_X" target="_blank" rel="external">OS X</a>
-</p>
-
-
-<a id="solaris_support"></a>
-<h2>5.7. Solaris</h2>
-
-<p>
-Fully supported.
-</p>
-
-<p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
-
-<p>
-<a href="http://openindiana.org" target="_blank" rel="external">Open Indiana</a>
-<p>
-
-
-<a id="windows_support"></a>
-<h2>5.8. Windows</h2>
-
-<p>
-Partially supported.
-</p>
-
-<p>Tested on 
-<a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>,
-<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>, and 
-<a href="http://en.wikipedia.org/wiki/Windows_8" target="_blank" rel="external">Windows 8</a>.
-There are still issues with 
-building and finding C/C++ libraries on Windows. It is recommended 
-that Windows users use Cygwin.
-</p>
-
-Bugs:
-<ol>
-	<li><a href="https://bugs.launchpad.net/raise/+bug/1247015" target="_blank" rel="external">Static and shared libraries are broken on Windows</a></li>
-</ol>
-
-<p>
-Has not been tested on Windows Vista or Windows RT.
-</p>
-
-
-<hr />
-
-
 <a id="fundamentals"></a>
-<h1>6. Fundamentals</h1>
+<h1>5. Fundamentals</h1>
 
 <p>
 Raise uses a specific format to show messages to the user. It prints what it 
@@ -699,7 +684,7 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 </pre>
 
 <a id="emoticons"></a>
-<h2>6.1. Emoticons</h2>
+<h2>5.1. Emoticons</h2>
 
 	<p>
 	<span class="smile">:)</span> - A green smile represents success. This is 
@@ -720,7 +705,7 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 
 
 <a id="file_extensions"></a>
-<h2>6.2. File Extensions</h2>
+<h2>5.2. File Extensions</h2>
 
 <p>
 One of the huge issue in dealing with different platforms, is how they handle file 
@@ -755,7 +740,7 @@ To see the mappings, look at the section for each language.
 
 
 <a id="basics"></a>
-<h1>7. Basics</h1>
+<h1>6. Basics</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -763,7 +748,7 @@ import lib_raise_process as Process
 	</code></pre>
 
 <a id="functions_that_must_succeed"></a>
-<h2>7.1. Functions that must succeed</h2>
+<h2>6.1. Functions that must succeed</h2>
 
 <p>
 The fundamental way that Raise works, is that it wraps function 
@@ -822,7 +807,7 @@ Running that code will produce this result:
 </pre>
 
 <a id="functions_that_may_fail"></a>
-<h2>7.2. Functions that may fail</h2>
+<h2>6.2. Functions that may fail</h2>
 
 <p>
 If you do not want the script to exit when the function is_broken throws an 
@@ -853,7 +838,7 @@ Running that code will produce this result:
 </pre>
 
 <a id="commands_and_printing_the_result"></a>
-<h2>7.3. Commands and printing the result</h2>
+<h2>6.3. Commands and printing the result</h2>
 
 <p>
 If you want to run a command and have its result printed, you can use the 
@@ -876,7 +861,7 @@ Produces the result:
 </pre>
 
 <a id="commands_and_getting_the_result"></a>
-<h2>7.4. Commands and getting the result</h2>
+<h2>6.4. Commands and getting the result</h2>
 
 <p>
 If you want to run a command and get its standard output, you can use the 
@@ -902,7 +887,7 @@ Produces the result:
 
 
 <a id="users"></a>
-<h1>8. Users</h1>
+<h1>. Users</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -910,7 +895,7 @@ import lib_raise_users as Users
 	</code></pre>
 
 <a id="users_running_as_root"></a>
-<h2>8.1. Running as Root</h2>
+<h2>7.1. Running as Root</h2>
 
 	<p>
 	If you want to ensure that a script is run as root. You can use the
@@ -945,7 +930,7 @@ Effective user id: 1000
 
 
 <a id="users_running_as_a_normal_user"></a>
-<h2>8.2. Running as a Normal User</h2>
+<h2>7.2. Running as a Normal User</h2>
 
 	<p>
 	If you want to ensure that a script is run as a normal user, you can 
@@ -980,7 +965,7 @@ Effective user id: 1000
 
 
 <a id="users_privilege_escalation"></a>
-<h2>8.3. Privilege Escalation</h2>
+<h2>7.3. Privilege Escalation</h2>
 
 	<p>
 	Often you will need do some actions as root, and others as a normal user, 
@@ -1009,7 +994,7 @@ ${template_info['users_privilege_escalation']['output']}
 
 
 <a id="users_user_name"></a>
-<h2>8.4. User Name</h2>
+<h2>7.4. User Name</h2>
 
 	<p>
 	When running a script with a privilege escalation tool such as 
@@ -1048,7 +1033,7 @@ Normal user name: matt
 	</pre>
 
 <a id="users_user_id"></a>
-<h2>8.5. User ID</h2>
+<h2>7.5. User ID</h2>
 
 	<p>
 	When running a script with a privilege escalation tool such as 
@@ -1090,7 +1075,7 @@ Normal user id: 1000
 
 
 <a id="file_system"></a>
-<h1>9. File System</h1>
+<h1>8. File System</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -1098,7 +1083,7 @@ import lib_raise_fs as FS
 	</code></pre>
 
 <a id="fs_change_dir"></a>
-<h2>9.1. Change Dir</h2>
+<h2>8.1. Change Dir</h2>
 
 	<p>
 	<span class="fun">change_dir(<span class="arg">name</span>)</span><br />
@@ -1123,7 +1108,7 @@ ${template_info['fs_change_dir']['output']}
 	</pre>
 
 <a id="fs_move_file"></a>
-<h2>9.2. Move File</h2>
+<h2>8.2. Move File</h2>
 
 	<p>
 	<span class="fun">move_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
@@ -1148,7 +1133,7 @@ ${template_info['fs_move_file']['output']}
 	</pre>
 
 <a id="fs_copy_file"></a>
-<h2>9.3. Copy File</h2>
+<h2>8.3. Copy File</h2>
 	<p>
 	<span class="fun">copy_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
 	Uses the standard Python <span class="fun">shutil.copy2</span> function to copy the file
@@ -1172,7 +1157,7 @@ ${template_info['fs_copy_file']['output']}
 	</pre>
 
 <a id="fs_copy_new_file"></a>
-<h2>9.4. Copy New File</h2>
+<h2>8.4. Copy New File</h2>
 	<p>
 	<span class="fun">copy_new_file(<span class="arg">source</span>, <span class="arg">dest</span>)</span><br />
 	Copies the file only if <span class="arg">dest</span> does not exist, or <span class="arg">source</span> is
@@ -1196,7 +1181,7 @@ ${template_info['fs_copy_new_file']['output']}
 	</pre>
 
 <a id="fs_copy_dir"></a>
-<h2>9.5. Copy Dir</h2>
+<h2>8.5. Copy Dir</h2>
 	<p>
 	<span class="fun">copy_dir(<span class="arg">source</span>, <span class="arg">dest</span>, <span class="arg">symlinks</span> = False)</span><br />
 	Uses the standard Python <span class="fun">shutil.copytree</span> function to recursively copy 
@@ -1222,7 +1207,7 @@ ${template_info['fs_copy_dir']['output']}
 	</pre>
 
 <a id="fs_make_dir"></a>
-<h2>9.6. Make Dir</h2>
+<h2>8.6. Make Dir</h2>
 	<p>
 	<span class="fun">make_dir(<span class="arg">source</span>, <span class="arg">ignore_failure</span> = False)</span><br />
 	Uses the standard Python <span class="fun">os.mkdir</span> function to make the 
@@ -1247,7 +1232,7 @@ ${template_info['fs_make_dir']['output']}
 	</pre>
 
 <a id="fs_remove_dir"></a>
-<h2>9.7. Remove Dir</h2>
+<h2>8.7. Remove Dir</h2>
 	<p>
 	<span class="fun">remove_dir(<span class="arg">name</span>, <span class="arg">and_children</span> = False)</span><br />
 	Uses the standard Python <span class="fun">shutil.rmtree</span> function to remove the 
@@ -1273,7 +1258,7 @@ ${template_info['fs_remove_dir']['output']}
 	</pre>
 
 <a id="fs_remove_file"></a>
-<h2>9.8. Remove File</h2>
+<h2>8.8. Remove File</h2>
 	<p>
 	<span class="fun">remove_file(<span class="arg">name</span>, <span class="arg">ignore_failure</span> = False)</span><br />
 	Uses the standard Python <span class="fun">os.rmdir</span> function to remove the 
@@ -1298,7 +1283,7 @@ ${template_info['fs_remove_file']['output']}
 	</pre>
 
 <a id="fs_remove_binaries"></a>
-<h2>9.9. Remove Binaries</h2>
+<h2>8.9. Remove Binaries</h2>
 	<p>
 	<span class="fun">remove_binaries(<span class="arg">name</span>)</span><br />
 	Will remove any files that start with <span class="arg">name</span>, and have the 
@@ -1323,7 +1308,7 @@ ${template_info['fs_remove_binaries']['output']}
 	</pre>
 
 <a id="fs_symlink"></a>
-<h2>9.10. Symlink</h2>
+<h2>8.10. Symlink</h2>
 	<p>
 	<span class="fun">symlink(<span class="arg">source</span>, <span class="arg">link_name</span>)</span><br />
 	Uses the standard Python <span class="fun">os.symlink</span> function to create a 
@@ -1350,7 +1335,7 @@ ${template_info['fs_symlink']['output']}
 
 
 <a id="terminal"></a>
-<h1>10. Terminal</h1>
+<h1>9. Terminal</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -1358,7 +1343,7 @@ import lib_raise_terminal as Terminal
 	</code></pre>
 
 <a id="terminal_ok"></a>
-<h2>10.1. Terminal OK</h2>
+<h2>9.1. Terminal OK</h2>
 	<p>
 	If you want to print your own OK message, you can use the 
 	<span class="fun">Terminal.status</span> and 
@@ -1382,7 +1367,7 @@ ${template_info['terminal_ok']['output']}
 	</pre>
 
 <a id="terminal_warning"></a>
-<h2>10.2. Terminal Warning</h2>
+<h2>9.2. Terminal Warning</h2>
 	<p>
 	If you want to print your own warning message, you can use the 
 	<span class="fun">Terminal.status</span> and 
@@ -1406,7 +1391,7 @@ ${template_info['terminal_warning']['output']}
 	</pre>
 
 <a id="terminal_fail"></a>
-<h2>10.3. Terminal Fail</h2>
+<h2>9.3. Terminal Fail</h2>
 	<p>
 	If you want to print your own fail message, you can use the 
 	<span class="fun">Terminal.status</span> and 
@@ -1434,7 +1419,7 @@ ${template_info['terminal_fail']['output']}
 
 
 <a id="find"></a>
-<h1>11. Finding Programs, Libraries, and Headers Files</h1>
+<h1>10. Finding Programs, Libraries, and Headers Files</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -1464,7 +1449,7 @@ Raise searches the OS packaging sources in this order:
 </ol>
 
 <a id="find_by_version"></a>
-<h2>11.1. Finding By Version</h2>
+<h2>10.1. Finding By Version</h2>
 	<p>
 	Version numbers use the standard format major.minor.micro. They are
 	stored in a named tuple. You can access the complete version as
@@ -1501,7 +1486,7 @@ ver.micro # 0
 	</code></pre>
 
 <a id="find_finding_programs"></a>
-<h2>11.2. Finding Programs</h2>
+<h2>10.2. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
 	<span class="fun">Find.program_paths</span> function. There is currently
@@ -1525,7 +1510,7 @@ ${template_info['find_finding_programs']['output']}
 	</pre>
 
 <a id="find_requiring_programs"></a>
-<h2>11.3. Requiring Programs</h2>
+<h2>10.3. Requiring Programs</h2>
 	<p>
 	You can make sure a program is installed, by using the 
 	<span class="fun">Find.require_programs</span> function. If the 
@@ -1550,7 +1535,7 @@ ${template_info['find_requiring_programs']['output']}
 	</pre>
 
 <a id="find_finding_libraries"></a>
-<h2>11.4. Finding Libraries</h2>
+<h2>10.4. Finding Libraries</h2>
 	<p>
 	You can find a library, by searching for it with the
 	<span class="fun">Find.get_static_library</span> and
@@ -1575,7 +1560,7 @@ ${template_info['find_finding_libraries']['output']}
 	</pre>
 
 <a id="find_requiring_libraries"></a>
-<h2>11.5. Requiring Libraries</h2>
+<h2>10.5. Requiring Libraries</h2>
 	<p>
 	You can make sure a library is installed, by using the 
 	<span class="fun">Find.require_static_library</span> and
@@ -1601,7 +1586,7 @@ ${template_info['find_requiring_libraries']['output']}
 	</pre>
 
 <a id="find_finding_headers"></a>
-<h2>11.6. Finding Headers Files</h2>
+<h2>10.6. Finding Headers Files</h2>
 	<p>
 	You can find a header file, by searching for it with the
 	<span class="fun">Find.get_header_file</span> function. Optionally
@@ -1625,7 +1610,7 @@ ${template_info['find_finding_headers']['output']}
 	</pre>
 
 <a id="find_requiring_headers"></a>
-<h2>11.7. Requiring Headers Files</h2>
+<h2>10.7. Requiring Headers Files</h2>
 	<p>
 	You can make sure a header file is installed, by using the 
 	<span class="fun">Find.require_header_file</span> function. 
@@ -1650,7 +1635,7 @@ ${template_info['find_requiring_headers']['output']}
 	</pre>
 
 <a id="find_requiring_environmental_variables"></a>
-<h2>11.8. Requiring Environmental Variables</h2>
+<h2>10.8. Requiring Environmental Variables</h2>
 	<p>
 	You can search for environmental variables by using the 
 	<span class="fun">Find.require_environmental_variable</span> function. 
@@ -1673,7 +1658,7 @@ ${template_info['find_requiring_environmental_variable']['output']}
 	</pre>
 
 <a id="find_requiring_python_modules"></a>
-<h2>11.8. Requiring Python Modules</h2>
+<h2>10.9. Requiring Python Modules</h2>
 	<p>
 	You can make sure Python modules are installed by using the 
 	<span class="fun">Python.require_python_modules</span> function. 
@@ -1699,7 +1684,7 @@ ${template_info['find_requiring_python_modules']['output']}
 
 
 <a id="c"></a>
-<h1>12. C</h1>
+<h1>11. C</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -1708,7 +1693,7 @@ import lib_raise_ar as AR
 	</code></pre>
 
 <a id="c_file_extensions"></a>
-<h2>12.1. C File Extensions</h2>
+<h2>11.1. C File Extensions</h2>
 
 	<p>
 	Many C compilers/OSes use different extensions for different types of 
@@ -1761,7 +1746,7 @@ import lib_raise_ar as AR
 	</table>
 
 <a id="c_compilers"></a>
-<h2>12.2. C Compilers</h2>
+<h2>11.2. C Compilers</h2>
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C compilers. The compiler
@@ -1797,7 +1782,7 @@ ${template_info['c_compilers']['output']}
 	</pre>
 
 <a id="c_compiler_setup"></a>
-<h2>12.3. C Compiler Setup</h2>
+<h2>11.3. C Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -1852,7 +1837,7 @@ ${template_info['c_compiler_setup']['output']}
 	</pre>
 
 <a id="c_building_object"></a>
-<h2>12.4. C Building Object</h2>
+<h2>11.4. C Building Object</h2>
 
 	<p>
 		C object files can be built using the <span class="fun">C.build_object</span> function.
@@ -1875,7 +1860,7 @@ ${template_info['c_building_object']['output']}
 	</pre>
 
 <a id="c_building_program"></a>
-<h2>12.5. C Building Program</h2>
+<h2>11.5. C Building Program</h2>
 
 	<p>
 		C programs can be built using the <span class="fun">C.build_program</span> function.
@@ -1898,7 +1883,7 @@ ${template_info['c_building_program']['output']}
 	</pre>
 
 <a id="c_building_library"></a>
-<h2>12.6. C Building Library</h2>
+<h2>11.6. C Building Library</h2>
 
 	<p>
 		C shared library can be built using the 
@@ -1924,7 +1909,7 @@ ${template_info['c_building_library']['output']}
 	</pre>
 
 <a id="c_program_installation_and_uninstallation"></a>
-<h2>12.7. C Program Installation and Uninstallation</h2>
+<h2>11.7. C Program Installation and Uninstallation</h2>
 
 	<p>
 		C programs can be installed with the <span class="fun">C.install_program</span> function, and
@@ -1949,7 +1934,7 @@ ${template_info['c_program_installation_and_uninstallation']['output']}
 
 
 <a id="c_library_installation_and_uninstallation"></a>
-<h2>12.8. C Library Installation and Uninstallation</h2>
+<h2>11.8. C Library Installation and Uninstallation</h2>
 
 	<p>
 		C libraries can be installed with the <span class="fun">C.install_library</span> function, and
@@ -1974,7 +1959,7 @@ ${template_info['c_library_installation_and_uninstallation']['output']}
 
 
 <a id="c_header_installation_and_uninstallation"></a>
-<h2>12.9. C Header Installation and Uninstallation</h2>
+<h2>11.9. C Header Installation and Uninstallation</h2>
 
 	<p>
 		C headers can be installed with the <span class="fun">C.install_header</span> function, and
@@ -1999,7 +1984,7 @@ ${template_info['c_header_installation_and_uninstallation']['output']}
 
 
 <a id="c_running_and_printing"></a>
-<h2>12.10. C Running and Printing</h2>
+<h2>11.10. C Running and Printing</h2>
 
 	<p>
 		C programs can be ran with the <span class="fun">C.run_print</span> function.
@@ -2026,7 +2011,7 @@ ${template_info['c_running_and_printing']['output']}
 
 
 <a id="cxx"></a>
-<h1>13. C++</h1>
+<h1>12. C++</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -2035,7 +2020,7 @@ import lib_raise_ar as AR
 	</code></pre>
 
 <a id="cxx_file_extensions"></a>
-<h2>13.1. C++ File Extensions</h2>
+<h2>12.1. C++ File Extensions</h2>
 
 	<p>
 	Many C++ compilers/OSes use different extensions for different types of 
@@ -2088,7 +2073,7 @@ import lib_raise_ar as AR
 	</table>
 
 <a id="cxx_compilers"></a>
-<h2>13.2. C++ Compilers</h2>
+<h2>12.2. C++ Compilers</h2>
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C++ compilers. The compiler
@@ -2124,7 +2109,7 @@ ${template_info['cxx_compilers']['output']}
 	</pre>
 
 <a id="cxx_compiler_setup"></a>
-<h2>13.3. C++ Compiler Setup</h2>
+<h2>12.3. C++ Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2177,7 +2162,7 @@ ${template_info['cxx_compiler_setup']['output']}
 	</pre>
 
 <a id="cxx_building_object"></a>
-<h2>13.4. C++ Building Object</h2>
+<h2>12.4. C++ Building Object</h2>
 
 	<p>
 		C++ object files can be built using the <span class="fun">CXX.build_object</span> function.
@@ -2200,7 +2185,7 @@ ${template_info['cxx_building_object']['output']}
 	</pre>
 
 <a id="cxx_building_program"></a>
-<h2>13.5. C++ Building Program</h2>
+<h2>12.5. C++ Building Program</h2>
 
 	<p>
 		C++ programs can be built using the <span class="fun">CXX.build_program</span> function.
@@ -2223,7 +2208,7 @@ ${template_info['cxx_building_program']['output']}
 	</pre>
 
 <a id="cxx_building_library"></a>
-<h2>13.6. C++ Building Library</h2>
+<h2>12.6. C++ Building Library</h2>
 
 	<p>
 		C++ shared library can be built using the 
@@ -2249,7 +2234,7 @@ ${template_info['cxx_building_library']['output']}
 	</pre>
 
 <a id="cxx_program_installation_and_uninstallation"></a>
-<h2>13.7.C++ Program Installation and Uninstallation</h2>
+<h2>12.7.C++ Program Installation and Uninstallation</h2>
 
 	<p>
 		C++ programs can be installed with the <span class="fun">CXX.install_program</span> function, and
@@ -2274,7 +2259,7 @@ ${template_info['cxx_program_installation_and_uninstallation']['output']}
 
 
 <a id="cxx_library_installation_and_uninstallation"></a>
-<h2>13.8. C++ Library Installation and Uninstallation</h2>
+<h2>12.8. C++ Library Installation and Uninstallation</h2>
 
 	<p>
 		C++ libraries can be installed with the <span class="fun">CXX.install_library</span> function, and
@@ -2299,7 +2284,7 @@ ${template_info['cxx_library_installation_and_uninstallation']['output']}
 
 
 <a id="cxx_header_installation_and_uninstallation"></a>
-<h2>13.9. C++ Header Installation and Uninstallation</h2>
+<h2>12.9. C++ Header Installation and Uninstallation</h2>
 
 	<p>
 		C++ headers can be installed with the <span class="fun">CXX.install_header</span> function, and
@@ -2324,7 +2309,7 @@ ${template_info['cxx_header_installation_and_uninstallation']['output']}
 
 
 <a id="cxx_running_and_printing"></a>
-<h2>13.10. C++ Running and Printing</h2>
+<h2>12.10. C++ Running and Printing</h2>
 
 	<p>
 		C++ programs can be ran with the <span class="fun">CXX.run_print</span> function.
@@ -2351,7 +2336,7 @@ ${template_info['cxx_running_and_printing']['output']}
 
 
 <a id="d"></a>
-<h1>14. D</h1>
+<h1>13. D</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -2359,7 +2344,7 @@ import lib_raise_d as D
 	</code></pre>
 
 <a id="d_file_extensions"></a>
-<h2>14.1. D File Extensions</h2>
+<h2>13.1. D File Extensions</h2>
 
 	<p>
 	Many D compilers/OSes use different extensions for different types of 
@@ -2407,7 +2392,7 @@ import lib_raise_d as D
 	</table>
 
 <a id="d_compilers"></a>
-<h2>14.2. D Compilers</h2>
+<h2>13.2. D Compilers</h2>
 
 	<p>
 		Raise supports the DMD, and LDC, D compilers (not GDC). The compiler
@@ -2443,7 +2428,7 @@ ${template_info['d_compilers']['output']}
 	</pre>
 
 <a id="d_compiler_setup"></a>
-<h2>14.3. D Compiler Setup</h2>
+<h2>13.3. D Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2474,7 +2459,7 @@ ${template_info['d_compiler_setup']['output']}
 	</pre>
 
 <a id="d_building_object"></a>
-<h2>14.4. D Building Object</h2>
+<h2>13.4. D Building Object</h2>
 
 	<p>
 		D object files can be built using the <span class="fun">D.build_object</span> function.
@@ -2497,7 +2482,7 @@ ${template_info['d_building_object']['output']}
 	</pre>
 
 <a id="d_building_program"></a>
-<h2>14.5. D Building Program</h2>
+<h2>13.5. D Building Program</h2>
 
 	<p>
 		D programs can be built using the <span class="fun">D.build_program</span> function.
@@ -2520,7 +2505,7 @@ ${template_info['d_building_program']['output']}
 	</pre>
 
 <a id="d_building_library"></a>
-<h2>14.6. D Building Library</h2>
+<h2>3.6. D Building Library</h2>
 
 	<p>
 		D static library can be built using the <span class="fun">D.build_static_library</span> function.
@@ -2544,7 +2529,7 @@ ${template_info['d_building_library']['output']}
 	</pre>
 
 <a id="d_building_interface"></a>
-<h2>14.7. D Building Interface</h2>
+<h2>13.7. D Building Interface</h2>
 
 	<p>
 		D interface can be built using the <span class="fun">D.build_interface</span> function.
@@ -2567,7 +2552,7 @@ ${template_info['d_building_interface']['output']}
 	</pre>
 
 <a id="d_program_installation_and_uninstallation"></a>
-<h2>14.8. D Program Installation and Uninstallation</h2>
+<h2>13.8. D Program Installation and Uninstallation</h2>
 
 	<p>
 		D programs can be installed with the <span class="fun">D.install_program</span> function, and
@@ -2592,7 +2577,7 @@ ${template_info['d_program_installation_and_uninstallation']['output']}
 
 
 <a id="d_library_installation_and_uninstallation"></a>
-<h2>14.9. D Library Installation and Uninstallation</h2>
+<h2>13.9. D Library Installation and Uninstallation</h2>
 
 	<p>
 		D libraries can be installed with the <span class="fun">D.install_library</span> function, and
@@ -2617,7 +2602,7 @@ ${template_info['d_library_installation_and_uninstallation']['output']}
 
 
 <a id="d_interface_installation_and_uninstallation"></a>
-<h2>14.10. D Interface Installation and Uninstallation</h2>
+<h2>13.10. D Interface Installation and Uninstallation</h2>
 
 	<p>
 		D interfaces can be installed with the <span class="fun">D.install_interface</span> function, and
@@ -2642,7 +2627,7 @@ ${template_info['d_interface_installation_and_uninstallation']['output']}
 
 
 <a id="d_running_and_printing"></a>
-<h2>14.11. D Running and Printing</h2>
+<h2>13.11. D Running and Printing</h2>
 
 	<p>
 		D programs can be ran with the <span class="fun">D.run_print</span> function.
@@ -2669,7 +2654,7 @@ ${template_info['d_running_and_printing']['output']}
 
 
 <a id="csharp"></a>
-<h1>15. C#</h1>
+<h1>14. C#</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -2677,7 +2662,7 @@ import lib_raise_csharp as CS
 	</code></pre>
 
 <a id="csharp_compilers"></a>
-<h2>15.1. C# Compilers</h2>
+<h2>14.1. C# Compilers</h2>
 
 	<p>
 		Raise supports the Mono, and MS.NET C# compilers. The compiler
@@ -2713,7 +2698,7 @@ ${template_info['csharp_compilers']['output']}
 	</pre>
 
 <a id="csharp_compiler_setup"></a>
-<h2>15.2. C# Compiler Setup</h2>
+<h2>14.2. C# Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2743,7 +2728,7 @@ ${template_info['csharp_compiler_setup']['output']}
 	</pre>
 
 <a id="csharp_building_program"></a>
-<h2>15.3. C# Building Program</h2>
+<h2>14.3. C# Building Program</h2>
 	<p>
 		C# programs can be built using the <span class="fun">CS.build_program</span> function.
 	</p>
@@ -2765,7 +2750,7 @@ ${template_info['csharp_building_program']['output']}
 	</pre>
 
 <a id="csharp_building_library"></a>
-<h2>15.4. C# Building Library</h2>
+<h2>14.4. C# Building Library</h2>
 	<p>
 		C# static library can be built using the <span class="fun">CS.build_shared_library</span> function.
 	</p>
@@ -2787,7 +2772,7 @@ ${template_info['csharp_building_library']['output']}
 	</pre>
 
 <a id="csharp_program_installation_and_uninstallation"></a>
-<h2>15.5. C# Program Installation and Uninstallation</h2>
+<h2>14.5. C# Program Installation and Uninstallation</h2>
 
 	<p>
 		C# programs can be installed with the <span class="fun">CS.install_program</span> function, and
@@ -2811,7 +2796,7 @@ ${template_info['csharp_program_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="csharp_library_installation_and_uninstallation"></a>
-<h2>15.6. C# Library Installation and Uninstallation</h2>
+<h2>14.6. C# Library Installation and Uninstallation</h2>
 	<p>
 		C# libraries can be installed with the <span class="fun">CS.install_library</span> function, and
 		uninstalled with the <span class="fun">CS.uninstall_library</span> function.
@@ -2834,7 +2819,7 @@ ${template_info['csharp_library_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="csharp_running_and_printing"></a>
-<h2>15.7. C# Running and Printing</h2>
+<h2>14.7. C# Running and Printing</h2>
 	<p>
 		C# programs can be ran with the <span class="fun">CS.run_print</span> function.
 	</p>
@@ -2860,7 +2845,7 @@ ${template_info['csharp_running_and_printing']['output']}
 
 
 <a id="java"></a>
-<h1>16. Java</h1>
+<h1>15. Java</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -2868,7 +2853,7 @@ import lib_raise_java as Java
 	</code></pre>
 
 <a id="java_compilers"></a>
-<h2>16.1. Java Compilers</h2>
+<h2>15.1. Java Compilers</h2>
 
 	<p>
 		Raise supports the OpenJDK 7 Java compiler. The compiler
@@ -2904,7 +2889,7 @@ ${template_info['java_compilers']['output']}
 	</pre>
 
 <a id="java_compiler_setup"></a>
-<h2>16.2. Java Compiler Setup</h2>
+<h2>15.2. Java Compiler Setup</h2>
 	<p>
 		After the compiler is selected, it can be configured 
 		using the properties.
@@ -2934,7 +2919,7 @@ ${template_info['java_compiler_setup']['output']}
 	</pre>
 
 <a id="java_building_program"></a>
-<h2>16.3. Java Building Program</h2>
+<h2>15.3. Java Building Program</h2>
 	<p>
 		Java programs can be built using the <span class="fun">Java.build_program</span> function.
 	</p>
@@ -2956,7 +2941,7 @@ ${template_info['java_building_program']['output']}
 	</pre>
 
 <a id="java_building_library"></a>
-<h2>16.4. Java Building Library</h2>
+<h2>15.4. Java Building Library</h2>
 	<p>
 		Java static library can be built using the <span class="fun">Java.build_shared_library</span> function.
 	</p>
@@ -2978,7 +2963,7 @@ ${template_info['java_building_library']['output']}
 	</pre>
 
 <a id="java_program_installation_and_uninstallation"></a>
-<h2>16.5. Java Program Installation and Uninstallation</h2>
+<h2>15.5. Java Program Installation and Uninstallation</h2>
 
 	<p>
 		Java programs can be installed with the <span class="fun">Java.install_program</span> function, and
@@ -3002,7 +2987,7 @@ ${template_info['java_program_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="java_library_installation_and_uninstallation"></a>
-<h2>16.6. Java Library Installation and Uninstallation</h2>
+<h2>15.6. Java Library Installation and Uninstallation</h2>
 	<p>
 		Java libraries can be installed with the <span class="fun">Java.install_library</span> function, and
 		uninstalled with the <span class="fun">Java.uninstall_library</span> function.
@@ -3025,7 +3010,7 @@ ${template_info['java_library_installation_and_uninstallation']['output']}
 	</pre>
 
 <a id="java_running_and_printing"></a>
-<h2>16.7. Java Running and Printing</h2>
+<h2>15.7. Java Running and Printing</h2>
 	<p>
 		Java programs can be ran with the <span class="fun">Java.run_print</span> function.
 	</p>
@@ -3051,7 +3036,7 @@ ${template_info['java_running_and_printing']['output']}
 
 
 <a id="concurrency"></a>
-<h1>17. Concurrency</h1>
+<h1>16. Concurrency</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -3088,7 +3073,7 @@ ${template_info['concurrency']['output']}
 
 
 <a id="cpu"></a>
-<h1>18. CPU</h1>
+<h1>17. CPU</h1>
 
 	<pre><code data-language="python">
 # Most of this section requires the modules:
@@ -3127,7 +3112,7 @@ ${template_info['cpu']['output']}
 
 
 <a id="tools"></a>
-<h1>19. Tools</h1>
+<h1>18. Tools</h1>
 
 <p>
 If you choose to do development on Raise itself, there are some tools that
@@ -3138,7 +3123,7 @@ will do.
 </p>
 
 <a id="tools_update_raise_in_sub_directories"></a>
-<h2>19.1. Update Raise in Sub Directories</h2>
+<h2>18.1. Update Raise in Sub Directories</h2>
 
 	<p>
 	If you make changes to the root "raise" file, you will want those
