@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 13th 2014
+Last updated on September 14th 2014
 </p>
 
 <p>
@@ -334,7 +334,7 @@ process, as its own line.
 		<li>Should run without needing to be installed.</li>
 		<li>Should be small enough to include in your VCS and ship with your software.</li>
 		<li>Should not require any external dependencies, libraries, or tools.</li>
-		<li>Should do everything implicitly instead of explicitly.</li>
+		<li>Should do everything explicitly instead of implicitly.</li>
 		<li>Should work consistently across platforms.</li>
 		<li>Should easily do things sequentially or concurrently.</li>
 		<li>Should present output in a uniform and intuitive way.</li>
