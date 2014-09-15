@@ -1,4 +1,5 @@
 * Release 0.5.0
+	* Fixed Bug #1368959: 'Running gcc when not installed on OS X pops up a gui'.
 
 2014-09-12 Release 0.4.0
 	* Fixed Bug #1365825: 'Add a help menu'.

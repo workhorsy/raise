@@ -59,6 +59,13 @@ def setup():
 	global c_compilers
 	global missing_compilers
 
+	# Figure out if OS X has the dev tools installed
+	OSX_HAS_TOOLS = False
+	if Config.os_type in OSType.MacOS:
+		result = findlib.run_and_get_stdout('pkgutil --pkg-info=com.apple.pkg.CLTools_Executables')
+		if result:
+			OSX_HAS_TOOLS = True
+
 	# Get the names and paths for know C compilers
 	names = ['gcc', 'clang', 'cl.exe']
 	for name in names:
@@ -82,8 +89,8 @@ def setup():
 
 		if name == 'gcc':
 			# On Mac OS X skip this compiler if it is clang pretending to be gcc
-			if Config.os_type in OSType.MacOS:
-				version = Process.run_and_get_stdout('gcc --version')
+			if Config.os_type in OSType.MacOS and OSX_HAS_TOOLS:
+				version = findlib.run_and_get_stdout('gcc --version')
 				if version and 'clang' in version.lower():
 					missing_compilers.append(name)
 					continue

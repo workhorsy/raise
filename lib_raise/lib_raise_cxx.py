@@ -57,6 +57,13 @@ def setup():
 	global cxx_compilers
 	global missing_compilers
 
+	# Figure out if OS X has the dev tools installed
+	OSX_HAS_TOOLS = False
+	if Config.os_type in OSType.MacOS:
+		result = findlib.run_and_get_stdout('pkgutil --pkg-info=com.apple.pkg.CLTools_Executables')
+		if result:
+			OSX_HAS_TOOLS = True
+
 	# Get the names and paths for known C++ compilers
 	names = ['g++', 'clang++', 'cl.exe']
 	for name in names:
@@ -78,7 +85,7 @@ def setup():
 
 		if name == 'g++':
 			# On Mac OS X skip this compiler if it is clang pretending to be g++
-			if Config.os_type in OSType.MacOS:
+			if Config.os_type in OSType.MacOS and OSX_HAS_TOOLS:
 				version = findlib.run_and_get_stdout('g++ --version')
 				if version and 'clang' in version.lower():
 					missing_compilers.append(name)
