@@ -34,6 +34,7 @@ import lib_raise_helpers as Helpers
 import lib_raise_config as Config
 import lib_raise_users as Users
 
+import osinfo
 import cpuinfo
 import findlib
 
@@ -51,6 +52,48 @@ utilization_thread = None
 is_utilization_thread_running = False
 
 
+def _get_utilization_thread_linux():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'top -b -n 2 -d 1'
+
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split("%Cpu(s):")[2]
+		out = out.split('\n')[0]
+		out = out.split(',')
+
+		# Add the percentages to get the real cpu usage
+		speed = \
+		float(out[0].split('us')[0]) + \
+		float(out[1].split('sy')[0]) + \
+		float(out[2].split('ni')[0])
+
+		cpu_utilization = speed
+
+def _get_utilization_thread_unix():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'top -b -P -s 2 -d 2'
+
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split("CPU:")[1]
+		out = out.split('\n')[0]
+		out = out.split(',')
+
+		# Add the percentages to get the real cpu usage
+		speed = \
+		float(out[0].split('% user')[0]) + \
+		float(out[1].split('% nice')[0]) + \
+		float(out[2].split('% system')[0])
+
+		cpu_utilization = speed
+
 def get_utilization():
 	global cpu_utilization
 	return cpu_utilization
@@ -58,28 +101,11 @@ def get_utilization():
 def start_get_utilization_thread():
 	global utilization_thread
 
-	def real_get_utilization():
-		global cpu_utilization
-		global is_utilization_thread_running
+	if Config.os_type in osinfo.OSType.Linux:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_linux, args=())
+	elif Config.os_type in osinfo.OSType.Unix:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_unix, args=())
 
-		command = 'top -b -n 2 -d 1'
-
-		while is_utilization_thread_running:
-			# Get the cpu percentages
-			out = findlib.run_and_get_stdout(command)
-			out = out.split("%Cpu(s):")[2]
-			out = out.split('\n')[0]
-			out = out.split(',')
-
-			# Add the percentages to get the real cpu usage
-			speed = \
-			float(out[0].split('us')[0]) + \
-			float(out[1].split('sy')[0]) + \
-			float(out[2].split('ni')[0])
-
-			cpu_utilization = speed
-
-	utilization_thread = threading.Thread(target=real_get_utilization, args=())
 	utilization_thread.daemon = True
 	utilization_thread.start()
 
