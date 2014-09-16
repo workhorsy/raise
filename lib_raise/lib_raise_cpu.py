@@ -25,10 +25,16 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import cpuinfo
+import sys, os, re
+import subprocess
+import threading
+
 import lib_raise_helpers as Helpers
 import lib_raise_config as Config
 import lib_raise_users as Users
+
+import cpuinfo
+import findlib
 
 
 arch = None
@@ -39,7 +45,39 @@ vendor_name = None
 flags = []
 cpus_total = None
 cpus_free = None
+cpu_utilization = 0.0
+utilization_thread = None
 
+
+def get_utilization():
+	global cpu_utilization
+	return cpu_utilization
+
+def start_get_utilization_thread():
+	global utilization_thread
+
+	def real_get_utilization():
+		global cpu_utilization
+		command = 'top -b -n 2 -d 1'
+
+		while True:
+			# Get the cpu percentages
+			out = findlib.run_and_get_stdout(command)
+			out = out.split("%Cpu(s):")[2]
+			out = out.split('\n')[0]
+			out = out.split(',')
+
+			# Add the percentages to get the real cpu usage
+			speed = \
+			float(out[0].split('us')[0]) + \
+			float(out[1].split('sy')[0]) + \
+			float(out[2].split('ni')[0])
+
+			cpu_utilization = speed
+
+	utilization_thread = threading.Thread(target=real_get_utilization, args=())
+	utilization_thread.daemon = True
+	utilization_thread.start()
 
 def setup():
 	global arch
@@ -82,6 +120,8 @@ def setup():
 	# Figure out how many cpus there are
 	cpus_total = info['count']
 	cpus_free = cpus_total
+
+	start_get_utilization_thread()
 
 setup()
 

@@ -127,24 +127,21 @@ def concurrent_end():
 			# Success. Keep going
 			if event._status == 'success':
 				running_events.remove(event)
-				CPU.cpus_free += 1
 			# Failure. Stop events and exit
 			elif event._status == 'failure':
 				Print.exit("Event failed.")
 
 		# Check for events that need to start
-		while CPU.cpus_free > 0 and len(ready_events):
+		while CPU.get_utilization() < 95.0 and len(ready_events):
 			event = ready_events.pop()
 			if event.run():
-				CPU.cpus_free -= 1
 				running_events.insert(0, event)
 
 		# Sleep if all the cpu cores are busy, or have already started
-		if CPU.cpus_free == 0 or len(ready_events) == 0:
-			time.sleep(0.1)
+		#if CPU.get_utilization() >= 95.0:
+		#	time.sleep(0.1)
 
 	# Clear all the events
-	CPU.cpus_free = CPU.cpus_total
 	Event.events = []
 	Event.is_concurrent = False
 	Event.is_first_concurrent = False
