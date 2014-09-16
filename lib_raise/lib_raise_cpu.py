@@ -28,6 +28,7 @@
 import sys, os, re
 import subprocess
 import threading
+import atexit
 
 import lib_raise_helpers as Helpers
 import lib_raise_config as Config
@@ -47,6 +48,7 @@ cpus_total = None
 cpus_free = None
 cpu_utilization = 0.0
 utilization_thread = None
+is_utilization_thread_running = False
 
 
 def get_utilization():
@@ -58,9 +60,11 @@ def start_get_utilization_thread():
 
 	def real_get_utilization():
 		global cpu_utilization
+		global is_utilization_thread_running
+
 		command = 'top -b -n 2 -d 1'
 
-		while True:
+		while is_utilization_thread_running:
 			# Get the cpu percentages
 			out = findlib.run_and_get_stdout(command)
 			out = out.split("%Cpu(s):")[2]
@@ -123,6 +127,18 @@ def setup():
 
 	start_get_utilization_thread()
 
+def exit_module():
+	global utilization_thread
+	global is_utilization_thread_running
+
+	if utilization_thread:
+		is_utilization_thread_running = False
+		utilization_thread.join()
+		utilization_thread = None
+
 setup()
+atexit.register(exit_module)
+
+
 
 

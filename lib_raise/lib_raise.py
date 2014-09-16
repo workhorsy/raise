@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.5.0 dev - September 14 2014) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.5.0 dev - September 15 2014) http://launchpad.net/raise")
 		print("COMMANDS:")
 		print("    ./raise help    - Print the help menu")
 		print("    ./raise update  - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
