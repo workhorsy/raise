@@ -94,6 +94,24 @@ def _get_utilization_thread_unix():
 
 		cpu_utilization = speed
 
+def _get_utilization_thread_beos():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'top -d -i 2 -n 2'
+
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split("------")[1]
+		out = out.split('% TOTAL')[0]
+		out = out.split()
+
+		# Add the percentages to get the real cpu usage
+		speed = float(out[-1])
+
+		cpu_utilization = speed
+
 def get_utilization():
 	global cpu_utilization
 	return cpu_utilization
@@ -105,6 +123,8 @@ def start_get_utilization_thread():
 		utilization_thread = threading.Thread(target=_get_utilization_thread_linux, args=())
 	elif Config.os_type in osinfo.OSType.Unix:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_unix, args=())
+	elif Config.os_type in osinfo.OSType.BeOS:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_beos, args=())
 
 	utilization_thread.daemon = True
 	utilization_thread.start()
