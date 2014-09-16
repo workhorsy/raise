@@ -58,6 +58,7 @@ def _get_utilization_thread_linux():
 
 	command = 'top -b -n 2 -d 1'
 
+	is_utilization_thread_running = True
 	while is_utilization_thread_running:
 		# Get the cpu percentages
 		out = findlib.run_and_get_stdout(command)
@@ -73,12 +74,13 @@ def _get_utilization_thread_linux():
 
 		cpu_utilization = speed
 
-def _get_utilization_thread_unix():
+def _get_utilization_thread_bsd():
 	global cpu_utilization
 	global is_utilization_thread_running
 
 	command = 'top -b -P -s 2 -d 2'
 
+	is_utilization_thread_running = True
 	while is_utilization_thread_running:
 		# Get the cpu percentages
 		out = findlib.run_and_get_stdout(command)
@@ -94,12 +96,35 @@ def _get_utilization_thread_unix():
 
 		cpu_utilization = speed
 
+def _get_utilization_thread_solaris():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'top -b -s 2 -d 2'
+
+	is_utilization_thread_running = True
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split("CPU states: ")[2]
+		out = out.split('\n')[0]
+		out = out.split(',')
+
+		# Add the percentages to get the real cpu usage
+		speed = \
+		float(out[0].split('% user')[0]) + \
+		float(out[1].split('% nice')[0]) + \
+		float(out[2].split('% kernel')[0])
+
+		cpu_utilization = speed
+
 def _get_utilization_thread_beos():
 	global cpu_utilization
 	global is_utilization_thread_running
 
 	command = 'top -d -i 2 -n 2'
 
+	is_utilization_thread_running = True
 	while is_utilization_thread_running:
 		# Get the cpu percentages
 		out = findlib.run_and_get_stdout(command)
@@ -119,10 +144,16 @@ def get_utilization():
 def start_get_utilization_thread():
 	global utilization_thread
 
-	if Config.os_type in osinfo.OSType.Linux:
+	# Linux & Cygwin
+	if Config.os_type in osinfo.OSType.Linux or Config.os_type in osinfo.OSType.Cywgin:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_linux, args=())
-	elif Config.os_type in osinfo.OSType.Unix:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_unix, args=())
+	# BSD & OS X
+	elif Config.os_type in osinfo.OSType.BSD or Config.os_type in osinfo.OSType.MacOS:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_bsd, args=())
+	# Solaris
+	elif Config.os_type in osinfo.OSType.Solaris:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_solaris, args=())
+	# BeOS
 	elif Config.os_type in osinfo.OSType.BeOS:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_beos, args=())
 
