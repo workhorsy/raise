@@ -137,6 +137,23 @@ def _get_utilization_thread_beos():
 
 		cpu_utilization = speed
 
+def _get_utilization_thread_windows():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'wmic cpu get loadpercentage'
+
+	is_utilization_thread_running = True
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split()[-1]
+
+		# Add the percentages to get the real cpu usage
+		speed = float(out)
+
+		cpu_utilization = speed
+
 def get_utilization():
 	global cpu_utilization
 	return cpu_utilization
@@ -156,6 +173,9 @@ def start_get_utilization_thread():
 	# BeOS
 	elif Config.os_type in osinfo.OSType.BeOS:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_beos, args=())
+	# Windows
+	elif Config.os_type in osinfo.OSType.Windows:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_windows, args=())
 
 	utilization_thread.daemon = True
 	utilization_thread.start()
