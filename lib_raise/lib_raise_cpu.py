@@ -77,9 +77,9 @@ def _get_utilization_thread_linux():
 def _get_utilization_thread_bsd():
 	global cpu_utilization
 	global is_utilization_thread_running
-
+	
 	command = 'top -b -P -s 2 -d 2'
-
+	
 	is_utilization_thread_running = True
 	while is_utilization_thread_running:
 		# Get the cpu percentages
@@ -87,12 +87,33 @@ def _get_utilization_thread_bsd():
 		out = out.split("CPU:")[1]
 		out = out.split('\n')[0]
 		out = out.split(',')
-
+		
 		# Add the percentages to get the real cpu usage
 		speed = \
 		float(out[0].split('% user')[0]) + \
 		float(out[1].split('% nice')[0]) + \
 		float(out[2].split('% system')[0])
+		
+		cpu_utilization = speed
+
+def _get_utilization_thread_osx():
+	global cpu_utilization
+	global is_utilization_thread_running
+
+	command = 'top -F -l 2 -i 2 -n 0'
+
+	is_utilization_thread_running = True
+	while is_utilization_thread_running:
+		# Get the cpu percentages
+		out = findlib.run_and_get_stdout(command)
+		out = out.split("CPU usage:")[2]
+		out = out.split('\n')[0]
+		out = out.split(',')
+
+		# Add the percentages to get the real cpu usage
+		speed = \
+		float(out[0].split('% user')[0]) + \
+		float(out[1].split('% sys')[0])
 
 		cpu_utilization = speed
 
@@ -162,11 +183,14 @@ def start_get_utilization_thread():
 	global utilization_thread
 
 	# Linux & Cygwin
-	if Config.os_type in osinfo.OSType.Linux or Config.os_type in osinfo.OSType.Cywgin:
+	if Config.os_type in osinfo.OSType.Linux or Config.os_type in osinfo.OSType.Cygwin:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_linux, args=())
-	# BSD & OS X
-	elif Config.os_type in osinfo.OSType.BSD or Config.os_type in osinfo.OSType.MacOS:
+	# BSD
+	elif Config.os_type in osinfo.OSType.BSD:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_bsd, args=())
+	# OS X
+	elif Config.os_type in osinfo.OSType.MacOS:
+		utilization_thread = threading.Thread(target=_get_utilization_thread_osx, args=())
 	# Solaris
 	elif Config.os_type in osinfo.OSType.Solaris:
 		utilization_thread = threading.Thread(target=_get_utilization_thread_solaris, args=())
@@ -235,7 +259,5 @@ def exit_module():
 
 setup()
 atexit.register(exit_module)
-
-
 
 
