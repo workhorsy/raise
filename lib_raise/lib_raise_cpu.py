@@ -52,128 +52,94 @@ utilization_thread = None
 is_utilization_thread_running = False
 
 
-def _get_utilization_thread_linux():
+def _get_utilization_thread():
 	global cpu_utilization
 	global is_utilization_thread_running
-
-	command = 'top -b -n 2 -d 1'
 
 	is_utilization_thread_running = True
 	while is_utilization_thread_running:
 		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split("%Cpu(s):")[2]
-		out = out.split('\n')[0]
-		out = out.split(',')
+		speed = 0
+		out = None
 
-		# Add the percentages to get the real cpu usage
-		speed = \
-		float(out[0].split('us')[0]) + \
-		float(out[1].split('sy')[0]) + \
-		float(out[2].split('ni')[0])
+		if Config.os_type in osinfo.OSType.Linux or Config.os_type in osinfo.OSType.Cygwin:
+			command = 'top -b -n 2 -d 1'
+			out = findlib.run_and_get_stdout(command)
 
-		cpu_utilization = speed
+			# Get the cpu percentages
+			out = out.split("%Cpu(s):")[2]
+			out = out.split('\n')[0]
+			out = out.split(',')
 
-def _get_utilization_thread_bsd():
-	global cpu_utilization
-	global is_utilization_thread_running
-	
-	command = 'top -b -P -s 2 -d 2'
-	
-	is_utilization_thread_running = True
-	while is_utilization_thread_running:
-		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split("CPU:")[1]
-		out = out.split('\n')[0]
-		out = out.split(',')
+			# Add the percentages to get the real cpu usage
+			speed = \
+			float(out[0].split('us')[0]) + \
+			float(out[1].split('sy')[0]) + \
+			float(out[2].split('ni')[0])
+		elif Config.os_type in osinfo.OSType.BSD:
+			command = 'top -b -P -s 2 -d 2'
+			out = findlib.run_and_get_stdout(command)
+
+			# Get the cpu percentages
+			out = out.split("CPU:")[1]
+			out = out.split('\n')[0]
+			out = out.split(',')
 		
-		# Add the percentages to get the real cpu usage
-		speed = \
-		float(out[0].split('% user')[0]) + \
-		float(out[1].split('% nice')[0]) + \
-		float(out[2].split('% system')[0])
-		
-		cpu_utilization = speed
+			# Add the percentages to get the real cpu usage
+			speed = \
+			float(out[0].split('% user')[0]) + \
+			float(out[1].split('% nice')[0]) + \
+			float(out[2].split('% system')[0])
+		elif Config.os_type in osinfo.OSType.MacOS:
+			command = 'top -F -l 2 -i 2 -n 0'
+			out = findlib.run_and_get_stdout(command)
 
-def _get_utilization_thread_osx():
-	global cpu_utilization
-	global is_utilization_thread_running
+			# Get the cpu percentages
+			out = out.split("CPU usage:")[2]
+			out = out.split('\n')[0]
+			out = out.split(',')
 
-	command = 'top -F -l 2 -i 2 -n 0'
+			# Add the percentages to get the real cpu usage
+			speed = \
+			float(out[0].split('% user')[0]) + \
+			float(out[1].split('% sys')[0])
+		elif Config.os_type in osinfo.OSType.Solaris:
+			command = 'top -b -s 2 -d 2'
+			out = findlib.run_and_get_stdout(command)
 
-	is_utilization_thread_running = True
-	while is_utilization_thread_running:
-		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split("CPU usage:")[2]
-		out = out.split('\n')[0]
-		out = out.split(',')
+			# Get the cpu percentages
+			out = out.split("CPU states: ")[2]
+			out = out.split('\n')[0]
+			out = out.split(',')
 
-		# Add the percentages to get the real cpu usage
-		speed = \
-		float(out[0].split('% user')[0]) + \
-		float(out[1].split('% sys')[0])
+			# Add the percentages to get the real cpu usage
+			speed = \
+			float(out[0].split('% user')[0]) + \
+			float(out[1].split('% nice')[0]) + \
+			float(out[2].split('% kernel')[0])
+		elif Config.os_type in osinfo.OSType.BeOS:
+			command = 'top -d -i 2 -n 2'
+			out = findlib.run_and_get_stdout(command)
 
-		cpu_utilization = speed
+			# Get the cpu percentages
+			out = out.split("------")[1]
+			out = out.split('% TOTAL')[0]
+			out = out.split()
 
-def _get_utilization_thread_solaris():
-	global cpu_utilization
-	global is_utilization_thread_running
+			# Add the percentages to get the real cpu usage
+			speed = float(out[-1])
+		elif Config.os_type in osinfo.OSType.Windows:
+			command = 'wmic cpu get loadpercentage'
+			out = findlib.run_and_get_stdout(command)
 
-	command = 'top -b -s 2 -d 2'
+			# Get the cpu percentages
+			out = out.split()[-1]
 
-	is_utilization_thread_running = True
-	while is_utilization_thread_running:
-		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split("CPU states: ")[2]
-		out = out.split('\n')[0]
-		out = out.split(',')
-
-		# Add the percentages to get the real cpu usage
-		speed = \
-		float(out[0].split('% user')[0]) + \
-		float(out[1].split('% nice')[0]) + \
-		float(out[2].split('% kernel')[0])
-
-		cpu_utilization = speed
-
-def _get_utilization_thread_beos():
-	global cpu_utilization
-	global is_utilization_thread_running
-
-	command = 'top -d -i 2 -n 2'
-
-	is_utilization_thread_running = True
-	while is_utilization_thread_running:
-		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split("------")[1]
-		out = out.split('% TOTAL')[0]
-		out = out.split()
-
-		# Add the percentages to get the real cpu usage
-		speed = float(out[-1])
+			# Add the percentages to get the real cpu usage
+			speed = float(out)
 
 		cpu_utilization = speed
 
-def _get_utilization_thread_windows():
-	global cpu_utilization
-	global is_utilization_thread_running
-
-	command = 'wmic cpu get loadpercentage'
-
-	is_utilization_thread_running = True
-	while is_utilization_thread_running:
-		# Get the cpu percentages
-		out = findlib.run_and_get_stdout(command)
-		out = out.split()[-1]
-
-		# Add the percentages to get the real cpu usage
-		speed = float(out)
-
-		cpu_utilization = speed
 
 def get_utilization():
 	global cpu_utilization
@@ -182,25 +148,7 @@ def get_utilization():
 def start_get_utilization_thread():
 	global utilization_thread
 
-	# Linux & Cygwin
-	if Config.os_type in osinfo.OSType.Linux or Config.os_type in osinfo.OSType.Cygwin:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_linux, args=())
-	# BSD
-	elif Config.os_type in osinfo.OSType.BSD:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_bsd, args=())
-	# OS X
-	elif Config.os_type in osinfo.OSType.MacOS:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_osx, args=())
-	# Solaris
-	elif Config.os_type in osinfo.OSType.Solaris:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_solaris, args=())
-	# BeOS
-	elif Config.os_type in osinfo.OSType.BeOS:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_beos, args=())
-	# Windows
-	elif Config.os_type in osinfo.OSType.Windows:
-		utilization_thread = threading.Thread(target=_get_utilization_thread_windows, args=())
-
+	utilization_thread = threading.Thread(target=_get_utilization_thread, args=())
 	utilization_thread.daemon = True
 	utilization_thread.start()
 
@@ -252,7 +200,7 @@ def exit_module():
 	global utilization_thread
 	global is_utilization_thread_running
 
-	if utilization_thread:
+	if is_utilization_thread_running and utilization_thread:
 		is_utilization_thread_running = False
 		utilization_thread.join()
 		utilization_thread = None
