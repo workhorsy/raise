@@ -34,6 +34,7 @@ if sys.version_info < (2, 6):
 # Load the default imports
 import os
 import stat
+import threading
 if sys.version_info < (3, 0):
 	from urllib2 import urlopen
 else:
@@ -89,77 +90,98 @@ def update(dir_name):
 	if not os.path.isdir(dir_name):
 		os.mkdir(dir_name)
 
+	ts = []
 	for module, url in RAISE_URLS.items():
 		# Get the real name if a raise module
 		if not module.endswith('.py'):
 			module = "lib_{0}.py".format(module)
 
+		t = Downloader(module, url, dir_name)
+		t.daemon = True
+		t.start()
+		ts.append(t)
+
+	for t in ts:
+		t.join()
+		if t.message:
+			print(t.message)
+		if not t.is_success:
+			exit(1)
+
+	print("Done!")
+
+
+class Downloader(threading.Thread):
+	def __init__(self, module, url, dir_name):
+		super(Downloader, self).__init__()
+
+		self.module = module
+		self.url = url
+		self.dir_name = dir_name
+		self.is_success = False
+		self.message = None
+
+	def run(self):
 		# Get the file name for script
-		file_name = os.path.join(dir_name, module)
+		file_name = os.path.join(self.dir_name, self.module)
 
 		# Download the file and call the cb after each chunk
-		_download_file(url, file_name)
+		self._download_file(self.url, file_name)
 
 		# Make the file executable
 		os.chmod(file_name, 0o775 | stat.S_IXOTH)
 
-def _download_file(url, file_name):
-	CHUNK_SIZE = 1024
+	def _download_file(self, url, file_name):
+		CHUNK_SIZE = 1024
 
-	try:
-		# Connect with HTTP
-		response = urlopen(url)
-		if response.code != 200:
-			sys.stderr.write('Download failed. Exiting ...\n')
-			sys.stderr.flush()
+		try:
+			# Connect with HTTP
+			response = urlopen(url)
+			if response.code != 200:
+				self.is_success = False
+				self.message = 'Download failed. Exiting ...'
+				exit(1)
+
+			# Read the HTTP header
+			content_length = int(response.headers['Content-Length'])
+			data = b''
+			data_length = 0
+
+			# Read the HTTP body
+			while True:
+				chunk = response.read(CHUNK_SIZE)
+				if not chunk:
+					break
+
+				data += chunk
+				data_length += len(chunk)
+				percent = round((float(data_length) / content_length)*100, 2)
+
+				self._cb_dl_progress(file_name, chunk, data_length, CHUNK_SIZE, content_length, percent)
+		except Exception as e:
+			self.is_success = False
+			self.message = 'Download failed. Exiting ...\n{0}\n{1}'.format(str(e), self.url)
 			exit(1)
 
-		# Read the HTTP header
-		content_length = int(response.headers['Content-Length'])
-		data = b''
-		data_length = 0
+		# Write the file to disk
+		self._cb_dl_done(file_name, data)
 
-		# Read the HTTP body
-		while True:
-			chunk = response.read(CHUNK_SIZE)
-			if not chunk:
-				break
+	def _cb_dl_progress(self, file_name, chunk, data_length, chunk_size, content_length, percent):
+		pass
 
-			data += chunk
-			data_length += len(chunk)
-			percent = round((float(data_length) / content_length)*100, 2)
+	def _cb_dl_done(self, file_name, data):
+		# Make sure the downloaded file is python
+		if not data.decode().startswith("#!/usr/bin/env python"):
+			self.is_success = False
+			self.message = 'The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...'
+			exit(1)
 
-			_cb_dl_progress(file_name, chunk, data_length, CHUNK_SIZE, content_length, percent)
-	except Exception as e:
-		sys.stderr.write('Download failed. Exiting ...\n')
-		sys.stderr.write(str(e) + '\n')
-		sys.stderr.write(url + '\n')
-		sys.stderr.flush()
-		exit(1)
+		# Save the file
+		with open(file_name, 'wb') as f:
+			f.write(data)
 
-	# Write the file to disk
-	_cb_dl_done(file_name, data)
-
-def _cb_dl_progress(file_name, chunk, data_length, chunk_size, content_length, percent):
-	# Write the download progress
-	sys.stdout.write("    {0} of {1} ({2}%) '{3}'\r".format(friendly_size(data_length), friendly_size(content_length), percent, file_name))
-
-	# Write a newline if the download is complete
-	if data_length >= content_length:
-		sys.stdout.write('\n')
-
-	sys.stdout.flush()
-
-def _cb_dl_done(file_name, data):
-	# Make sure the downloaded file is python
-	if not data.decode().startswith("#!/usr/bin/env python"):
-		sys.stderr.write('The downloaded update was invalid. Make sure http://launchpad.net can be accessed. Exiting ...\n')
-		sys.stderr.flush()
-		exit(1)
-
-	# Save the file
-	with open(file_name, 'wb') as f:
-		f.write(data)
+		self.is_success = True
+		self.message = '    {0}'.format(file_name)
 
 if __name__ == '__main__':
 	needs_update = True

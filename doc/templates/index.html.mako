@@ -356,7 +356,7 @@ from inside your project's directory.
 <p>
 Raise consists of a small shim script called "raise" and a directory of 
 modules called ".lib_raise". The "raise" shim is safe to save into your VCS 
-along with your source code. It is small (8kB) and should not change very often. 
+along with your source code. It is small (10kB) and should not change very often. 
 All the ".lib_raise" modules are automatically downloaded by the "raise" 
 shim. You should not check the ".lib_raise" directory into your VCS.
 </p>
