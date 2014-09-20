@@ -49,9 +49,13 @@ def setup():
 	global missing_compilers
 
 	# Get the names and paths for know D compilers
-	names = ['dmd2', 'dmd', 'ldc2', 'ldc'] #gdc
-	for name in names:
-		paths = Find.program_paths(name)
+	compilers = {
+		'dmd' : ['dmd', r'dmd[0-9]*'],
+		'ldc' : ['ldc', r'ldc[0-9]*'],
+		#gdc
+	}
+	for name, alt_names in compilers.items():
+		paths = Find.program_paths(*alt_names)
 		if len(paths) == 0:
 			missing_compilers.append(name)
 			continue
