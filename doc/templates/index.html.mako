@@ -21,7 +21,7 @@ Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 14th 2014
+Last updated on September 19th 2014
 </p>
 
 <p>
@@ -1489,8 +1489,9 @@ ver.micro # 0
 <h2>10.2. Finding Programs</h2>
 	<p>
 	You can find a program, by searching for it with the 
-	<span class="fun">Find.program_paths</span> function. There is currently
-	no way to specify what version of the program you want to find.
+	<span class="fun">Find.program_paths</span> function. You can also
+	use regular expressions in the name. There is currently
+	no standard way to specify what version of the program you want to find.
 	</p>
 
 	<p>
