@@ -38,8 +38,8 @@ import findlib
 import findlib_server
 from osinfo import *
 
-def program_paths(program_name):
-	return findlib.program_paths(program_name)
+def program_paths(*program_names):
+	return findlib.program_paths(program_names)
 
 def get_header_file(header_name, version_str = None):
 	return findlib.get_header_file(header_name, version_str)
