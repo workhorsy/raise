@@ -369,7 +369,7 @@ def d_compilers():
 	print("name: {0}".format(dc._name))
 	print("path: {0} ".format(dc._path))
 
-	dc = D.d_compilers['ldc2']
+	dc = D.d_compilers['ldc']
 
 	# Print the compiler name and path for fun
 	print("name: {0}".format(dc._name))
@@ -717,6 +717,9 @@ Finding Programs, Libraries, and Headers Files
 
 def find_finding_programs():
 	paths = Find.program_paths('gcc')
+	print(paths)
+
+	paths = Find.program_paths('g++', r'g++-[0-9|\.]*')
 	print(paths)
 
 def find_requiring_programs():

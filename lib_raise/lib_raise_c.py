@@ -67,9 +67,13 @@ def setup():
 			OSX_HAS_TOOLS = True
 
 	# Get the names and paths for know C compilers
-	names = ['gcc', 'clang', 'cl.exe']
-	for name in names:
-		paths = Find.program_paths(name)
+	compilers = {
+		'gcc' : ['gcc', r'gcc[0-9]*', r'gcc-[0-9|\.]*'],
+		'clang' : ['clang'],
+		'cl.exe' : ['cl.exe']
+	}
+	for name, alt_names in compilers.items():
+		paths = Find.program_paths(*alt_names)
 		if len(paths) == 0:
 			missing_compilers.append(name)
 			continue
