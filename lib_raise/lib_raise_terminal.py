@@ -91,10 +91,10 @@ def set_fancy():
 
 	# Figure out the terminal colors
 	if not Config.os_type in OSType.Windows:
-		BGColors.MESSAGE = '\033[44m\033[37m'
-		BGColors.OK = '\033[42m\033[37m'
-		BGColors.WARNING = '\033[43m\033[30m'
-		BGColors.FAIL = '\033[41m\033[37m'
+		BGColors.MESSAGE = '\033[1m\033[44m\033[37m'
+		BGColors.OK = '\033[1m\033[42m\033[37m'
+		BGColors.WARNING = '\033[1m\033[43m\033[30m'
+		BGColors.FAIL = '\033[1m\033[41m\033[37m'
 		BGColors.ENDC = '\033[0m'
 
 def pad(length, pad_char=' '):
