@@ -17,11 +17,11 @@ A small build automation tool that ships with your software.
 <p>
 
 <p>
-Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
+Copyright &copy; 2015 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 19th 2014
+Last updated on September 3rd 2015
 </p>
 
 <p>
@@ -257,7 +257,7 @@ The Raise documentation is license under
 <h2>1.2. Authors and Copyright</h2>
 
 <p>
-Copyright &copy; 2013 - 2014 Matthew Brennan Jones <a href="mailto:matthew.brennan.jones@gmail.com">&lt;matthew.brennan.jones@gmail.com&gt;</a>
+Copyright &copy; 2013 - 2015 Matthew Brennan Jones <a href="mailto:matthew.brennan.jones@gmail.com">&lt;matthew.brennan.jones@gmail.com&gt;</a>
 </p>
 
 <p>
@@ -1038,7 +1038,7 @@ Normal user name: matt
 	<p>
 	When running a script with a privilege escalation tool such as 
 	<span class="fun">sudo</span>, you often need to get the actual user
-	name. Most python functions such as 
+	id. Most python functions such as 
 	<span class="fun">os.getuid</span> and 
 	<span class="fun">os.geteuid</span> will return 0, because it is
 	actually being run as root.
@@ -3164,7 +3164,7 @@ python tools/update_raise_in_sub_directories.py
 
 
 		<div id="footer">
-			Copyright &copy; 2014 <a href="#authors_and_copyright">Raise Authors</a>
+			Copyright &copy; 2015 <a href="#authors_and_copyright">Raise Authors</a>
 			<br />
 			Raise is licensed under 
 			<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
