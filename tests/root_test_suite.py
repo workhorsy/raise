@@ -4,7 +4,7 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+# Copyright (c) 2015, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -311,7 +311,7 @@ class TestProcessRunner(object):
 
 class TestBasics(TestCase):
 	@classmethod
-	def get_prereqs(cls):
+	def get_found_prereqs(cls):
 		return True
 
 	def set_up(self, id):
