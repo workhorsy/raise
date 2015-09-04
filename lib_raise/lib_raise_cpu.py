@@ -179,7 +179,7 @@ def setup():
 	bits = info['bits']
 
 	# Get the CPU MHz
-	mhz = info['hz']
+	mhz = info['hz_advertised']
 
 	# Get the CPU name
 	name = info['brand']
