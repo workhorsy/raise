@@ -1,7 +1,7 @@
 
 Raise is a small build automation tool that ships with your software.
 
-The project is hosted at http://launchpad.net/raise and licensed under
+The project is hosted at https://github.com/workhorsy/raise and licensed under
 a MIT style license.
 
 // Linux/Unix install requirements
@@ -30,5 +30,3 @@ cd examples/c_simple/
 
 // Documentation can be regenerated in the doc directory
 sudo python generate_documentation.py
-
-

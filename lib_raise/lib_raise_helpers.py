@@ -3,7 +3,7 @@
 
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
-# Raise uses a MIT style license, and is hosted at http://launchpad.net/raise .
+# Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
 # Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
