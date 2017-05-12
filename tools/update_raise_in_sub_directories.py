@@ -23,7 +23,7 @@ for root, dirs, files in os.walk('..'):
 		abs_name = os.path.abspath(relative_name)
 
 		# Skip the file if it is in a VCS directory
-		if '.bzr' in relative_name:
+		if '.git' in relative_name:
 			continue
 
 		# Skip the file if it is not named 'raise'
@@ -38,5 +38,3 @@ for root, dirs, files in os.walk('..'):
 		print('    Copied "raise" to "{0}"'.format(abs_name))
 
 print('Done!')
-
-
