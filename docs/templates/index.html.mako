@@ -581,11 +581,11 @@ Has not been tested on Windows Vista or Windows RT.
 
 	<p>
 		Source code can be checked out using the
-		<a href="http://bazaar.canonical.com/en/" target="_blank" rel="external">Bazaar VCS</a>.
+		<a href="https://git-scm.com/" target="_blank" rel="external">Git VCS</a>.
 	<p>
 
 	<pre><code data-language="shell">
-bzr branch lp:raise
+git clone
 cd raise/examples/c_simple
 ./raise test
 	</code></pre>
@@ -3126,25 +3126,6 @@ will do.
 	"tools/update_raise_in_sub_directories.py" script. It will automatically
 	look through all the sub directories and replace any files named "raise"
 	with the root "raise" file.
-	</p>
-
-	<p>
-	If you are wondering why symlinks were not used, instead of copying the
-	"raise" file all over the place. It is because they are not supported on
-	Windows. On Windows checking out code from a Bazaar VCS fails, if there
-	is a symlink in your project. The NTFS file system does not support
-	symlinks (And no,
-	<a href="http://en.wikipedia.org/wiki/NTFS_junction_point" target="_blank" rel="external">
-	NTFS Junction Points</a>
-	 won't work on a single file).
-	</p>
-
-	<p>
-	Fore more information, see this bug in Python
-	<a href="http://bugs.python.org/issue1578269" target="_blank" rel="external">http://bugs.python.org/issue1578269</a>
-	and this bug Bazaar
-	<a href="http://wiki.bazaar.canonical.com/WindowsSymlinkSupport" target="_blank" rel="external">http://wiki.bazaar.canonical.com/WindowsSymlinkSupport</a>
-	.
 	</p>
 
 	<pre><code data-language="shell">
