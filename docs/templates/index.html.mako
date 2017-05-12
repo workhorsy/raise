@@ -17,15 +17,15 @@ A small build automation tool that ships with your software.
 <p>
 
 <p>
-Copyright &copy; 2015 <a href="#authors_and_copyright">Raise Authors</a>
+Copyright &copy; 2017 <a href="#authors_and_copyright">Raise Authors</a>
 </p>
 
 <p>
-Last updated on September 3rd 2015
+Last updated on May 12th 2017
 </p>
 
 <p>
-<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a>
+<a href="https://github.com/workhorsy/raise" target="_blank" rel="external">https://github.com/workhorsy/raise</a>
 </p>
 
 
@@ -243,7 +243,7 @@ compatible with most other software licenses.
 
 <p>
 The Raise software is licensed under
-<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
+<a href="https://raw.githubusercontent.com/workhorsy/raise/master/LICENSE" target="_blank" rel="external">The MIT License</a>
 .
 </p>
 
@@ -257,7 +257,7 @@ The Raise documentation is license under
 <h2>1.2. Authors and Copyright</h2>
 
 <p>
-Copyright &copy; 2013 - 2015 Matthew Brennan Jones <a href="mailto:matthew.brennan.jones@gmail.com">&lt;matthew.brennan.jones@gmail.com&gt;</a>
+Copyright &copy; 2012 - 2017 Matthew Brennan Jones <a href="mailto:matthew.brennan.jones@gmail.com">&lt;matthew.brennan.jones@gmail.com&gt;</a>
 </p>
 
 <p>
@@ -269,17 +269,9 @@ Other authors please add your copyright and contact info here.
 
 <p>
 If you find any errors, bugs, or misinformation, please report a bug at
-<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a> or
+<a href="https://github.com/workhorsy/raise" target="_blank" rel="external">https://github.com/workhorsy/raise</a> or
 contact one of the authors.
 </p>
-
-<p>
-Please have a look at the list of upcomming bug fixes for the upcomming
-<a href="https://launchpad.net/raise/+milestone/0.5.0" target="_blank" rel="external">
-0.5.0 release</a>.
-
-</p>
-
 
 <a id="documentation"></a>
 <h2>1.4. Documentation</h2>
@@ -408,7 +400,7 @@ Has been tested on FreeBSD, and PCBSD, but not on OpenBSD, NetBSD, or DragonflyB
 </p>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -431,7 +423,7 @@ Fully Supported.
 </p>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -454,7 +446,7 @@ for programs/libraries. Not yet tested on BeOS.
 </p>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -483,7 +475,7 @@ Tested primarily on
 </p>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -521,7 +513,7 @@ Bugs:
 </ol>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -541,7 +533,7 @@ Fully supported.
 <p>Tested on Open Indiana, Open Solaris, and Open SXCE. Not yet tested on Oracle Solaris.</p>
 
 <pre><code data-language="shell">
-wget http://launchpad.net/raise/trunk/0.5.0/+download/raise
+wget https://raw.githubusercontent.com/workhorsy/raise/master/raise
 chmod +x raise
 ./raise
 </code></pre>
@@ -568,7 +560,7 @@ that Windows users use Cygwin.
 </p>
 
 <p>
-Download from <a href="http://launchpad.net/raise/trunk/0.5.0/+download/raise"> http://launchpad.net/raise/trunk/0.5.0/+download/raise</a>
+Download from <a href="https://github.com/workhorsy/raise">https://github.com/workhorsy/raise</a>
 </p>
 
 <pre><code data-language="shell">
@@ -3164,10 +3156,10 @@ python tools/update_raise_in_sub_directories.py
 
 
 		<div id="footer">
-			Copyright &copy; 2015 <a href="#authors_and_copyright">Raise Authors</a>
+			Copyright &copy; 2017 <a href="#authors_and_copyright">Raise Authors</a>
 			<br />
 			Raise is licensed under
-			<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
+			<a href="https://raw.githubusercontent.com/workhorsy/raise/master/LICENSE" target="_blank" rel="external">The MIT License</a>
 			<br />
 			This website and all documentation are licensed under
 			<a href="http://creativecommons.org/licenses/by/3.0" rel="external">The Creative Commons Attribution License v3.0</a>
