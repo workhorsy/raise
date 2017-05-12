@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -79,15 +79,15 @@ def setup():
 			continue
 
 		standards = {
-			Standard.std1989 : '-std=c89', 
-			Standard.std1990 : '-std=c90', 
-			Standard.std1999 : '-std=c99', 
-			Standard.std2011 : '-std=c11', 
-			Standard.std201x : '-std=c1x', 
-			Standard.gnu1989 : '-std=gnu89', 
-			Standard.gnu1990 : '-std=gnu90', 
-			Standard.gnu1999 : '-std=gnu99', 
-			Standard.gnu2011 : '-std=gnu11', 
+			Standard.std1989 : '-std=c89',
+			Standard.std1990 : '-std=c90',
+			Standard.std1999 : '-std=c99',
+			Standard.std2011 : '-std=c11',
+			Standard.std201x : '-std=c1x',
+			Standard.gnu1989 : '-std=gnu89',
+			Standard.gnu1990 : '-std=gnu90',
+			Standard.gnu1999 : '-std=gnu99',
+			Standard.gnu2011 : '-std=gnu11',
 			Standard.gnu201x : '-std=gnu1x'
 		}
 
@@ -100,68 +100,68 @@ def setup():
 					continue
 
 			comp = CCompiler(
-				name =                 'gcc', 
-				path =                 paths[0], 
-				standards =             standards, 
-				setup =                '', 
-				out_file =             '-o ', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				position_independent_code = '-fPIC', 
-				warnings_all =         '-Wall', 
-				warnings_extra =       '-Wextra', 
-				warnings_as_errors =   '-Werror', 
+				name =                 'gcc',
+				path =                 paths[0],
+				standards =             standards,
+				setup =                '',
+				out_file =             '-o ',
+				no_link =              '-c',
+				debug =                '-g',
+				position_independent_code = '-fPIC',
+				warnings_all =         '-Wall',
+				warnings_extra =       '-Wextra',
+				warnings_as_errors =   '-Werror',
 				optimize_zero =        '-O0',
 				optimize_one =         '-O1',
 				optimize_two =         '-O2',
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
-				compile_time_flags =   '-D', 
+				compile_time_flags =   '-D',
 				link =                 '-shared -Wl,-as-needed'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'clang':
 			comp = CCompiler(
-				name =                 'clang', 
-				path =                 paths[0], 
-				standards =             standards, 
-				setup =                '', 
-				out_file =             '-o ', 
-				no_link =              '-c', 
-				debug =                '-g', 
-				position_independent_code = '-fPIC', 
-				warnings_all =         '-Wall', 
-				warnings_extra =       '-Wextra', 
-				warnings_as_errors =   '-Werror', 
+				name =                 'clang',
+				path =                 paths[0],
+				standards =             standards,
+				setup =                '',
+				out_file =             '-o ',
+				no_link =              '-c',
+				debug =                '-g',
+				position_independent_code = '-fPIC',
+				warnings_all =         '-Wall',
+				warnings_extra =       '-Wextra',
+				warnings_as_errors =   '-Werror',
 				optimize_zero =        '-O0',
 				optimize_one =         '-O1',
 				optimize_two =         '-O2',
 				optimize_three =       '-O3',
 				optimize_size =        '-Os',
-				compile_time_flags =   '-D', 
+				compile_time_flags =   '-D',
 				link =                 '-shared'
 			)
 			c_compilers[comp._name] = comp
 		elif name == 'cl.exe':
 			# http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
 			comp = CCompiler(
-				name =                 'cl.exe', 
-				path =                 paths[0], 
-				standards =             None, 
-				setup =                '/nologo', 
-				out_file =             '/Fe', 
-				no_link =              '/c', 
-				debug =                '/Zi', 
-				position_independent_code = '', 
-				warnings_all =         '/Wall', 
-				warnings_extra =       None, 
-				warnings_as_errors =   '/WX', 
+				name =                 'cl.exe',
+				path =                 paths[0],
+				standards =             None,
+				setup =                '/nologo',
+				out_file =             '/Fe',
+				no_link =              '/c',
+				debug =                '/Zi',
+				position_independent_code = '',
+				warnings_all =         '/Wall',
+				warnings_extra =       None,
+				warnings_as_errors =   '/WX',
 				optimize_zero =        '/Od',
 				optimize_one =         '/O1',
 				optimize_two =         '/O2',
 				optimize_three =       '/Ox',
 				optimize_size =        '/Os',
-				compile_time_flags =   '/D', 
+				compile_time_flags =   '/D',
 				link =                 '/LDd'
 			)
 			c_compilers[comp._name] = comp
@@ -176,11 +176,11 @@ def setup():
 # Other C compilers: DMC, Dingus, Elsa, PCC
 # http://en.wikipedia.org/wiki/List_of_compilers#C_compilers
 class CCompiler(object):
-	def __init__(self, name, path, standards, setup, out_file, 
-				no_link, debug, position_independent_code, 
-				warnings_all, warnings_extra, warnings_as_errors, 
+	def __init__(self, name, path, standards, setup, out_file,
+				no_link, debug, position_independent_code,
+				warnings_all, warnings_extra, warnings_as_errors,
 				optimize_zero, optimize_one, optimize_two,
-				optimize_three, optimize_size, 
+				optimize_three, optimize_size,
 				compile_time_flags, link):
 
 		self._name = name
@@ -263,12 +263,12 @@ class CCompiler(object):
 		plural = 'C programs'
 		singular = 'C program'
 		command = '"{0}" {1} {2} {3} {4} {5}{6}'.format(
-					self._path, 
-					self.cflags, 
-					self._opt_link, 
-					str.join(' ', obj_files), 
-					str.join(' ', i_files), 
-					self._opt_out_file, 
+					self._path,
+					self.cflags,
+					self._opt_link,
+					str.join(' ', obj_files),
+					str.join(' ', i_files),
+					self._opt_out_file,
 					out_file)
 		command = to_native(command)
 
@@ -298,11 +298,11 @@ class CCompiler(object):
 		plural = 'C objects'
 		singular = 'C object'
 		command = '"{0}" {1} {2} {3}{4} {5} {6}'.format(
-					self._path, 
-					self.cflags, 
-					self._opt_no_link, 
-					self._opt_out_file, 
-					o_file, 
+					self._path,
+					self.cflags,
+					self._opt_no_link,
+					self._opt_out_file,
+					o_file,
 					str.join(' ', c_files),
 					str.join(' ', i_files))
 		command = to_native(command)
@@ -333,11 +333,11 @@ class CCompiler(object):
 		plural = 'C programs'
 		singular = 'C program'
 		command = '"{0}" {1} {2} {3} {4}{5}'.format(
-					self._path, 
-					self.cflags, 
-					str.join(' ', c_files), 
-					str.join(' ', i_files), 
-					self._opt_out_file, 
+					self._path,
+					self.cflags,
+					str.join(' ', c_files),
+					str.join(' ', i_files),
+					self._opt_out_file,
 					o_file)
 		command = to_native(command)
 
@@ -367,11 +367,11 @@ class CCompiler(object):
 		plural = 'C shared libraries'
 		singular = 'C shared library'
 		command = "{0} {1} {2} {3} {4}{5}".format(
-					self._name, 
-					self._opt_setup, 
-					self._opt_link, 
-					str.join(' ', o_files), 
-					self._opt_out_file, 
+					self._name,
+					self._opt_setup,
+					self._opt_link,
+					str.join(' ', o_files),
+					self._opt_out_file,
 					so_file)
 		command = to_native(command)
 
@@ -641,6 +641,3 @@ def uninstall_header(name, dir_name=None):
 				lambda: fn())
 
 setup()
-
-
-

@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -57,25 +57,25 @@ def setup():
 
 		if name in ['dmcs']:
 			comp = CSCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				out_file =             '-out:', 
-				debug =                '-debug', 
-				warnings_all =         '-warn:4', 
-				warnings_as_errors =   '-warnaserror', 
-				optimize =             '-optimize', 
+				name =                 name,
+				path =                 paths[0],
+				out_file =             '-out:',
+				debug =                '-debug',
+				warnings_all =         '-warn:4',
+				warnings_as_errors =   '-warnaserror',
+				optimize =             '-optimize',
 				runtime =              'mono'
 			)
 			cs_compilers[comp._name] = comp
 		elif name in ['csc']:
 			comp = CSCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				out_file =             '-out:', 
-				debug =                '-debug', 
-				warnings_all =         '-warn:4', 
-				warnings_as_errors =   '-warnaserror', 
-				optimize =             '-optimize', 
+				name =                 name,
+				path =                 paths[0],
+				out_file =             '-out:',
+				debug =                '-debug',
+				warnings_all =         '-warn:4',
+				warnings_as_errors =   '-warnaserror',
+				optimize =             '-optimize',
 				runtime =              ''
 			)
 			cs_compilers[comp._name] = comp
@@ -88,8 +88,8 @@ def setup():
 
 
 class CSCompiler(object):
-	def __init__(self, name, path, out_file, 
-				debug, warnings_all, warnings_as_errors, 
+	def __init__(self, name, path, out_file,
+				debug, warnings_all, warnings_as_errors,
 				optimize, runtime):
 
 		self._name = name
@@ -140,11 +140,11 @@ class CSCompiler(object):
 		plural = 'C# programs'
 		singular = 'C# program'
 		command = '"{0}" {1} {2}{3} {4} {5}'.format(
-			self._path, 
-			self.csflags, 
-			self._opt_out_file, 
-			out_file, 
-			str.join(' ', inc_files), 
+			self._path,
+			self.csflags,
+			self._opt_out_file,
+			out_file,
+			str.join(' ', inc_files),
 			str.join(' ', link_files)
 		)
 		command = to_native(command)
@@ -176,11 +176,11 @@ class CSCompiler(object):
 		plural = 'C# shared libraries'
 		singular = 'C# shared library'
 		command = '"{0}" {1} -target:library {2}{3} {4} {5}'.format(
-			self._path, 
-			self.csflags, 
-			self._opt_out_file, 
-			out_file, 
-			str.join(' ', inc_files), 
+			self._path,
+			self.csflags,
+			self._opt_out_file,
+			out_file,
+			str.join(' ', inc_files),
 			str.join(' ', link_files)
 		)
 		command = to_native(command)
@@ -390,4 +390,3 @@ def uninstall_library(name, dir_name):
 				lambda: fn())
 
 setup()
-

@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 	# Exit if there is no target
 	if not Config.target_name:
-		print("Raise build automation tool (Version 0.5.0 dev - September 3 2015) http://launchpad.net/raise")
+		print("Raise build automation tool (Version 0.5.0 dev - May 23 2017) http://launchpad.net/raise")
 		print("COMMANDS:")
 		print("    ./raise help    - Print the help menu")
 		print("    ./raise update  - Downloads the Raise libraries into a directory named \".lib_raise\" or \"lib_raise\".")
@@ -124,6 +124,3 @@ if __name__ == '__main__':
 	target = targets[Config.target_name]
 	Print.info("Running target '{0}'".format(Config.target_name))
 	target()
-
-
-

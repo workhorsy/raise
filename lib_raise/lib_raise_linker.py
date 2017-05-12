@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -54,16 +54,16 @@ def setup():
 		if name == 'link.exe':
 			link = Linker(
 				name            = 'link.exe',
-				setup           = '/nologo', 
-				out_file        = '/out:', 
+				setup           = '/nologo',
+				out_file        = '/out:',
 				shared          = '/dll '
 			)
 			linkers[link._name] = link
 		elif name == 'ld':
 			link = Linker(
 				name            = 'ld',
-				setup           = '', 
-				out_file        = '-o ', 
+				setup           = '',
+				out_file        = '-o ',
 				shared          = '-G'
 			)
 			linkers[link._name] = link
@@ -78,7 +78,7 @@ def setup():
 class Linker(object):
 	def __init__(self, name, setup, out_file, shared):
 		self._name = name
-		
+
 		self._opt_setup = setup
 		self._opt_out_file = out_file
 		self._opt_shared = shared
@@ -94,10 +94,10 @@ class Linker(object):
 		plural = 'programs'
 		singular = 'program'
 		command = "{0} {1}{2} {3} {4}".format(
-					self.link, 
-					linker._opt_out_file, 
-					out_file, 
-					str.join(' ', obj_files), 
+					self.link,
+					linker._opt_out_file,
+					out_file,
+					str.join(' ', obj_files),
 					str.join(' ', i_files)
 		)
 		command = to_native(command)
@@ -214,5 +214,3 @@ def link_static_or_shared_paths(lib_names):
 
 
 setup()
-
-

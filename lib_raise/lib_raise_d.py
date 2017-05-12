@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -62,59 +62,59 @@ def setup():
 
 		if name in ['dmd2', 'dmd']:
 			comp = DCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				lib =                  '-lib', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
-				optimize =             '-O', 
-				compile_time_flags =   '-version=', 
-				link =                 '-Wl,-as-needed', 
-				interface =            '-H', 
-				interface_file =       '-Hf', 
-				interface_dir =        '-Hd', 
+				name =                 name,
+				path =                 paths[0],
+				setup =                '',
+				out_file =             '-of',
+				no_link =              '-c',
+				lib =                  '-lib',
+				debug =                '-g',
+				warnings_all =         '-w',
+				optimize =             '-O',
+				compile_time_flags =   '-version=',
+				link =                 '-Wl,-as-needed',
+				interface =            '-H',
+				interface_file =       '-Hf',
+				interface_dir =        '-Hd',
 				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['ldc2', 'ldc']:
 			comp = DCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-of', 
-				no_link =              '-c', 
-				lib =                  '-lib', 
-				debug =                '-g', 
-				warnings_all =         '-w', 
+				name =                 name,
+				path =                 paths[0],
+				setup =                '',
+				out_file =             '-of',
+				no_link =              '-c',
+				lib =                  '-lib',
+				debug =                '-g',
+				warnings_all =         '-w',
 				optimize =             '-O2',
-				compile_time_flags =   '-d-version=', 
-				link =                 '-Wl,-as-needed', 
-				interface =            '-H', 
-				interface_file =       '-Hf=', 
-				interface_dir =        '-Hd=', 
+				compile_time_flags =   '-d-version=',
+				link =                 '-Wl,-as-needed',
+				interface =            '-H',
+				interface_file =       '-Hf=',
+				interface_dir =        '-Hd=',
 				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
 		elif name in ['gdc']:
 			# http://wiki.dlang.org/GDC/Using_GDC
 			comp = DCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				setup =                '', 
-				out_file =             '-o ', 
-				no_link =              '-c', 
-				lib =                  '-lib', 
-				debug =                '-g', 
-				warnings_all =         '-Werror', 
-				optimize =             '-O2', 
-				compile_time_flags =   '-f-version=', 
-				link =                 '-Wl,-as-needed', 
-				interface =            '-fintfc=', 
-				interface_file =       '-fintfc-file=', 
-				interface_dir =        '-fintfc-dir=', 
+				name =                 name,
+				path =                 paths[0],
+				setup =                '',
+				out_file =             '-o ',
+				no_link =              '-c',
+				lib =                  '-lib',
+				debug =                '-g',
+				warnings_all =         '-Werror',
+				optimize =             '-O2',
+				compile_time_flags =   '-f-version=',
+				link =                 '-Wl,-as-needed',
+				interface =            '-fintfc=',
+				interface_file =       '-fintfc-file=',
+				interface_dir =        '-fintfc-dir=',
 				unittest =             '-unittest'
 			)
 			d_compilers[comp._name] = comp
@@ -127,10 +127,10 @@ def setup():
 
 
 class DCompiler(object):
-	def __init__(self, name, path, setup, out_file, no_link, 
-				lib, debug, warnings_all, optimize, 
-				compile_time_flags, link, 
-				interface, interface_file, interface_dir, 
+	def __init__(self, name, path, setup, out_file, no_link,
+				lib, debug, warnings_all, optimize,
+				compile_time_flags, link,
+				interface, interface_file, interface_dir,
 				unittest):
 
 		self._name = name
@@ -191,14 +191,14 @@ class DCompiler(object):
 
 		f = FS.self_deleting_named_temporary_file()
 		command = '"{0}" {1} {2} {3} {4} {5}{6}i {7}{8}'.format(
-			self._path, 
-			self.dflags, 
-			self._opt_no_link, 
-			d_file, 
-			str.join(' ', i_files), 
-			self._opt_interface_file, 
-			d_file, 
-			self._opt_out_file, 
+			self._path,
+			self.dflags,
+			self._opt_no_link,
+			d_file,
+			str.join(' ', i_files),
+			self._opt_interface_file,
+			d_file,
+			self._opt_out_file,
 			f.name
 		)
 		command = to_native(command)
@@ -227,13 +227,13 @@ class DCompiler(object):
 		singular = 'D object'
 
 		command = '"{0}" {1} {2} {3}{4} {5} {6} {7}'.format(
-			self._path, 
-			self.dflags, 
-			self._opt_no_link, 
-			self._opt_out_file, 
-			o_file, 
-			str.join(' ', d_files), 
-			str.join(' ', i_files), 
+			self._path,
+			self.dflags,
+			self._opt_no_link,
+			self._opt_out_file,
+			o_file,
+			str.join(' ', d_files),
+			str.join(' ', i_files),
 			str.join(' ', l_files)
 		)
 		if h_file or h_dir:
@@ -278,19 +278,19 @@ class DCompiler(object):
 		singular = 'D static library'
 
 		command = '"{0}" {1} {2} {3}{4} {5} {6} {7}'.format(
-			self._path, 
-			self.dflags, 
-			self._opt_lib, 
-			self._opt_out_file, 
-			o_file, 
-			str.join(' ', d_files), 
-			str.join(' ', i_files), 
+			self._path,
+			self.dflags,
+			self._opt_lib,
+			self._opt_out_file,
+			o_file,
+			str.join(' ', d_files),
+			str.join(' ', i_files),
 			str.join(' ', l_files)
 		)
 		if generate_headers:
 			command += "  {0}import {1}".format(
-				self._opt_interface_dir, 
-				self._opt_interface, 
+				self._opt_interface_dir,
+				self._opt_interface,
 			)
 		command = to_native(command)
 
@@ -320,11 +320,11 @@ class DCompiler(object):
 		plural = 'D programs'
 		singular = 'D program'
 		command = '"{0}" {1} {2}{3} {4} {5}'.format(
-			self._path, 
-			self.dflags, 
-			self._opt_out_file, 
-			out_file, 
-			str.join(' ', inc_files), 
+			self._path,
+			self.dflags,
+			self._opt_out_file,
+			out_file,
+			str.join(' ', inc_files),
 			str.join(' ', link_files)
 		)
 		command = to_native(command)
@@ -579,4 +579,3 @@ def uninstall_interface(name, dir_name=None):
 				lambda: fn())
 
 setup()
-

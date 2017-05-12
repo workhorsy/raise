@@ -4,8 +4,8 @@
 # This file is part of Raise.
 # Raise is a small build automation tool that ships with your software.
 # Raise uses a MIT style license, and is hosted at https://github.com/workhorsy/raise .
-# Copyright (c) 2014, Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
-# 
+# Copyright (c) 2012-2017 Matthew Brennan Jones <matthew.brennan.jones@gmail.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -13,10 +13,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -58,13 +58,13 @@ def setup():
 
 		if name in ['javac']:
 			comp = JavaCompiler(
-				name =                 name, 
-				path =                 paths[0], 
-				debug =                '-g', 
-				no_warnings =          '-nowarn', 
-				verbose =              '-verbose', 
-				deprecation =          '-deprecation', 
-				runtime =              'java', 
+				name =                 name,
+				path =                 paths[0],
+				debug =                '-g',
+				no_warnings =          '-nowarn',
+				verbose =              '-verbose',
+				deprecation =          '-deprecation',
+				runtime =              'java',
 				jar =                  'jar'
 			)
 			java_compilers[comp._name] = comp
@@ -77,7 +77,7 @@ def setup():
 
 
 class JavaCompiler(object):
-	def __init__(self, name, path, debug, no_warnings, verbose, 
+	def __init__(self, name, path, debug, no_warnings, verbose,
 				deprecation, runtime, jar):
 
 		self._name = name
@@ -139,9 +139,9 @@ class JavaCompiler(object):
 		plural = 'Java programs'
 		singular = 'Java program'
 		command = '"{0}" {1} {2} {3}'.format(
-			self._path, 
-			self.javaflags, 
-			str.join(' ', inc_files), 
+			self._path,
+			self.javaflags,
+			str.join(' ', inc_files),
 			str.join(' ', link_files)
 		)
 		command = to_native(command)
@@ -173,9 +173,9 @@ class JavaCompiler(object):
 		plural = 'Java jars'
 		singular = 'Java jar'
 		command = '"{0}" -cf {1} {2} {3}'.format(
-			self.jar, 
-			out_file, 
-			str.join(' ', inc_files), 
+			self.jar,
+			out_file,
+			str.join(' ', inc_files),
 			str.join(' ', link_files)
 		)
 		command = to_native(command)
@@ -376,4 +376,3 @@ def uninstall_jar(name, dir_name=None):
 
 
 setup()
-
