@@ -237,12 +237,12 @@ Last updated on September 3rd 2015
 <h2>1.1. License</h2>
 
 <p>
-Raise is licensed as freely as possible, in the hopes that it will be 
+Raise is licensed as freely as possible, in the hopes that it will be
 compatible with most other software licenses.
 </p>
 
 <p>
-The Raise software is licensed under 
+The Raise software is licensed under
 <a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
 .
 </p>
@@ -268,13 +268,13 @@ Other authors please add your copyright and contact info here.
 <h2>1.3. Contact and Bugs</h2>
 
 <p>
-If you find any errors, bugs, or misinformation, please report a bug at 
-<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a> or 
+If you find any errors, bugs, or misinformation, please report a bug at
+<a href="https://launchpad.net/raise" target="_blank" rel="external">https://launchpad.net/raise</a> or
 contact one of the authors.
 </p>
 
 <p>
-Please have a look at the list of upcomming bug fixes for the upcomming 
+Please have a look at the list of upcomming bug fixes for the upcomming
 <a href="https://launchpad.net/raise/+milestone/0.5.0" target="_blank" rel="external">
 0.5.0 release</a>.
 
@@ -285,15 +285,15 @@ Please have a look at the list of upcomming bug fixes for the upcomming
 <h2>1.4. Documentation</h2>
 
 <p>
-	Documentation is provided in the doc/index.html file. It is generated 
-	from the <a href="http://makotemplates.org" target="_blank" rel="external">Python Mako Template</a> 
-	file doc/templates/index.html.mako.
+	Documentation is provided in the docs/index.html file. It is generated
+	from the <a href="http://makotemplates.org" target="_blank" rel="external">Python Mako Template</a>
+	file docs/templates/index.html.mako.
 </p>
 
 <p>
-	Warning! Because Raise uses scripts to generate the documentation, you 
+	Warning! Because Raise uses scripts to generate the documentation, you
 	won't be able to generate the documentation unless you have all the compilers and
-	tools installed. Doing this also requires root, because it runs all the code 
+	tools installed. Doing this also requires root, because it runs all the code
 	examples to get the actual output from those code examples.
 </p>
 
@@ -306,8 +306,8 @@ python generate_documentation.py
 </code></pre>
 
 <p>
-	Any changes should be added to the index.html.mako file, as it will 
-	wipe out any changes in index.html when generate_documentation.py 
+	Any changes should be added to the index.html.mako file, as it will
+	wipe out any changes in index.html when generate_documentation.py
 	is run.
 </p>
 
@@ -317,9 +317,9 @@ python generate_documentation.py
 
 <p>
 The philosophy of Raise is that it says what it is doing. Not how
- it is doing it. It only shows the details when something goes wrong. 
-That way the build output does not fill with information you 
-don't need. It shows the output for each step of the build 
+ it is doing it. It only shows the details when something goes wrong.
+That way the build output does not fill with information you
+don't need. It shows the output for each step of the build
 process, as its own line.
 </p>
 
@@ -354,17 +354,17 @@ from inside your project's directory.
 </p>
 
 <p>
-Raise consists of a small shim script called "raise" and a directory of 
-modules called ".lib_raise". The "raise" shim is safe to save into your VCS 
-along with your source code. It is small (10kB) and should not change very often. 
-All the ".lib_raise" modules are automatically downloaded by the "raise" 
+Raise consists of a small shim script called "raise" and a directory of
+modules called ".lib_raise". The "raise" shim is safe to save into your VCS
+along with your source code. It is small (10kB) and should not change very often.
+All the ".lib_raise" modules are automatically downloaded by the "raise"
 shim. You should not check the ".lib_raise" directory into your VCS.
 </p>
 
 <p>
-If you want to check the raise modules into your VCS (So your project will 
+If you want to check the raise modules into your VCS (So your project will
 build without needing an Internet connection). You should rename the
-".lib_raise" directory to "lib_raise". This is also a good idea to do before 
+".lib_raise" directory to "lib_raise". This is also a good idea to do before
 you release your source code as a compressed file.
 </p>
 
@@ -472,13 +472,13 @@ Fully supported.
 </p>
 
 <p>
-Primarily developed on Linux with kernel 2.6 and greater. 
-Tested primarily on 
-<a href="http://ubuntu.com" target="_blank" rel="external">Ubuntu</a>, 
-<a href="http://debian.org" target="_blank" rel="external">Debian</a>, 
-<a href="http://linuxmint.com" target="_blank" rel="external">Linux Mint</a>, 
-<a href="http://fedoraproject.org" target="_blank" rel="external">Fedora</a>, and 
-<a href="http://centos.org" target="_blank" rel="external">Centos</a>. It should 
+Primarily developed on Linux with kernel 2.6 and greater.
+Tested primarily on
+<a href="http://ubuntu.com" target="_blank" rel="external">Ubuntu</a>,
+<a href="http://debian.org" target="_blank" rel="external">Debian</a>,
+<a href="http://linuxmint.com" target="_blank" rel="external">Linux Mint</a>,
+<a href="http://fedoraproject.org" target="_blank" rel="external">Fedora</a>, and
+<a href="http://centos.org" target="_blank" rel="external">Centos</a>. It should
 "just work" on other Linux distros.
 </p>
 
@@ -497,8 +497,8 @@ Not supported.
 </p>
 
 <p>
-None of the mobile OSes are supported. They either do not support the required 
-compilers, or are locked down too tightly to use. Hopefully this will change in 
+None of the mobile OSes are supported. They either do not support the required
+compilers, or are locked down too tightly to use. Hopefully this will change in
 the future.
 </p>
 
@@ -558,12 +558,12 @@ chmod +x raise
 Partially supported.
 </p>
 
-<p>Tested on 
+<p>Tested on
 <a href="http://en.wikipedia.org/wiki/Windows_XP" target="_blank" rel="external">Windows XP</a>,
-<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>, and 
+<a href="http://en.wikipedia.org/wiki/Windows_7" target="_blank" rel="external">Windows 7</a>, and
 <a href="http://en.wikipedia.org/wiki/Windows_8" target="_blank" rel="external">Windows 8</a>.
-There are still issues with 
-building and finding C/C++ libraries on Windows. It is recommended 
+There are still issues with
+building and finding C/C++ libraries on Windows. It is recommended
 that Windows users use Cygwin.
 </p>
 
@@ -588,7 +588,7 @@ Has not been tested on Windows Vista or Windows RT.
 <h2>2.9. From Trunk Installation</h2>
 
 	<p>
-		Source code can be checked out using the 
+		Source code can be checked out using the
 		<a href="http://bazaar.canonical.com/en/" target="_blank" rel="external">Bazaar VCS</a>.
 	<p>
 
@@ -668,14 +668,14 @@ Java works with OpenJDK 7.
 <h1>5. Fundamentals</h1>
 
 <p>
-Raise uses a specific format to show messages to the user. It prints what it 
-is going to do. Then when it is done, it prints an emoticon for success, 
-warning, or failure. By using this format, it should be easy for anyone to 
+Raise uses a specific format to show messages to the user. It prints what it
+is going to do. Then when it is done, it prints an emoticon for success,
+warning, or failure. By using this format, it should be easy for anyone to
 quickly tell if everything is okay or not.
 </p>
 
 <p>
-For example this prints out "Building C++ program 'main.exe' ..." when it 
+For example this prints out "Building C++ program 'main.exe' ..." when it
 starts. Then prints a "<span class="smile">:)</span>" when it is successful.
 </p>
 
@@ -687,19 +687,19 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 <h2>5.1. Emoticons</h2>
 
 	<p>
-	<span class="smile">:)</span> - A green smile represents success. This is 
-	used when a command has a return code of zero, and has nothing printed 
+	<span class="smile">:)</span> - A green smile represents success. This is
+	used when a command has a return code of zero, and has nothing printed
 	to stderr.
 	</p>
 
 	<p>
-	<span class="normal">:\</span> - A yellow half smile represents success 
-	with a warning. This is used when a command has a return code of zero, but 
+	<span class="normal">:\</span> - A yellow half smile represents success
+	with a warning. This is used when a command has a return code of zero, but
 	has something printed to stderr.
 	</p>
 
 	<p>
-	<span class="frown">:(</span> - A red frown represents failure. This is 
+	<span class="frown">:(</span> - A red frown represents failure. This is
 	used when a command has a return code that is not zero.
 	</p>
 
@@ -708,14 +708,14 @@ Building C++ program 'main.exe' ...   <span class="smile">:)</span>
 <h2>5.2. File Extensions</h2>
 
 <p>
-One of the huge issue in dealing with different platforms, is how they handle file 
+One of the huge issue in dealing with different platforms, is how they handle file
 extensions. Many have different extensions for the same type of file. For example
-Windows typically uses .exe for executable, and .obj for object. While Linux 
+Windows typically uses .exe for executable, and .obj for object. While Linux
 typically uses no extension for executable, and .o for object.
 </p>
 
 <p>
-Raise gets around this by having its own list of file extensions and mapping 
+Raise gets around this by having its own list of file extensions and mapping
 them to the native type for that Operating System.
 </p>
 
@@ -751,13 +751,13 @@ import lib_raise_process as Process
 <h2>6.1. Functions that must succeed</h2>
 
 <p>
-The fundamental way that Raise works, is that it wraps function 
-calls. It says that it is going to call a function, calls the 
+The fundamental way that Raise works, is that it wraps function
+calls. It says that it is going to call a function, calls the
 function, then prints an emoticon for success or failure.
 </p>
 
 <p>
-For example: Below the <span class="fun">Process.do_on_fail_exit</span> 
+For example: Below the <span class="fun">Process.do_on_fail_exit</span>
 function will print "Running simple_function", call the function,
 then print a smiley on success. The function output will be printed
 below the smiley.
@@ -782,9 +782,9 @@ Running that code will produce this result:
 
 <p>
 If the function <span class="fun">Process.do_on_fail_exit</span> is called
-on a function that raises an error. The function will print 
-"Running simple_function", call the function while catching the 
-exception, print the frown, then print the failure message "It failed". 
+on a function that raises an error. The function will print
+"Running simple_function", call the function while catching the
+exception, print the frown, then print the failure message "It failed".
 The function output will be printed below the failure message.
 </p>
 
@@ -810,8 +810,8 @@ Running that code will produce this result:
 <h2>6.2. Functions that may fail</h2>
 
 <p>
-If you do not want the script to exit when the function is_broken throws an 
-exception, you can use the <span class="fun">Process.do_on_fail_pass</span> 
+If you do not want the script to exit when the function is_broken throws an
+exception, you can use the <span class="fun">Process.do_on_fail_pass</span>
 function. It will ignore any exceptions raised by the functions.
 </p>
 
@@ -841,7 +841,7 @@ Running that code will produce this result:
 <h2>6.3. Commands and printing the result</h2>
 
 <p>
-If you want to run a command and have its result printed, you can use the 
+If you want to run a command and have its result printed, you can use the
 <span class="fun">Process.run_print</span> convenience function. The command
 itself will be printed, then the result of the command.
 </p>
@@ -864,7 +864,7 @@ Produces the result:
 <h2>6.4. Commands and getting the result</h2>
 
 <p>
-If you want to run a command and get its standard output, you can use the 
+If you want to run a command and get its standard output, you can use the
 <span class="fun">Process.run_and_get_stdout</span> convenience function.
 </p>
 
@@ -933,7 +933,7 @@ Effective user id: 1000
 <h2>7.2. Running as a Normal User</h2>
 
 	<p>
-	If you want to ensure that a script is run as a normal user, you can 
+	If you want to ensure that a script is run as a normal user, you can
 	use the <span class="fun">Users.require_not_root</span> function. If the
 	script is run as root, it will print an error and exit.
 	</p>
@@ -968,10 +968,10 @@ Effective user id: 1000
 <h2>7.3. Privilege Escalation</h2>
 
 	<p>
-	Often you will need do some actions as root, and others as a normal user, 
-	all in the same script. A common example is to compile a program as a 
-	normal user, then install it as root. You can do this by running the 
-	script as root, then using the function 
+	Often you will need do some actions as root, and others as a normal user,
+	all in the same script. A common example is to compile a program as a
+	normal user, then install it as root. You can do this by running the
+	script as root, then using the function
 	<span class="fun">Users.do_as_normal_user</span>
 	to temporarily step down as a normal user.
 	</p>
@@ -997,12 +997,12 @@ ${template_info['users_privilege_escalation']['output']}
 <h2>7.4. User Name</h2>
 
 	<p>
-	When running a script with a privilege escalation tool such as 
+	When running a script with a privilege escalation tool such as
 	<span class="fun">sudo</span>, you often need to get the actual user
-	name. Most python functions such as 
-	<span class="fun">getpass.getuser</span> 
+	name. Most python functions such as
+	<span class="fun">getpass.getuser</span>
 	will return 'root', because it is actually being run as root. To get
-	the actual user name, you can use the 
+	the actual user name, you can use the
 	<span class="fun">Users.get_normal_user_name</span> function.
 	</p>
 
@@ -1036,10 +1036,10 @@ Normal user name: matt
 <h2>7.5. User ID</h2>
 
 	<p>
-	When running a script with a privilege escalation tool such as 
+	When running a script with a privilege escalation tool such as
 	<span class="fun">sudo</span>, you often need to get the actual user
-	id. Most python functions such as 
-	<span class="fun">os.getuid</span> and 
+	id. Most python functions such as
+	<span class="fun">os.getuid</span> and
 	<span class="fun">os.geteuid</span> will return 0, because it is
 	actually being run as root.
 	</p>
@@ -1087,7 +1087,7 @@ import lib_raise_fs as FS
 
 	<p>
 	<span class="fun">change_dir(<span class="arg">name</span>)</span><br />
-		Uses the standard Python <span class="fun">os.chdir</span> 
+		Uses the standard Python <span class="fun">os.chdir</span>
 	function to change to the <span class="arg">name</span> directory.
 	</p>
 
@@ -1184,9 +1184,9 @@ ${template_info['fs_copy_new_file']['output']}
 <h2>8.5. Copy Dir</h2>
 	<p>
 	<span class="fun">copy_dir(<span class="arg">source</span>, <span class="arg">dest</span>, <span class="arg">symlinks</span> = False)</span><br />
-	Uses the standard Python <span class="fun">shutil.copytree</span> function to recursively copy 
+	Uses the standard Python <span class="fun">shutil.copytree</span> function to recursively copy
 	the directory from <span class="arg">source</span> to <span class="arg">dest</span>. If
-	<span class="arg">symlinks</span> is True, symlinks remail links. If symlinks is False the links 
+	<span class="arg">symlinks</span> is True, symlinks remail links. If symlinks is False the links
 	are replaced with copies of the actual data.
 	</p>
 
@@ -1210,8 +1210,8 @@ ${template_info['fs_copy_dir']['output']}
 <h2>8.6. Make Dir</h2>
 	<p>
 	<span class="fun">make_dir(<span class="arg">source</span>, <span class="arg">ignore_failure</span> = False)</span><br />
-	Uses the standard Python <span class="fun">os.mkdir</span> function to make the 
-	directory <span class="arg">source</span>. If <span class="arg">ignore_failure</span> 
+	Uses the standard Python <span class="fun">os.mkdir</span> function to make the
+	directory <span class="arg">source</span>. If <span class="arg">ignore_failure</span>
 	is False, any errors will be ignored.
 	</p>
 
@@ -1235,9 +1235,9 @@ ${template_info['fs_make_dir']['output']}
 <h2>8.7. Remove Dir</h2>
 	<p>
 	<span class="fun">remove_dir(<span class="arg">name</span>, <span class="arg">and_children</span> = False)</span><br />
-	Uses the standard Python <span class="fun">shutil.rmtree</span> function to remove the 
-	directory <span class="arg">name</span>. If <span class="arg">name</span> is the current 
-	directory, it will display an error. If <span class="arg">and_children</span> 
+	Uses the standard Python <span class="fun">shutil.rmtree</span> function to remove the
+	directory <span class="arg">name</span>. If <span class="arg">name</span> is the current
+	directory, it will display an error. If <span class="arg">and_children</span>
 	is True it will remove any child directories.
 	</p>
 
@@ -1261,8 +1261,8 @@ ${template_info['fs_remove_dir']['output']}
 <h2>8.8. Remove File</h2>
 	<p>
 	<span class="fun">remove_file(<span class="arg">name</span>, <span class="arg">ignore_failure</span> = False)</span><br />
-	Uses the standard Python <span class="fun">os.rmdir</span> function to remove the 
-	file <span class="arg">name</span>. If <span class="arg">ignore_failure</span> 
+	Uses the standard Python <span class="fun">os.rmdir</span> function to remove the
+	file <span class="arg">name</span>. If <span class="arg">ignore_failure</span>
 	is True it will ignore any errors.
 	</p>
 
@@ -1286,8 +1286,8 @@ ${template_info['fs_remove_file']['output']}
 <h2>8.9. Remove Binaries</h2>
 	<p>
 	<span class="fun">remove_binaries(<span class="arg">name</span>)</span><br />
-	Will remove any files that start with <span class="arg">name</span>, and have the 
-	extensions .exe, .o, .obj, .so, .a, .dll, .lib, .pyc, .exe.mdb, .dll.mdb, 
+	Will remove any files that start with <span class="arg">name</span>, and have the
+	extensions .exe, .o, .obj, .so, .a, .dll, .lib, .pyc, .exe.mdb, .dll.mdb,
 	.jar, .class.
 	</p>
 
@@ -1311,7 +1311,7 @@ ${template_info['fs_remove_binaries']['output']}
 <h2>8.10. Symlink</h2>
 	<p>
 	<span class="fun">symlink(<span class="arg">source</span>, <span class="arg">link_name</span>)</span><br />
-	Uses the standard Python <span class="fun">os.symlink</span> function to create a 
+	Uses the standard Python <span class="fun">os.symlink</span> function to create a
 	symlink from <span class="arg">source</span> to <span class="arg">link_name</span>.
 	</p>
 
@@ -1345,8 +1345,8 @@ import lib_raise_terminal as Terminal
 <a id="terminal_ok"></a>
 <h2>9.1. Terminal OK</h2>
 	<p>
-	If you want to print your own OK message, you can use the 
-	<span class="fun">Terminal.status</span> and 
+	If you want to print your own OK message, you can use the
+	<span class="fun">Terminal.status</span> and
 	<span class="fun">Terminal.ok</span> functions.
 	</p>
 
@@ -1369,8 +1369,8 @@ ${template_info['terminal_ok']['output']}
 <a id="terminal_warning"></a>
 <h2>9.2. Terminal Warning</h2>
 	<p>
-	If you want to print your own warning message, you can use the 
-	<span class="fun">Terminal.status</span> and 
+	If you want to print your own warning message, you can use the
+	<span class="fun">Terminal.status</span> and
 	<span class="fun">Terminal.warning</span> functions.
 	</p>
 
@@ -1393,8 +1393,8 @@ ${template_info['terminal_warning']['output']}
 <a id="terminal_fail"></a>
 <h2>9.3. Terminal Fail</h2>
 	<p>
-	If you want to print your own fail message, you can use the 
-	<span class="fun">Terminal.status</span> and 
+	If you want to print your own fail message, you can use the
+	<span class="fun">Terminal.status</span> and
 	<span class="fun">Terminal.fail</span> functions.
 	</p>
 
@@ -1428,9 +1428,9 @@ import lib_raise_python as Python
 	</code></pre>
 
 <p>
-Raise has built in functionality for finding programs, libraries, 
+Raise has built in functionality for finding programs, libraries,
 and header files. It tries to use the OSes native way of searching
-for files. If that is not available, or does not find anything, 
+for files. If that is not available, or does not find anything,
 it will fall-back to searching the file system. Raise can also include the
 version number when searching for libraries and header files.
 </p>
@@ -1488,7 +1488,7 @@ ver.micro # 0
 <a id="find_finding_programs"></a>
 <h2>10.2. Finding Programs</h2>
 	<p>
-	You can find a program, by searching for it with the 
+	You can find a program, by searching for it with the
 	<span class="fun">Find.program_paths</span> function. You can also
 	use regular expressions in the name. There is currently
 	no standard way to specify what version of the program you want to find.
@@ -1513,9 +1513,9 @@ ${template_info['find_finding_programs']['output']}
 <a id="find_requiring_programs"></a>
 <h2>10.3. Requiring Programs</h2>
 	<p>
-	You can make sure a program is installed, by using the 
-	<span class="fun">Find.require_programs</span> function. If the 
-	program is not installed, it will print an error and exit. There is 
+	You can make sure a program is installed, by using the
+	<span class="fun">Find.require_programs</span> function. If the
+	program is not installed, it will print an error and exit. There is
 	currently no way to specify what version of the program you want to require.
 	</p>
 
@@ -1563,9 +1563,9 @@ ${template_info['find_finding_libraries']['output']}
 <a id="find_requiring_libraries"></a>
 <h2>10.5. Requiring Libraries</h2>
 	<p>
-	You can make sure a library is installed, by using the 
+	You can make sure a library is installed, by using the
 	<span class="fun">Find.require_static_library</span> and
-	<span class="fun">Find.require_shared_library</span> functions. 
+	<span class="fun">Find.require_shared_library</span> functions.
 	If the library is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
@@ -1613,8 +1613,8 @@ ${template_info['find_finding_headers']['output']}
 <a id="find_requiring_headers"></a>
 <h2>10.7. Requiring Headers Files</h2>
 	<p>
-	You can make sure a header file is installed, by using the 
-	<span class="fun">Find.require_header_file</span> function. 
+	You can make sure a header file is installed, by using the
+	<span class="fun">Find.require_header_file</span> function.
 	If the header is not installed, it will print an error and exit. Optionally
 	you can use the version lambda to specify what version you want.
 	</p>
@@ -1638,8 +1638,8 @@ ${template_info['find_requiring_headers']['output']}
 <a id="find_requiring_environmental_variables"></a>
 <h2>10.8. Requiring Environmental Variables</h2>
 	<p>
-	You can search for environmental variables by using the 
-	<span class="fun">Find.require_environmental_variable</span> function. 
+	You can search for environmental variables by using the
+	<span class="fun">Find.require_environmental_variable</span> function.
 	</p>
 
 	<p>
@@ -1661,8 +1661,8 @@ ${template_info['find_requiring_environmental_variable']['output']}
 <a id="find_requiring_python_modules"></a>
 <h2>10.9. Requiring Python Modules</h2>
 	<p>
-	You can make sure Python modules are installed by using the 
-	<span class="fun">Python.require_python_modules</span> function. 
+	You can make sure Python modules are installed by using the
+	<span class="fun">Python.require_python_modules</span> function.
 	</p>
 
 	<p>
@@ -1697,7 +1697,7 @@ import lib_raise_ar as AR
 <h2>11.1. C File Extensions</h2>
 
 	<p>
-	Many C compilers/OSes use different extensions for different types of 
+	Many C compilers/OSes use different extensions for different types of
 	files. To get around this limitation, you can use the file extension for
 	the Raise rows below, and it will automatically be mapped to the OS
 	type below.
@@ -1751,7 +1751,7 @@ import lib_raise_ar as AR
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C compilers. The compiler
-		 is abstracted away in a generalized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't
 		have to worry about compiler specific functionality.
 	</p>
 
@@ -1761,7 +1761,7 @@ import lib_raise_ar as AR
 	</p>
 
 	<p>
-		You can also select the compiler specifically by using the 
+		You can also select the compiler specifically by using the
 		<span class="fun">C.c_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
@@ -1785,7 +1785,7 @@ ${template_info['c_compilers']['output']}
 <a id="c_compiler_setup"></a>
 <h2>11.3. C Compiler Setup</h2>
 	<p>
-		After the compiler is selected, it can be configured 
+		After the compiler is selected, it can be configured
 		using the properties.
 	</p>
 
@@ -1887,9 +1887,9 @@ ${template_info['c_building_program']['output']}
 <h2>11.6. C Building Library</h2>
 
 	<p>
-		C shared library can be built using the 
+		C shared library can be built using the
 		<span class="fun">C.build_shared_library</span> function. C static
-		libraries can be built using the 
+		libraries can be built using the
 		<span class="fun">AR.build_static_library</span> function.
 	</p>
 
@@ -2024,7 +2024,7 @@ import lib_raise_ar as AR
 <h2>12.1. C++ File Extensions</h2>
 
 	<p>
-	Many C++ compilers/OSes use different extensions for different types of 
+	Many C++ compilers/OSes use different extensions for different types of
 	files. To get around this limitation, you can use the file extension for
 	the Raise rows below, and it will automatically be mapped to the OS
 	type below.
@@ -2078,7 +2078,7 @@ import lib_raise_ar as AR
 
 	<p>
 		Raise supports the GCC, Clang, and MS cl.exe C++ compilers. The compiler
-		 is abstracted away in a generalized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't
 		have to worry about compiler specific functionality.
 	</p>
 
@@ -2088,7 +2088,7 @@ import lib_raise_ar as AR
 	</p>
 
 	<p>
-		You can also select the compiler specifically by using the 
+		You can also select the compiler specifically by using the
 		<span class="fun">CXX.cxx_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
@@ -2112,7 +2112,7 @@ ${template_info['cxx_compilers']['output']}
 <a id="cxx_compiler_setup"></a>
 <h2>12.3. C++ Compiler Setup</h2>
 	<p>
-		After the compiler is selected, it can be configured 
+		After the compiler is selected, it can be configured
 		using the properties.
 	</p>
 
@@ -2212,9 +2212,9 @@ ${template_info['cxx_building_program']['output']}
 <h2>12.6. C++ Building Library</h2>
 
 	<p>
-		C++ shared library can be built using the 
+		C++ shared library can be built using the
 		<span class="fun">CXX.build_shared_library</span> function. C++ static
-		libraries can be built using the 
+		libraries can be built using the
 		<span class="fun">AR.build_static_library</span> function.
 	</p>
 
@@ -2348,7 +2348,7 @@ import lib_raise_d as D
 <h2>13.1. D File Extensions</h2>
 
 	<p>
-	Many D compilers/OSes use different extensions for different types of 
+	Many D compilers/OSes use different extensions for different types of
 	files. To get around this limitation, you can use the file extension for
 	the Raise rows below, and it will automatically be mapped to the OS
 	type below.
@@ -2397,7 +2397,7 @@ import lib_raise_d as D
 
 	<p>
 		Raise supports the DMD, and LDC, D compilers (not GDC). The compiler
-		 is abstracted away in a generalized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't
 		have to worry about compiler specific functionality.
 	</p>
 
@@ -2407,7 +2407,7 @@ import lib_raise_d as D
 	</p>
 
 	<p>
-		You can also select the compiler specifically by using the 
+		You can also select the compiler specifically by using the
 		<span class="fun">D.d_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
@@ -2431,7 +2431,7 @@ ${template_info['d_compilers']['output']}
 <a id="d_compiler_setup"></a>
 <h2>13.3. D Compiler Setup</h2>
 	<p>
-		After the compiler is selected, it can be configured 
+		After the compiler is selected, it can be configured
 		using the properties.
 	</p>
 
@@ -2667,7 +2667,7 @@ import lib_raise_csharp as CS
 
 	<p>
 		Raise supports the Mono, and MS.NET C# compilers. The compiler
-		 is abstracted away in a generalized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't
 		have to worry about compiler specific functionality.
 	</p>
 
@@ -2677,7 +2677,7 @@ import lib_raise_csharp as CS
 	</p>
 
 	<p>
-		You can also select the compiler specifically by using the 
+		You can also select the compiler specifically by using the
 		<span class="fun">CS.cs_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
@@ -2701,7 +2701,7 @@ ${template_info['csharp_compilers']['output']}
 <a id="csharp_compiler_setup"></a>
 <h2>14.2. C# Compiler Setup</h2>
 	<p>
-		After the compiler is selected, it can be configured 
+		After the compiler is selected, it can be configured
 		using the properties.
 	</p>
 
@@ -2858,7 +2858,7 @@ import lib_raise_java as Java
 
 	<p>
 		Raise supports the OpenJDK 7 Java compiler. The compiler
-		 is abstracted away in a generalized way, as to make it so you don't 
+		 is abstracted away in a generalized way, as to make it so you don't
 		have to worry about compiler specific functionality.
 	</p>
 
@@ -2868,7 +2868,7 @@ import lib_raise_java as Java
 	</p>
 
 	<p>
-		You can also select the compiler specifically by using the 
+		You can also select the compiler specifically by using the
 		<span class="fun">Java.cs_compilers</span> dictionary. Be careful
 		as only compilers that were found by Raise will be in the dictionary.
 	</p>
@@ -2892,7 +2892,7 @@ ${template_info['java_compilers']['output']}
 <a id="java_compiler_setup"></a>
 <h2>15.2. Java Compiler Setup</h2>
 	<p>
-		After the compiler is selected, it can be configured 
+		After the compiler is selected, it can be configured
 		using the properties.
 	</p>
 
@@ -3046,10 +3046,10 @@ import lib_raise_process as Process
 
 	<p>
 	Raise normally runs events in serial. If you want to run events concurrently
-	 and leverage multiple CPU cores, you can use 
-	<span class="fun">Process.concurrent_start</span> and 
-	<span class="fun">Process.concurrent_end</span>. Make sure to only group 
-	the same type of events, between start and end. Otherwise it may give you 
+	 and leverage multiple CPU cores, you can use
+	<span class="fun">Process.concurrent_start</span> and
+	<span class="fun">Process.concurrent_end</span>. Make sure to only group
+	the same type of events, between start and end. Otherwise it may give you
 	unexpected results.
 	</p>
 
@@ -3118,9 +3118,9 @@ ${template_info['cpu']['output']}
 <p>
 If you choose to do development on Raise itself, there are some tools that
 can make it easier. These are located in the "tools" directory. These scripts
-are smart enough to automatically figure out the correct directories to work 
-on. So you do not need to run them from the "tools" directory. Any directory 
-will do. 
+are smart enough to automatically figure out the correct directories to work
+on. So you do not need to run them from the "tools" directory. Any directory
+will do.
 </p>
 
 <a id="tools_update_raise_in_sub_directories"></a>
@@ -3128,29 +3128,29 @@ will do.
 
 	<p>
 	If you make changes to the root "raise" file, you will want those
-	same changes to be copied to all the other directories that have 
+	same changes to be copied to all the other directories that have
 	their own "raise" file (tests, docs, and examples). Instead of having
-	to do this manually, you can use the 
+	to do this manually, you can use the
 	"tools/update_raise_in_sub_directories.py" script. It will automatically
 	look through all the sub directories and replace any files named "raise"
 	with the root "raise" file.
 	</p>
 
 	<p>
-	If you are wondering why symlinks were not used, instead of copying the 
+	If you are wondering why symlinks were not used, instead of copying the
 	"raise" file all over the place. It is because they are not supported on
 	Windows. On Windows checking out code from a Bazaar VCS fails, if there
-	is a symlink in your project. The NTFS file system does not support 
-	symlinks (And no, 
+	is a symlink in your project. The NTFS file system does not support
+	symlinks (And no,
 	<a href="http://en.wikipedia.org/wiki/NTFS_junction_point" target="_blank" rel="external">
 	NTFS Junction Points</a>
 	 won't work on a single file).
 	</p>
 
 	<p>
-	Fore more information, see this bug in Python 
+	Fore more information, see this bug in Python
 	<a href="http://bugs.python.org/issue1578269" target="_blank" rel="external">http://bugs.python.org/issue1578269</a>
-	and this bug Bazaar 
+	and this bug Bazaar
 	<a href="http://wiki.bazaar.canonical.com/WindowsSymlinkSupport" target="_blank" rel="external">http://wiki.bazaar.canonical.com/WindowsSymlinkSupport</a>
 	.
 	</p>
@@ -3166,10 +3166,10 @@ python tools/update_raise_in_sub_directories.py
 		<div id="footer">
 			Copyright &copy; 2015 <a href="#authors_and_copyright">Raise Authors</a>
 			<br />
-			Raise is licensed under 
+			Raise is licensed under
 			<a href="http://bazaar.launchpad.net/~workhorsy/raise/main/view/head:/LICENSE" target="_blank" rel="external">The MIT License</a>
 			<br />
-			This website and all documentation are licensed under 
+			This website and all documentation are licensed under
 			<a href="http://creativecommons.org/licenses/by/3.0" rel="external">The Creative Commons Attribution License v3.0</a>
 		</div>
 
@@ -3180,4 +3180,3 @@ python tools/update_raise_in_sub_directories.py
 		<script src="js/language/python.js"></script>
 	</body>
 </html>
-

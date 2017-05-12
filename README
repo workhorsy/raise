@@ -28,5 +28,5 @@ cd examples/c_simple/
 ./raise test
 
 
-// Documentation can be regenerated in the doc directory
+// Documentation can be regenerated in the docs directory
 sudo python generate_documentation.py
